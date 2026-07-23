@@ -1,0 +1,652 @@
+{
+ "id": "fourier-series",
+ "title": "Fourier Series",
+ "tagline": "Every repeating signal is a chord — here's how to read the notes.",
+ "prereqs": ["calculus"],
+ "description": "From periodic functions to the frequency domain. The one move that matters — extracting a coefficient by integrating against a basis function — gets the depth; the rest is calibrated refresher for an engineer who has seen this before.",
+ "concepts": [
+  {
+   "id": "c01-periodic",
+   "title": "Periodic functions and superposition",
+   "summary": "A function with period T repeats forever; Fourier's claim is that any reasonable one is a sum of sines and cosines at the fundamental frequency and its integer multiples.",
+   "cards": [
+    {
+     "h": "The claim",
+     "md": "A function is **periodic with period T** if f(x + T) = f(x) for all x. Sines, cosines, square waves, heartbeats, seasonal patterns — anything that repeats.\n\nFourier's 1807 claim, scandalous at the time: **any reasonable periodic function is a sum of sines and cosines** — even ones with corners and jumps, which look nothing like smooth waves.\n\n## f(x) = a₀/2 + Σₙ₌₁^∞ [aₙ cos(nωx) + bₙ sin(nωx)]\n\nwhere ω = 2π/T is the **fundamental frequency** and the n-th term — the **n-th harmonic** — completes exactly n cycles per period. Lagrange objected that a sum of smooth waves could never make a corner. He was wrong, in an interesting way (that's the Gibbs concept, ahead).\n\nYou saw this machinery in the early '70s. The plan here: sprint through what re-recognition handles, then slow down hard on the one move everything hinges on — how orthogonality lets you fish out a single coefficient."
+    },
+    {
+     "h": "Superposition: functions add like vectors",
+     "md": "Why sums? Because the systems Fourier cared about (heat flow, vibration) are **linear**: if f and g are solutions, so is any combination αf + βg. Solve for each pure sine, add up the pieces — superposition does the rest.\n\nThe load-bearing shift in viewpoint: treat functions as **vectors**. A vector in 3-space is a weighted sum of basis vectors ê₁, ê₂, ê₃. A periodic function is a weighted sum of basis *functions* — 1, cos(ωx), sin(ωx), cos(2ωx), sin(2ωx), … An infinite-dimensional space, but the same geometry.\n\nTwo questions then decide everything:\n\n1. Is this basis *orthogonal*, so components can be read off independently? (Yes — next concept.)\n2. Do the sums actually converge back to f? (Mostly yes, with one famous ~9% asterisk.)\n\nEvery coefficient formula you half-remember is just 'take the dot product with a basis vector,' dressed up in integrals."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A signal has period T = 2 ms. Its third harmonic completes how many cycles in one period, at what frequency?",
+     "options": [
+      "1 cycle, at 500 Hz",
+      "3 cycles, at 1500 Hz",
+      "3 cycles, at 500 Hz",
+      "1/3 cycle, at 167 Hz"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's the fundamental (n = 1). The n-th harmonic runs n times faster than the fundamental.",
+      "Right — fundamental is 1/T = 500 Hz; the third harmonic fits 3 full cycles per period, so 1500 Hz.",
+      "Three cycles per period means three times the fundamental frequency, not the same frequency.",
+      "Harmonics are integer *multiples* of the fundamental, never fractions — a 1/3-cycle wave wouldn't repeat with period T."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why does the Fourier recipe only use frequencies ω, 2ω, 3ω, … and not, say, 1.5ω?",
+     "options": [
+      "Non-integer multiples are too hard to integrate",
+      "A component at 1.5ω doesn't repeat with period T, so the sum would no longer be T-periodic",
+      "1.5ω terms are always zero anyway",
+      "It's a convention; any frequencies would work equally well"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The integrals are no harder — the issue is periodicity, not computability.",
+      "Right. sin(1.5ωx) needs 2T to repeat; adding it breaks the period. Only integer multiples of ω share period T.",
+      "They're not automatically zero — they're *excluded* because they'd wreck the periodicity.",
+      "Not a convention: the harmonics at nω are exactly the sinusoids that repeat every T. That set is forced."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "The whole strategy of Fourier series treats functions as vectors. What plays the role of the basis vectors?",
+     "options": [
+      "The coefficients aₙ and bₙ",
+      "The values f(x₁), f(x₂), … at sample points",
+      "The functions 1, cos(nωx), sin(nωx)",
+      "The period T and its multiples"
+     ],
+     "answer": 2,
+     "feedback": [
+      "The coefficients are the *components* along each basis direction — the weights, not the basis.",
+      "Sample values are more like coordinates in the 'standard basis' of points; Fourier's insight is to change to a smarter basis.",
+      "Right — sines and cosines are the basis directions; aₙ, bₙ are how far f extends along each one.",
+      "T sets the fundamental frequency but isn't itself a direction in function space."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "3Blue1Brown — But what is a Fourier series?",
+     "url": "https://www.youtube.com/watch?v=r6sGWTCMz2k",
+     "type": "video",
+     "note": "24 min. Rotating-vector view of superposition — drawing pictures with circles. Best single reactivation of the whole topic."
+    },
+    {
+     "label": "Falstad — Fourier series applet",
+     "url": "https://www.falstad.com/fourier/",
+     "type": "interactive",
+     "note": "Drag harmonic sliders and watch the waveform rebuild. Keep this open for the entire topic."
+    },
+    {
+     "label": "Wikipedia — Fourier series",
+     "url": "https://en.wikipedia.org/wiki/Fourier_series",
+     "type": "reading",
+     "note": "Reference formulas in every convention; the history section covers the Lagrange objection."
+    }
+   ]
+  },
+  {
+   "id": "c02-orthogonality",
+   "title": "Orthogonality: a dot product for functions",
+   "summary": "⟨f,g⟩ = ∫f(x)g(x)dx over one period acts as a dot product, and the sine/cosine family is mutually orthogonal under it — the fact the whole subject stands on.",
+   "cards": [
+    {
+     "h": "From Σ to ∫: the dot product generalizes",
+     "md": "For vectors, the dot product is a sum of products of matching components: **a·b = Σ aᵢbᵢ**. Orthogonal means it's zero.\n\nNow let the 'components' of a function be its values at every point. The sum over components becomes an integral:\n\n## ⟨f, g⟩ = ∫ f(x)g(x) dx  (over one period)\n\nThis behaves exactly like a dot product: it's linear, symmetric, and ⟨f, f⟩ = ∫f² ≥ 0 acts as squared length. Two functions are **orthogonal** when ⟨f, g⟩ = 0.\n\nDon't read this as a formal analogy — it's the literal geometry of function space. 'Perpendicular functions' means: multiply them pointwise, integrate over a period, get zero. Every projection trick you know from vectors now transfers wholesale."
+    },
+    {
+     "h": "The trig family is mutually orthogonal",
+     "md": "Over one period, say [−π, π], the basis functions are pairwise orthogonal:\n\n- ∫ sin(mx) cos(nx) dx = 0 — **always** (odd × even is odd: the integrand cancels itself)\n- ∫ cos(mx) cos(nx) dx = 0 for m ≠ n\n- ∫ sin(mx) sin(nx) dx = 0 for m ≠ n\n\nWhy do mismatched frequencies cancel? Product-to-sum: cos(mx)cos(nx) = ½[cos((m−n)x) + cos((m+n)x)]. For m ≠ n both terms are genuine oscillations, and any whole number of cosine cycles integrates to zero — equal area above and below.\n\nBut when **m = n**, the first term becomes cos(0) = 1 — a constant that *doesn't* cancel:\n\n## ∫₋π^π cos²(nx) dx = ∫₋π^π sin²(nx) dx = π\n\nThat's the whole mechanism: mismatched frequencies beat against each other and average away; a frequency multiplied by *itself* rectifies into something with a nonzero mean. Matching survives, everything else dies."
+    },
+    {
+     "h": "Why this buys you extraction",
+     "md": "Recall how you read off a component of a vector: v = v₁ê₁ + v₂ê₂ + v₃ê₃, and because the basis is orthonormal, **v·ê₂ = v₂**. The dot product with ê₂ annihilates every term except the ê₂ one.\n\nSame move in function space. Take f = a₀/2 + Σ[aₙcos(nx) + bₙsin(nx)], multiply the *whole series* by cos(3x), integrate over a period. Term by term:\n\n- every sin term dies (sin ⊥ cos, always)\n- every cos(nx) with n ≠ 3 dies (mismatched frequencies)\n- the constant dies (a cosine integrates to zero over full cycles)\n- **one term survives**: a₃ ∫cos²(3x)dx = a₃π\n\nSo ∫f(x)cos(3x)dx = a₃π, and a₃ falls out. One integral, one coefficient, no simultaneous equations — an infinite system of unknowns solved one at a time, independently.\n\nThis is the concept to actually re-own. The coefficient formulas in the next concept are not new facts to memorize; they are this projection, written out."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Without computing: ∫₋π^π sin(3x)cos(5x) dx = ?",
+     "options": [
+      "π",
+      "0, but only because 3 ≠ 5",
+      "0, because sin × cos gives an odd integrand over a symmetric interval — regardless of the frequencies",
+      "2π/15"
+     ],
+     "answer": 2,
+     "feedback": [
+      "π is what you get when a function meets *itself* — sin(3x) against sin(3x). Mismatched pairs give zero.",
+      "It is zero, but for a stronger reason: sin ⊥ cos even when m = n. ∫sin(3x)cos(3x)dx = 0 too.",
+      "Right — odd × even = odd, which integrates to zero on [−π, π]. The sine-cosine cross terms vanish for *every* m, n.",
+      "No mismatched product of basis sinusoids leaves a residue — orthogonality forces exactly zero."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "You multiply the full Fourier series of f by sin(2x) and integrate over [−π, π]. What survives, and why?",
+     "options": [
+      "Only b₂∫sin²(2x)dx = b₂π — every other term is orthogonal to sin(2x)",
+      "All the bₙ terms — sines match sines",
+      "The b₂ and a₂ terms — anything at frequency 2 survives",
+      "Nothing — you need cos to extract coefficients"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right. This is the extraction move: the integral acts as a dot product with sin(2x), and only the parallel component survives.",
+      "sin(nx) with n ≠ 2 is orthogonal to sin(2x) — mismatched frequencies beat and average to zero. Only n = 2 lives.",
+      "a₂cos(2x) dies too: sin(2x)cos(2x) = ½sin(4x), which integrates to zero. Frequency match isn't enough — phase (sin vs cos) must match as well.",
+      "Sines extract the bₙ exactly as cosines extract the aₙ. The machinery is symmetric."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "What is the deepest reason Fourier coefficients can be computed one at a time, each ignoring all the others?",
+     "options": [
+      "The series converges fast, so later terms don't matter",
+      "The basis functions are orthogonal, so each coefficient is an independent projection",
+      "Sines and cosines are bounded by 1",
+      "Integration is a linear operation"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Convergence speed is irrelevant here — the projection is exact even for slowly converging series.",
+      "Right. Orthogonality decouples the infinite system: ⟨f, basisₙ⟩ touches only coefficient n. Non-orthogonal bases would need solving all equations simultaneously.",
+      "Boundedness keeps things finite but does nothing to separate one coefficient from another.",
+      "Linearity is necessary (it lets you integrate term by term) but not sufficient — without orthogonality the cross terms wouldn't vanish."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Falstad — Fourier series applet",
+     "url": "https://www.falstad.com/fourier/",
+     "type": "interactive",
+     "note": "Set a single harmonic and multiply mentally against another — the beating-cancellation intuition, live."
+    },
+    {
+     "label": "MIT OCW 18.03SC — Unit III: Fourier Series",
+     "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/pages/unit-iii-fourier-series-and-laplace-transform/",
+     "type": "reading",
+     "note": "Session-by-session notes with the orthogonality integrals worked in full — the rigorous backstop."
+    },
+    {
+     "label": "Wikipedia — Orthogonal functions",
+     "url": "https://en.wikipedia.org/wiki/Orthogonal_functions",
+     "type": "reading",
+     "note": "The ⟨f,g⟩ = ∫fg inner product in general — Fourier's basis is one family among many (Legendre, Bessel…)."
+    }
+   ]
+  },
+  {
+   "id": "c03-coefficients",
+   "title": "Computing the coefficients",
+   "summary": "aₙ and bₙ are projections: integrate f against the matching basis function over one period, divide by the basis function's squared length. Symmetry halves the work.",
+   "cards": [
+    {
+     "h": "The formulas, and where they come from",
+     "md": "For period 2L, write f(x) = a₀/2 + Σ[aₙcos(nπx/L) + bₙsin(nπx/L)]. The extraction move from the last concept, done for every n at once:\n\n## aₙ = (1/L) ∫₋L^L f(x) cos(nπx/L) dx\n## bₙ = (1/L) ∫₋L^L f(x) sin(nπx/L) dx\n\nThe 1/L is not decoration — it's dividing by the squared length of the basis function (∫cos² over the period = L). Projection = dot product ÷ ‖basis‖².\n\nTwo conventions worth re-fixing:\n\n- **Why a₀/2?** So the aₙ formula works for n = 0 too (∫1²dx = 2L, twice the others). The constant term a₀/2 is just the **average value of f** — its DC level.\n- On [−π, π], L = π and these reduce to the (1/π)∫f cos(nx)dx you likely remember."
+    },
+    {
+     "h": "Even/odd: the symmetry shortcuts",
+     "md": "Before integrating anything, check symmetry — it can kill half the coefficients on sight.\n\n- **f even** (f(−x) = f(x)): f × sin is odd → every **bₙ = 0**. Cosines only.\n- **f odd** (f(−x) = −f(x)): f × cos is odd → every **aₙ = 0**, including the average. Sines only.\n\nMakes sense: cosines are even, sines are odd; a function can only be built from bricks that share its symmetry.\n\nAnd for the survivors, integrate over half the period and double:\n\n## f odd: bₙ = (2/L) ∫₀^L f(x) sin(nπx/L) dx\n\nOne symmetry glance can turn a page of integration into three lines. The examiners of 1973 knew this; so should the you of now."
+    },
+    {
+     "h": "Worked: the square wave",
+     "md": "The canonical example — f(x) = −1 on (−π, 0), +1 on (0, π), repeating with period 2π.\n\nf is **odd** → all aₙ = 0 instantly. For the sines:\n\nbₙ = (2/π) ∫₀^π (1)·sin(nx) dx = (2/π) · [(1 − cos(nπ))/n]\n\ncos(nπ) alternates: −1 for odd n, +1 for even n. So 1 − cos(nπ) is 2 or 0:\n\n## bₙ = 4/(nπ) for odd n,  0 for even n\n\n## f(x) = (4/π)[sin x + sin(3x)/3 + sin(5x)/5 + …]\n\nRead the result, don't just verify it:\n\n- **Only odd harmonics.** The square wave has an extra symmetry (each half-period is the negative of the previous), and even harmonics can't have it.\n- **Amplitudes fall off as 1/n** — slowly. That slow decay is the price of the jump discontinuities, a thread the next two concepts pull hard."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "f(x) = x on (−π, π), extended periodically (the sawtooth). Before computing anything, what do you know?",
+     "options": [
+      "All bₙ = 0 — cosines only",
+      "All aₙ = 0 including the average — sines only",
+      "Only that a₀ = 0",
+      "Nothing until you integrate"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's the rule for an *even* function. x is odd: x(−x)… check: f(−x) = −x = −f(x).",
+      "Right — f(x) = x is odd, so it's built purely from odd bricks: sines. Every cosine integral is odd × even = odd → zero.",
+      "True but weak — oddness kills every aₙ, not just the average.",
+      "Symmetry is exactly the thing that lets you know before integrating. Never skip the parity check."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "For the ±1 square wave, b₁ = 4/π ≈ 1.27 — the fundamental's amplitude *exceeds* the wave's own height of 1. How?",
+     "options": [
+      "It's an error — no component can exceed the signal",
+      "The higher harmonics partially cancel the fundamental's excess, flattening the peak into the plateau",
+      "The 4/π is a normalization artifact with no physical meaning",
+      "Square waves are a pathological case where Fourier fails"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Components aren't slices of the signal's height — they can overshoot as long as the others correct for it.",
+      "Right. sin(3x)/3 is *negative* near the fundamental's peak — the harmonics shave the crest and fill the shoulders to build the flat top.",
+      "4/π is the honest physical amplitude of the 1st harmonic — pass the square wave through a narrow filter at ω and that's what comes out.",
+      "Nothing pathological: the series converges to the square wave everywhere except the jump points."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A signal rides on a nonzero baseline: f(x) = 3 + (periodic wiggle averaging zero). Which coefficient captures the 3?",
+     "options": [
+      "b₀",
+      "a₁",
+      "a₀/2 — the constant term is the mean of f over a period",
+      "None — you must subtract the baseline before using Fourier"
+     ],
+     "answer": 2,
+     "feedback": [
+      "There is no b₀ — sin(0·x) = 0 identically; it can't carry anything.",
+      "a₁ is the cos(ωx) component — it oscillates and averages to zero, so it can't hold a DC level.",
+      "Right. a₀/2 = (1/2L)∫f dx = the average value. Engineers call it the DC component for exactly this reason.",
+      "No preprocessing needed — the constant basis function 1 is part of the family and soaks up the mean automatically."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "MIT OCW 18.03SC — Unit III: Fourier Series",
+     "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/pages/unit-iii-fourier-series-and-laplace-transform/",
+     "type": "reading",
+     "note": "Worked coefficient computations including the square wave and sawtooth — check your hand against theirs."
+    },
+    {
+     "label": "Falstad — Fourier series applet",
+     "url": "https://www.falstad.com/fourier/",
+     "type": "interactive",
+     "note": "Select 'Square' and watch the 4/π, 0, 4/3π, 0, … pattern appear in the coefficient bars you just derived."
+    }
+   ]
+  },
+  {
+   "id": "c04-convergence",
+   "title": "Convergence and the Gibbs phenomenon",
+   "summary": "At a jump the series converges to the midpoint, and partial sums forever overshoot by ~9% of the jump — the spike narrows but never shrinks.",
+   "cards": [
+    {
+     "h": "Where the series lands",
+     "md": "Does the infinite sum actually equal f? For any piecewise-smooth function (finitely many jumps and corners per period — every signal you'll meet), the **Dirichlet conditions** settle it:\n\n- At every point where f is continuous: the series converges to **f(x)**. ✓\n- At a jump: the series converges to the **midpoint** of the jump — (f(x⁻) + f(x⁺))/2 — *regardless of what value you assigned f at that point*.\n\nThe midpoint rule isn't arbitrary. The series is built from symmetric, democratic ingredients; asked to pick a value inside a jump it has no basis to favor either side, so it splits the difference.\n\nCheck it on the square wave at x = 0: every term sin(n·0) = 0, so the series says f(0) = 0 — exactly halfway between −1 and +1."
+    },
+    {
+     "h": "Gibbs: the overshoot that never dies",
+     "md": "Now the famous asterisk. Truncate the square-wave series at N terms and plot it. Near each jump the partial sum **overshoots** — a spike past the true level, then a decaying ripple.\n\nThe natural expectation: more terms → smaller overshoot. **False.** As N grows:\n\n- the spike gets **narrower** (it hugs the jump ever more tightly),\n- but its **height converges to ≈ 8.9% of the jump size** — and stays there. Forever.\n\nFor the ±1 square wave (jump of 2), the partial sums keep peaking near 1.18 no matter how many thousands of terms you add.\n\nThe number is universal: (1/π)∫₀^π (sin t)/t dt ≈ 1.0895 of the half-jump — the Wilbraham–Gibbs constant. Every jump discontinuity, any function, same 9%."
+    },
+    {
+     "h": "How 'converges' and 'overshoots forever' coexist",
+     "md": "Sounds like a contradiction: the series converges at every point, yet the overshoot never shrinks?\n\nResolution: the spike doesn't sit still — it **migrates toward the jump** as N grows. Pick any fixed x near the jump: eventually the spike moves inside your position, and the partial sums at *your* x settle down to f(x). Pointwise, all is well. But at every stage there is always *some* x (ever closer to the jump) currently under the spike.\n\nThis is the textbook gap between **pointwise** convergence (each fixed x eventually behaves) and **uniform** convergence (the worst error over all x goes to zero). Fourier series of discontinuous functions converge pointwise, never uniformly.\n\nThis isn't an academic curiosity. Truncating a spectrum is what every band-limited channel, every low-pass filter, every JPEG does — and Gibbs is the **ringing** at sharp edges that engineers have fought ever since: pre-echo in audio, halos at image edges. Lagrange was almost right — the corner is achieved only in the limit, and the 9% ghost of his objection haunts every finite approximation."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A periodic f has f(x⁻) = 2 and f(x⁺) = 6 at a jump, and the textbook defines f(x) = 6 there. The Fourier series at x converges to:",
+     "options": [
+      "6 — the defined value",
+      "2 — the left limit",
+      "4 — the midpoint of the jump",
+      "It diverges at jump points"
+     ],
+     "answer": 2,
+     "feedback": [
+      "The series never sees the single-point definition — changing f at one point changes no integral, hence no coefficient.",
+      "The series is symmetric between the two sides; it has no reason to favor the left.",
+      "Right: (2 + 6)/2 = 4. The coefficients only know f through integrals, and integrals can't distinguish single-point values.",
+      "It converges fine at jumps — just to the midpoint rather than either side."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "You sum 10,000 terms of the square-wave series instead of 100. What happens to the Gibbs overshoot near the jump?",
+     "options": [
+      "Its height shrinks toward zero — that's what convergence means",
+      "It narrows, but its height still approaches ~9% of the jump",
+      "It grows without bound",
+      "It disappears exactly at N = 1/(jump size)"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The seductive wrong answer — pointwise convergence does NOT force the peak down; it only forces the spike to migrate toward the jump.",
+      "Right. Height → the Wilbraham–Gibbs level (≈ 1.18 for a ±1 wave), width → 0. More terms buy narrowness, never a shorter spike.",
+      "It's bounded — the overshoot converges to the ~9% level from whichever side, it doesn't blow up.",
+      "There's no magic N; the overshoot persists at every finite truncation."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A digital scope shows ripples ('ringing') just before and after each edge of a measured square pulse. The Fourier explanation:",
+     "options": [
+      "The instrument's bandwidth truncates the spectrum — a partial Fourier sum, so Gibbs oscillation appears at the jumps",
+      "Electrical noise happens to concentrate at edges",
+      "The pulse itself physically rings; the scope is faithful",
+      "Aliasing from sampling too slowly"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right. Finite bandwidth = keeping only harmonics below a cutoff = a truncated Fourier series — and truncation at a jump manufactures the Gibbs ripple.",
+      "Noise is broadband and random; Gibbs ringing is deterministic, symmetric, and always pinned to the discontinuities.",
+      "Possible in some circuits, but the universal edge-ripple on band-limited instruments is the mathematics of truncation, present even with a perfect source.",
+      "Aliasing folds high frequencies into wrong low ones — a different artifact. Ringing at edges is the signature of a chopped spectrum."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Wikipedia — Gibbs phenomenon",
+     "url": "https://en.wikipedia.org/wiki/Gibbs_phenomenon",
+     "type": "reading",
+     "note": "The animated partial sums are worth the visit alone; the formal statement of the 8.9% constant."
+    },
+    {
+     "label": "Falstad — Fourier series applet",
+     "url": "https://www.falstad.com/fourier/",
+     "type": "interactive",
+     "note": "Square wave, then drag the number-of-terms slider: watch the spike narrow while its height refuses to drop."
+    }
+   ]
+  },
+  {
+   "id": "c05-complex",
+   "title": "The complex form",
+   "summary": "cₙ = (1/2π)∫f(x)e^(−inx)dx repackages each (aₙ, bₙ) pair into one complex number holding amplitude and phase. Bookkeeping, not new mathematics.",
+   "cards": [
+    {
+     "h": "Euler consolidates the basis",
+     "md": "Euler's formula, e^(iθ) = cos θ + i sin θ, runs both ways:\n\ncos(nx) = (e^(inx) + e^(−inx))/2   sin(nx) = (e^(inx) − e^(−inx))/(2i)\n\nSubstitute into the series and regroup by exponentials. The three families (constant, cosines, sines) collapse into **one**:\n\n## f(x) = Σₙ₌₋∞^∞ cₙ e^(inx)\n## cₙ = (1/2π) ∫₋π^π f(x) e^(−inx) dx\n\nOne formula, indexed over all integers — negative n included. Orthogonality becomes a single clean statement: ∫e^(imx)e^(−inx)dx = 0 unless m = n (then 2π). The extraction move survives intact: multiply by e^(−inx), integrate, one term lives."
+    },
+    {
+     "h": "Bookkeeping, not new math",
+     "md": "Nothing new was learned about f — the information was repackaged. The dictionary:\n\n- **c₀ = a₀/2** — still the average\n- **cₙ = (aₙ − i·bₙ)/2** for n > 0\n- **c₋ₙ = (aₙ + i·bₙ)/2 = c̄ₙ** (complex conjugate) when f is real\n\nTwo real sequences became one complex sequence with a symmetry constraint. Same degrees of freedom, zero new content.\n\nWhy bother? The complex form is where the *useful* structure lives:\n\n- **|cₙ| = ½√(aₙ² + bₙ²)** — half the amplitude of harmonic n\n- **arg(cₙ)** — its phase\n\nAmplitude-and-phase is how engineers actually think about harmonics, and a single complex number carries both. Bonus: differentiation becomes multiplication — d/dx turns cₙ into in·cₙ. That one-liner (derivatives → multiplication by frequency) is why the complex form owns signal processing and PDE-solving alike."
+    },
+    {
+     "h": "What negative frequency means",
+     "md": "The index n now runs over negative integers — is something spinning backward?\n\nFor a real signal: no physics, pure bookkeeping. e^(inx) is a phasor rotating counterclockwise; e^(−inx) rotates clockwise. A real cosine is the *sum of both*:\n\ncos(nx) = ½e^(inx) + ½e^(−inx)\n\nTwo counter-rotating phasors whose imaginary parts cancel at every instant — that's the only way to build a purely real oscillation out of complex exponentials. The negative-frequency coefficient c₋ₙ = c̄ₙ carries no independent information; it's the mirror half that keeps the sum real.\n\nSo when a spectrum plot shows symmetric spikes at ±n: that's one physical oscillation, drawn in a basis that splits it into two rotations. (For genuinely complex signals — I/Q data in radio, analytic signals — the two sides *do* become independent. Same formalism, more room.)"
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "f is a real signal with c₅ = 0.3 − 0.4i. What is c₋₅?",
+     "options": [
+      "0.3 + 0.4i — the complex conjugate",
+      "−0.3 + 0.4i — the negative",
+      "0.3 − 0.4i — the same value",
+      "Undetermined without more information"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right — realness of f forces c₋ₙ = c̄ₙ. The negative side of the spectrum is the conjugate mirror of the positive side.",
+      "That's −c₅; the reality constraint conjugates, it doesn't negate. The imaginary parts must cancel in the sum, not the whole coefficients.",
+      "Equal coefficients would make the sine parts add instead of cancel — the imaginary content of f wouldn't vanish.",
+      "It IS determined: for real f the two halves of the spectrum are locked together by conjugate symmetry."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Does the complex form encode information about f that the aₙ, bₙ form misses?",
+     "options": [
+      "Yes — the phases arg(cₙ) are new information",
+      "Yes — negative frequencies add content",
+      "No — cₙ = (aₙ − i·bₙ)/2 is an invertible repackaging; same information, tighter notation",
+      "No — but only for even functions"
+     ],
+     "answer": 2,
+     "feedback": [
+      "The phase was always there — hidden in the *ratio* of bₙ to aₙ (a cos + b sin = A cos(nx − φ)). The complex form displays it; it doesn't create it.",
+      "For real f, c₋ₙ is fully determined by cₙ — the negative side is a mirror, not a new channel.",
+      "Right. It's a change of coordinates in coefficient space: two reals (aₙ, bₙ) ↔ one complex cₙ. Bookkeeping, chosen because algebra (especially d/dx → ×in) gets dramatically cleaner.",
+      "The equivalence holds for every function, even or not — parity affects which coefficients vanish, not the translatability."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "In the complex form, what happens to the Fourier coefficients when you differentiate f?",
+     "options": [
+      "cₙ → cₙ/(in) — differentiation divides by frequency",
+      "cₙ → in·cₙ — each harmonic is multiplied by its frequency (times i)",
+      "The coefficients are unchanged; only the basis changes",
+      "You must recompute all integrals from scratch"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Dividing by in is *integration* — the inverse operation. Differentiation amplifies high frequencies, so it must multiply by n, not divide.",
+      "Right: d/dx e^(inx) = in·e^(inx), so each coefficient just picks up a factor of in. Calculus becomes algebra — the core reason PDEs surrender to Fourier methods.",
+      "The basis functions e^(inx) are eigenfunctions of d/dx — the basis survives; the coefficients are what change (by the eigenvalue in).",
+      "That's exactly the labor the complex form abolishes: differentiate term by term, and each term is trivial."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Better Explained — An Interactive Guide to the Fourier Transform",
+     "url": "https://betterexplained.com/articles/an-interactive-guide-to-the-fourier-transform/",
+     "type": "reading",
+     "note": "The circular-path/phasor intuition for e^(iωt), with interactive widgets — makes negative frequency feel inevitable."
+    },
+    {
+     "label": "Wikipedia — Fourier series (exponential form)",
+     "url": "https://en.wikipedia.org/wiki/Fourier_series",
+     "type": "reading",
+     "note": "The aₙ,bₙ ↔ cₙ dictionary laid out precisely — keep it open while doing the conversions once by hand."
+    }
+   ]
+  },
+  {
+   "id": "c06-spectrum",
+   "title": "The spectrum view of signals",
+   "summary": "The coefficients ARE the signal, re-described: |cₙ| against n is its spectrum. Smoothness in time is decay in frequency — sharp edges demand strong high harmonics.",
+   "cards": [
+    {
+     "h": "Two portraits of one signal",
+     "md": "You now hold two complete descriptions of any periodic signal:\n\n- **Time domain**: f(x) — its value at every instant\n- **Frequency domain**: the list of coefficients — how much of each harmonic it contains\n\nNeither is more real. The **spectrum** — amplitude Aₙ = √(aₙ² + bₙ²) (or 2|cₙ|) plotted against n — is the frequency-domain portrait.\n\nRead the square wave's spectrum: bars at n = 1, 3, 5, 7… with heights (4/π)·(1, 1/3, 1/5, 1/7…). Silence at even n. That bar chart *is* the square wave, as completely as its graph is.\n\nThe physical meaning of bar n is concrete: pass the signal through a filter that keeps only frequency n·f₀, and a sine of exactly that amplitude and phase comes out. A prism does this to light; a cochlea does it to sound; a spectrum analyzer does it to anything. Your ear literally hears the spectrum, not the waveform — which is why a violin and a flute playing the same A₄ sound different: same fundamental, different bar heights."
+    },
+    {
+     "h": "Sharp edges are expensive",
+     "md": "Why does the square wave need harmonics all the way up, and why do they fade so slowly (1/n)?\n\nA harmonic at frequency n can't change faster than its own oscillation. To build a **jump** — an instantaneous change — no finite collection of speed-limited waves suffices; you need contributions from arbitrarily high frequencies, and lots of them.\n\nThe general law: **smoothness in time ⇔ decay rate in frequency.**\n\n- Jump discontinuity → coefficients ~ 1/n (square wave, sawtooth)\n- Continuous but kinked → ~ 1/n² (triangle wave)\n- Each additional continuous derivative buys one more power of 1/n\n- Infinitely smooth → decay faster than any power\n\nThis is a diagnostic you can run in both directions: see a spectrum falling as 1/n², and you know the waveform has corners but no jumps — without ever seeing it. And it prices things: sharp edges cost bandwidth. A crisp pulse over a narrow channel is a contradiction; every communication system lives inside that constraint."
+    },
+    {
+     "h": "Parseval: energy is conserved across the views",
+     "md": "The two portraits agree about energy. **Parseval's theorem**:\n\n## (1/2π) ∫₋π^π |f(x)|² dx = Σₙ₌₋∞^∞ |cₙ|²\n\nThe mean power of the signal equals the sum of the powers of its harmonics. Changing basis rotated the vector; orthogonality means nothing leaked and nothing double-counted — it's the Pythagorean theorem in function space (‖v‖² = Σ components², in any orthonormal basis).\n\nThis makes the spectrum an **energy budget**. For the square wave, the fundamental alone carries (4/π)²/2 ≈ 0.81 of the unit power — 81%. Fundamental plus third harmonic: ~90%. The infinite tail of higher harmonics splits the last few percent — which is exactly why a low-pass-filtered square wave still looks recognizably square (Gibbs ripple aside): most of the *energy* was in the low bars all along, even though the *sharpness* lived in the high ones."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "In the ±1 square wave's spectrum, the bar at n = 5 has height 4/5π. What does that number physically mean?",
+     "options": [
+      "The signal spends 4/5π of its time at frequency 5f₀",
+      "A filter passing only 5f₀ would output a sine of amplitude 4/5π",
+      "The square wave's value at x = 5",
+      "The probability that the signal contains frequency 5f₀"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Signals don't take turns being frequencies — all harmonics are present simultaneously, at all times.",
+      "Right — the coefficient is the literal amplitude of the sinusoid you'd extract with an ideal narrowband filter at 5f₀. Measurable on a bench.",
+      "The spectrum's axis is frequency index n, not position x. The two portraits have different axes entirely.",
+      "Nothing probabilistic here — the harmonic content is deterministic and exact."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Signal A's coefficients decay like 1/n; signal B's like 1/n³. Without seeing either waveform, what can you say?",
+     "options": [
+      "A is smoother than B",
+      "B has jump discontinuities; A doesn't",
+      "A has jumps; B is continuous with at least a continuous first derivative — B is markedly smoother",
+      "Nothing — decay rate and smoothness are unrelated"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Backwards — slower decay means more high-frequency content, which means *less* smooth. 1/n is the roughest of the standard decays.",
+      "Reversed: 1/n decay is the fingerprint of jumps. B's fast decay rules jumps out.",
+      "Right. 1/n ⇒ jumps (square/sawtooth class); 1/n³ ⇒ continuous, with continuous f′ as well. The decay exponent is a smoothness meter you can read off a spectrum analyzer.",
+      "They're tightly coupled — smoothness in time IS decay in frequency; that equivalence is the concept's core law."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "You low-pass a square wave, keeping only harmonics 1 and 3. Per Parseval, the output retains ~90% of the power. What did the missing 10% mostly carry?",
+     "options": [
+      "The signal's average level",
+      "The edges — the sharpness of the transitions",
+      "The fundamental pitch",
+      "Nothing important; the last 10% is noise"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The average is c₀ (zero here anyway) and passes any low-pass filter untouched.",
+      "Right — high harmonics contribute little energy but ALL the fast structure. The output is recognizably square-ish yet visibly rounded at the transitions. Energy lives low; sharpness lives high.",
+      "The pitch is harmonic 1 — kept, and carrying 81% of the power by itself.",
+      "It's not noise — it's exactly the deterministic high-frequency content that built the edges. Lose it and the edges slump."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Falstad — Fourier series applet",
+     "url": "https://www.falstad.com/fourier/",
+     "type": "interactive",
+     "note": "The applet's bar display IS the spectrum. Zero out bars above n = 3 by hand and watch the edges slump — q3, live."
+    },
+    {
+     "label": "3Blue1Brown — But what is a Fourier series? (lesson page)",
+     "url": "https://www.3blue1brown.com/lessons/fourier-series",
+     "type": "reading",
+     "note": "The written version of the video — the drawing-with-circles construction is the spectrum view made kinetic."
+    },
+    {
+     "label": "Wikipedia — Parseval's theorem",
+     "url": "https://en.wikipedia.org/wiki/Parseval%27s_theorem",
+     "type": "reading",
+     "note": "The precise statement across conventions — worth a skim so factor-of-2π placements never surprise you."
+    }
+   ]
+  },
+  {
+   "id": "c07-transform",
+   "title": "Toward the Fourier transform",
+   "summary": "Let the period grow without bound: harmonic spacing shrinks to zero, the discrete spectrum melts into a continuous one, and the series becomes the Fourier transform.",
+   "cards": [
+    {
+     "h": "The problem with T = ∞",
+     "md": "Fourier series demand periodicity — but a single voltage spike, a lone pulse, a one-off transient never repeats. How do you take the spectrum of something that happens once?\n\nThe trick: a non-repeating signal is a periodic signal whose **period is infinite**. So take a pulse, pretend it repeats every T, compute the series, and watch what happens as T → ∞.\n\nThe harmonics sit at frequencies n·(2π/T) — spaced **Δω = 2π/T apart**. As T grows:\n\n- T = 1 s → lines every 2π rad/s\n- T = 1 hour → lines packed 3600× tighter\n- T → ∞ → the lines **merge into a continuum**\n\nThe discrete bar chart of cₙ melts into a smooth curve over all frequencies. Every frequency now participates, not just integer multiples of a fundamental — because with no repetition, there is no fundamental."
+    },
+    {
+     "h": "The limit, and the pair",
+     "md": "Chase the limit carefully (each cₙ shrinks like 1/T, so track T·cₙ — a *density* per unit frequency) and the series pair becomes the **transform pair**:\n\n## F(ω) = ∫₋∞^∞ f(x) e^(−iωx) dx\n## f(x) = (1/2π) ∫₋∞^∞ F(ω) e^(iωx) dω\n\nNothing structurally new — inspect the anatomy:\n\n- F(ω) is the cₙ formula with the discrete n·ω₀ replaced by a continuous ω: still *the dot product of f against a complex exponential* — the same extraction move from concept 2, now asked at every real frequency.\n- The reconstruction is the series with Σ → ∫: superpose the basis functions, weighted by their coefficients.\n\nEverything you built transfers: conjugate symmetry for real signals, d/dx → ×iω, Parseval (∫|f|² ∝ ∫|F|²), smoothness ⇔ decay. One new headline: **a narrow pulse has a wide spectrum, and vice versa** — sharpness in time and concentration in frequency are enemies. Pushed to the limit, that trade-off is the uncertainty principle."
+    },
+    {
+     "h": "Where this goes",
+     "md": "You're standing at a three-way junction:\n\n**PDEs** (your next topic, and the one you solved in '73-'74): separation of variables turns the heat and wave equations into ODEs *per harmonic* — Fourier coefficients evolve independently because e^(inx) are eigenfunctions of d²/dx². Fourier invented the series for exactly this. The heat equation's answer: harmonic n decays like e^(−n²kt) — high frequencies die fastest, which is why sharp temperature profiles blur smooth. Diffusion is a low-pass filter.\n\n**Computation**: sample the signal and the transform becomes the DFT — computable for N points in N log N steps by the **FFT** (Cooley-Tukey, 1965 — it arrived after your coursework, and it's why the frequency domain went from theory to the default engineering habitat). Every audio codec, image compressor, and spectrum analyzer runs on it.\n\n**The habit of mind**: 'what does this look like in the frequency domain?' is a permanent addition to the toolkit — filtering is multiplication, convolution collapses, cycles hiding in noisy series show themselves. Whenever a problem involves anything that repeats, oscillates, or diffuses, change basis first and ask again."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "As the assumed period T of a signal grows, the spacing between adjacent harmonics in its spectrum:",
+     "options": [
+      "Grows proportionally to T",
+      "Shrinks as 2π/T, so the spectral lines crowd toward a continuum",
+      "Stays fixed — spacing depends only on the signal's shape",
+      "Oscillates depending on the harmonics present"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Inverted — a *longer* period means a *lower* fundamental, hence lines packed closer, not farther.",
+      "Right. Δω = 2π/T → 0 as T → ∞. The continuum limit of that crowding is exactly the Fourier transform.",
+      "Spacing is set purely by the period (Δω = 2π/T), not by the waveform within it — shape sets the heights, period sets the grid.",
+      "The grid of possible frequencies is rigid at multiples of 2π/T; only the amplitudes on the grid depend on the shape."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "In the T → ∞ limit, the Fourier coefficient cₙ corresponds to what feature of the transform F(ω)?",
+     "options": [
+      "F(ω) is a density: cₙ ≈ F(nω₀)·Δω/2π — coefficient per sliver of frequency, not a value at a point",
+      "F(ω) equals cₙ exactly at integer ω",
+      "F(ω) is the derivative of cₙ",
+      "There is no relationship; the transform is a separate theory"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right — each cₙ shrinks like 1/T, so the honest limit object is amplitude *per unit frequency*: a density, like mass giving way to mass-density for a continuous rod.",
+      "cₙ → 0 individually as T grows; F(ω) stays finite precisely because it's the rescaled (×T) version — they can't be equal.",
+      "No differentiation is involved in the passage — it's a rescale-and-refine limit, the same one that turns Riemann sums into integrals.",
+      "The transform IS the series' limit — same extraction integral, same reconstruction, with Σ ripened into ∫."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A 1 μs pulse and a 1 s pulse of the same shape: which has the wider spectrum, and why?",
+     "options": [
+      "The 1 s pulse — more signal, more frequencies",
+      "The 1 μs pulse — compressing in time stretches in frequency; fast features demand high-frequency content",
+      "Both the same — spectrum width depends only on pulse shape",
+      "Neither has a spectrum — single pulses aren't periodic"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Duration adds energy, not bandwidth — the long, slow pulse is built comfortably from low frequencies alone.",
+      "Right — time-scaling by a reciprocally scales the spectrum by 1/a. It's the c06 lesson (sharp = high-frequency) in transform clothing, and the seed of the uncertainty principle.",
+      "Shape sets the spectrum's *profile*; the time-scale sets its *width*. Squeeze one domain and the other bulges — that trade is inescapable.",
+      "Escaping periodicity was this concept's whole point: the transform assigns a (continuous) spectrum to any finite-energy one-off signal."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "3Blue1Brown — But what is the Fourier transform?",
+     "url": "https://www.youtube.com/watch?v=spUNpyF58BY",
+     "type": "video",
+     "note": "20 min. The winding-frequency visual for F(ω) — the series-to-transform bridge, animated."
+    },
+    {
+     "label": "Better Explained — An Interactive Guide to the Fourier Transform",
+     "url": "https://betterexplained.com/articles/an-interactive-guide-to-the-fourier-transform/",
+     "type": "reading",
+     "note": "The 'smoothie → recipe' framing with interactive decompositions — plain-language consolidation before the PDEs topic."
+    },
+    {
+     "label": "Wikipedia — Fourier transform",
+     "url": "https://en.wikipedia.org/wiki/Fourier_transform",
+     "type": "reading",
+     "note": "Reference for the transform pair, convention zoo, and the properties table (shift, scale, derivative, convolution)."
+    }
+   ]
+  }
+ ]
+}

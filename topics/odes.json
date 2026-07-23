@@ -1,0 +1,789 @@
+{
+ "id": "odes",
+ "title": "Ordinary Differential Equations",
+ "tagline": "Laws of change, and the functions that obey them.",
+ "description": "A refresher ladder for someone who once knew this cold. The mechanics you'll re-recognize are compressed to worked reminders; the depth goes where the half-memories are — where the integrating factor comes from, what the discriminant says physically, why the Wronskian matters, how to read a phase portrait, and why Euler drifts while RK4 doesn't.",
+ "prereqs": ["calculus"],
+ "concepts": [
+  {
+   "id": "c01-what-an-ode-says",
+   "title": "What an ODE says",
+   "summary": "A differential equation's unknown is a function; the equation is a local law relating the function to its own derivatives. Solutions form families; initial conditions pick one member.",
+   "cards": [
+    {
+     "h": "The unknown is a function",
+     "md": "An algebraic equation asks for a *number*: x² = 4, so x = ±2. A **differential equation** asks for a *function* — one whose relationship with its own derivatives satisfies a stated law.\n\ndy/dt = ky says: find every function whose rate of change is proportional to its current value. The answer, y = Ce^(kt), isn't a number — it's a whole family of curves, one per C.\n\nAnd you verify a candidate exactly the way you did in 1974: differentiate and substitute. y = Ce^(kt) gives y′ = kCe^(kt) = ky — it checks. No technique in this topic outranks that check, because it *is* the definition of 'solution.' Every method you'll refresh here is just a way of producing functions that survive it."
+    },
+    {
+     "h": "An ODE is a slope field",
+     "md": "Read dy/dt = f(t, y) as a machine: **at every point (t, y) of the plane, the equation dictates the slope a solution must have there.** Draw a small dash with that slope at each grid point and you have a **slope field**.\n\nA solution is any curve that flows with the dashes — tangent to the field everywhere. Before solving anything symbolically, you can *see* the whole family: where solutions climb, level off, or funnel together.\n\nTwo payoffs worth carrying through this ladder:\n\n- Most ODEs met in practice have **no closed-form solution**. The slope field — and its numerical cousins in concept 8 — still deliver everything qualitative.\n- Through each point passes exactly **one** solution curve (for reasonably smooth f). That uniqueness is why an initial condition buys you a single prediction — and why, later, trajectories in a phase portrait can never cross."
+    },
+    {
+     "h": "Order, constants, initial conditions",
+     "md": "The **order** of an ODE is the highest derivative appearing. Each layer of differentiation you'd have to undo contributes one arbitrary constant:\n\n- 1st order → one constant → one condition pins it: y(0) = y₀\n- 2nd order → two constants → two conditions: for a spring, initial *position and* initial *velocity*\n\nConstants still free: the **general solution**. Conditions applied: a **particular solution**.\n\nThe physical reading is the part to keep in front of you. Newton's second law, F = ma, is a 2nd-order ODE — which is *why* predicting a projectile takes both where it starts and how fast it's moving. The math's bookkeeping (n constants for order n) is the physics' bookkeeping (n independent facts about the initial state). When a model demands more initial data than you expected, it's telling you about the order of the underlying law."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "How do you verify that y = 5e^(2t) − 3 solves y′ = 2y + 6?",
+     "options": [
+      "Check that y(0) has the right value",
+      "Differentiate y, substitute both y′ and y into the equation, and confirm the two sides agree identically",
+      "Solve the equation from scratch and compare answers",
+      "Confirm the equation is first order"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A single point can't confirm a function-level identity — the equation must hold at every t, not just t = 0.",
+      "Right: y′ = 10e^(2t) and 2y + 6 = 10e^(2t). Substitution is the definition of 'solution' — and it's always available, even when solving isn't.",
+      "Works when you can solve, but the whole point of the check is that it needs no solving technique at all.",
+      "Order tells you how many conditions you need; it says nothing about whether this candidate satisfies the law."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "In a slope field for dy/dt = f(t, y), the dash drawn at a point represents:",
+     "options": [
+      "The value of the solution at that point",
+      "The slope any solution passing through that point is required to have",
+      "The direction time flows",
+      "The second derivative of the solution"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The field shows rates, not values — the solution's value is the point's own y-coordinate.",
+      "Right. The ODE is a local law: it prescribes the slope everywhere, and solutions are curves that obey it everywhere.",
+      "Time flows along the horizontal axis regardless; the dash encodes dy/dt, the law itself.",
+      "Second derivatives would need a second-order equation; a first-order field prescribes first derivatives only."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A mass on a spring obeys a 2nd-order ODE. To predict its motion uniquely you must supply:",
+     "options": [
+      "Its initial position only",
+      "The spring constant only",
+      "Its initial position and initial velocity",
+      "Any single measurement made at any time"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Released from the same spot moving versus at rest gives different futures — position alone underdetermines the motion.",
+      "The spring constant is part of the equation itself, not of the initial state; it can't select among the solution family.",
+      "Right: order 2 means two free constants, so two independent facts about the initial state. That's the physics of the bookkeeping.",
+      "One measurement pins one constant; a 2nd-order family has two."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "3Blue1Brown — Differential equations, a tourist's guide",
+     "url": "https://www.youtube.com/watch?v=p_di4Zn4wz4",
+     "type": "video",
+     "note": "27 min. The whole subject's landscape — slope fields, phase space, and why exact solutions are the exception. The ideal reorientation after 50 years."
+    },
+    {
+     "label": "Paul's Online Math Notes — Definitions and basic concepts",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/Definitions.aspx",
+     "type": "reading",
+     "note": "Order, linearity, general vs particular solutions — the vocabulary of this concept, tersely."
+    },
+    {
+     "label": "Khan Academy — Differential equations",
+     "url": "https://www.khanacademy.org/math/differential-equations",
+     "type": "interactive",
+     "note": "Practice problems with worked solutions when you want more reps than the checkpoints give."
+    }
+   ]
+  },
+  {
+   "id": "c02-separable",
+   "title": "Separable equations",
+   "summary": "If dy/dx = g(x)h(y), split the variables and integrate both sides. The technique you remember — plus the two snags worth re-learning: lost equilibrium solutions and finite-time blowup.",
+   "cards": [
+    {
+     "h": "The move, once",
+     "md": "You'll re-recognize this in a heartbeat. If the equation factors as dy/dx = g(x)·h(y), herd the y's left and the x's right, then integrate both sides:\n\n## ∫ dy/h(y) = ∫ g(x) dx\n\nWorked, at speed: dy/dx = xy\n\n- dy/y = x dx\n- ln|y| = x²/2 + C\n- y = A·e^(x²/2)  (A = ±e^C swallows the constant and the absolute value)\n\nThe 'multiply both sides by dx' step that felt like cheating in 1973 still isn't an algebra of infinitesimals — it's shorthand for integration by substitution, and it unwinds rigorously every time for separable equations. Use the shorthand freely; it never lies here.\n\nRecognition is the real skill: y′ = e^(x+y) separates (it's eˣ·e^y); y′ = x + y does not — no factoring will split a sum. Sums of x-stuff and y-stuff are the classic non-separable tell, and they're exactly what the next concept handles."
+    },
+    {
+     "h": "The two snags worth re-learning",
+     "md": "**Lost solutions.** Dividing by h(y) silently assumes h(y) ≠ 0 — so every root of h(y) = 0 is a constant solution the algebra threw away. In dy/dx = xy, the discarded y ≡ 0 happens to be recovered by A = 0. But solve dy/dx = y² and you get y = −1/(x + C) — and y ≡ 0 is *not* in that family for any C. Check h(y) = 0 separately, every time; those constant solutions are the equilibria that concept 7 is built on.\n\n**Finite-time blowup.** Take dy/dx = y² with y(0) = 1: the solution is y = 1/(1 − x), which escapes to infinity as x → 1. Not gradually — the solution simply *ceases to exist* at finite x. Nonlinear equations can do this; linear ones never can. When a feedback model is superlinear (growth rate rising faster than the quantity itself), 'the solution exists' carries an expiration date — and that's a modeling conclusion about the system, not a mathematical curiosity."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Separate and integrate dy/dx = y·cos x. The general solution is:",
+     "options": [
+      "y = A·e^(sin x)",
+      "y = sin x + C",
+      "y = A·e^(cos x)",
+      "y = A·cos x"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right: dy/y = cos x dx gives ln|y| = sin x + C, so y = A·e^(sin x). Differentiate to confirm: y′ = y·cos x.",
+      "That drops the y on the right side — you integrated cos x but forgot the dy/y on the left produces a logarithm.",
+      "The antiderivative of cos x is sin x, not cos x — check by differentiating your exponent.",
+      "Differentiate it: y′ = −A sin x, which is not y·cos x. The exponential structure comes from integrating dy/y."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Solving dy/dx = y² by separation yields y = −1/(x + C). What happened to the solution y ≡ 0?",
+     "options": [
+      "It isn't actually a solution",
+      "It's the C = 0 member of the family",
+      "It was discarded when both sides were divided by y², and must be recorded separately",
+      "It's recovered in the limit x → ∞"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Substitute it: y′ = 0 and y² = 0 — it satisfies the equation perfectly.",
+      "C = 0 gives y = −1/x, which is nowhere zero. No finite C produces the zero function.",
+      "Right. Division by h(y) assumes h(y) ≠ 0; the roots of h are constant solutions the algebra silently drops. Check them every time.",
+      "A solution is a function on its whole domain, not a limiting value — y ≡ 0 is missing from the family outright."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Which of these equations yields to separation of variables?",
+     "options": [
+      "y′ = x + y",
+      "y′ = e^(x+y)",
+      "y′ = sin(x + y)",
+      "y′ = x + y²"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A sum of x-stuff and y-stuff can't be factored into g(x)·h(y) — this one needs the integrating factor of the next concept.",
+      "Right: e^(x+y) = eˣ·e^y, a clean product. Exponentials turn sums into the products separation needs.",
+      "The sine of a sum doesn't factor — sin(x+y) is not sin-of-x times something-of-y.",
+      "Still a sum; the square on y doesn't rescue the additive structure."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Paul's Online Math Notes — Separable equations",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/Separable.aspx",
+     "type": "reading",
+     "note": "A stack of worked examples, including intervals of validity — the blowup issue from card 2, treated carefully."
+    },
+    {
+     "label": "MIT OCW 18.03SC — Differential Equations",
+     "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/",
+     "type": "reading",
+     "note": "The full course this ladder shadows. Unit 1 covers separable and linear first-order with lecture videos and problem sets."
+    }
+   ]
+  },
+  {
+   "id": "c03-linear-first-order",
+   "title": "Linear first-order & the integrating factor",
+   "summary": "y′ + p(t)y = q(t) is solved by multiplying through by μ = e^(∫p dt) — not a magic formula, but the unique multiplier that makes the left side a perfect (product-rule) derivative.",
+   "cards": [
+    {
+     "h": "The form, and why separation fails",
+     "md": "**Linear first-order**: y′ + p(t)·y = q(t).\n\nThis is the workhorse form of applied modeling — the RC circuit lives here (RC·V′ + V = V_in), so does a mixing tank, so does any 'inflow minus proportional leak' balance.\n\nTry to separate y′ + 2y = cos t and watch it jam: the right side welds t-stuff and y-stuff together additively, and no factoring frees them.\n\nThe escape is a change of goal. Stop trying to isolate y. Instead ask: **can the left side be reshaped into the derivative of a single product?** A perfect derivative integrates for free — that would collapse the whole problem to one integration. The next card shows the reshaping isn't hopeful thinking; it's forced."
+    },
+    {
+     "h": "Where the integrating factor comes from",
+     "md": "This is the piece almost everyone half-remembers as a formula pulled from a hat. It isn't. It's the product rule, run backwards.\n\nMultiply the equation by an unknown function μ(t):\n\nμy′ + μp·y = μq\n\nNow compare the left side with what the product rule says (μy)′ expands to:\n\n(μy)′ = μy′ + μ′y\n\nTerm by term, they match **exactly when μ′ = p·μ**. And that little side condition is itself separable — the one technique already in hand:\n\n## μ = e^(∫p dt)\n\nSo 'multiply by e^(∫p dt)' means precisely: *choose the one multiplier that makes the left side collapse into (μy)′.* Then the equation reads (μy)′ = μq, so\n\nμy = ∫ μq dt + C  →  divide by μ.\n\nDerive it once this way and it stops being a memory item forever: the exponential of ∫p is not a trick, it's the unique answer to 'what factor makes the product rule appear?'"
+    },
+    {
+     "h": "Worked reminder — and how to read the answer",
+     "md": "y′ + 2y = 3. (An RC charging circuit, if you like: leak rate 2, constant drive 3.)\n\n- μ = e^(∫2 dt) = e^(2t)\n- (e^(2t)·y)′ = 3e^(2t)\n- e^(2t)·y = (3/2)e^(2t) + C\n- **y = 3/2 + C·e^(−2t)**\n\nNow read the structure, because it's universal for stable linear systems:\n\n## solution = steady state + decaying transient\n\nThe 3/2 is where the system is heading regardless of history — set y′ = 0 and it falls out. The Ce^(−2t) is the memory of the initial condition, fading with time constant 1/2. Your oscilloscope called these the DC level and the settling; the textbooks call them the particular and homogeneous responses. Same decomposition, and it recurs at second order (concept 5) and in stability theory (concept 7): **linear systems forget their initial conditions exponentially, and how fast they forget is the coefficient's job.**"
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "The integrating factor for y′ + (2/t)·y = t (for t > 0) is:",
+     "options": [
+      "e^(2t)",
+      "t²",
+      "2/t",
+      "e^(2/t)"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's e^(∫2 dt) — but p(t) here is 2/t, not 2. Integrate the actual coefficient of y.",
+      "Right: μ = e^(∫(2/t)dt) = e^(2 ln t) = t². Check the defining property: (t²y)′ = t²y′ + 2t·y = t²(y′ + (2/t)y). It collapses.",
+      "That's p(t) itself. The factor is the exponential of its integral — the function whose own growth rate is p.",
+      "You exponentiated p instead of ∫p dt. The derivation demands μ′ = pμ, whose solution integrates p first."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "What is the defining property that makes μ = e^(∫p dt) work?",
+     "options": [
+      "It cancels q(t) from the right side",
+      "It satisfies μ′ = pμ, so the left side becomes exactly (μy)′ — a perfect derivative",
+      "It makes the equation separable",
+      "It normalizes the equation so the coefficient of y′ is 1"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The right side just gets multiplied along for the ride — μq is whatever it is; the surgery is all on the left.",
+      "Right. Matching μy′ + μpy against the product-rule expansion μy′ + μ′y forces μ′ = pμ. The factor exists to make the product rule appear.",
+      "The equation never becomes separable — it becomes directly integrable, which is better.",
+      "The coefficient of y′ was already 1 in standard form; μ multiplies it away from 1, in fact."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "In the solution y = 3/2 + Ce^(−2t) of y′ + 2y = 3, what does each piece represent physically?",
+     "options": [
+      "3/2 is the initial value; Ce^(−2t) is the steady state",
+      "3/2 is the steady state the system approaches; Ce^(−2t) is a transient encoding the initial condition, gone within a few time constants",
+      "Both pieces decay; the system ends at zero",
+      "The pieces have no separate meaning — only the sum matters"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Backwards: at t = 0 the value is 3/2 + C (both pieces contribute), and it's the exponential that carries the initial-condition information.",
+      "Right — steady state plus decaying transient. Every stable linear first-order system answers to this description; only the numbers change.",
+      "e^(−2t) decays but 3/2 doesn't budge; the system settles at 3/2, the value where y′ = 0.",
+      "The decomposition is exactly what transfers across problems: where the system is heading, and how it forgets where it started."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Paul's Online Math Notes — Linear first-order equations",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/Linear.aspx",
+     "type": "reading",
+     "note": "Derives the integrating factor the same reverse-product-rule way as this concept, then drills it on a dozen examples."
+    },
+    {
+     "label": "MIT OCW 18.03SC — Unit 1: First-order equations",
+     "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/",
+     "type": "reading",
+     "note": "Lecture videos on integrating factors plus the input-response language engineers use for the steady-state/transient split."
+    },
+    {
+     "label": "Wikipedia — Integrating factor",
+     "url": "https://en.wikipedia.org/wiki/Integrating_factor",
+     "type": "reading",
+     "note": "The derivation in card 2, stated compactly, plus the generalizations you don't need yet."
+    }
+   ]
+  },
+  {
+   "id": "c04-growth-decay",
+   "title": "Exponential growth & decay models",
+   "summary": "dy/dt = ky and its two great refinements: rate proportional to a gap (Newton's cooling, RC charging) and growth that saturates (logistic). One equation, many costumes.",
+   "cards": [
+    {
+     "h": "One law, many costumes",
+     "md": "dy/dt = ky is the most-modeled sentence in science: *the rate of change is proportional to the amount present.* Solution: y = y₀e^(kt).\n\nThe working constants, which you once knew and will use again:\n\n- **Doubling time** (k > 0): t₂ = ln 2 / k ≈ 0.693/k\n- **Half-life** (k < 0): t½ = ln 2 / |k| — the same formula in decay clothing. Each half-life halves what's left, so after n half-lives the fraction remaining is (1/2)ⁿ, regardless of the starting amount.\n- **Time constant** τ = 1/|k|: after one τ a decaying quantity is down to e⁻¹ ≈ 37% of its start; after 3τ, about 5%; after 5τ, gone for engineering purposes. Your RC instinct — '63% charged after one RC' — is exactly this, because τ = RC.\n\nCompound interest, radiocarbon dating, capacitor discharge, drug clearance: one equation, four vocabularies."
+    },
+     {
+     "h": "Decay toward a target: Newton's cooling",
+     "md": "Most real systems don't decay to zero — they relax toward a *target*. Coffee cools to room temperature, not to absolute zero:\n\n## dT/dt = −k(T − T_env)\n\nThe rate is proportional to the **gap**, not the amount. Substitute u = T − T_env (the gap itself): u′ = −ku, plain exponential decay of the gap. Hence\n\nT(t) = T_env + (T₀ − T_env)·e^(−kt)\n\n— the temperature slides exponentially from where it started to where it's headed.\n\nThis 'rate ∝ gap' shape is the same law as an RC circuit charging toward its supply voltage, a room approaching thermostat temperature, and a drug approaching steady-state concentration under constant infusion. Whenever data shows an exponential leveling off at a **nonzero plateau**, this equation — decay of a gap — is what's underneath. The plateau is the equilibrium; the exponential is the transient. Concept 3's decomposition, again."
+    },
+    {
+     "h": "When proportional growth lies: the logistic",
+     "md": "Pure exponential growth is a *local* truth: every self-reproducing thing grows like e^(rt) — until something binds. The classic correction:\n\n## dP/dt = rP(1 − P/K)\n\nRead it as a story. When P is small, the parenthesis ≈ 1 and growth is nearly exponential at rate r. As P approaches the **carrying capacity** K, the parenthesis → 0 and growth stalls. The solution is the S-curve: exponential takeoff, inflection at K/2 — growth is *fastest* halfway to capacity, not at the start — then saturation at K.\n\nThe modeling moral, for anyone who fits curves for a living: an exponential fitted to the early data of a logistic process gives a beautiful in-sample fit and a catastrophically wrong forecast. The assumption lives in the differential equation, not in the fitted curve — so the first question to ask of any exponential claim is the equation's question: **what, eventually, stops the growth?**"
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A radioactive sample has a half-life of 10 days. What fraction remains after 30 days?",
+     "options": [
+      "1/3 — a third of the time period pattern",
+      "1/8 — three halvings",
+      "1/6 — half of a third",
+      "Essentially zero"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Exponential decay isn't linear in time — each 10-day block halves what's *left*, it doesn't remove a fixed share of the original.",
+      "Right: 30 days is three half-lives, so (1/2)³ = 1/8. Halving compounds multiplicatively.",
+      "That mixes two operations; the clean rule is (1/2)^(t/t½) with t/t½ = 3.",
+      "Three half-lives leaves 12.5% — very much still there. 'Gone for engineering purposes' takes more like 7-10 half-lives."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Coffee at 90° sits in a 20° room and obeys Newton's cooling. As t → ∞, its temperature approaches:",
+     "options": [
+      "0° — exponential decay always goes to zero",
+      "20° — the gap to ambient decays to zero, not the temperature",
+      "Halfway, 55°",
+      "It depends on the cooling constant k"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The thing decaying exponentially is the *gap* T − 20, not T itself. Decay-to-zero is the special case T_env = 0.",
+      "Right. Rate ∝ gap means the gap dies exponentially, so T slides to the room's 20°. The plateau is the equilibrium.",
+      "Nothing distinguishes the halfway point; the system passes through it and keeps relaxing toward ambient.",
+      "k sets how *fast* the approach happens (the time constant), never *where* it ends — the destination is the ambient temperature."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "In the logistic model dP/dt = rP(1 − P/K), when is the population growing fastest?",
+     "options": [
+      "At the very start, when resources are most abundant",
+      "At P = K/2, halfway to carrying capacity",
+      "Just below P = K",
+      "Growth rate is constant until P hits K"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The *per-capita* rate is highest at the start, but total growth rP(1−P/K) is small when P itself is small — few individuals, however fertile.",
+      "Right: rP(1 − P/K) is a downward parabola in P, peaking at K/2. That's the S-curve's inflection point.",
+      "Near K the parenthesis is nearly zero — growth is stalling, not peaking.",
+      "The whole point of the logistic is that the growth rate varies: rising to K/2, falling after."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Paul's Online Math Notes — Modeling with first-order equations",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/Modeling.aspx",
+     "type": "reading",
+     "note": "Mixing tanks, falling objects, populations — the full modeling workout for concepts 2-4."
+    },
+    {
+     "label": "Wikipedia — Newton's law of cooling",
+     "url": "https://en.wikipedia.org/wiki/Newton%27s_law_of_cooling",
+     "type": "reading",
+     "note": "The gap-decay law with its history and its limits (when convection makes k non-constant)."
+    },
+    {
+     "label": "Wikipedia — Logistic function",
+     "url": "https://en.wikipedia.org/wiki/Logistic_function",
+     "type": "reading",
+     "note": "The S-curve, its closed-form solution, and its reach — ecology to epidemiology to neural-network activations."
+    }
+   ]
+  },
+  {
+   "id": "c05-second-order",
+   "title": "Second-order linear & oscillation",
+   "summary": "my″ + cy′ + ky = 0 via the characteristic equation. The discriminant c² − 4mk sorts overdamped, critically damped, and ringing; the Wronskian certifies that two solutions are genuinely two.",
+   "cards": [
+    {
+     "h": "The spring, and why e^(rt) is the right guess",
+     "md": "## m·y″ + c·y′ + k·y = 0\n\nMass, damper, spring. (The RLC circuit is the same equation with L, R, 1/C in those seats — the analogy is exact, not poetic.)\n\nThe classical move: try y = e^(rt). This was never a lucky guess. The equation demands that y, y′, and y″ cancel in fixed proportions *at every instant* — which requires a function whose derivatives are shaped like itself. The exponential is the only function whose every derivative is a constant multiple of itself, so it's the only candidate that can turn a differential equation into algebra. Substituting:\n\n## m·r² + c·r + k = 0\n\n— the **characteristic equation**. Two roots r₁, r₂ give two exponential solutions, and the general solution is y = c₁e^(r₁t) + c₂e^(r₂t).\n\nOne quadratic now encodes all the physics: everything the mass can ever do is written in where those two roots sit in the complex plane. Left half-plane: decay. On the imaginary axis: pure oscillation. Real parts are decay rates; imaginary parts are frequencies. That reading is the next card."
+    },
+    {
+     "h": "The discriminant is the physics",
+     "md": "c² − 4mk decides the personality of the motion:\n\n- **c² − 4mk > 0 — overdamped.** Two real negative roots: two dying exponentials, no oscillation ever. A screen-door closer — eases shut, never swings past.\n- **c² − 4mk = 0 — critically damped.** One repeated root, −c/(2m). The fastest possible return to rest *without overshoot* — which is why shock absorbers and analog meter needles are tuned to sit here. More damping than this is slower, not safer.\n- **c² − 4mk < 0 — underdamped.** Complex roots −α ± iω. Euler's formula converts e^((−α+iω)t) into real form:\n\n  y = e^(−αt)·(A cos ωt + B sin ωt)\n\n  — oscillation inside a decaying envelope. A struck tuning fork, ringing down.\n- **c = 0 — undamped.** y″ + ω²y = 0: a pure sinusoid at ω = √(k/m), forever.\n\nSame equation, four behaviors, one discriminant. And the translation skill worth rebuilding: when the roots come out complex, **the imaginary part is the ringing frequency and the real part is the decay rate.** An engineer who sees r = −2 ± 3i should hear a 3 rad/s ring dying on a half-second-ish envelope before touching a pencil."
+    },
+    {
+     "h": "Why two solutions — and what the Wronskian certifies",
+     "md": "Why must the general solution have *two* pieces, c₁y₁ + c₂y₂? Because the physics has two degrees of initial freedom — position and velocity — and matching an arbitrary pair takes two independent dials.\n\nBut the two solutions must be **genuinely different**. e^(rt) and 5e^(rt) are two formulas but one dial: every combination is just (c₁ + 5c₂)e^(rt), one effective constant, and it cannot meet an arbitrary position *and* velocity. The certificate of genuine independence is the **Wronskian**:\n\n## W = y₁·y₂′ − y₁′·y₂\n\nW ≠ 0 means the 2×2 linear system for (c₁, c₂), given any initial (y, y′), is solvable — W is literally that system's determinant. W ≡ 0 means your second solution was the first one in disguise, and half the initial conditions are unreachable.\n\nThis is exactly what bites at critical damping: the repeated root supplies only one exponential. The rescue is y₂ = t·e^(rt) — compute W = e^(2rt) ≠ 0, genuinely independent — and *that* is where the odd-looking (c₁ + c₂t)e^(rt) solution you half-remember comes from. The t isn't decoration; it's the second dial."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "The general solution of y″ + 16y = 0 is:",
+     "options": [
+      "y = c₁e^(4t) + c₂e^(−4t)",
+      "y = A cos 4t + B sin 4t",
+      "y = A cos 16t + B sin 16t",
+      "y = (c₁ + c₂t)e^(−4t)"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Real exponentials come from r² − 16 = 0. Here the characteristic equation is r² + 16 = 0: roots ±4i, pure oscillation.",
+      "Right: r = ±4i, so undamped oscillation at ω = 4 = √16. Frequency is the square root of the coefficient.",
+      "Tempting — but ω² = 16 means ω = 4. The coefficient in the equation is the frequency *squared*.",
+      "That's the critically damped form, which needs a repeated real root; r² + 16 = 0 has none."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A system has m = 1, c = 5, k = 4, so c² − 4mk = 25 − 16 = 9 > 0. Displaced and released, the mass:",
+     "options": [
+      "Oscillates with a decaying amplitude",
+      "Oscillates forever at constant amplitude",
+      "Returns toward rest without ever oscillating",
+      "Is critically damped — fastest no-overshoot return"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Decaying oscillation needs complex roots, i.e. a negative discriminant. Positive discriminant means the roots are real — no ringing at all.",
+      "Constant-amplitude oscillation is the undamped case c = 0; here damping is strong, not absent.",
+      "Right — overdamped: roots −1 and −4, both real and negative. Two dying exponentials, monotone-ish return, no overshoot, no ring.",
+      "Critical damping is the knife-edge c² − 4mk = 0 exactly; 9 > 0 is past it, into overdamped territory."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "The characteristic roots come out r = −2 ± 3i. The motion is:",
+     "options": [
+      "A ring at 2 rad/s inside an e^(−3t) envelope",
+      "A ring at 3 rad/s inside an e^(−2t) envelope",
+      "Pure oscillation at 3 rad/s",
+      "Non-oscillatory decay at rates 2 and 3"
+     ],
+     "answer": 1,
+     "feedback": [
+      "You've swapped the parts: the real part is the decay, the imaginary part is the frequency.",
+      "Right. Real part −2 → envelope e^(−2t); imaginary part ±3 → cos 3t and sin 3t inside it. That translation is the whole skill.",
+      "Pure oscillation needs the roots on the imaginary axis (zero real part); −2 drags the amplitude down.",
+      "Two separate real decay rates would need two real roots; a complex pair is one decaying oscillation."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Why can't y = c₁e^(−t) + c₂·(5e^(−t)) serve as the general solution of a 2nd-order equation?",
+     "options": [
+      "The constant 5 makes it discontinuous",
+      "It can — two constants are present",
+      "The two pieces are proportional (Wronskian ≡ 0), so there's really one dial — arbitrary initial position AND velocity can't both be matched",
+      "e^(−t) can't solve a 2nd-order equation"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Scaling an exponential by 5 changes nothing about its smoothness — the problem is deeper than that.",
+      "Two constants, one effective dial: the sum collapses to (c₁ + 5c₂)e^(−t). Counting letters isn't counting freedoms.",
+      "Right. Independence — certified by W ≠ 0 — is what guarantees any (y(0), y′(0)) pair is reachable. Proportional solutions leave half the initial-condition space unreachable.",
+      "It can and often does (e.g. y″ + 2y′ + y = 0 has it); the issue is needing a genuinely second solution alongside it."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "MIT OCW 18.03SC — Unit 2: Second-order constant-coefficient equations",
+     "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/",
+     "type": "reading",
+     "note": "The damping regimes and characteristic-equation machinery, with the spring-mass and RLC demos side by side."
+    },
+    {
+     "label": "Wikipedia — Damping",
+     "url": "https://en.wikipedia.org/wiki/Damping",
+     "type": "reading",
+     "note": "Damping ratio ζ, the standard engineering repackaging of the discriminant — the notation you'll meet in any controls or vibration text."
+    },
+    {
+     "label": "Wikipedia — Wronskian",
+     "url": "https://en.wikipedia.org/wiki/Wronskian",
+     "type": "reading",
+     "note": "The determinant view of independence from card 3, plus Abel's identity — why W is either never zero or always zero for solutions."
+    }
+   ]
+  },
+  {
+   "id": "c06-systems-phase",
+   "title": "Systems & phase portraits",
+   "summary": "Promote velocity to a variable and any 2nd-order equation becomes a first-order system: a velocity field on state space. Trajectories, spirals, saddles, and eigen-directions replace formulas.",
+   "cards": [
+    {
+     "h": "State space: turning order into dimension",
+     "md": "Any 2nd-order equation becomes a **first-order system** by promoting velocity to a variable of its own. For the spring, with x = position and v = velocity:\n\nx′ = v\nv′ = −(k/m)x − (c/m)v\n\nThe pair (x, v) is the **state** — a single point in a plane that encodes everything the future needs (exactly the two initial freedoms from concept 5). The ODE becomes a rule attaching a velocity *arrow* to every point of that plane, and a solution is a particle drifting with the arrows: a **trajectory**.\n\nThis is more than notation. It's the standard form every numerical solver expects (concept 8 consumes systems, not orders), and it converts questions about invisible functions of time into questions about visible geometry — which is where the qualitative theory lives."
+    },
+    {
+     "h": "Reading a phase portrait",
+     "md": "A phase portrait is the state plane with representative trajectories drawn in. **Time appears on neither axis** — it flows *along* the curves, arrowheads showing direction. The reading dictionary:\n\n- **Closed loop** → periodic motion. The undamped spring orbits an ellipse: the rightmost point is maximum stretch at zero speed; the top is maximum speed passing through center. One lap = one period.\n- **Spiral inward** → decaying oscillation (underdamped). Each lap is a smaller swing; the equilibrium at the center is the final rest state.\n- **Spiral outward** → growing oscillation: instability, something pumping energy in.\n- **Trajectories never cross.** Through each state passes exactly one future — uniqueness again. An apparent crossing means a projection artifact or a drawing error.\n\nThe pendulum's full portrait shows two worlds at once: closed loops (back-and-forth swinging) around the hanging-down equilibrium, open wave-like curves above (over-the-top spinning), and between them a boundary curve — the **separatrix** — passing through the balanced-upright points. One picture, every possible motion, no formulas."
+    },
+    {
+     "h": "Linear systems: eigen-directions organize the picture",
+     "md": "For a linear system x′ = A·x (A a matrix), there are special straight-line solutions: start on an eigenvector of A and you stay on that line forever, scaling like e^(λt). The eigenvalues then classify the entire portrait:\n\n- Both λ real and negative → **node**: everything funnels into the origin.\n- Real with opposite signs → **saddle**: drawn in along one eigen-direction, flung out along the other. Unstable, but with one knife-edge path in.\n- Complex pair, negative real part → **spiral in**. Positive real part → spiral out. Zero real part → **center**: closed orbits.\n\nFor the system form of a 2nd-order equation, these eigenvalues are *exactly* the characteristic roots of concept 5 — the same two numbers, now visible as geometry instead of algebra. Overdamped = node; underdamped = spiral; undamped = center.\n\nAnd the reach is longer than linear: near an equilibrium, well-behaved nonlinear systems look like their linearization (concept 7 makes this precise). This short list of pictures is the local alphabet of essentially all smooth dynamics — predator–prey cycles, circuit stability, epidemic takeoff."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A trajectory in a phase portrait is a perfectly closed curve. The motion it represents is:",
+     "options": [
+      "Decaying to equilibrium",
+      "Periodic — the state retraces the same cycle forever",
+      "At rest",
+      "Chaotic"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Decay looks like a spiral or a curve terminating at an equilibrium point — the state would have to stop returning to close the loop at the same speed.",
+      "Right: return to the same state means the same future, forever. Closed curve = cycle, and one lap is one period.",
+      "Rest is a single *point* (an equilibrium), not a curve — the state isn't moving at all.",
+      "Chaos never exactly repeats — its trajectories wander without closing. A closed curve is the opposite: perfect repetition."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Two distinct trajectories of a smooth system appear to cross at a regular point of the phase plane. What's the correct conclusion?",
+     "options": [
+      "The system is nonlinear",
+      "The system is chaotic",
+      "Something is wrong — uniqueness forbids it: a crossing point would have two different futures",
+      "The crossing point is an equilibrium"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Nonlinear systems obey uniqueness just as strictly (given smoothness); nonlinearity bends trajectories, it doesn't let them collide.",
+      "Even chaotic trajectories never cross in their full state space — that's precisely why chaos needs 3+ dimensions for continuous systems.",
+      "Right. The state determines the future uniquely, so two futures from one state is impossible — you're seeing a projection artifact or an error.",
+      "Trajectories can *approach* an equilibrium asymptotically but never reach or cross through it in finite time."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A damped spring (underdamped) is displaced and released. Its phase-plane trajectory is:",
+     "options": [
+      "A closed ellipse",
+      "A spiral winding into the origin",
+      "A straight line to the origin",
+      "A spiral winding outward"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The ellipse is the *undamped* portrait — closed orbit, energy conserved. Damping breaks the closure.",
+      "Right: each swing is smaller (energy bleeding off), so each lap of the loop tightens — a spiral into the rest state at (0, 0).",
+      "Straight-line approach happens along eigen-directions of overdamped (real-root) systems; underdamped means it overshoots and winds.",
+      "Outward spirals mean growing oscillations — energy being fed *in*, the signature of instability, not damping."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "3Blue1Brown — Differential equations, a tourist's guide (phase space section)",
+     "url": "https://www.youtube.com/watch?v=p_di4Zn4wz4",
+     "type": "video",
+     "note": "The middle third builds the pendulum's phase portrait live — exactly this concept, animated. Worth a rewatch even if you saw it at concept 1."
+    },
+    {
+     "label": "Paul's Online Math Notes — Phase plane",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/PhasePlane.aspx",
+     "type": "reading",
+     "note": "Nodes, saddles, spirals, centers — the eigenvalue classification of card 3 with worked portraits."
+    },
+    {
+     "label": "Wikipedia — Phase portrait",
+     "url": "https://en.wikipedia.org/wiki/Phase_portrait",
+     "type": "reading",
+     "note": "Gallery of the standard portraits; useful as a visual flashcard set for the reading dictionary."
+    }
+   ]
+  },
+  {
+   "id": "c07-equilibria-stability",
+   "title": "Equilibria & stability",
+   "summary": "Equilibria are the zeros of the right-hand side; stability asks whether perturbations decay. The derivative test f′(y*) < 0 answers it locally — no solving required.",
+   "cards": [
+    {
+     "h": "Standing still: the phase line",
+     "md": "An **equilibrium** of dy/dt = f(y) is any value y* with f(y*) = 0: start there and you stay forever. These are exactly the constant solutions that separation of variables kept trying to throw away in concept 2.\n\nFor one variable, the complete qualitative analysis fits on a line. Mark the zeros of f. Between consecutive zeros, f keeps one sign, so solutions move right (f > 0) or left (f < 0). Draw the arrows; every solution's fate is now decided **without solving anything**.\n\nLogistic example: f(P) = rP(1 − P/K) has zeros at P = 0 and P = K. Arrows point *away* from 0 and *toward* K from both sides. So extinction is **unstable** — any spark of population grows away from it — and carrying capacity is **stable**: perturb the population and it returns. Two arrows on a line just reproduced everything the S-curve solution knows about destinations."
+    },
+    {
+     "h": "The derivative test (linearization)",
+     "md": "Zoom in near an equilibrium: write y = y* + u with u small. Since f(y*) = 0, Taylor gives\n\nu′ ≈ f′(y*)·u\n\n— plain exponential growth or decay of the *perturbation*, with rate f′(y*). Hence the test:\n\n- **f′(y*) < 0** → perturbations decay → **stable** (and |f′(y*)| is the return rate — a time constant, yet again)\n- **f′(y*) > 0** → perturbations grow → **unstable**\n- f′(y*) = 0 → the linear term is silent; consult the sign pattern of f directly (the point may be semi-stable — attracting from one side, repelling from the other)\n\nFor systems, the same idea reads: eigenvalues of the Jacobian at the equilibrium, with 'all real parts negative' playing the role of f′ < 0 — which plugs straight into the portrait alphabet of concept 6.\n\nNotice what this buys: most nonlinear equations can't be solved in closed form, but near equilibria they don't need to be. The linearization already contains the verdict."
+    },
+    {
+     "h": "Why stability is the question that matters",
+     "md": "Exact solutions answer 'where is the system at t = 7.3?' Stability answers the questions engineering and modeling actually ask: *if disturbed, does it return? Which long-run states are reachable? How fast is the approach?*\n\nAnd one consequential pattern: **equilibria move, collide, and vanish as parameters change.** Add constant harvesting h to the logistic:\n\nf(P) = rP(1 − P/K) − h\n\nFor small h, the parabola still crosses zero twice: a stable equilibrium (slightly below K) and an unstable one (slightly above 0) — a floor below which the population can't recover. As h rises, the two zeros slide toward each other, meet, and annihilate. Beyond that critical h there is **no equilibrium at all**: the population crashes from *any* starting size.\n\nA tipping point is not a metaphor; it's two zeros of f merging. Every simulation at fixed h looks smooth and reassuring right up to the parameter cliff — which is precisely why stability analysis, not simulation, is what warns you. The same mathematics runs fishery collapse, thermal runaway, and market liquidity spirals."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "For dy/dt = y(1 − y), classify the equilibria:",
+     "options": [
+      "y = 0 stable, y = 1 unstable",
+      "y = 0 unstable, y = 1 stable",
+      "Both stable",
+      "Both unstable"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Check the arrows: for 0 < y < 1, f > 0, so solutions move *away* from 0 and *toward* 1 — the opposite assignment.",
+      "Right. f′(y) = 1 − 2y: f′(0) = 1 > 0 (unstable), f′(1) = −1 < 0 (stable). The phase-line arrows agree.",
+      "They can't both attract with nothing between them — between adjacent equilibria f keeps one sign, so it pushes toward one and away from the other.",
+      "If both repelled, solutions between them would have nowhere to go; f > 0 on (0,1) drives everything to y = 1."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "f(y*) = 0 and f′(y*) = −3. Near y*, a small perturbation u behaves like:",
+     "options": [
+      "u grows like e^(3t) — unstable",
+      "u decays like e^(−3t) — stable, with time constant 1/3",
+      "u oscillates around y* at frequency 3",
+      "Can't say without solving the full nonlinear equation"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A negative f′ is the *stable* sign — the perturbation equation u′ = −3u pulls u back to zero.",
+      "Right: u′ ≈ f′(y*)u = −3u. Disturbances die exponentially, ~95% gone within three time constants (t = 1).",
+      "One-variable flows can't oscillate around a point — overshooting would require crossing the equilibrium, where motion stops. Oscillation needs two dimensions.",
+      "That's the beauty of linearization: for f′ ≠ 0 the local verdict is decided by this one number, no solution formula needed."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "In the harvested logistic dP/dt = rP(1 − P/K) − h, what happens as harvesting h passes its critical value?",
+     "options": [
+      "The stable equilibrium shifts smoothly lower and the population adjusts",
+      "The stable and unstable equilibria merge and disappear — beyond it, the population collapses from any starting size",
+      "A new, higher equilibrium appears",
+      "Nothing changes qualitatively; harvesting just slows growth"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's the sub-critical story. The trap is that the smooth shifting *ends*: the equilibrium doesn't slide to zero, it vanishes mid-air when it meets its unstable partner.",
+      "Right — two zeros of f merge and annihilate. That's a tipping point in the literal, mathematical sense, and no simulation at fixed h shows it coming.",
+      "Subtracting a constant h lowers the whole parabola — it can only remove crossings, never create higher ones.",
+      "Qualitative change is exactly what happens: from 'perturb and recover' to 'collapse from anywhere' at a finite parameter value."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Paul's Online Math Notes — Equilibrium solutions",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/EquilibriumSolutions.aspx",
+     "type": "reading",
+     "note": "Phase-line classification with the logistic worked in full — cards 1 and 2 in drill form."
+    },
+    {
+     "label": "Wikipedia — Stability theory",
+     "url": "https://en.wikipedia.org/wiki/Stability_theory",
+     "type": "reading",
+     "note": "The formal ladder above this concept: Lyapunov stability, asymptotic stability, and the eigenvalue criteria for systems."
+    }
+   ]
+  },
+  {
+   "id": "c08-numerical",
+   "title": "Numerical methods: Euler & RK4",
+   "summary": "Euler steps along stale tangents and drifts systematically (O(h) global error); RK4 samples four slopes per step and lands O(h⁴). Plus the two failure modes worth knowing: energy drift and stiffness.",
+   "cards": [
+    {
+     "h": "Euler: follow the tangent",
+     "md": "When no formula exists — which is most of the time — you march. From the current point (tₙ, yₙ), the ODE hands you the slope f(tₙ, yₙ); step along that tangent:\n\n## yₙ₊₁ = yₙ + h·f(tₙ, yₙ)\n\nThat's Euler's method: the slope field taken literally, one dash at a time.\n\nIts flaw is structural, not sloppy. The slope is sampled at the *start* of the step and assumed for the whole step — but on a curving solution, that slope is stale before you land. Each step commits an O(h²) error, and crossing an interval takes ~1/h steps, so the errors pile up to **O(h) global error**: halve the step, merely halve the error. Ten times the work for one more digit.\n\nWorse, the drift is *systematic*, not random. Integrate circular motion (x′ = −y, y′ = x) with Euler and the orbit spirals slowly outward: every step leaves along a tangent line, and a tangent to a circle always exits it. The numerical trajectory steadily gains energy the true system conserves. Errors with a consistent bias don't average out — they compound."
+    },
+    {
+     "h": "RK4: interview the step before committing",
+     "md": "If the start-slope goes stale, sample the interval better before moving. The classical fourth-order Runge–Kutta method probes four slopes per step:\n\n- k₁ — slope at the start\n- k₂ — slope at the midpoint, reached provisionally using k₁\n- k₃ — slope at the midpoint again, re-estimated using k₂\n- k₄ — slope at the far end, reached using k₃\n\nthen commits to a weighted average, midpoints counted double:\n\n## yₙ₊₁ = yₙ + (h/6)·(k₁ + 2k₂ + 2k₃ + k₄)\n\nThe weights are chosen so the step matches the true solution's Taylor expansion through the h⁴ term. Global error: **O(h⁴)** — halve the step and the error falls ~16×.\n\nConcretely: an accuracy that costs Euler a million steps costs RK4 a few hundred, and RK4's steps are only 4× dearer. Same slope field, same marching shape — just a smarter interview of the interval before committing. That trade is why RK4 has been the default workhorse since the era of punch cards, and still is inside most 'ode45-style' adaptive solvers."
+    },
+    {
+     "h": "What to still watch for",
+     "md": "Two honest caveats before trusting any solver blindly:\n\n**Long-time energy drift.** RK4's per-step error is tiny but still one-signed for oscillatory systems: integrate a frictionless orbit long enough and it, too, slowly spirals. When a *conservation law* matters more than pointwise accuracy — celestial mechanics, molecular dynamics — the fix is a different design goal (symplectic integrators, which conserve a nearby energy exactly), not a smaller h.\n\n**Stiffness.** When a system carries both a fast-decaying transient and slow dynamics you care about — an e^(−1000t) component inside a problem interesting at t ≈ 10 — explicit methods like Euler and RK4 must take absurdly small steps, not for accuracy but to avoid *blowing up*: overstep the fast decay and the method overshoots and oscillates with growing amplitude. The symptom: a smooth, boring solution whose solver nonetheless demands microscopic steps. The cure: **implicit methods** (backward Euler and kin), which buy unconditional stability by solving a small equation each step.\n\nRule of thumb: RK4 with a sensible step for everyday problems; suspect stiffness the moment the required step size looks insulting compared to how smooth the answer is."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "y′ = y with y(0) = 1. One Euler step with h = 0.5 gives y(0.5) ≈ ?",
+     "options": [
+      "1.5",
+      "1.649",
+      "1.25",
+      "2.0"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right: y₁ = 1 + 0.5·f(0, 1) = 1 + 0.5·1 = 1.5. The true value e^0.5 ≈ 1.649 — Euler undershoots because the slope grew mid-step and Euler never noticed.",
+      "That's the exact answer e^0.5 — Euler's whole problem is that it doesn't achieve it; it freezes the starting slope for the entire step.",
+      "1.25 would be a step of h = 0.25; the update adds h times the slope, and the slope at the start is y = 1.",
+      "2.0 would need slope 2 — but f = y = 1 at the starting point. The slope reaches 2 only where y = 2."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Euler-integrating the circular system x′ = −y, y′ = x makes the orbit spiral slowly outward. Why?",
+     "options": [
+      "Floating-point round-off accumulates",
+      "Each step exits along a tangent line, which always leaves the circle outward — a systematic, one-directional bias that compounds",
+      "The step size was randomly too large on some steps",
+      "The system itself is unstable"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Round-off is real but tiny and roughly unbiased; this drift appears in exact arithmetic and always in the same direction.",
+      "Right — a tangent to a circle lies outside it, so every step gains a little radius (energy). Biased errors compound; they never average away.",
+      "The drift occurs with a perfectly constant step size — it's the method's geometry, not step-size luck.",
+      "The true system conserves x² + y² exactly (circles forever). The instability belongs to the method, not the equations."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "You halve the step size h. Roughly how do the global errors of Euler and RK4 respond?",
+     "options": [
+      "Both halve",
+      "Euler halves; RK4 drops ~16×",
+      "Euler drops 4×; RK4 drops 8×",
+      "Both drop 16×"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's Euler's O(h) behavior applied to both — RK4's fourth-order convergence is enormously better than that.",
+      "Right: O(h) vs O(h⁴), so ×½ vs ×(1/2)⁴ = 1/16. This gap, compounded over refinements, is the whole case for higher-order methods.",
+      "Those would be second- and third-order methods; classical Euler is first order and classical RK4 is fourth.",
+      "Only RK4 earns the 16×; Euler pays a full halving of h for a mere halving of error."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A solution looks completely smooth, yet RK4 blows up unless the step is made microscopically small. The likely diagnosis:",
+     "options": [
+      "The equation has no solution",
+      "Stiffness — a fast-decaying hidden component limits the stable step size; switch to an implicit method",
+      "RK4 is a first-order method and needs small steps",
+      "The initial condition is wrong"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A solution exists and is even smooth — the trouble is the solver's stability, not the equation's solvability.",
+      "Right. The step must resolve the fastest timescale in the system even after that component has decayed to nothing. Implicit methods (backward Euler and kin) remove the constraint.",
+      "RK4 is fourth-order; accuracy isn't the issue here at all — stability is, and higher order doesn't fix stiffness.",
+      "A wrong initial condition gives the wrong (but computable) trajectory; it doesn't force microscopic steps on a smooth problem."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Paul's Online Math Notes — Euler's method",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/EulersMethod.aspx",
+     "type": "reading",
+     "note": "The tangent-stepping algorithm with error tables you can eyeball — watch the O(h) convergence happen in the numbers."
+    },
+    {
+     "label": "Wikipedia — Runge–Kutta methods",
+     "url": "https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods",
+     "type": "reading",
+     "note": "The RK4 tableau, the general family, and the error analysis behind the 1-2-2-1 weights."
+    },
+    {
+     "label": "3Blue1Brown — Differential equations, a tourist's guide (final section)",
+     "url": "https://www.youtube.com/watch?v=p_di4Zn4wz4",
+     "type": "video",
+     "note": "The last third builds a numerical pendulum solver on screen — the moment the slope-field picture becomes an algorithm."
+    }
+   ]
+  }
+ ]
+}

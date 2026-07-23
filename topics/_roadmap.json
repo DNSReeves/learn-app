@@ -1,0 +1,83 @@
+{
+  "newtonian-physics": {
+    "title": "Newtonian Physics",
+    "prereqs": [
+      "calculus"
+    ],
+    "concepts": 8,
+    "ladder_hint": "motion & reference frames; the three laws; forces & free-body diagrams; energy & work; momentum & collisions; circular motion & gravitation; oscillation; where Newton breaks (relativity/quantum teaser)"
+  },
+  "llms": {
+    "title": "Large Language Models",
+    "prereqs": [
+      "neural-networks"
+    ],
+    "concepts": 8,
+    "ladder_hint": "tokens & embeddings; next-token prediction as the objective; the transformer at scale; pretraining data & scaling laws; fine-tuning & RLHF; prompting & in-context learning; capabilities & failure modes (hallucination, jailbreaks); evaluation"
+  },
+  "ai-agents": {
+    "title": "AI Agents",
+    "prereqs": [
+      "llms"
+    ],
+    "concepts": 8,
+    "ladder_hint": "what makes a model an agent (loop, goals, tools); tool use & function calling; planning & decomposition; memory & state; multi-agent systems; evaluation & reliability; safety (reward hacking, prompt injection, sandboxing); agent infrastructure in practice"
+  },
+  "agi-and-beyond": {
+    "title": "AGI and Beyond",
+    "prereqs": [
+      "ai-agents"
+    ],
+    "concepts": 7,
+    "ladder_hint": "defining general intelligence; forecasting & scaling debates; alignment problem fundamentals; interpretability; governance & competition dynamics; economic transformation scenarios; epistemics \u2014 how to reason about deep uncertainty honestly (this topic must present contested claims as contested)"
+  },
+  "odes": {
+    "title": "Ordinary Differential Equations",
+    "prereqs": [
+      "calculus"
+    ],
+    "concepts": 8,
+    "ladder_hint": "what an ODE says; separable equations; linear first-order & integrating factors; exponential growth/decay models; second-order linear & oscillation; systems & phase portraits; equilibria & stability; numerical methods (Euler, RK4)"
+  },
+  "fourier-series": {
+    "title": "Fourier Series",
+    "prereqs": [
+      "calculus"
+    ],
+    "concepts": 7,
+    "ladder_hint": "periodic functions & superposition; orthogonality of sines/cosines; computing coefficients as integrals; convergence & Gibbs phenomenon; complex form; the spectrum view of signals; toward the Fourier transform"
+  },
+  "pdes": {
+    "title": "Partial Differential Equations",
+    "prereqs": [
+      "odes",
+      "fourier-series"
+    ],
+    "concepts": 7,
+    "ladder_hint": "partial derivatives & what a PDE states; the big three (heat, wave, Laplace) as physical stories; boundary & initial conditions; separation of variables (where Fourier series earn their keep); classification & behavior; numerical solution idea; where PDEs run the modern world"
+  },
+  "quant-finance": {
+    "title": "Quantitative Finance",
+    "prereqs": [
+      "calculus",
+      "bayesian-inference"
+    ],
+    "concepts": 8,
+    "ladder_hint": "returns & compounding conventions; risk measures (vol, Sharpe/Sortino, drawdown); portfolio theory & why MVO is fragile; factors (value/momentum/quality) and why most selection studies die out-of-sample; backtesting discipline (overfitting, selection bias, holdout spending); position sizing (Kelly, vol targeting); regime & tail risk; the honest-research loop (pre-registration, kill criteria)"
+  },
+  "investing-with-etfs": {
+    "title": "Investing with ETFs",
+    "prereqs": [],
+    "concepts": 7,
+    "ladder_hint": "what an ETF is (creation/redemption, the tax-efficient wrapper); reading a fund (expense ratios gross vs net, AUM, spread, tracking error, the prospectus); fund taxonomy incl. why levered/inverse decay surprises people; building a portfolio (core-satellite, diversified vs sector, the style box); execution (limit orders, premium/discount); costs & taxes; common failure modes"
+  },
+  "options-and-iv": {
+    "title": "Trading Options & Implied Volatility",
+    "prereqs": [
+      "calculus",
+      "quant-finance"
+    ],
+    "concepts": 8,
+    "ladder_hint": "option mechanics (calls/puts, payoffs, moneyness); no-arbitrage & put-call parity; Black-Scholes as a diffusion \u2014 it is the heat equation in disguise (bridge to the PDEs pack); the Greeks as partial derivatives; implied volatility \u2014 inverting the model for the market's price of uncertainty, IV vs realized; the vol surface (smile/skew, term structure); trading structures & IV positioning (covered calls, verticals, condors, IV rank); failure modes (short-vol blowups, earnings crush, assignment, liquidity)"
+  }
+}

@@ -1,0 +1,790 @@
+{
+ "id": "pdes",
+ "title": "Partial Differential Equations",
+ "tagline": "Local laws, global behavior — the equations the physical world is written in.",
+ "description": "The summit of the refresher ladder. The full heat-on-a-rod story end to end — how boundary conditions select the eigenfunctions, how Fourier coefficients carry the initial condition — plus why classification predicts whether a solution smooths, propagates, or settles.",
+ "prereqs": ["odes", "fourier-series"],
+ "concepts": [
+  {
+   "id": "c01-what-a-pde-states",
+   "title": "Partial derivatives and what a PDE states",
+   "summary": "A PDE is a local law relating rates of change in several variables at once. Its general solution contains arbitrary functions, not constants — and linearity buys superposition.",
+   "cards": [
+    {
+     "h": "One variable was never enough",
+     "md": "An ODE tracks a function of one variable — a trajectory u(t). But the temperature along a rod is **u(x, t)**: it depends on where AND when. Rates of change now come in flavors:\n\n- **∂u/∂t** — how fast u changes in time, standing at one fixed spot\n- **∂u/∂x** — the spatial slope of the profile at one frozen instant\n- **∂²u/∂x²** — the *curvature* of the profile at that instant\n\nThe ∂ means exactly one thing: differentiate with respect to this variable, hold the others still. That is the entire notation reminder you need — fifty years hasn't changed it.\n\nA **partial differential equation** is an equation relating these mixed rates. Its solution is not a curve but a whole *field*: a value at every point of space and time simultaneously."
+    },
+    {
+     "h": "A PDE is a local law",
+     "md": "## ∂u/∂t = α ∂²u/∂x²\n\nRead the heat equation aloud: *temperature at a point rises in proportion to how concave-up the profile is there.* Equivalently — and this is the reading worth tattooing — each point compares itself to the **average of its immediate neighbors**: hotter than that average (concave-down), it cools; cooler (concave-up), it warms. That neighbor-average reading of ∂²u/∂x² will explain the numerical methods of concept 6 almost by itself.\n\nNotice what the equation does *not* say: nothing about the rod's length, the starting temperatures, or what's happening at the ends. A PDE is a **local law** — a constraint enforced identically at every interior point, blind to the particular situation. The particulars enter through boundary and initial conditions (concept 3), and that split — universal law versus particular data — is the deep architecture of the whole subject."
+    },
+    {
+     "h": "Arbitrary functions, not arbitrary constants",
+     "md": "Solve the ODE u′ = ku and you get u = Ce^(kt) — one arbitrary *constant*. Now solve the simplest PDE, the transport equation:\n\n## ∂u/∂t + c ∂u/∂x = 0\n\nSolution: u(x, t) = f(x − ct) for **any differentiable f whatsoever** — a Gaussian, a square bump, your signature — each sliding rigidly rightward at speed c. Check it with the chain rule: ∂u/∂t = −c·f′ and ∂u/∂x = f′, and they cancel.\n\nAn ODE's general solution has arbitrary constants; a PDE's has arbitrary **functions**. The equation alone pins down almost nothing — which is why boundary and initial conditions do vastly more work here than they ever did in ODE-land.\n\nOne more lever — the one this entire pack pulls. If the PDE is **linear and homogeneous** (heat, wave, and Laplace all are), solutions add: if u₁ and u₂ solve it, so does au₁ + bu₂. Superposition is what will let us assemble the real solution out of infinitely many simple ones."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "In the heat equation ∂u/∂t = α ∂²u/∂x², the quantity ∂²u/∂x² at a point measures:",
+     "options": [
+      "How fast the temperature at that point is changing in time",
+      "How the temperature there compares to the average of its immediate neighbors",
+      "The slope of the temperature profile at that point",
+      "The total heat currently stored in the rod"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's the left side, ∂u/∂t. The equation says the time-rate is *driven by* the spatial curvature — the two sides are different quantities.",
+      "Right. Concave-up means the point sits below its neighbors' average, so it warms; concave-down, it cools. This local-average reading powers everything from Laplace's equation to the finite-difference stencil.",
+      "The slope is the first derivative, ∂u/∂x. A uniformly sloped profile has zero second derivative and doesn't change at all under pure diffusion.",
+      "A PDE is a local law — no single term knows anything global like total heat. (Total heat is an integral of u, computed after the fact.)"
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "u(x, t) = f(x − ct) solves the transport equation for ANY differentiable f. What does this illustrate about PDEs generally?",
+     "options": [
+      "The transport equation is defective and has no real solution",
+      "General solutions of PDEs contain arbitrary functions — the equation alone barely narrows the field",
+      "Only exponential functions can solve linear PDEs",
+      "The wave speed c must be determined from the initial conditions"
+     ],
+     "answer": 1,
+     "feedback": [
+      "It has infinitely many perfectly good solutions — that abundance, not absence, is the point.",
+      "Exactly. Where an ODE leaves constants free, a PDE leaves whole functions free. Pinning them down is the job of boundary and initial conditions, which is why concept 3 carries so much weight.",
+      "f can be any differentiable shape at all — that's precisely what the example demonstrates.",
+      "c is a coefficient of the equation itself (the medium's speed), fixed before any data arrives. The initial condition determines f, not c."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "u₁ and u₂ both solve the heat equation. Which combination is guaranteed to solve it too?",
+     "options": [
+      "u₁ · u₂",
+      "u₁²",
+      "3u₁ − 2u₂",
+      "e^(u₁)"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Products break linearity: the derivative of a product sprays cross-terms that the equation doesn't cancel.",
+      "Squaring is nonlinear — (u²)ₜ = 2u·uₜ, and the right side picks up a (∂u/∂x)² term with no partner.",
+      "Right — any linear combination. The heat equation is linear and homogeneous, so superposition holds. This is the lever separation of variables will pull to sum infinitely many modes.",
+      "Composing with a nonlinear function destroys the linear structure entirely; superposition applies to sums and scalar multiples only."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "3Blue1Brown — But what is a partial differential equation?",
+     "url": "https://www.youtube.com/watch?v=ly4S0oi3Yz8",
+     "type": "video",
+     "note": "17 min. The heat equation built from the neighbor-average intuition — the ideal reawakening of this material."
+    },
+    {
+     "label": "3Blue1Brown — PDEs written lesson",
+     "url": "https://www.3blue1brown.com/lessons/pdes",
+     "type": "reading",
+     "note": "Same material as the video, readable at your own pace."
+    },
+    {
+     "label": "Wikipedia — Partial differential equation",
+     "url": "https://en.wikipedia.org/wiki/Partial_differential_equation",
+     "type": "reading",
+     "note": "Reference-grade overview; skim the intro and 'Well-posedness' now, return for the rest later."
+    }
+   ]
+  },
+  {
+   "id": "c02-the-big-three",
+   "title": "The big three: heat, wave, Laplace",
+   "summary": "Heat diffuses and smooths (one time derivative — irreversible). Wave transports shape at finite speed (two time derivatives — reversible). Laplace is equilibrium: every point already the average of its neighbors.",
+   "cards": [
+    {
+     "h": "Heat: relaxation toward the neighbors",
+     "md": "## ∂u/∂t = α ∂²u/∂x²\n\nThe story: a quantity spread over space, every point relaxing toward its neighbors' average. Temperature in a rod, ink in still water, a crowd dispersing — and, after a change of variables, the Black–Scholes value of a stock option (concept 7).\n\nThe signature behavior is **smoothing**. Kinks round off, spikes collapse, wiggles die — and the finer the wiggle, the faster it dies. In concept 4 you'll compute the exact rate: mode n decays like e^(−α(nπ/L)²t), so mode n dies n² times faster than the fundamental. Run long enough and everything slumps toward flat.\n\nOne time derivative means **one-way time**. A film of diffusion played backwards — ink un-mixing, blur sharpening itself — is instantly recognizable as fake. The heat equation has an arrow of time built into its first-order ∂/∂t, and concept 5 will show exactly why the reverse direction is not just unphysical but mathematically ill-posed."
+    },
+    {
+     "h": "Wave: acceleration proportional to curvature",
+     "md": "## ∂²u/∂t² = c² ∂²u/∂x²\n\nNow the second time derivative — an *acceleration*. Read it as Newton's law for a string element: bulging above the line its neighbors define, tension yanks it back. Acceleration proportional to curvature, F = ma made continuous.\n\nd'Alembert wrote down the general solution in 1747:\n\nu(x, t) = f(x − ct) + g(x + ct)\n\n— any shape gliding right at speed c, plus any shape gliding left. **No smoothing whatsoever**: a kink stays a kink and travels. Waves *transport* shape; heat *destroys* it.\n\nAnd because two time derivatives don't care whether t runs forward or backward (t → −t leaves ∂²/∂t² unchanged), the wave equation is **time-reversible**: the backwards movie is also a legal solution. Energy sloshes between kinetic and potential and is conserved — nothing is forgotten.\n\nSame spatial term as heat; opposite personality. The entire difference lives in the time term."
+    },
+    {
+     "h": "Laplace: the equilibrium the others aim at",
+     "md": "## ∇²u = ∂²u/∂x² + ∂²u/∂y² = 0\n\nNo time at all. Laplace's equation describes **equilibrium** — what the heat equation leaves behind when ∂u/∂t → 0: steady temperature in a plate, electrostatic potential, the shape of a soap film spanning a bent wire.\n\n∇²u = 0 says: *every point is exactly the average of its neighbors.* Not relaxing toward the average — already there, everywhere at once. Solutions ('harmonic functions') are aristocrats: infinitely smooth, and obeying the **maximum principle** — no interior maximum or minimum is possible; extremes live only on the boundary. (An interior hot spot would, by the neighbor-average reading, still be cooling — so it can't be equilibrium.)\n\nThe big three are the archetypes of concept 5's classification: parabolic (heat), hyperbolic (wave), elliptic (Laplace). Learn the personalities here and classification becomes recognition, not taxonomy."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "The heat equation has ∂u/∂t where the wave equation has ∂²u/∂t². What behavioral difference does that single change produce?",
+     "options": [
+      "None that matters — the shared ∂²u/∂x² term dominates the behavior",
+      "Heat solutions decay irreversibly and smooth out; wave solutions oscillate, propagate, and run equally well backwards in time",
+      "Wave solutions travel faster than heat solutions but otherwise behave the same",
+      "The wave equation is nonlinear while the heat equation is linear"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Backwards — the spatial terms are identical, so the time term is the ONLY difference, and it flips the entire character: dissipation versus oscillation.",
+      "Right. First-order-in-time couples curvature to velocity (relax and forget); second-order couples it to acceleration (overshoot and oscillate, conserving energy). One derivative is the arrow of time.",
+      "Speed isn't the axis of difference — heat's influence is formally infinite-speed. The real split is smoothing/irreversible versus shape-preserving/reversible.",
+      "Both are linear. Linearity is what they share; the time order is where they part."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Let the temperature in a 2D plate settle until nothing changes in time. The heat equation ∂u/∂t = α∇²u then reduces to:",
+     "options": [
+      "u = 0 everywhere",
+      "The wave equation",
+      "∇²u = 0 — Laplace's equation",
+      "∂u/∂x = 0 — a spatially uniform temperature"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Steady doesn't mean cold — a plate held hot on one edge and cold on another settles to a nonzero steady pattern.",
+      "There's no mechanism to grow a second time derivative; steady state removes time, it doesn't add inertia.",
+      "Right. Set ∂u/∂t = 0 and Laplace is what remains. Elliptic equations ARE the equilibria of parabolic ones — that's why they have no initial condition.",
+      "Uniformity is only the special case where the boundary is uniform. Generally the steady state still varies in space — harmonically."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "u solves Laplace's equation in a metal plate. Where is the hottest point guaranteed to be?",
+     "options": [
+      "At the exact center of the plate",
+      "Somewhere on the boundary",
+      "At any interior point where ∇²u is largest",
+      "Wherever the initial condition placed it"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The center is just another interior point, and interior extremes are forbidden at equilibrium.",
+      "Right — the maximum principle. An interior point equals its neighbors' average, so it can't exceed all of them; push the argument to the edge and the max lands on the boundary.",
+      "∇²u = 0 everywhere for a solution — there is no interior point where it's 'largest' in any useful sense.",
+      "Laplace's equation has no time and no initial condition — the boundary data alone determines the whole interior. That's the equilibrium character."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A triangular pulse (sharp corner and all) is set moving on an ideal infinite string. An hour later, the pulse is:",
+     "options": [
+      "The same triangle, corner intact, displaced by c × 1 hour",
+      "A rounded, widened bump — the corner smooths off in transit",
+      "Flat — the string dissipates the disturbance",
+      "Unpredictable without solving numerically"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right — d'Alembert: u = f(x − ct), the shape slides rigidly. Hyperbolic equations transport features; they do not sand them down.",
+      "That's diffusion behavior. You're describing what the HEAT equation would do to that profile — the classic parabolic/hyperbolic confusion this pack keeps poking at.",
+      "The ideal wave equation conserves energy exactly; nothing dissipates without an added damping term.",
+      "No numerics needed — this is one of the few PDEs with a complete closed-form general solution, and it says: rigid translation."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Falstad — Ripple tank simulation",
+     "url": "https://www.falstad.com/ripple/",
+     "type": "interactive",
+     "note": "Play with the wave equation live: sources, walls, reflection. Watch kinks propagate instead of smoothing."
+    },
+    {
+     "label": "Wikipedia — Heat equation",
+     "url": "https://en.wikipedia.org/wiki/Heat_equation",
+     "type": "reading",
+     "note": "The physical derivation and the smoothing/maximum-principle properties, well told."
+    },
+    {
+     "label": "Wikipedia — Wave equation",
+     "url": "https://en.wikipedia.org/wiki/Wave_equation",
+     "type": "reading",
+     "note": "d'Alembert's solution and the derivation from a stretched string."
+    }
+   ]
+  },
+  {
+   "id": "c03-boundary-and-initial-conditions",
+   "title": "Boundary and initial conditions",
+   "summary": "PDE + domain + BCs + ICs = a well-posed problem. Dirichlet pins values, Neumann pins flux — and the boundary conditions act as the filter that selects which eigenfunctions survive.",
+   "cards": [
+    {
+     "h": "The equation is not the problem",
+     "md": "The transport equation was solved by *any* f(x − ct). So 'solve the PDE' is under-specified in the same way 'solve F = ma' is: the law is universal; a *problem* is law plus particulars. For a PDE the particulars are:\n\n- the **domain** — the rod 0 ≤ x ≤ L, the plate, the drumhead\n- **boundary conditions (BCs)** — what happens at the spatial edges, for all time\n- **initial conditions (ICs)** — the state at t = 0 across all space (time-dependent equations only)\n\nHadamard's definition of a **well-posed** problem: a solution *exists*, is *unique*, and *depends continuously on the data* — nudge the inputs and the answer nudges, rather than lurching. With the right conditions, the big three are all well-posed. Over-specify and you get contradictions; under-specify and you get a mob of solutions. The conditions aren't bureaucracy — they are half the physics."
+    },
+    {
+     "h": "Dirichlet pins the value, Neumann pins the flux",
+     "md": "Two condition types cover most of the territory, and each has a physical smell:\n\n**Dirichlet** — prescribe **u itself** on the boundary. The rod's ends clamped in ice baths: u(0, t) = u(L, t) = 0. A string's ends nailed down. You are pinning the *value*.\n\n**Neumann** — prescribe the **normal derivative** ∂u/∂n on the boundary. For heat, the gradient at an end is the heat *flux* through it; insulated ends mean zero flux: ∂u/∂x = 0 at x = 0 and L. Nothing crosses; the end's value floats free.\n\n(**Robin** conditions blend the two — au + b·∂u/∂n prescribed — e.g. an end losing heat to surrounding air in proportion to its temperature.)\n\nThe choice has consequences you can feel. An insulated rod conserves its total heat forever: it can never relax to zero, only to its own average. Ice-bath ends bleed heat out until u ≡ 0. Same PDE, different ends, different destiny."
+    },
+    {
+     "h": "The boundary conditions choose the eigenfunctions",
+     "md": "Here is the joint you half-remember. Concept 4 will hunt for building-block solutions of the form X(x)·T(t), and the BCs will fall on X alone. They act as a **filter on the menu of sines and cosines** — only shapes that respect the ends survive:\n\n**Ends pinned at zero** (Dirichlet, u = 0 at both ends): the block must vanish at x = 0 and x = L. Cosine is dead on arrival — cos(0) = 1, it *starts* at full height. Sine vanishes at x = 0 for free, and vanishes at x = L only when a whole number of half-waves fits exactly:\n\n## sin(nπx/L), n = 1, 2, 3, …\n\n**Ends insulated** (Neumann, ∂u/∂x = 0 at both ends): now the block needs zero *slope* at the ends — and the roles flip. Sine dies (slope is maximal at x = 0); cos(nπx/L) survives, joined by the constant function (the n = 0 mode — the average that insulation preserves forever).\n\nThe survivors are the problem's **eigenfunctions**, and their frequencies are **quantized** — a discrete ladder, not a continuum, because only special wavelengths honor both ends at once. This is literally the same mathematics that quantizes the energy levels of a quantum particle in a box."
+    },
+    {
+     "h": "How many conditions? Count the time derivatives",
+     "md": "**Heat (∂u/∂t)** — first order in time → **one** IC: the starting profile u(x, 0) = f(x). Note that's a whole function of x, not a number: 'the state' of a field is a curve.\n\n**Wave (∂²u/∂t²)** — second order in time → **two** ICs: initial displacement AND initial velocity, exactly as a Newtonian particle needs position and velocity. The two correspond to physically different launches: a *plucked* guitar string (shape, zero velocity) versus a *struck* piano string (flat, nonzero velocity).\n\n**Laplace** — no time → **no ICs**. The boundary values alone determine the interior completely and uniquely. That is the equilibrium character stated logically: the inside is entirely the boundary's business.\n\nMismatch the count and well-posedness collapses: hand the heat equation a second initial condition and (generically) no solution exists; hand the wave equation only one and infinitely many do."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A rod has both ends held at zero (ice baths). Why do the surviving spatial modes come out as sin(nπx/L) rather than cos(nπx/L)?",
+     "options": [
+      "Sines are smoother than cosines, and heat flow prefers smooth shapes",
+      "cos(0) = 1, so a cosine can never satisfy u = 0 at x = 0; sine vanishes there, and vanishes at x = L exactly when n half-waves fit",
+      "Cosines belong to the wave equation, sines to the heat equation",
+      "It's a convention — either family would work equally well"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Sines and cosines are equally smooth — they're the same shape shifted. The selection is done entirely by the endpoint values.",
+      "Right. The BC is a filter: it kills every candidate that fails at the ends. Cosine fails instantly at x = 0; the sines that also hit zero at x = L form the quantized ladder n = 1, 2, 3, …",
+      "Both equations use whichever family the BOUNDARY demands — an ice-bath wave problem (nailed string ends) also selects sines. The equation sets the clocks; the boundary picks the shapes.",
+      "Not a convention: cos(nπx/L) simply violates u(0, t) = 0. Swap to insulated ends and the choice genuinely flips to cosines — the boundary decides."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "'The ends of the rod are perfectly insulated.' As a boundary condition, that statement means:",
+     "options": [
+      "u = 0 at the ends",
+      "∂u/∂t = 0 at the ends",
+      "∂u/∂x = 0 at the ends — zero heat flux (a Neumann condition)",
+      "u equals the room's ambient temperature at the ends"
+     ],
+     "answer": 2,
+     "feedback": [
+      "That's a Dirichlet condition — ends CLAMPED at temperature zero, i.e. perfect contact with an ice bath. Insulation is the opposite: no contact at all.",
+      "That would freeze the endpoint's temperature in time — but an insulated end's temperature does drift as heat rearranges internally. Insulation forbids flow THROUGH the end, not change AT it.",
+      "Right. Heat flux is proportional to the gradient; no flux through the end means zero gradient there. The end's value floats — and the rod's total heat is conserved.",
+      "Matching ambient describes an UN-insulated end exchanging heat with the room (that's Robin/Newton-cooling territory)."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why does the wave equation demand two initial conditions when the heat equation needs only one?",
+     "options": [
+      "Waves move in two directions, so each direction needs its own condition",
+      "It is second order in time — like Newton's F = ma, its state is position AND velocity",
+      "The wave equation is harder, so it needs more data to pin down",
+      "The heat equation also needs two; the second is usually left implicit"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Tempting — and the two ICs do end up feeding d'Alembert's two traveling parts — but the reason is the order in time, not the direction count. A one-directional transport equation needs just one IC.",
+      "Right. ∂²u/∂t² means specifying u(x,0) alone leaves the initial velocity ∂u/∂t(x,0) free — pluck versus strike give different futures from the same shape. First-order heat has no such freedom.",
+      "'Hardness' isn't a counting principle. The time order is: each time-derivative order consumes one initial function.",
+      "No — hand heat a second initial condition and the problem becomes over-determined; generically no solution exists at all."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A rod with insulated ends starts with an uneven temperature profile f(x). As t → ∞, u(x, t) approaches:",
+     "options": [
+      "Zero everywhere",
+      "The initial profile f(x) — insulation freezes everything in place",
+      "The constant equal to the average of f over the rod",
+      "It grows without bound, since heat can't escape"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Zero is where DIRICHLET ice-bath ends take you — they drain heat out. Insulation traps it: total heat is conserved, so the rod can't cool to zero.",
+      "Insulation stops flow through the ENDS only; heat still flows freely inside the rod, ironing out the unevenness.",
+      "Right. Total heat is conserved (Neumann's zero flux) while internal diffusion levels the profile — so it flattens onto its own mean. That surviving constant is exactly the n = 0 cosine mode.",
+      "Nothing is generating heat; conservation caps the total. The profile redistributes, it doesn't grow."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Paul's Online Notes — Boundary Value Problems",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/BoundaryValueProblem.aspx",
+     "type": "reading",
+     "note": "The BVP eigenvalue warm-up in Paul's patient house style — the exact bridge from your ODE refresher into this concept."
+    },
+    {
+     "label": "Wikipedia — Boundary value problem",
+     "url": "https://en.wikipedia.org/wiki/Boundary_value_problem",
+     "type": "reading",
+     "note": "Dirichlet, Neumann, Robin, and well-posedness in one place."
+    },
+    {
+     "label": "Paul's Online Notes — Eigenvalues and Eigenfunctions",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/BVPEvals.aspx",
+     "type": "reading",
+     "note": "Works the sin-vs-cos selection for every standard end condition, case by case. The full machinery behind card 3."
+    }
+   ]
+  },
+  {
+   "id": "c04-separation-of-variables",
+   "title": "Separation of variables — where Fourier series earn their keep",
+   "summary": "Guess u = X(x)T(t): the PDE splits into two ODEs, the BCs quantize the eigenvalues, and the initial condition hands over its Fourier coefficients. The complete heat-on-a-rod story.",
+   "cards": [
+    {
+     "h": "The gamble that turns one PDE into two ODEs",
+     "md": "Separation of variables is a gamble: *guess* that some solutions have the product form\n\nu(x, t) = X(x) · T(t)\n\n— a fixed spatial shape whose overall amplitude changes in time. Substitute into ∂u/∂t = α ∂²u/∂x²:\n\nX(x) T′(t) = α X″(x) T(t)\n\nDivide through by α·X·T:\n\n## T′/(αT) = X″/X\n\nThe left side depends only on t; the right side only on x — and they're equal for *every* x and t. Hold x still and vary t: the right side hasn't moved, so the left can't move either. Neither side can vary at all. **Both equal one constant.** Call it −λ (the sign choice pays off on the next card).\n\nThe gamble pays instantly: one PDE has become two ODEs —\n\nX″ + λX = 0  and  T′ = −αλT\n\n— both of which 1974-you could solve in his sleep.\n\nWhy is such a restrictive guess legitimate? Because it doesn't have to find *the* solution — only enough building blocks. Linearity means sums of products are also solutions, and the sum will reach what no single product can."
+    },
+    {
+     "h": "The boundary conditions quantize λ",
+     "md": "Now solve X″ + λX = 0 under the ice-bath conditions X(0) = X(L) = 0, and watch the BCs execute almost every candidate:\n\n**λ < 0:** X = Ae^(kx) + Be^(−kx) — exponentials. Forcing zero at both ends forces A = B = 0. Only the trivial solution. Dead.\n\n**λ = 0:** X = Ax + B — a straight line hitting zero at both ends is the zero line. Dead.\n\n**λ > 0:** X = A sin(√λ·x) + B cos(√λ·x). X(0) = 0 kills B — there's your 'why not cosine' at the level of the machinery. X(L) = 0 then demands sin(√λ·L) = 0, so √λ·L = nπ:\n\n## λₙ = (nπ/L)²,  Xₙ = sin(nπx/L),  n = 1, 2, 3, …\n\nThe boundary conditions have **quantized** the separation constant: an eigenvalue ladder, one rung per count of half-waves that fit. (And the sign gamble −λ is vindicated: only λ > 0 survived.)\n\nEach rung's clock is now forced. T′ = −αλₙT gives\n\nTₙ(t) = e^(−α(nπ/L)²·t)\n\nEvery allowed mode is a frozen sine melting exponentially — and mode n melts **n² times faster** than mode 1. Fine detail dies young; the fundamental lingers longest. Hold that thought: it becomes 'heat forgets' in concept 5."
+    },
+    {
+     "h": "The initial condition buys the coefficients — enter Fourier",
+     "md": "Superpose the modes (linearity guarantees the sum still solves the PDE and still meets the BCs):\n\n## u(x, t) = Σₙ bₙ sin(nπx/L) e^(−α(nπ/L)²t)\n\nThe PDE fixed the decay clocks; the BCs picked the sine shapes. One job remains — match t = 0 to the measured starting profile f(x):\n\nf(x) = Σₙ bₙ sin(nπx/L)\n\nThat is a **Fourier sine series** — and this equation is not an *application* of Fourier series; it is their *birthplace*. Fourier built the entire apparatus for exactly this heat problem (Théorie analytique de la chaleur, 1822), scandalizing his referees — Lagrange among them — by insisting essentially arbitrary f could be so expanded.\n\nThe extraction move is the one from your Fourier refresher: **orthogonality**. The sines are perpendicular under ∫₀ᴸ: multiply both sides by sin(mπx/L), integrate, and every term but one dies:\n\nbₙ = (2/L) ∫₀ᴸ f(x) sin(nπx/L) dx\n\nBehold the division of labor:\n\n**The PDE sets the clocks. The boundary conditions choose the shapes. The initial condition sets the volumes.**\n\nThat sentence is the entire heat-on-a-rod story — and the reusable template for vibrating strings, drumheads, and quantum wells."
+    },
+    {
+     "h": "Where the trick applies — and where it dies",
+     "md": "Separation demands three things, each load-bearing:\n\n1. **A linear, homogeneous PDE.** Superposition must hold, or the modes you find can't be summed into anything.\n\n2. **Homogeneous BCs.** The zeros must pass through to X alone. Ends held at 100° and 40°? Not fatal: subtract the steady state (here a straight line — a Laplace solution in 1D), and the leftover satisfies zero BCs. Standard pre-processing, not failure.\n\n3. **A separable geometry** — a domain aligned with a coordinate grid. Rectangles and boxes give sines and cosines; disks and cylinders give **Bessel functions**; spheres give **Legendre polynomials**. Different eigenfunction families, identical script: BCs quantize, orthogonality extracts coefficients. A potato-shaped domain gives you nothing.\n\n**Nonlinearity is the true wall.** Try u = XT in ∂u/∂t = u·∂u/∂x: the right side becomes X X′ T², and no division untangles x from t — the ansatz won't split. Worse, even if product solutions existed, without superposition you couldn't add them. This is why Navier–Stokes has no mode-ladder recipe.\n\nWhen the trick dies, the field reaches for transforms, Green's functions — and above all, the numerical methods of concept 6."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "After substituting u = X(x)T(t) into the heat equation, we set T′/(αT) = X″/X equal to a constant. What forces it to be constant?",
+     "options": [
+      "It's an approximation that makes the algebra tractable",
+      "A function of t alone equals a function of x alone for all x and t — vary one variable while holding the other and neither side can move",
+      "The boundary conditions force both sides to zero",
+      "Experimental measurements show the ratio is constant for real rods"
+     ],
+     "answer": 1,
+     "feedback": [
+      "It's exact, not approximate — the separation constant is a theorem, not a convenience.",
+      "Right. Freeze x and sweep t: the x-side is unchanged, so the t-side must be too. Symmetrically for x. A quantity that can't vary with either variable is a constant.",
+      "The BCs act later — they select WHICH constants λ are allowed. The constancy itself comes purely from the two-sides argument.",
+      "No measurement involved: this is forced by the structure of the separated equation alone."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "In the rod solution u = Σ bₙ sin(nπx/L) e^(−α(nπ/L)²t), where do the numbers bₙ come from?",
+     "options": [
+      "From the boundary conditions, which set the amplitude of each mode",
+      "From solving one additional ODE per mode",
+      "They are Fourier sine coefficients of the initial profile: bₙ = (2/L)∫₀ᴸ f(x) sin(nπx/L) dx",
+      "They're free parameters, chosen to make the solution look physical"
+     ],
+     "answer": 2,
+     "feedback": [
+      "The BCs' whole contribution was choosing the sine FAMILY and quantizing λₙ — they say nothing about how much of each mode. Amplitudes are the initial condition's department.",
+      "All the ODEs are already spent: X gave the sines, T gave the exponentials. The bₙ come from an integral, not another differential equation.",
+      "Right — orthogonality projects f onto each eigenfunction. This is precisely where your Fourier-series ladder plugs in: the IC hands each mode its starting volume.",
+      "Nothing is free: f(x) determines every bₙ uniquely. Uniqueness is part of what makes the problem well-posed."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Compare mode n = 10 to mode n = 1 in the rod solution. The n = 10 mode's exponential decay RATE is:",
+     "options": [
+      "10 times the fundamental's",
+      "100 times the fundamental's",
+      "The same — all modes decay together",
+      "One tenth — long wavelengths die faster"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The rate carries λₙ = (nπ/L)² — the n gets squared before it reaches the exponent.",
+      "Right: rate ∝ n². By the time the fundamental has faded noticeably, mode 10 is down by a factor of e raised to 100 times as much — utterly gone. This n² law is why diffusion erases fine detail first, and it's the engine of 'heat forgets' in the next concept.",
+      "They share the form e^(−αλt) but each has its own λₙ; the ladder of rates is the whole point.",
+      "Backwards — SHORT wavelengths (high n) have big curvature relative to their size, so diffusion attacks them hardest."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "In solving X″ + λX = 0 with X(0) = X(L) = 0, why are λ < 0 and λ = 0 thrown out?",
+     "options": [
+      "Negative eigenvalues would make the temperature negative, which is unphysical",
+      "Their solutions (exponentials; straight lines) can't vanish at both ends without being identically zero",
+      "They make the time factor blow up, so we discard them for stability",
+      "Convention — the sign of λ is chosen so the formulas look tidy"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Negative TEMPERATURE isn't the issue (u can be negative in these problems anyway); it's the boundary conditions the candidates can't meet.",
+      "Right. e^(kx) combinations have at most one zero, and a line through two zeros is the zero line. Only oscillatory solutions can touch zero twice — the BCs themselves force λ > 0.",
+      "Half-credit reasoning: λ < 0 WOULD give growing T(t), but we never get that far — the spatial problem already has no nontrivial solution. The execution happens in x, not t.",
+      "It isn't cosmetic: the sign is a conclusion, not a choice. Writing −λ up front just anticipates what the BCs are about to prove."
+     ]
+    },
+    {
+     "id": "q5",
+     "type": "mcq",
+     "prompt": "Why does separation of variables fail for a nonlinear PDE like ∂u/∂t = u·∂u/∂x?",
+     "options": [
+      "The product guess never splits into one-variable sides — and without superposition, modes couldn't be summed even if found",
+      "Nonlinear PDEs have no solutions to find",
+      "It works, but the eigenvalues become complex numbers",
+      "The boundary conditions can't be applied to nonlinear equations"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right — the failure is double. Substituting XT gives X X′ T² on the right: no division isolates x from t. And the deeper loss is superposition, the lever that made a sum of modes a solution. Both jaws of the method break at once.",
+      "They have solutions — often wild ones (shocks, turbulence). What they lack is this particular recipe for constructing them.",
+      "Complex eigenvalues occur in perfectly linear problems and are handled routinely. The nonlinear failure is structural, not numerical.",
+      "BCs apply fine to nonlinear problems — Navier–Stokes simulations enforce them constantly. It's the solution METHOD that dies, not the problem statement."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "3Blue1Brown — Solving the heat equation",
+     "url": "https://www.youtube.com/watch?v=ToIXSwZ1pJU",
+     "type": "video",
+     "note": "The exact arc of this concept — sine modes, boundary conditions, Fourier coefficients — animated. Watch after card 3."
+    },
+    {
+     "label": "Paul's Online Notes — Separation of Variables",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/SeparationofVariables.aspx",
+     "type": "reading",
+     "note": "Every algebraic step written out, for all the standard equations — the machinery you remember the NAME of, fully restored."
+    },
+    {
+     "label": "Paul's Online Notes — Solving the Heat Equation",
+     "url": "https://tutorial.math.lamar.edu/Classes/DE/SolvingHeatEquation.aspx",
+     "type": "reading",
+     "note": "The rod problem end to end with worked examples, including insulated-end (cosine) variants."
+    }
+   ]
+  },
+  {
+   "id": "c05-classification-and-behavior",
+   "title": "Classification: elliptic, parabolic, hyperbolic",
+   "summary": "B² − 4AC sorts second-order PDEs into three classes, and the class predicts everything: elliptic = equilibrium, parabolic = smoothing (and forgetting), hyperbolic = finite-speed propagation (and remembering).",
+   "cards": [
+    {
+     "h": "The discriminant",
+     "md": "Every second-order linear PDE in two variables,\n\nA ∂²u/∂x² + B ∂²u/∂x∂y + C ∂²u/∂y² + (lower-order terms) = 0,\n\nis sorted by the same discriminant that sorts conic sections:\n\n- **B² − 4AC < 0 → elliptic.** Laplace: A = C = 1, B = 0 → discriminant −4.\n- **B² − 4AC = 0 → parabolic.** Heat (y = t): only one second derivative survives → 0.\n- **B² − 4AC > 0 → hyperbolic.** Wave (y = t): A = c², C = −1, B = 0 → +4c².\n\nThe names are borrowed from ellipse/parabola/hyperbola, and the borrowing is honest — the second-order coefficients form the same quadratic form that shapes those curves.\n\nWhy classify at all? Because **the class, not the application, predicts the behavior**. An unfamiliar equation from finance or biology that tests hyperbolic will transport signals at finite speed whether or not anything is visibly 'waving.' Meet a new PDE, compute the discriminant, and you already know its temperament — which conditions make it well-posed, what its solutions can and cannot do.\n\n(When A, B, C vary with position, one equation can change type across its domain — transonic airflow famously flips elliptic-to-hyperbolic across the sound barrier, which is precisely why that regime was hard.)"
+    },
+    {
+     "h": "Three personalities",
+     "md": "**Hyperbolic — propagation.** Information travels at *finite speed* along characteristics (the lines x ± ct = const). The solution here-and-now depends only on initial data inside a cone reaching back at speed c — a genuine domain of dependence, the same causality structure as relativity. Sharp features survive: a jump propagates as a jump. Time-reversible; energy conserved. Needs initial data (two functions) and it marches.\n\n**Parabolic — smoothing.** Influence spreads (formally) at infinite speed, but the deeper signature is **instant smoothing**: for any t > 0, the solution is infinitely differentiable no matter how jagged the start — a step function becomes silk immediately. Irreversible; it forgets (next card). One initial function, then a one-way march toward equilibrium.\n\n**Elliptic — equilibrium.** No time, no propagation, no marching. Every interior point feels ALL the boundary data at once; change the boundary anywhere and the entire interior shifts in response. Solutions are maximally smooth and obey the maximum principle. It doesn't evolve — it *balances*.\n\nThe big three aren't just examples of the classes; they're canonical: near any point, a well-behaved second-order PDE of each class can be changed of variables into (approximately) its archetype."
+    },
+    {
+     "h": "Why heat forgets and the wave remembers",
+     "md": "Run both equations through concept 4's machinery on the same rod and compare what time does to each mode.\n\n**Heat multiplies mode n by e^(−α(nπ/L)²t).** The n² in the exponent means detail is annihilated hierarchically: after time L²/α, essentially every mode but the fundamental sits beneath any conceivable measurement precision. Two very different initial profiles — same b₁, different everything else — become experimentally indistinguishable. **The equation forgets.**\n\nNow try to run it backwards: reconstructing t = 0 from a later snapshot means multiplying each measured mode by e^(+α(nπ/L)²t) — amplifying immeasurably small high-n residue (and, inevitably, your measurement noise) by astronomically large factors. Hadamard's continuous-dependence clause dies: **backward heat is ill-posed**. That's why deblurring an image is genuinely hard, and why the cream never unstirs from the coffee.\n\n**The wave multiplies mode n by cos(ωₙt)** (plus a sine term from initial velocity), ωₙ = nπc/L. The multiplier *oscillates with magnitude 1*: no amplitude information is ever lost, energy is exactly conserved, and t → −t gives another legal solution. Better: at t = 2L/c every mode has completed a whole number of half-cycles and the string exactly reconstructs its initial state. **The equation remembers.**\n\nOne ∂/∂t versus two: dissipation versus oscillation, forgetting versus total recall, an arrow of time versus reversibility. The classification table is really a table of what time itself does inside each equation."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "You meet an unfamiliar second-order PDE from a biology paper and compute B² − 4AC > 0. Before solving anything, you can already predict:",
+     "options": [
+      "Solutions smooth out instantly and evolve one-way toward equilibrium",
+      "Signals propagate at finite speed, sharp features can survive, and two initial conditions will be needed",
+      "There is no time dependence; boundary values alone determine the interior",
+      "Nothing — behavior depends on what the equation models, not its coefficients"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's the parabolic personality — discriminant zero. You've described the heat class, not the hyperbolic one.",
+      "Right. Positive discriminant = hyperbolic = wave-class temperament: characteristics, finite-speed causality, preserved discontinuities, second-order-in-time data requirements — regardless of what's 'waving.'",
+      "That's elliptic — negative discriminant. Equilibrium is the opposite temperament from propagation.",
+      "The whole payoff of classification is that the coefficients ALONE fix the qualitative behavior. The application names the variables; the class writes the plot."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why is running the heat equation backwards in time ill-posed, when running the wave equation backwards is perfectly fine?",
+     "options": [
+      "Backward heat requires amplifying vanished high-frequency modes (and noise) by enormous e^(+αλₙt) factors; wave modes just oscillate at magnitude 1, losing nothing",
+      "The heat equation is nonlinear in reverse",
+      "Both are ill-posed backwards; the wave equation just fails more slowly",
+      "The heat equation's solutions become negative in reverse, which is impossible"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right. Forward decay e^(−αn²t) becomes backward amplification e^(+αn²t) — tiny measurement noise at high n explodes, violating continuous dependence on data. The wave's unit-magnitude oscillations are exactly reversible.",
+      "Linearity is direction-blind — the equation is linear both ways. The pathology is amplification, not nonlinearity.",
+      "The wave equation is genuinely well-posed in both directions — t → −t maps solutions to solutions. Only the parabolic class has the arrow.",
+      "Negative values of u are unremarkable (measure temperature from the mean and half your profile is negative). The failure is the noise blow-up, not a sign."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "At t = 0, a rod's temperature has a sharp jump, and a string's displacement has a sharp corner. One millisecond later:",
+     "options": [
+      "Both features are gone — PDEs smooth everything",
+      "Both features persist — PDEs preserve everything",
+      "The temperature jump has already melted into a smooth ramp; the string's corner is intact and traveling",
+      "The string's corner has smoothed; the temperature jump propagates along the rod"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Half right. Parabolic equations do smooth instantly — but hyperbolic ones don't smooth at all; they transport.",
+      "Half right the other way: the wave keeps its corner, but heat's smoothing is instantaneous — for ANY t > 0 the profile is infinitely differentiable.",
+      "Right — the two classes in one sentence. Parabolic: instant smoothing (high-n modes annihilated by e^(−αn²t)). Hyperbolic: features ride the characteristics unchanged.",
+      "Exactly backwards — you've swapped the personalities. Heat smooths and stays put; waves preserve and propagate."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "For Laplace's equation on a disk, you slightly change the boundary values along one small arc. What happens to the solution inside?",
+     "options": [
+      "Only the region near that arc changes",
+      "Nothing changes until the disturbance has time to propagate inward",
+      "The change spreads inward at the equation's characteristic speed",
+      "Every interior point changes, immediately and simultaneously — elliptic solutions feel the entire boundary at once"
+     ],
+     "answer": 3,
+     "feedback": [
+      "Elliptic problems have no locality of that kind — the interior solves a global balance against ALL the boundary data. (The influence does weaken with distance, but it is everywhere nonzero.)",
+      "There is no time in the problem — 'until' doesn't exist. Equilibrium is re-solved as a whole, not reached by a process.",
+      "Characteristics and propagation speeds belong to the hyperbolic class; elliptic equations have no real characteristics at all.",
+      "Right. That global, instantaneous dependence is the elliptic signature — and it's why discretized Laplace becomes one big simultaneous system (concept 6) instead of a time march."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Wikipedia — PDE classification (second-order equations)",
+     "url": "https://en.wikipedia.org/wiki/Partial_differential_equation",
+     "type": "reading",
+     "note": "See the 'Classification' section: the discriminant, characteristics, and the canonical forms."
+    },
+    {
+     "label": "Steve Brunton — Engineering math lectures (YouTube)",
+     "url": "https://www.youtube.com/@Eigensteve",
+     "type": "video",
+     "note": "Search his channel for 'heat equation' and 'wave equation' — clear blackboard-style treatments of the classes and their physics."
+    },
+    {
+     "label": "MIT OCW 18.03SC — Differential Equations",
+     "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/",
+     "type": "reading",
+     "note": "The Fourier/PDE unit ties the ODE, Fourier, and PDE rungs of your ladder together at MIT depth, free."
+    }
+   ]
+  },
+  {
+   "id": "c06-the-numerical-idea",
+   "title": "The numerical solution idea",
+   "summary": "Replace derivatives with grid differences and the PDE becomes an update rule — but stability (r ≤ 1/2, CFL) polices the step sizes, and the equation's class dictates the algorithm's shape.",
+   "cards": [
+    {
+     "h": "Replace derivatives with differences",
+     "md": "No separable geometry? Nonlinear equation? Then discretize. Lay a grid — xᵢ = iΔx, tⱼ = jΔt — and store one unknown per grid point, uᵢⱼ ≈ u(xᵢ, tⱼ). Replace each derivative by a difference of neighbors:\n\n∂u/∂t ≈ (uᵢ,ⱼ₊₁ − uᵢ,ⱼ) / Δt\n\n∂²u/∂x² ≈ (uᵢ₊₁,ⱼ − 2uᵢ,ⱼ + uᵢ₋₁,ⱼ) / Δx²\n\nLook hard at that second one: it is concept 1's neighbor-average reading made literal — twice the gap between me and the average of my two neighbors, per Δx². The heat equation becomes an **update rule**:\n\n## uᵢ,ⱼ₊₁ = uᵢ,ⱼ + r (uᵢ₊₁,ⱼ − 2uᵢ,ⱼ + uᵢ₋₁,ⱼ),  r = αΔt/Δx²\n\nStart from the initial condition, pin the boundary points with the BCs, and march forward one tick at a time: each point nudges toward the average of its neighbors. The algorithm doesn't *approximate* the physics story — the algorithm **is** the physics story, told in discrete steps."
+    },
+    {
+     "h": "Stability: the step-size trap",
+     "md": "The explicit heat scheme carries a trap. If **r = αΔt/Δx² > 1/2**, each update overshoots the neighbor average, overshoots harder next tick, and the grid erupts into sawtooth oscillations growing without bound. Not inaccuracy — *exponential garbage*. The scheme is stable only for r ≤ 1/2, which reads as a tax: halve Δx for finer spatial detail and you must **quarter** Δt. (Notice which modes explode first: the highest-frequency ones the grid can hold — the discrete ghost of the n² law.)\n\nFor the wave equation the constraint is the **CFL condition** (Courant–Friedrichs–Lewy, 1928):\n\n## c·Δt ≤ Δx\n\nRead it causally: in one time step, the physical wave moves c·Δt, while the numerical stencil only consults adjacent cells — information moves at most one Δx per step. If the real wave outruns the scheme's reach, the computation is deciding the future without the data that determines it. Divergence is guaranteed.\n\nThe escape is **implicit methods** (backward Euler, Crank–Nicolson): write the update in terms of the *unknown* next-step values and solve a linear system every tick. Unconditionally stable — any Δt — at the price of algebra per step. Stability bought with a matrix solve."
+    },
+    {
+     "h": "Classification survives discretization",
+     "md": "The class of the PDE dictates the *shape of the algorithm*:\n\n**Parabolic and hyperbolic → time-marching.** There's an initial state and a causal direction; the solver walks it, step by step, under its stability constraint.\n\n**Elliptic → one giant simultaneous system.** No time to march along. Discretize ∇²u = 0 and every interior point demands to equal the average of its four neighbors — all at once. That's a huge sparse linear system (millions of coupled unknowns), attacked by iterative solvers: Jacobi and Gauss–Seidel sweeps (which mimic diffusing toward equilibrium — solving Laplace by *simulating* the heat equation to steady state), accelerated by multigrid. The global-dependence personality of elliptic problems reappears as global coupling in the matrix.\n\nBeyond finite differences, the modern zoo: **finite elements** (triangulate the potato-shaped domain — this is the FEA in every engineering package), and **spectral methods**, where the unknowns are Fourier coefficients themselves — separation of variables reborn as an algorithm, converging exponentially fast on smooth problems.\n\nThe honest headline: most PDEs of practice — Navier–Stokes, Einstein's equations, weather — have no closed-form solution. Numerics isn't the fallback. It's the profession."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "The stencil (uᵢ₊₁ − 2uᵢ + uᵢ₋₁)/Δx² approximates which quantity, with what intuition?",
+     "options": [
+      "∂u/∂x — the average slope across three points",
+      "∂²u/∂x² — how the center point compares to the average of its two neighbors",
+      "∂u/∂t — the change per time step",
+      "The local truncation error of the scheme"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The slope would be (uᵢ₊₁ − uᵢ₋₁)/2Δx — antisymmetric in the neighbors. This stencil is symmetric: it measures bending, not tilt.",
+      "Right. Rewrite it as 2[(uᵢ₊₁ + uᵢ₋₁)/2 − uᵢ]/Δx² — twice the me-versus-neighbor-average gap. The same reading that explained the heat equation in concept 1 now runs the computation.",
+      "Time never appears in the stencil — all three samples are at the same time level j.",
+      "It has truncation error (order Δx²), but the stencil itself is the derivative estimate, not the error."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Using the explicit heat scheme, you halve Δx to double the spatial resolution. To stay stable you must:",
+     "options": [
+      "Halve Δt as well — keep the steps proportional",
+      "Leave Δt alone; stability only depends on Δx",
+      "Quarter Δt — the constraint is r = αΔt/Δx² ≤ 1/2, and Δx enters squared",
+      "Double Δt to compensate for the extra work"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Proportional scaling suits the wave equation's CFL (c·Δt ≤ Δx). Diffusion is harsher: Δx is SQUARED in r.",
+      "Δt and Δx are locked together through r = αΔt/Δx²; changing one without the other changes r — here to four times its old value. Instability follows.",
+      "Right. Δx² in the denominator means 2× spatial resolution costs 4× the time steps — 8× total work in 1D. This scaling tax is a prime motivation for implicit methods.",
+      "That pushes r to 8× its old value — the grid will erupt into growing sawtooth noise within a few steps."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "The CFL condition c·Δt ≤ Δx for the wave equation expresses which requirement?",
+     "options": [
+      "The grid must be fine enough to make the solution accurate to plotting precision",
+      "Numerical information (one cell per step) must move at least as fast as the physical wave, or the scheme computes the future without the data that determines it",
+      "The wave speed must be recomputed at every time step",
+      "Round-off error must stay below the truncation error"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Accuracy is a separate (softer) budget. CFL is about causality, and violating it doesn't give a blurry answer — it gives explosive divergence.",
+      "Right. The scheme's domain of dependence must contain the PDE's. It's the hyperbolic finite-speed-of-information personality (concept 5) showing up as an engineering constraint on your timestep.",
+      "c is a fixed property of the medium in the linear wave equation; nothing about it updates.",
+      "Round-off versus truncation is a real bookkeeping concern, but it isn't what Courant, Friedrichs, and Lewy were policing."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Why does discretizing Laplace's equation produce one giant simultaneous system instead of a time-marching loop?",
+     "options": [
+      "Elliptic equations have no time direction to march along — every point's neighbor-average condition must hold at once, globally coupled",
+      "Laplace's equation is too nonlinear for marching",
+      "It's a solver-implementation choice; marching would work equally well",
+      "The boundary conditions are too numerous for explicit updates"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right — the elliptic personality (all-at-once global dependence) becomes matrix structure. Amusingly, iterative solvers like Jacobi 'march' anyway: they simulate pseudo-diffusion until it equilibrates, using the parabolic equation to solve its own steady state.",
+      "Laplace's equation is perfectly linear. The obstacle is the missing time direction, not nonlinearity.",
+      "There's real structure here, not preference: with no initial state and no causal direction, an explicit march has nowhere to start and nothing to follow.",
+      "The BC count is the normal one for an elliptic problem (data on the whole boundary). The coupling comes from the interior stencil, not the boundary."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Wikipedia — Finite difference method",
+     "url": "https://en.wikipedia.org/wiki/Finite_difference_method",
+     "type": "reading",
+     "note": "The stencils and the explicit/implicit heat schemes, with the stability analysis sketched."
+    },
+    {
+     "label": "Wikipedia — Courant–Friedrichs–Lewy condition",
+     "url": "https://en.wikipedia.org/wiki/Courant%E2%80%93Friedrichs%E2%80%93Lewy_condition",
+     "type": "reading",
+     "note": "The causality reading of CFL, plus its history — the 1928 paper predates electronic computers."
+    },
+    {
+     "label": "Steve Brunton — Engineering math lectures (YouTube)",
+     "url": "https://www.youtube.com/@Eigensteve",
+     "type": "video",
+     "note": "His finite-difference and spectral-methods lectures are the natural next depth level after this concept."
+    }
+   ]
+  },
+  {
+   "id": "c07-pdes-run-the-modern-world",
+   "title": "Where PDEs run the modern world",
+   "summary": "Maxwell, Schrödinger, Navier–Stokes, Einstein, Black–Scholes — the famous equations are PDEs, their simulation is industrial infrastructure, and even generative AI runs on diffusion.",
+   "cards": [
+    {
+     "h": "The famous equations are the big three in costume",
+     "md": "**Maxwell's equations** are first-order PDEs in the electromagnetic fields; uncouple them and each field component satisfies the *wave equation*, with propagation speed 1/√(μ₀ε₀) — which computes to the measured speed of light. That's how humanity learned light is electromagnetic: it fell out of a hyperbolic PDE.\n\n**Schrödinger's equation** is the heat equation wearing an i: iℏ ∂ψ/∂t = −(ℏ²/2m) ∂²ψ/∂x² + Vψ. Diffusion in imaginary time — so modes *rotate* in phase instead of decaying, which is why quantum evolution is reversible while diffusion isn't. And the particle-in-a-box energy levels? Exactly concept 3's BC-quantized eigenvalue ladder.\n\n**Navier–Stokes** is Newton's second law for a fluid parcel: nonlinear transport plus parabolic viscosity. It runs weather, aerodynamics, and your coffee cup — and whether its 3-D solutions always stay smooth is a Clay Millennium Problem: $1M, unclaimed since 2000.\n\n**Einstein's field equations**: ten coupled nonlinear PDEs for the geometry of spacetime. Gravitational waves were a hyperbolic-class prediction a century before LIGO heard one.\n\n**Black–Scholes** prices options — and a change of variables turns it into the plain heat equation. The Nobel-winning formula is a heat kernel in a suit; the smooth option-value curve is the diffusion of uncertainty about a kinked payoff."
+    },
+    {
+     "h": "Simulation as civilization's infrastructure",
+     "md": "**Weather.** Forecast centers integrate the 'primitive equations' — Navier–Stokes plus thermodynamics and moisture — on global grids of ~10 km cells, timestep capped by CFL for the fastest waves in the model. Forecast skill has improved by roughly one day per decade for forty years: a five-day forecast now is as good as a four-day forecast was ten years ago. That compounding is concept 6's machinery plus better data, relentlessly applied.\n\n**Engineering.** CFD has replaced most wind-tunnel hours in aircraft design; cars are crash-tested in finite-element elastodynamics thousands of times before a prototype bends; chip designers fight the heat equation by name (their term is 'thermal budget'). Every FEA package is the numerical zoo of concept 6 behind a GUI.\n\n**Imaging is PDEs run backwards.** CT, MRI, ultrasound, and seismic exploration are *inverse problems*: measure on the boundary, infer the interior — reconstruct the coefficients or sources of a PDE from its boundary behavior. Concept 3's well-posedness is precisely what's at stake: inverse problems are typically ill-posed (backward heat's cousins), and 'regularization' — the art of stabilizing them — is a whole applied-math discipline. Every medical scan is a boundary-value problem solved in reverse."
+    },
+    {
+     "h": "The frontier: PDEs meet learning",
+     "md": "The newest chapter reads like a callback to concept 5.\n\n**Diffusion models** — the systems generating images from text — are named literally. The forward process adds noise step by step, evolving the image-distribution under a heat-like (Fokker–Planck) equation: information is destroyed exactly the way parabolic equations destroy it, fine structure first. Generation is the learned *reverse-time* map — running backward heat, the canonically ill-posed direction, made tractable because the network has learned the statistics of real images as a prior. Un-stirring the coffee, by knowing what coffee looks like.\n\n**Learned solvers.** Physics-informed neural networks bake the PDE residual into the loss; neural surrogates approximate expensive solvers (weather emulators now run in seconds); learned turbulence closures patch the scales Navier–Stokes simulations can't afford to resolve. The solvers of concept 6 are becoming hybrids of stencil and statistics.\n\nStep back and take the summit view: a subject you last saw in 1974 — rods, strings, drumheads — turned out to be the operating system of forecasting, engineering, imaging, finance, and now generative AI. The machinery didn't age out; it became infrastructure.\n\nThe mastery review will now interleave the whole ladder — modes, boundaries, classes, stencils. That mixing is where fifty-year-old memory gets rebuilt into something that holds."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Black–Scholes 'is the heat equation after a change of variables.' What does that fact actually deliver?",
+     "options": [
+      "It proves stock prices themselves diffuse like heat in a rod",
+      "The pricing PDE inherits heat-equation machinery: closed-form solutions via the heat kernel, and the guarantee that the option value smooths the kinked payoff",
+      "It shows financial markets are time-reversible",
+      "Nothing practical — it's a formal curiosity"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Careful — the transformation applies to the pricing EQUATION in transformed variables, not to the price path itself. The model's price process is a separate (stochastic) assumption.",
+      "Right. Fifty years of heat-equation results transfer wholesale: the Black–Scholes formula is a heat-kernel integral, and parabolic smoothing is why an option's value curve is silky even though its expiry payoff has a corner.",
+      "Backwards — the parabolic class is the IRREVERSIBLE one. (The pricing equation actually runs backward from expiry, which the change of variables flips into forward heat.)",
+      "It's among the most practically consequential changes of variables in applied math — it produced a closed-form formula that reshaped global markets."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A weather center doubles its grid resolution (halves the cell size) to sharpen forecasts. Why must the timestep shrink too?",
+     "options": [
+      "Smaller cells hold less data, so more steps are needed to fill them",
+      "The CFL condition: the fastest waves in the model must not cross more than about one (now smaller) cell per timestep",
+      "Rounding error accumulates faster on fine grids",
+      "It needn't shrink — resolution and timestep are independent choices"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Cells don't 'fill' — the constraint is about how far physical signals travel per step relative to cell size.",
+      "Right — CFL at planetary scale. Halving Δx halves the allowed Δt (worse for any diffusive terms), so 2× resolution costs roughly 8-16× the computation. This scaling is why weather models are perennial top consumers of supercomputing.",
+      "Round-off is real but minor here; the binding constraint is stability, and violating it produces explosive garbage, not gradual error.",
+      "They're locked together by stability — the same trap you met on the rod, now with the fate of the five-day forecast attached."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "In image-generating 'diffusion models,' the forward noising process is heat-like. Through concept 5's lens, what is generation?",
+     "options": [
+      "Solving Laplace's equation on the space of images",
+      "A learned approximation to the reverse-time parabolic problem — the classically ill-posed direction, stabilized by learned knowledge of what real images look like",
+      "Running the wave equation, since images must be reconstructed without loss",
+      "A rebranding with no real connection to the PDE"
+     ],
+     "answer": 1,
+     "feedback": [
+      "There's no equilibrium boundary-value structure here — the process is dynamic and time-directed, the parabolic signature.",
+      "Right. Backward diffusion amplifies what was destroyed — impossible in general (concept 5's ill-posedness), but tractable when a prior narrows 'in general' down to 'images people photograph.' Regularization by learning.",
+      "Reversibility is exactly what the forward noising does NOT have — that's why generation must be learned rather than merely computed.",
+      "The connection is mathematically literal: the noising process evolves the data distribution under a Fokker–Planck equation, diffusion's formal machinery."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Wikipedia — Navier–Stokes equations",
+     "url": "https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations",
+     "type": "reading",
+     "note": "The equations, their physical reading, and the Millennium Prize smoothness problem."
+    },
+    {
+     "label": "Wikipedia — Black–Scholes equation",
+     "url": "https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_equation",
+     "type": "reading",
+     "note": "Includes the explicit change of variables to the heat equation — worth seeing once with your own eyes."
+    },
+    {
+     "label": "3Blue1Brown — Heat equation written lesson",
+     "url": "https://www.3blue1brown.com/lessons/heat-equation",
+     "type": "reading",
+     "note": "Reread now from the summit: every idea in it should feel owned rather than borrowed."
+    }
+   ]
+  }
+ ]
+}

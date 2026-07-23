@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEFF3; --panel:#FFFFFF; --ink:#16243A; --dim:#5B6B80;
+  --prior:#7C8DA5; --post:#E8A13C; --post-deep:#C77F14; --wrong:#B3423A;
+  --ok:#2E7D5B; --line:#C9D2DE; --lock:#AEB9C7;
+  --r:10px; --shadow:0 1px 2px rgba(22,36,58,.08),0 8px 24px rgba(22,36,58,.07);
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"IBM Plex Serif",serif;line-height:1.25;font-weight:600}
+.mono{font-family:"IBM Plex Mono",monospace}
+a{color:var(--post-deep)}
+button{font:inherit;cursor:pointer;border:0;border-radius:8px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--post-deep);outline-offset:2px}
+.btn{background:var(--ink);color:#fff;padding:10px 18px;font-weight:600}
+.btn:disabled{background:var(--lock);cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.warm{background:var(--post);color:var(--ink)}
+input{font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;width:100%;background:#fff;color:var(--ink)}
+
+/* ---------- shell ---------- */
+#top{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1.5px solid var(--line)}
+#top .wordmark{font-family:"IBM Plex Serif",serif;font-weight:600;font-size:20px;letter-spacing:.2px}
+#top .wordmark em{font-style:normal;color:var(--post-deep)}
+#top .spacer{flex:1}
+#top .who{color:var(--dim);font-size:14px}
+main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
+
+/* ---------- auth ---------- */
+.auth{max-width:380px;margin:9vh auto 0;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:30px}
+.auth h1{font-size:30px;margin-bottom:4px}
+.auth p{color:var(--dim);margin-bottom:20px;font-size:15px}
+.auth form>*{margin-bottom:12px}
+.auth .err{color:var(--wrong);font-size:14px;min-height:20px}
+.auth .swap{background:none;color:var(--dim);text-decoration:underline;padding:4px 0}
+
+/* ---------- dashboard ---------- */
+.dash h1{font-size:34px;margin-bottom:2px}
+.dash .sub{color:var(--dim);margin-bottom:26px}
+.tcard{display:block;width:100%;text-align:left;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:16px;color:var(--ink);border:1.5px solid transparent}
+.tcard:hover{border-color:var(--post)}
+.tcard h2{font-size:23px}
+.tcard .tag{color:var(--dim);font-size:15px;margin:2px 0 14px}
+.meterline{display:flex;align-items:center;gap:12px}
+.meterline .bar{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.meterline .bar i{display:block;height:100%;background:var(--post);border-radius:4px}
+.meterline .num{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--dim);white-space:nowrap}
+.due-pill{background:var(--post);color:var(--ink);font-size:12.5px;font-weight:600;border-radius:99px;padding:2px 10px;margin-left:8px}
+
+/* ---------- topic: ladder + stage ---------- */
+.topic{display:grid;grid-template-columns:280px 1fr;gap:24px}
+.ladder{align-self:start;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:14px}
+.rung{display:flex;gap:10px;width:100%;text-align:left;background:none;padding:10px;border-radius:8px;align-items:flex-start;color:var(--ink)}
+.rung:hover:not(:disabled){background:var(--paper)}
+.rung:disabled{color:var(--lock);cursor:default}
+.rung.active{background:var(--paper);box-shadow:inset 3px 0 0 var(--post)}
+.rung .dot{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12px;margin-top:2px;background:#fff}
+.rung.done .dot{background:var(--post);border-color:var(--post);color:var(--ink);font-weight:600}
+.rung .rt{font-size:14.5px;line-height:1.35;font-weight:500}
+.rung .rp{font-size:12px;color:var(--dim);font-family:"IBM Plex Mono",monospace}
+.rung .flag{font-size:11.5px;color:var(--post-deep);font-weight:600}
+
+/* ---------- posterior strip (signature) ---------- */
+.strip{background:var(--ink);color:#fff;border-radius:var(--r);padding:16px 20px;margin-bottom:18px}
+.strip .lab{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#B9C4D4;display:flex;justify-content:space-between}
+.strip .lab .mono{color:var(--post)}
+.strip .track{position:relative;height:16px;background:#2A3A54;border-radius:8px;margin:10px 0 6px;overflow:visible}
+.strip .fill{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--prior),var(--post));border-radius:8px;transition:width .9s cubic-bezier(.22,.9,.3,1)}
+.strip .gate{position:absolute;top:-5px;bottom:-5px;width:2px;background:#fff9;border-radius:1px}
+.strip .gate::after{content:"gate";position:absolute;top:-16px;left:-12px;font-size:10px;color:#B9C4D4;font-family:"IBM Plex Mono",monospace}
+.strip .foot{display:flex;justify-content:space-between;font-size:12.5px;color:#B9C4D4}
+.pips{display:inline-flex;gap:5px;vertical-align:middle}
+.pips i{width:9px;height:9px;border-radius:50%;background:#2A3A54;display:inline-block}
+.pips i.on{background:var(--post)}
+
+/* ---------- concept stage ---------- */
+.stage{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:26px 30px}
+.stage .kicker{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.stage h2{font-size:27px;margin:2px 0 18px}
+.card-body{font-size:16.5px}
+.card-body h3{font-size:19px;margin:14px 0 6px}
+.card-body p{margin:0 0 12px}
+.card-body ul{margin:0 0 12px 22px}
+.card-body li{margin-bottom:4px}
+.card-body strong{font-weight:600}
+.card-body .big{font-family:"IBM Plex Serif",serif;font-size:21px;text-align:center;background:var(--paper);border-radius:8px;padding:12px;margin:14px 0}
+.pager{display:flex;align-items:center;gap:14px;margin-top:22px;padding-top:16px;border-top:1.5px solid var(--line)}
+.pager .crumbs{display:flex;gap:6px}
+.pager .crumbs i{width:26px;height:5px;border-radius:3px;background:var(--line)}
+.pager .crumbs i.on{background:var(--post)}
+.pager .spacer{flex:1}
+
+/* ---------- checkpoint ---------- */
+.qprompt{font-size:17.5px;font-weight:500;margin-bottom:14px}
+.opt{display:block;width:100%;text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:9px;color:var(--ink);font-size:15.5px}
+.opt:hover:not(:disabled){border-color:var(--prior)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:#E7F2ED}
+.opt.wrongpick{border-color:var(--wrong);background:#F7E9E8}
+.fb{border-left:3px solid var(--prior);padding:10px 14px;margin:12px 0;background:var(--paper);border-radius:0 8px 8px 0;font-size:15.5px}
+.fb.good{border-color:var(--ok)}
+.fb.bad{border-color:var(--wrong)}
+.delta{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--dim);margin-bottom:10px}
+.delta b{color:var(--post-deep)}
+.mastered-banner{background:linear-gradient(100deg,var(--post),#F3C67A);border-radius:8px;padding:14px 18px;font-weight:600;margin:12px 0}
+
+/* ---------- animation player ---------- */
+.player{background:var(--ink);border-radius:var(--r);padding:14px;margin:16px 0}
+.player canvas{width:100%;border-radius:6px;display:block;background:#0F1A2C}
+.player .bar2{display:flex;align-items:center;gap:10px;margin-top:10px}
+.player .bar2 .cap{color:#D7DFEA;font-size:14px;flex:1;line-height:1.45;min-height:40px}
+.player button{background:#2A3A54;color:#fff;padding:8px 14px;font-weight:600}
+.player button[aria-pressed="true"]{background:var(--post);color:var(--ink)}
+
+/* ---------- resources ---------- */
+.res{margin-top:20px;border-top:1.5px solid var(--line);padding-top:14px}
+.res h3{font-size:16px;margin-bottom:10px}
+.res .item{display:flex;gap:10px;margin-bottom:10px;font-size:14.5px}
+.res .badge{flex:none;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--line);border-radius:5px;padding:1px 7px;height:fit-content;margin-top:2px;color:var(--dim)}
+.res .note{color:var(--dim)}
+
+.notice{background:var(--panel);border-left:3px solid var(--post);border-radius:0 8px 8px 0;box-shadow:var(--shadow);padding:12px 16px;margin-bottom:14px;font-size:15px}
+
+@media (max-width:820px){
+  .topic{grid-template-columns:1fr}
+  .ladder{display:flex;overflow-x:auto;gap:4px;padding:10px}
+  .rung{flex:none;width:200px}
+  .stage{padding:20px 18px}
+}
+@media (prefers-reduced-motion:reduce){
+  .strip .fill{transition:none}
+}
+</style>
+</head>
+<body>
+<header id="top">
+  <span class="wordmark">Learn<em>.</em></span>
+  <span class="spacer"></span>
+  <span class="who" id="who"></span>
+  <button class="btn ghost" id="signout" hidden>Sign out</button>
+</header>
+<main id="main"></main>
+
+<script>
+/* ================= tiny infrastructure ================= */
+const $ = s => document.querySelector(s);
+const main = $("#main");
+let TOKEN = localStorage.getItem("learn_token") || "";
+const api = async (path, opts={}) => {
+  const r = await fetch("/api"+path, {...opts,
+    headers:{"Content-Type":"application/json", Authorization:"Bearer "+TOKEN, ...(opts.headers||{})},
+    body: opts.body ? JSON.stringify(opts.body) : undefined});
+  if (r.status===401 && path!=="/login" && path!=="/register"){ signout(); throw new Error("signin"); }
+  const data = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(data.detail || "Request failed");
+  return data;
+};
+const esc = s => s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* minimal markdown: ## big line, ### h3, **bold**, - lists, blank-line paragraphs */
+function md(src){
+  const blocks = src.split(/\n\n+/).map(b=>{
+    b=b.trim();
+    if (b.startsWith("## ")) return `<div class="big">${inline(b.slice(3))}</div>`;
+    if (b.startsWith("### ")) return `<h3>${inline(b.slice(4))}</h3>`;
+    if (/^(\d+\.|-)\s/m.test(b)){
+      const items=b.split("\n").map(l=>`<li>${inline(l.replace(/^(\d+\.|-)\s*/,""))}</li>`).join("");
+      return b.match(/^\d+\./)?`<ol style="margin:0 0 12px 22px">${items}</ol>`:`<ul>${items}</ul>`;
+    }
+    return `<p>${inline(b).replace(/\n/g,"<br>")}</p>`;
+  });
+  return blocks.join("");
+  function inline(t){return esc(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>");}
+}
+function signout(){ TOKEN=""; localStorage.removeItem("learn_token"); route(); }
+$("#signout").onclick = async()=>{ try{await api("/logout",{method:"POST"});}catch(e){} signout(); };
+
+/* ================= views ================= */
+function route(){ speechSynthesis.cancel(); TOKEN ? viewDash() : viewAuth(); }
+
+function viewAuth(mode="login"){
+  $("#who").textContent=""; $("#signout").hidden=true;
+  main.innerHTML = `
+  <div class="auth">
+    <h1>${mode==="login"?"Welcome back":"Create your profile"}</h1>
+    <p>Mastery-based learning. Your progress is stored locally and privately.</p>
+    <form id="af">
+      <input id="u" placeholder="Username" autocomplete="username" required>
+      <input id="p" type="password" placeholder="Password (6+ characters)" autocomplete="current-password" required>
+      <div class="err" id="err"></div>
+      <button class="btn" style="width:100%">${mode==="login"?"Sign in":"Create profile"}</button>
+    </form>
+    <button class="swap" id="swap">${mode==="login"?"New here? Create a profile":"Have a profile? Sign in"}</button>
+  </div>`;
+  $("#swap").onclick=()=>viewAuth(mode==="login"?"register":"login");
+  $("#af").onsubmit=async e=>{
+    e.preventDefault();
+    try{
+      const d=await api("/"+mode,{method:"POST",body:{username:$("#u").value,password:$("#p").value}});
+      TOKEN=d.token; localStorage.setItem("learn_token",TOKEN); route();
+    }catch(err){ $("#err").textContent=err.message; }
+  };
+}
+
+async function viewDash(){
+  const d = await api("/topics");
+  $("#who").textContent=d.user; $("#signout").hidden=false;
+  main.innerHTML = `<div class="dash">
+    <h1>Choose a topic</h1>
+    <p class="sub">Advance when the evidence says you know it. Come back when reviews fall due.</p>
+    ${d.topics.map(t=>`
+      <button class="tcard" data-t="${t.id}">
+        <h2>${esc(t.title)}${t.review_due?`<span class="due-pill">${t.review_due} review${t.review_due>1?"s":""} due</span>`:""}</h2>
+        <div class="tag">${esc(t.tagline)}${t.prereqs&&t.prereqs.length?` <span class="mono" style="font-size:12px">· builds on ${t.prereqs.map(esc).join(", ")}</span>`:""}</div>
+        <div class="meterline">
+          <div class="bar"><i style="width:${100*t.mastered/t.concepts}%"></i></div>
+          <span class="num">${t.mastered}/${t.concepts} mastered</span>
+        </div>
+      </button>`).join("")}
+  </div>`;
+  main.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
+}
+
+let T=null; // current topic payload
+async function viewTopic(tid, focus){
+  T = await api("/topic/"+tid);
+  const cur = focus || (T.concepts.find(c=>c.unlocked && !c.mastered) || T.concepts[T.concepts.length-1]).id;
+  main.innerHTML = `<div class="topic">
+    <nav class="ladder" id="ladder"></nav>
+    <div id="stage"></div>
+  </div>`;
+  renderLadder(cur);
+  if (T.needs_placement && !focus){ viewPlacement(tid); return; }
+  viewConcept(tid, cur);
+}
+function renderLadder(curId){
+  $("#ladder").innerHTML =
+    `<button class="rung" id="back"><span class="dot">←</span><span><span class="rt">All topics</span></span></button>` +
+    T.concepts.map((c,i)=>`
+    <button class="rung ${c.mastered?"done":""} ${c.id===curId?"active":""}" data-c="${c.id}" ${c.unlocked?"":"disabled"}>
+      <span class="dot">${c.mastered?"✓":i+1}</span>
+      <span>
+        <span class="rt">${esc(c.title)}</span><br>
+        <span class="rp">P(known) ${c.p_mastery.toFixed(2)}</span>
+        ${c.review_due?'<br><span class="flag">review due</span>':""}
+        ${!c.unlocked?'<br><span class="rp">locked</span>':""}
+      </span>
+    </button>`).join("");
+  $("#back").onclick=()=>{speechSynthesis.cancel(); viewDash();};
+  $("#ladder").querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
+    speechSynthesis.cancel();
+    renderLadder(b.dataset.c); viewConcept(T.id,b.dataset.c);
+  });
+}
+
+/* ---------- placement (adaptive prior-setting) ---------- */
+async function viewPlacement(tid){
+  $("#stage").innerHTML = `
+  <section class="stage">
+    <div class="kicker">Placement · ${esc(T.title)}</div>
+    <h2>Where should you start?</h2>
+    <div class="card-body">
+      <p>A short adaptive check — usually <strong>4–5 questions</strong> — finds the edge of what you already know, so you skip what you've mastered and start exactly where learning begins.</p>
+      <p>In this topic's own language: instead of assuming an uninformative prior about you, we'll <strong>set your prior from evidence</strong>. No feedback is shown during placement; concepts you place out of are verified through review afterward.</p>
+    </div>
+    <div class="pager">
+      <button class="btn ghost" id="pl-skip">Skip — start from the beginning</button>
+      <span class="spacer"></span>
+      <button class="btn warm" id="pl-go">Start placement</button>
+    </div>
+  </section>`;
+  $("#pl-skip").onclick=async()=>{ await api(`/topic/${tid}/placement`,{method:"POST",body:{skip:true}}); viewTopic(tid); };
+  $("#pl-go").onclick=()=>placementStep(tid,[]);
+}
+async function placementStep(tid, history){
+  const d = await api(`/topic/${tid}/placement`,{method:"POST",body:{history}});
+  if (d.done){
+    const lvl=d.level, n=T.concepts.length;
+    $("#stage").innerHTML = `
+    <section class="stage">
+      <div class="kicker">Placement complete</div>
+      <h2>${lvl===0?"Starting from the beginning":lvl>=n?"You placed past the whole ladder":"Starting at concept "+(lvl+1)}</h2>
+      <div class="card-body">
+        ${lvl>0?`<p><strong>${lvl} concept${lvl>1?"s":""}</strong> marked as known — they're in your review queue now for verification (trust, then verify).</p>`:""}
+        ${lvl<n?`<p>Your first lesson: <strong>${esc(d.start_title)}</strong>. Your mastery prior there starts at 0.50 instead of 0.15 — the placement evidence, already priced in.</p>`
+               :`<p>Run the review queue to verify, then this topic is yours.</p>`}
+      </div>
+      <div class="pager"><span class="spacer"></span>
+        <button class="btn warm" id="pl-begin">Begin</button></div>
+    </section>`;
+    $("#pl-begin").onclick=()=>viewTopic(tid);
+    return;
+  }
+  const q=d.question;
+  $("#stage").innerHTML = `
+  <section class="stage">
+    <div class="kicker">Placement · question ${d.asked} (max ${d.max_questions}) · probing: ${esc(q.concept_title)}</div>
+    <p class="qprompt">${esc(q.prompt)}</p>
+    <div>${q.options.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>
+    <p style="color:var(--dim);font-size:13.5px;margin-top:10px">No feedback during placement — answer honestly; guessing only misplaces you.</p>
+  </section>`;
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    history.push({concept_id:q.concept_id, question_id:q.id, choice:+b.dataset.i});
+    placementStep(tid, history);
+  });
+}
+
+/* ---------- posterior strip ---------- */
+function stripHTML(p,streak,mastered){
+  return `<div class="strip" id="strip">
+    <div class="lab"><span>Your mastery posterior — a live Bayes update</span>
+      <span class="mono" id="pnum">P(known) = ${p.toFixed(3)}</span></div>
+    <div class="track">
+      <div class="fill" id="pfill" style="width:${100*p}%"></div>
+      <div class="gate" style="left:${100*T.mastery_p}%"></div>
+    </div>
+    <div class="foot">
+      <span>every answer moves this — correct raises it, a slip lowers it</span>
+      <span>streak <span class="pips" id="pips">${pipHTML(streak)}</span> ${mastered?'· <b style="color:var(--post)">mastered</b>':""}</span>
+    </div>
+  </div>`;
+}
+const pipHTML = s => [0,1,2].map(i=>`<i class="${i<Math.min(s,3)?"on":""}"></i>`).join("");
+function stripSet(p,streak){
+  $("#pfill").style.width=(100*p)+"%";
+  $("#pnum").textContent="P(known) = "+p.toFixed(3);
+  $("#pips").innerHTML=pipHTML(streak);
+}
+
+/* ---------- concept: cards -> checkpoint ---------- */
+let C=null, cardIx=0;
+async function viewConcept(tid,cid){
+  let d;
+  try{ d = await api(`/topic/${tid}/concept/${cid}`); }
+  catch(e){ $("#stage").innerHTML=`<div class="stage"><p>${esc(e.message)}</p></div>`; return; }
+  C=d; cardIx=0;
+  renderCard(tid);
+}
+function renderCard(tid){
+  const card=C.cards[cardIx], last=cardIx===C.cards.length-1;
+  $("#stage").innerHTML = stripHTML(C.p_mastery,C.streak,C.mastered) + `
+  <section class="stage">
+    <div class="kicker">Concept · ${esc(C.title)} — chunk ${cardIx+1} of ${C.cards.length}</div>
+    <h2>${esc(card.h)}</h2>
+    <div class="card-body">${md(card.md)}</div>
+    ${last && C.anim ? animHTML() : ""}
+    <div class="pager">
+      <button class="btn ghost" id="prev" ${cardIx===0?"disabled":""}>Back</button>
+      <div class="crumbs">${C.cards.map((_,i)=>`<i class="${i<=cardIx?"on":""}"></i>`).join("")}</div>
+      <span class="spacer"></span>
+      <button class="btn ${last?"warm":""}" id="next">${last?"Start checkpoint":"Continue"}</button>
+    </div>
+    ${last ? resHTML() : ""}
+  </section>`;
+  if (last && C.anim) mountAnim(C.anim);
+  $("#prev").onclick=()=>{speechSynthesis.cancel(); cardIx--; renderCard(tid);};
+  $("#next").onclick=()=>{speechSynthesis.cancel(); last ? startCheckpoint(tid) : (cardIx++, renderCard(tid));};
+}
+function resHTML(){
+  if (!C.resources.length) return "";
+  return `<div class="res"><h3>Vetted resources for this concept</h3>
+    ${C.resources.map(r=>`<div class="item">
+      <span class="badge">${r.type}</span>
+      <span><a href="${r.url}" target="_blank" rel="noopener">${esc(r.label)}</a><br>
+      <span class="note">${esc(r.note)}</span></span></div>`).join("")}</div>`;
+}
+
+let qIx=0;
+function startCheckpoint(tid){ qIx=0; renderQuestion(tid); }
+function renderQuestion(tid){
+  const q=C.questions[qIx % C.questions.length];
+  const t0=Date.now();
+  $("#stage").innerHTML = stripHTML(C.p_mastery,C.streak,C.mastered) + `
+  <section class="stage">
+    <div class="kicker">Checkpoint · ${esc(C.title)}</div>
+    <p class="qprompt">${esc(q.prompt)}</p>
+    <div id="opts">${q.options.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>
+    <div id="after"></div>
+  </section>`;
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=async()=>{
+    document.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+    const i=+b.dataset.i;
+    const r=await api(`/topic/${tid}/concept/${C.id}/answer`,{method:"POST",
+      body:{question_id:q.id, choice:i, latency_ms:Date.now()-t0}});
+    C.p_mastery=r.p_after; C.streak=r.streak; C.mastered=r.mastered;
+    b.classList.add(r.correct?"right":"wrongpick");
+    stripSet(r.p_after,r.streak);
+    const dir=r.p_after>=r.p_before?"↑":"↓";
+    $("#after").innerHTML = `
+      <div class="delta mono">posterior ${r.p_before.toFixed(3)} → <b>${r.p_after.toFixed(3)}</b> ${dir}</div>
+      <div class="fb ${r.correct?"good":"bad"}">${esc(r.feedback)}</div>
+      ${r.newly_mastered?`<div class="mastered-banner">Mastered — the gate is open. The next concept is unlocked, and this one enters spaced review tomorrow.</div>`:""}
+      <div class="pager">
+        ${!r.correct?`<button class="btn ghost" id="reread">Re-read the cards</button>
+                      <button class="btn ghost" id="helpme">Explain it differently</button>`:""}
+        <span class="spacer"></span>
+        ${r.newly_mastered
+          ? `<button class="btn warm" id="go-next">Next concept</button>`
+          : `<button class="btn" id="go-on">${r.correct?"Next question":"Try another"}</button>`}
+      </div>
+      <div id="aihelp"></div>`;
+    const on=$("#go-on"); if(on) on.onclick=()=>{qIx++; renderQuestion(tid);};
+    const gn=$("#go-next"); if(gn) gn.onclick=()=>viewTopic(tid);
+    const rr=$("#reread"); if(rr) rr.onclick=()=>{cardIx=0; renderCard(tid);};
+    const hm=$("#helpme"); if(hm) hm.onclick=async()=>{
+      hm.disabled=true; hm.textContent="Thinking…";
+      const h=await api(`/topic/${tid}/concept/${C.id}/help`,{method:"POST",body:{question_id:q.id}});
+      $("#aihelp").innerHTML=`<div class="fb">${esc(h.text)}${h.source==="ai"?' <span class="mono" style="font-size:11px;color:var(--dim)">— AI tutor</span>':""}</div>`;
+    };
+  });
+}
+
+/* ================= animation player (canvas + narration) ================= */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let AUDIO_ON = true;
+function animHTML(){
+  return `<div class="player">
+    <canvas id="cv" width="900" height="380"></canvas>
+    <div class="bar2">
+      <button id="a-play">▶ Play</button>
+      <button id="a-mute" aria-pressed="${AUDIO_ON}">${AUDIO_ON?"🔊 Voice on":"🔇 Voice off"}</button>
+      <span class="cap" id="a-cap">Animated walkthrough with narration. Press play.</span>
+    </div>
+  </div>`;
+}
+function narrate(text){
+  return new Promise(res=>{
+    $("#a-cap").textContent=text;
+    if (!AUDIO_ON || !("speechSynthesis" in window)){ setTimeout(res, Math.max(2200, text.length*55)); return; }
+    const u=new SpeechSynthesisUtterance(text); u.rate=1.02;
+    u.onend=res; u.onerror=res; speechSynthesis.speak(u);
+  });
+}
+function mountAnim(kind){
+  const cv=$("#cv"), ctx=cv.getContext("2d");
+  const playBtn=$("#a-play"), muteBtn=$("#a-mute");
+  muteBtn.onclick=()=>{AUDIO_ON=!AUDIO_ON; speechSynthesis.cancel();
+    muteBtn.setAttribute("aria-pressed",AUDIO_ON); muteBtn.textContent=AUDIO_ON?"🔊 Voice on":"🔇 Voice off";};
+  let running=false;
+  playBtn.onclick=async()=>{
+    if(running) return; running=true; playBtn.textContent="Playing…";
+    speechSynthesis.cancel();
+    try{ await ANIMS[kind](cv,ctx); }finally{ running=false; playBtn.textContent="↻ Replay"; }
+  };
+  ANIMS[kind+"_static"]?.(cv,ctx); // draw first frame
+}
+const F = {ax:"#7C8DA5", post:"#E8A13C", prior:"#7C8DA5", wrong:"#D46A62", ok:"#5FBF95", txt:"#D7DFEA"};
+function clear(ctx,cv){ctx.clearRect(0,0,cv.width,cv.height);}
+const sleep=ms=>new Promise(r=>setTimeout(r, REDUCED?0:ms));
+async function tween(ms,fn){ if(REDUCED){fn(1);return;} const t0=performance.now();
+  return new Promise(res=>{(function step(t){const k=Math.min(1,(t-t0)/ms);fn(k);k<1?requestAnimationFrame(step):res();})(t0);});}
+
+const ANIMS = {
+  /* --- c03: unit-square view of Bayes --- */
+  square_static(cv,ctx){ drawSquare(ctx,cv,0.25,0.8,0.4,0,0); },
+  async square(cv,ctx){
+    const pH=0.25, lH=0.8, lN=0.4;
+    drawSquare(ctx,cv,pH,lH,lN,0,0);
+    await narrate("The whole square is everything that could happen. Split it by the prior: the left slice is the worlds where the hypothesis is true — here, twenty five percent.");
+    await tween(900,k=>drawSquare(ctx,cv,pH,lH,lN,k,0));
+    await narrate("Shade each side by the likelihood: in hypothesis-worlds the evidence appears eighty percent of the time; in the others, forty percent. The shaded regions are the only worlds where you'd see this evidence.");
+    await tween(900,k=>drawSquare(ctx,cv,pH,lH,lN,1,k));
+    await narrate("You DID see the evidence — so reality lives somewhere in the shaded area. The posterior is simply the amber share of it: point two divided by point five, which is forty percent. Bayes' theorem is this picture, written as algebra.");
+  },
+
+  /* --- c05: population grid, base rates --- */
+  grid_static(cv,ctx){ drawGrid(ctx,cv,0,0,0); },
+  async grid(cv,ctx){
+    await narrate("Here are ten thousand people. The disease rate is one in a thousand — watch the sick light up.");
+    await tween(1000,k=>drawGrid(ctx,cv,k,0,0));
+    await narrate("Now run the test. It catches ninety nine percent of the sick — but it also wrongly flags five percent of the healthy. Watch how many healthy dots turn positive.");
+    await tween(1600,k=>drawGrid(ctx,cv,1,k,0));
+    await narrate("Collect only the positives. The true cases are buried: roughly ten real cases against five hundred false alarms. A positive result means about a two percent chance of disease. The prior did that — not the test.");
+    await tween(1200,k=>drawGrid(ctx,cv,1,1,k));
+  },
+
+  /* --- c06: sequential updating chain --- */
+  chain_static(cv,ctx){ drawChain(ctx,cv,0); },
+  async chain(cv,ctx){
+    await narrate("Start with a weak prior: ten percent. Each piece of independent evidence multiplies the odds, and the posterior climbs — then one piece of counter-evidence knocks it back. Every point on this path is a full Bayes update, and each posterior becomes the next prior.");
+    await tween(3200,k=>drawChain(ctx,cv,k));
+    await narrate("Notice there is no starting over. Wherever the path is now, that height IS your belief — the compressed memory of everything seen so far.");
+  },
+
+  /* --- c08: beta posterior --- */
+  beta_static(cv,ctx){ drawBeta(ctx,cv,1,1,1,1); },
+  async beta(cv,ctx){
+    let a=1,b=1;
+    await narrate("Flat curve: Beta one one — total ignorance about the coin's heads-rate. Now flip. Each head adds one to A. Each tail adds one to B. The whole belief curve reshapes with two increments.");
+    const flips=[1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1];
+    for (const f of flips){
+      const a0=a,b0=b; f?a++:b++;
+      await tween(REDUCED?0:260,k=>drawBeta(ctx,cv,a0+(a-a0)*k,b0+(b-b0)*k,a,b));
+      await sleep(60);
+    }
+    await narrate("Fifteen heads, five tails: the posterior is Beta sixteen six — piled up near seventy five percent, and much narrower than where it began. More data, tighter belief. That narrowing is what confidence actually is.");
+  }
+};
+function drawSquare(ctx,cv,pH,lH,lN,split,shade){
+  clear(ctx,cv);
+  const x=140,y=40,W=420,Hh=300, sx=x+W*pH;
+  ctx.font="14px 'IBM Plex Mono'"; ctx.fillStyle=F.txt;
+  ctx.strokeStyle="#3A4C68"; ctx.strokeRect(x,y,W,Hh);
+  if(split>0){
+    ctx.strokeStyle=F.txt; ctx.beginPath(); ctx.moveTo(sx,y+Hh*(1-split)); ctx.lineTo(sx,y+Hh); ctx.stroke();
+    ctx.fillText("H  (prior 0.25)", x+8, y+Hh+22);
+    ctx.fillText("not H  (0.75)", sx+8, y+Hh+22);
+  }
+  if(shade>0){
+    ctx.fillStyle=F.post; ctx.globalAlpha=.9;
+    ctx.fillRect(x, y+Hh*(1-lH*shade), W*pH, Hh*lH*shade);
+    ctx.fillStyle=F.prior;
+    ctx.fillRect(sx, y+Hh*(1-lN*shade), W*(1-pH), Hh*lN*shade);
+    ctx.globalAlpha=1;
+    ctx.fillStyle=F.txt;
+    ctx.fillText("P(E|H)=0.8", x+8, y+Hh*(1-lH*shade)-8);
+    ctx.fillText("P(E|not H)=0.4", sx+8, y+Hh*(1-lN*shade)-8);
+  }
+  // right-side readout
+  ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'";
+  ctx.fillText("evidence area:", 620, 120);
+  ctx.fillText("amber  0.25×0.8 = 0.20", 620, 150);
+  ctx.fillText("slate  0.75×0.4 = 0.30", 620, 175);
+  if(shade>=1){ ctx.fillStyle=F.post; ctx.font="18px 'IBM Plex Mono'";
+    ctx.fillText("P(H|E)=0.20/0.50", 620, 225); ctx.fillText("      =0.40", 620, 250); }
+}
+function drawGrid(ctx,cv,kSick,kTest,kZoom){
+  clear(ctx,cv);
+  const cols=125, rows=80, s=6, ox=60, oy=30, N=10000;
+  const sickIdx=new Set(); for(let i=0;i<10;i++) sickIdx.add(Math.floor(i*997)%N);
+  // deterministic pseudo-random false positives (5%)
+  const fp=i=>((i*2654435761)>>>0)%1000 < 50;
+  if(kZoom<1){
+    for(let i=0;i<N;i++){
+      const x=ox+(i%cols)*s+((cv.width-2*ox-cols*s)/2), y=oy+Math.floor(i/cols)*s/1.55;
+      const sick=sickIdx.has(i)&&kSick>i/N;
+      const pos=kTest>0 && ((sickIdx.has(i)&&kTest>=.99)||(!sickIdx.has(i)&&fp(i)&&kTest>i/N));
+      ctx.fillStyle = sick?F.wrong : pos?F.post : "#26364F";
+      ctx.fillRect(x,y,s-1.5,s/1.55-1);
+    }
+    ctx.fillStyle=F.txt; ctx.font="14px 'IBM Plex Mono'";
+    ctx.fillText("■ sick (10)", 60, 360); ctx.fillStyle=F.post; ctx.fillText("■ tested positive", 200, 360);
+  }else{
+    ctx.fillStyle=F.txt; ctx.font="16px 'IBM Plex Mono'";
+    ctx.fillText("positives only:", 70, 60);
+    let n=0;
+    for(let i=0;i<510;i++){ const x=70+(i%60)*12, y=100+Math.floor(i/60)*22;
+      ctx.fillStyle = i<10?F.wrong:F.post; ctx.fillRect(x,y,9,14); n++; }
+    ctx.fillStyle=F.wrong; ctx.fillText("true: ~10", 70, 330);
+    ctx.fillStyle=F.post;  ctx.fillText("false: ~500", 220, 330);
+    ctx.fillStyle=F.txt; ctx.font="18px 'IBM Plex Mono'";
+    ctx.fillText("P(sick | positive) ≈ 2%", 430, 330);
+  }
+}
+function drawChain(ctx,cv,k){
+  clear(ctx,cv);
+  const lrs=[3,3,3,0.2,3,3,2,0.5,4,3]; let odds=1/9;
+  const pts=[[0,odds/(1+odds)]];
+  lrs.forEach((lr,i)=>{odds*=lr; pts.push([i+1,odds/(1+odds)]);});
+  const X=i=>80+i*(760/10), Y=p=>340-p*300;
+  ctx.strokeStyle="#3A4C68"; ctx.beginPath(); ctx.moveTo(80,340); ctx.lineTo(840,340); ctx.moveTo(80,40); ctx.lineTo(80,340); ctx.stroke();
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("P(H)",30,45); ctx.fillText("evidence →",740,362);
+  ctx.fillText("1.0",44,45); ctx.fillText("0.0",44,344);
+  const upto=k*(pts.length-1);
+  ctx.strokeStyle=F.post; ctx.lineWidth=3; ctx.beginPath();
+  pts.forEach((p,i)=>{ if(i>upto) return; i?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1])); });
+  ctx.stroke(); ctx.lineWidth=1;
+  pts.forEach((p,i)=>{ if(i>upto) return;
+    ctx.fillStyle=i&&lrs[i-1]<1?F.wrong:F.post;
+    ctx.beginPath(); ctx.arc(X(p[0]),Y(p[1]),5,0,7); ctx.fill(); });
+}
+function lnGamma(z){const g=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,.1208650973866179e-2,-.5395239384953e-5];let x=z,y=z,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=g[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betaPdf(x,a,b){ if(x<=0||x>=1) return 0;
+  return Math.exp(lnGamma(a+b)-lnGamma(a)-lnGamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x)); }
+function drawBeta(ctx,cv,a,b,ai,bi){
+  clear(ctx,cv);
+  const X=x=>80+x*720, Y=(v,mx)=>330-(v/mx)*270;
+  let mx=0; for(let i=1;i<200;i++) mx=Math.max(mx,betaPdf(i/200,a,b));
+  mx=Math.max(mx,1.15);
+  ctx.strokeStyle="#3A4C68"; ctx.beginPath(); ctx.moveTo(80,330); ctx.lineTo(800,330); ctx.stroke();
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'";
+  [0,.25,.5,.75,1].forEach(t=>ctx.fillText(t,X(t)-8,352));
+  ctx.strokeStyle=F.post; ctx.lineWidth=3; ctx.beginPath();
+  for(let i=1;i<400;i++){const x=i/400, v=betaPdf(x,a,b); i===1?ctx.moveTo(X(x),Y(v,mx)):ctx.lineTo(X(x),Y(v,mx));}
+  ctx.stroke(); ctx.lineWidth=1;
+  ctx.fillStyle=F.txt; ctx.font="16px 'IBM Plex Mono'";
+  ctx.fillText(`Beta(${Math.round(ai)}, ${Math.round(bi)})   heads=${Math.round(ai)-1}  tails=${Math.round(bi)-1}`, 80, 40);
+  ctx.fillStyle=F.post;
+  ctx.fillText(`mean ≈ ${(a/(a+b)).toFixed(2)}`, 620, 40);
+}
+
+route();
+</script>
+</body>
+</html>

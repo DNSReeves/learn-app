@@ -1,0 +1,11 @@
+# user data — never ship (usernames, pw hashes, learning state)
+learn.db
+*.db
+*.db.bak*
+*.bak*
+# runtime noise
+boot.log
+__pycache__/
+.pytest_cache/
+.venv/
+.DS_Store
