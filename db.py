@@ -43,6 +43,9 @@ CREATE TABLE IF NOT EXISTS concept_state (
     interval_d  REAL NOT NULL DEFAULT 0,
     ease        REAL NOT NULL DEFAULT 2.5,
     due_at      REAL,
+    -- P2.6 (iss_0824d5ad): review-failure relearn — concept fell out of
+    -- mastered (cards re-served, gate re-run) but successors stay unlocked
+    relearn     INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (user_id, topic_id, concept_id)
 );
 -- Full answer log: powers analytics and AI remediation context.
@@ -108,6 +111,12 @@ def conn():
 def init():
     with conn() as c:
         c.executescript(SCHEMA)
+    # P2.6 additive migration (existing DBs predate the relearn column)
+    with conn() as c:
+        try:
+            c.execute("ALTER TABLE concept_state ADD COLUMN relearn INTEGER NOT NULL DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass          # column already there
 
 
 def _hash(pw: str, salt: bytes) -> bytes:
@@ -177,7 +186,7 @@ def get_states(user_id: int, topic_id: str) -> dict:
 
 def upsert_state(user_id: int, topic_id: str, concept_id: str, **fields):
     keys = ["p_mastery", "attempts", "correct", "streak", "unlocked",
-            "mastered_at", "interval_d", "ease", "due_at"]
+            "mastered_at", "interval_d", "ease", "due_at", "relearn"]
     vals = {k: fields[k] for k in keys if k in fields}
     with conn() as c:
         c.execute(

@@ -27,6 +27,12 @@ P_GUESS = 0.20     # P(right | not known) — 4-option MCQ baseline
 
 MASTERY_P = 0.95
 STREAK_GATE = 3
+# P2.6 (iss_0824d5ad): a review failure that drops the posterior below this
+# demotes the concept to RELEARN (cards re-served, gate re-run). One slip from
+# solid mastery lands ~0.72-0.93 and only shortens the review interval; it
+# takes repeated failure to fall through 0.70 — demotion means the knowledge
+# is genuinely gone, not that the learner blinked.
+RELEARN_P = 0.70
 
 
 def bkt_update(p: float, correct: bool) -> float:
@@ -39,7 +45,16 @@ def bkt_update(p: float, correct: bool) -> float:
         den = p * P_SLIP + (1 - p) * (1 - P_GUESS)
     post = num / den if den > 0 else p
     t = P_TRANSIT if correct else P_TRANSIT_WRONG
-    return post + (1 - post) * t
+    updated = post + (1 - post) * t
+    if not correct:
+        # SLIP-INVARIANT CLAMP (iss_67193f36, 2026-07-23): below p≈0.0526 the
+        # transit term outweighs the Bayes decrement, so a WRONG answer would
+        # RAISE the displayed posterior (0.03 → 0.054) — contradicting the
+        # meter's stated invariant. A miss may never move the meter up.
+        # (The 0.95 gate is unaffected either way; this protects the
+        # transparency-critical low end.)
+        return min(updated, p)
+    return updated
 
 
 def is_mastered(p: float, streak: int) -> bool:

@@ -118,6 +118,7 @@ def topic(tid: str, authorization: str | None = Header(default=None)):
         s = states.get(c["id"], {})
         p = s.get("p_mastery", mastery.P_INIT)
         mastered = bool(s.get("mastered_at"))
+        relearn = bool(s.get("relearn")) and not mastered
         unlocked = prev_mastered  # a concept opens when its predecessor is mastered
         due = bool(mastered and s.get("due_at") and s["due_at"] < time.time())
         concepts.append({
@@ -125,9 +126,11 @@ def topic(tid: str, authorization: str | None = Header(default=None)):
             "p_mastery": mastery.decay_for_review(p, s.get("due_at")) if mastered else p,
             "streak": s.get("streak", 0), "attempts": s.get("attempts", 0),
             "mastered": mastered, "unlocked": unlocked, "review_due": due,
+            "relearn": relearn,
             "has_anim": bool(c.get("anim")), "n_resources": len(c.get("resources", [])),
         })
-        prev_mastered = mastered
+        # P2.6: a concept in RELEARN was once mastered — successors stay open
+        prev_mastered = mastered or relearn
     return {"id": tid, "title": pack["title"], "tagline": pack.get("tagline", ""),
             "concepts": concepts, "needs_placement": needs_placement,
             "mastery_p": mastery.MASTERY_P, "streak_gate": mastery.STREAK_GATE}
@@ -146,7 +149,9 @@ def concept(tid: str, cid: str, authorization: str | None = Header(default=None)
     states = db.get_states(user["id"], tid)
     if idx > 0:
         prev = pack["concepts"][idx - 1]["id"]
-        if not states.get(prev, {}).get("mastered_at"):
+        ps = states.get(prev, {})
+        # P2.6: a prev in RELEARN was once mastered — the ladder stays traversable
+        if not (ps.get("mastered_at") or ps.get("relearn")):
             raise HTTPException(403, "Master the previous concept to unlock this one.")
     c = pack["concepts"][idx]
     s = states.get(cid, {})
@@ -157,7 +162,8 @@ def concept(tid: str, cid: str, authorization: str | None = Header(default=None)
             "anim": c.get("anim"), "resources": c.get("resources", []),
             "questions": qs,
             "p_mastery": s.get("p_mastery", mastery.P_INIT),
-            "streak": s.get("streak", 0), "mastered": bool(s.get("mastered_at"))}
+            "streak": s.get("streak", 0), "mastered": bool(s.get("mastered_at")),
+            "relearn": bool(s.get("relearn"))}
 
 
 # ---------- placement (adaptive prior-setting) ----------
@@ -265,11 +271,21 @@ def answer(tid: str, cid: str, a: Answer,
         streak=streak,
         mastered_at=s.get("mastered_at") or (time.time() if now_mastered else None),
     )
-    if was_mastered:  # review mode: reschedule
+    demoted = False
+    if was_mastered and not correct and p_after < mastery.RELEARN_P:
+        # P2.6 (iss_0824d5ad): the review failed hard — the concept drops out
+        # of mastered into RELEARN: cards re-serve, the 0.95+streak gate re-runs.
+        # Successors stay unlocked (relearn is not un-learning the ladder).
+        demoted = True
+        now_mastered = False
+        fields.update(mastered_at=None, relearn=1, streak=0,
+                      interval_d=0.0, due_at=None)
+    elif was_mastered:  # review mode: reschedule
         i, e, due = mastery.schedule_review(s.get("interval_d", 0), s.get("ease", 2.5), correct)
         fields.update(interval_d=i, ease=e, due_at=due)
-    elif now_mastered:  # first mastery: first review lands tomorrow
-        fields.update(interval_d=1.0, due_at=time.time() + 86400)
+    elif now_mastered:  # (re-)mastery: first review lands tomorrow; relearn clears
+        fields.update(interval_d=1.0, due_at=time.time() + 86400, relearn=0,
+                      mastered_at=time.time())
 
     db.upsert_state(user["id"], tid, cid, **fields)
     db.log_answer(user["id"], tid, cid, a.question_id, a.choice, correct, a.latency_ms)
@@ -278,7 +294,8 @@ def answer(tid: str, cid: str, a: Answer,
             "feedback": q["feedback"][a.choice],
             "p_before": round(p_before, 4), "p_after": round(p_after, 4),
             "streak": streak, "mastered": now_mastered,
-            "newly_mastered": now_mastered and not was_mastered}
+            "newly_mastered": now_mastered and not was_mastered,
+            "demoted": demoted}
 
 
 # ---------- review queue (interleaved, spaced) ----------

@@ -65,6 +65,7 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 .rung.active{background:var(--paper);box-shadow:inset 3px 0 0 var(--post)}
 .rung .dot{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12px;margin-top:2px;background:#fff}
 .rung.done .dot{background:var(--post);border-color:var(--post);color:var(--ink);font-weight:600}
+.rung.relearn .dot{border-color:#d97706;color:#d97706;font-weight:600}
 .rung .rt{font-size:14.5px;line-height:1.35;font-weight:500}
 .rung .rp{font-size:12px;color:var(--dim);font-family:"IBM Plex Mono",monospace}
 .rung .flag{font-size:11.5px;color:var(--post-deep);font-weight:600}
@@ -245,8 +246,8 @@ function renderLadder(curId){
   $("#ladder").innerHTML =
     `<button class="rung" id="back"><span class="dot">←</span><span><span class="rt">All topics</span></span></button>` +
     T.concepts.map((c,i)=>`
-    <button class="rung ${c.mastered?"done":""} ${c.id===curId?"active":""}" data-c="${c.id}" ${c.unlocked?"":"disabled"}>
-      <span class="dot">${c.mastered?"✓":i+1}</span>
+    <button class="rung ${c.mastered?"done":""} ${c.relearn?"relearn":""} ${c.id===curId?"active":""}" data-c="${c.id}" ${c.unlocked?"":"disabled"}>
+      <span class="dot">${c.mastered?"✓":(c.relearn?"↻":i+1)}</span>
       <span>
         <span class="rt">${esc(c.title)}</span><br>
         <span class="rp">P(known) ${c.p_mastery.toFixed(2)}</span>
