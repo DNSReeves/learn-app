@@ -158,6 +158,16 @@ def concept(tid: str, cid: str, authorization: str | None = Header(default=None)
     # strip answers/feedback — grading happens server-side only
     qs = [{"id": q["id"], "type": q["type"], "prompt": q["prompt"], "options": q["options"]}
           for q in c["questions"]]
+    # P2.5 (2026-07-23): serve the item most informative at the learner's current
+    # P(known) instead of authored order. Fresh concepts (no calibrated items) come
+    # back in authored order byte-identically; failures fall back the same way —
+    # question ORDER must never 500 a checkpoint.
+    try:
+        import calibration
+        qs = calibration.order_questions(qs, tid, cid,
+                                         s.get("p_mastery", mastery.P_INIT))
+    except Exception:
+        pass
     return {"id": cid, "title": c["title"], "summary": c["summary"], "cards": c["cards"],
             "anim": c.get("anim"), "resources": c.get("resources", []),
             "questions": qs,
