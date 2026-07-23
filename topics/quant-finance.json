@@ -1,0 +1,911 @@
+{
+ "id": "quant-finance",
+ "title": "Quantitative Finance",
+ "tagline": "Edges, error bars, and the discipline that keeps you from fooling yourself.",
+ "description": "From return arithmetic to the honest-research loop. The through-line: every number you compute is a noisy estimate, most published edges are selection artifacts, and the machinery that survives is the machinery built to catch its own errors — pre-registered gates, trial accounting, and drawdown-first verdicts.",
+ "prereqs": ["calculus", "bayesian-inference"],
+ "concepts": [
+  {
+   "id": "c01-returns",
+   "title": "Returns and compounding conventions",
+   "summary": "Simple returns aggregate across assets; log returns aggregate across time. Volatility drags geometric growth below the arithmetic mean, and every annualization formula smuggles in an i.i.d. assumption.",
+   "cards": [
+    {
+     "h": "Two arithmetics of return",
+     "md": "A price move from P₀ to P₁ has two natural encodings:\n\n- **Simple return**: r = P₁/P₀ − 1\n- **Log return**: ℓ = ln(P₁/P₀) = ln(1 + r)\n\nThey agree to first order (ℓ ≈ r − r²/2 + …), diverge as moves get large — and each is the *right* tool for exactly one direction of aggregation:\n\n- **Across time, use logs.** Logs add: ℓ_total = ℓ₁ + ℓ₂ + … + ℓ_T. Simple returns compound multiplicatively, which is why summing daily simple returns over a year is quietly wrong.\n- **Across assets, use simple.** A portfolio's simple return is exactly the weight-average of its components' simple returns: r_p = Σ wᵢrᵢ. The weight-average of *log* returns is NOT the portfolio's log return (Jensen's inequality — the portfolio log return is strictly larger, that's the rebalancing/diversification bonus).\n\nMixing them is a durable bug class in real pipelines: a warehouse that stores logs and a portfolio layer that averages them will systematically misstate portfolio performance, and the error is small enough daily to pass eyeball checks while compounding into something material over years. Convention discipline — declare which one every column holds — is not pedantry."
+    },
+    {
+     "h": "Volatility drag: the compounding tax",
+     "md": "Up 50%, then down 50%. Average return: 0%. Your wealth: 1.5 × 0.5 = **0.75** — down 25%.\n\nThat gap is **volatility drag**, and it's not a curiosity, it's the reason geometric and arithmetic means are different quantities:\n\n## g ≈ μ − σ²/2\n\nGeometric growth ≈ arithmetic mean minus half the variance. The σ²/2 term is what compounding *charges* you for taking a volatile path to the same average. Consequences worth keeping loaded:\n\n- Two assets with identical arithmetic means but σ of 10% vs 30% differ in long-run wealth growth by ≈ (0.09 − 0.01)/2 = 4 points a year. Vol is not just risk — it is a direct deduction from realized growth.\n- Daily-rebalanced leveraged ETFs decay in choppy markets for exactly this reason: leverage multiplies μ by k but the drag by k². A 3× fund on a flat, volatile underlying grinds to dust.\n- Any strategy comparison done on average returns instead of compound (CAGR) flatters the volatile one. Wealth compounds; averages don't.\n\nThe σ²/2 correction is also why maximizing expected *log* wealth (Kelly, concept 6) automatically penalizes variance — the penalty is built into the logarithm."
+    },
+    {
+     "h": "Annualization traps",
+     "md": "The standard conversions —\n\n- annual return ≈ 252 × daily mean (or 12 × monthly)\n- annual vol ≈ √252 × daily vol\n- annual Sharpe ≈ √12 × monthly Sharpe\n\n— all assume returns are **i.i.d.**: independent, identically distributed. Every one fails in a specific, exploitable way when that's false:\n\n- **Autocorrelation breaks √t scaling.** Positively autocorrelated returns (trending, or smoothed marks — private assets, stale-priced funds) make √252 *understate* true annual vol; mean-reverting returns make it overstate. Illiquid funds report flattering Sharpes partly because smoothing suppresses measured vol.\n- **Short windows annualize noise.** Annualizing a 3-month return to \"14% annualized\" multiplies one quarter's luck by four. The error bar annualizes too.\n- **CAGR vs average annual return.** A fund reporting \"average annual return 12%\" over a decade that included a −40% year has a CAGR well below 12%. Only CAGR corresponds to money.\n- **Sharpe annualization compounds the sin**: the mean scales with t, vol with √t, so Sharpe scales with √t — but only under i.i.d., and the sampling error on the Sharpe itself (concept 2) is usually bigger than the correction anyone argues about.\n\nRule: any annualized number from < 3 years of data should be quoted with its error bar or not at all."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "An asset returns +50% in year 1 and −50% in year 2. Over the two years your wealth is:",
+     "options": [
+      "Unchanged — the gains and losses cancel",
+      "Down 25%",
+      "Up 25%, since the +50% came first and compounded",
+      "Down 50% — the loss dominates because it came last"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Averages cancel; wealth doesn't. 1.5 × 0.5 = 0.75. The arithmetic mean is 0% but the geometric path loses — that gap is volatility drag, ≈ σ²/2 per period.",
+      "Right: 1.5 × 0.5 = 0.75. Order doesn't matter (multiplication commutes); the drag comes from the variance itself. This is why compound growth ≈ μ − σ²/2.",
+      "Order is irrelevant — multiplication commutes, so −50% then +50% gives the same 0.75. And there's no path to a gain here: the round trip is a guaranteed loss.",
+      "The loss doesn't dominate because of sequence; 0.5 × 1.5 = 0.75 either way. The 25% loss is the compounding penalty of the volatility, not of the ordering."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Your warehouse stores daily log returns. Which operation is INVALID as stated?",
+     "options": [
+      "Summing one asset's log returns over a year to get its annual log return",
+      "Taking the weight-average of the assets' log returns as the portfolio's log return",
+      "Converting a log return to simple via r = e^ℓ − 1 before cross-asset aggregation",
+      "Comparing two assets' full-period compounded growth via their summed log returns"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This one is exactly what logs are for — they add across time. That's the whole reason to store them.",
+      "Correct — this is the classic bug. Portfolio simple return is the weight-average of simple returns; the weight-average of logs understates the portfolio's log return (Jensen). Convert to simple, average, convert back.",
+      "That conversion is the legitimate bridge: exponentiate to simple returns, then weight-average across assets. Valid, and standard practice.",
+      "Summed logs are monotone in compounded growth, so ranking and comparing full-period growth this way is fine. The trap is cross-sectional averaging, not time aggregation."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A private-credit fund reports monthly returns with strong positive autocorrelation (smoothed marks). Annualizing its vol with √12 will:",
+     "options": [
+      "Understate true annual volatility, flattering the Sharpe",
+      "Overstate true annual volatility, penalizing the Sharpe",
+      "Be exact — √t scaling doesn't depend on autocorrelation",
+      "Understate the mean return but leave vol unaffected"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right. √t scaling assumes independence; positive autocorrelation means shocks accumulate rather than cancel, so true annual vol exceeds √12 × monthly vol. Smoothed marks are a Sharpe-inflation machine.",
+      "That's the mean-reverting case — negative autocorrelation makes shocks partially cancel over the year, so √12 overstates. Smoothing induces positive autocorrelation, the opposite regime.",
+      "√t scaling is exactly the i.i.d. assumption in disguise. The variance of a sum includes 2Σcov terms that vanish only under independence.",
+      "Autocorrelation doesn't bias the mean's annualization (means add regardless of dependence) — the distortion lands entirely on the vol, and via the vol, on the Sharpe."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A 3× daily-rebalanced leveraged ETF on an index that ends a choppy year exactly flat will most likely be:",
+     "options": [
+      "Flat — 3 × 0% = 0%",
+      "Down, because leverage triples the mean but multiplies volatility drag by roughly nine",
+      "Up, because it compounds gains three times as fast",
+      "Impossible to say even in expectation"
+     ],
+     "answer": 1,
+     "feedback": [
+      "3 × 0% is the right arithmetic for a single period, but the fund rebalances daily — it compounds 3× daily returns, and compounding charges σ²/2 per unit variance. Leverage scales σ² by 9.",
+      "Right. g ≈ kμ − k²σ²/2: the drag term grows with the square of leverage. Flat-but-volatile is the worst case — no mean to harvest, nine times the compounding tax.",
+      "It compounds losses three times as fast too, and the asymmetry of compounding (the −25% round-trip lesson) means chop is strictly costly. Faster compounding of a zero-mean path is a negative, not a positive.",
+      "In expectation the direction is clear and negative: same μ = 0, drag scaled by k². The only uncertainty is magnitude, which depends on realized variance."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Compound Annual Growth Rate (CAGR)",
+     "url": "https://www.investopedia.com/terms/c/cagr.asp",
+     "type": "reading",
+     "note": "The geometric/arithmetic distinction in its most practical clothing."
+    },
+    {
+     "label": "Wikipedia — Rate of return",
+     "url": "https://en.wikipedia.org/wiki/Rate_of_return",
+     "type": "reading",
+     "note": "Reference-grade: simple vs log, time-weighted vs money-weighted, annualization conventions."
+    },
+    {
+     "label": "Wikipedia — Volatility tax",
+     "url": "https://en.wikipedia.org/wiki/Volatility_tax",
+     "type": "reading",
+     "note": "The σ²/2 drag under its most honest name."
+    }
+   ]
+  },
+  {
+   "id": "c02-risk-measures",
+   "title": "Risk measures — and what each one hides",
+   "summary": "Vol treats upside and downside alike and misses tails entirely. Sharpe inherits both sins plus enormous sampling error. Max drawdown is what compounding feels like — but it's one order statistic, and it grows with track length.",
+   "cards": [
+    {
+     "h": "Volatility: the workhorse and its blind spots",
+     "md": "Standard deviation of returns is the field's default risk number because it's estimable, it scales (√t, with the caveats of concept 1), and it plugs straight into portfolio math. Its blind spots are structural, not incidental:\n\n- **Symmetry.** Vol charges a +3% day the same as a −3% day. A strategy that lurches upward looks exactly as \"risky\" as one that lurches down.\n- **Two moments only.** Return streams with identical mean and vol can differ wildly in skew and kurtosis. The canonical trap: **short-volatility payoffs** — selling insurance, carry trades, deep-OTM put writing. These produce years of small, steady gains (low measured vol) punctuated by rare wipeouts. The vol you measure between wipeouts is a lie about the risk you hold.\n- **Estimated from the sample you got.** If the crash isn't in your window, it isn't in your σ̂. Daily equity vol estimated 2012–2019 tells you little about March 2020.\n\nVol is a fine *conditional* risk dial (concept 7 — it clusters, so it forecasts itself). It is a poor *total* risk summary. Everything downstream that consumes vol — Sharpe, MVO, VaR-lite rules of thumb — inherits these blind spots silently."
+    },
+    {
+     "h": "Sharpe, Sortino, and the error bars nobody quotes",
+     "md": "**Sharpe** = (return − risk-free) / vol: excess return per unit of total volatility. **Sortino** swaps the denominator for downside deviation (root-mean-square of returns below a threshold), so upside variability stops counting against you. Sortino is kinder to convex, lumpy-upside strategies (trend following) and harsher on smooth-until-catastrophe ones — directionally the right correction, though the downside tail still has to *be in the sample* to be counted.\n\nThe under-appreciated fact about both: **the sampling error is enormous.** For roughly normal returns,\n\n## SE(SR) ≈ √((1 + SR²/2) / T)\n\nwith T in years (annualized). A strategy with a true annual Sharpe of 0.8 observed over 5 years carries a standard error around 0.47 — the 95% interval spans roughly −0.1 to +1.7. Five years of live performance *cannot statistically distinguish a good strategy from nothing.* Skewed, fat-tailed returns widen this further.\n\nTwo consequences: (1) manager selection on 3–5 year track records is mostly noise-chasing, which is why the industry's chase-the-recent-winner cycle reliably disappoints; (2) any backtest whose case rests on the second decimal of a Sharpe is making a claim the data cannot support. Quote the error bar or expect to be fooled."
+    },
+    {
+     "h": "Max drawdown: the number wealth actually feels",
+     "md": "**Max drawdown** — the largest peak-to-trough loss — is path-dependent, which is precisely its value: it measures the experience of *holding* the strategy, the thing that determines whether the capital (and its owner's nerve) survives to collect the long-run mean. A −29% drawdown against an incumbent's −11% can be a fully sufficient reason to reject a strategy whose average edge is real — expected return is a signal property, drawdown is a *book* property, and books are what you actually hold.\n\nBut MaxDD has its own failure modes:\n\n- **It's one order statistic.** The single worst episode in one realized path. Two runs of the same process produce different MaxDDs; it has the widest sampling distribution of any common risk stat.\n- **It grows with track length.** Expected MaxDD increases (roughly log-like for i.i.d. returns) with the number of periods observed. A −20% MaxDD over 3 years and −30% over 25 years may describe the *same* process. Comparing raw MaxDDs across unequal histories is a category error — normalize by horizon, or simulate.\n- **It's easy to game in-sample.** Any optimizer told to minimize historical MaxDD will contort around the specific past crash dates — a textbook overfitting target (concept 5).\n\nUse the triad together: vol for the everyday dial, Sharpe (with error bars) for efficiency, drawdown for survivability — and trust none of them alone."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A fund selling deep-OTM index puts shows a 2.1 Sharpe over four calm years. The most important thing this Sharpe hides is:",
+     "options": [
+      "The management fee drag on net returns",
+      "Severe negative skew — the loss tail hasn't occurred in-sample, so measured vol wildly understates held risk",
+      "That Sharpe should have been computed with monthly rather than daily data",
+      "Nothing — a 2.1 Sharpe over four years is statistically decisive"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Fees matter but they're visible and linear — a disclosure issue, not a measurement failure. The lethal problem is invisible in the return stream itself.",
+      "Right. Short-vol payoffs earn small steady premia until a rare wipeout; between wipeouts, σ̂ measures the calm and misses the exposure. Vol is only two moments, and the third and fourth are where this strategy lives.",
+      "Sampling frequency changes the estimate at the margins; it cannot conjure a tail event that isn't in the window. The problem is the payoff's shape, not the periodicity.",
+      "Even taking the numbers at face value, SE(SR) over 4 years is large — and for a negatively-skewed stream the normal-theory error bar itself understates the uncertainty. Decisive it is not."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Strategy A: MaxDD −20% over a 4-year backtest. Strategy B: MaxDD −28% over 25 years. What's the correct reading?",
+     "options": [
+      "A is safer — its worst loss is smaller",
+      "Not comparable as stated: expected MaxDD grows with track length, so B's deeper drawdown over 6× the history may reflect the same or better risk",
+      "B is safer because its drawdown is amortized over more years",
+      "They're equivalent since both are within normal equity ranges"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's the surface read. MaxDD is an extreme order statistic — the longer you watch, the deeper the worst episode gets, for the SAME process. Four calm years simply hasn't rolled the dice often enough.",
+      "Right. Horizon-matching (or simulating drawdown distributions from each strategy's return process) is mandatory before comparing. Raw cross-history MaxDD comparison is a category error.",
+      "There's no amortization concept for drawdowns — a −28% episode hurts identically whenever it lands. B's number isn't better *because* of the long history; it's just measured over more draws.",
+      "\"Both within normal ranges\" ducks the question. The point is that the two numbers aren't on a common scale until you condition on sample length."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Using SE(SR) ≈ √((1+SR²/2)/T): a manager shows Sharpe 0.9 over 5 years. Roughly what can you conclude?",
+     "options": [
+      "The true Sharpe is 0.9 ± about 0.1 — a solid edge",
+      "The 95% interval is roughly −0.05 to +1.85 — the track record can't rule out zero skill",
+      "Five years is enough if returns are normally distributed",
+      "The Sharpe is meaningless without knowing the benchmark"
+     ],
+     "answer": 1,
+     "feedback": [
+      "±0.1 would need on the order of a century of data. The intuition that 5 years of monthly numbers (60 observations) pins down a ratio of two estimated moments is the industry's most expensive illusion.",
+      "Right: SE ≈ √(1.4/5) ≈ 0.53, so the interval spans zero comfortably. This is why 3–5 year track records drive allocation decisions that mean-revert on the allocator.",
+      "Normality helps the formula apply but doesn't shrink the interval — T is what shrinks it, and 5 years of T is simply not much. Non-normality makes it worse, never better.",
+      "Sharpe already nets the risk-free rate; it's benchmark-free by construction. The issue here is sampling error, not reference point."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Sortino improves on Sharpe for a lumpy-upside strategy like trend following because:",
+     "options": [
+      "It uses a longer lookback window, smoothing the estimate",
+      "Its denominator counts only downside deviation, so large positive months stop inflating the risk term",
+      "It replaces the mean with the median return",
+      "It is immune to missing tail events in the sample"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Sortino is computed over the same window as Sharpe — the change is in *which* deviations count, not how many observations enter.",
+      "Right. Trend's signature is many small losses and occasional huge gains; Sharpe's symmetric σ punishes those gains as \"risk.\" Downside deviation removes that distortion — directionally the correct fix for convex payoffs.",
+      "Both keep the mean in the numerator. Sortino's edit is purely to the denominator's definition of deviation.",
+      "No sample statistic is. If the bad tail hasn't occurred in-window, downside deviation misses it exactly as vol does — Sortino fixes the symmetry sin, not the missing-tail sin."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Sharpe Ratio",
+     "url": "https://www.investopedia.com/terms/s/sharperatio.asp",
+     "type": "reading",
+     "note": "Definition, annualization, and the standard caveats in one place."
+    },
+    {
+     "label": "Investopedia — Sortino Ratio",
+     "url": "https://www.investopedia.com/terms/s/sortinoratio.asp",
+     "type": "reading",
+     "note": "The downside-deviation denominator, worked example included."
+    },
+    {
+     "label": "Wikipedia — Drawdown (economics)",
+     "url": "https://en.wikipedia.org/wiki/Drawdown_(economics)",
+     "type": "reading",
+     "note": "Formal definition plus the maximum-drawdown literature pointers."
+    }
+   ]
+  },
+  {
+   "id": "c03-mvo-fragility",
+   "title": "Portfolio theory — and why MVO is fragile",
+   "summary": "Markowitz's machine is mathematically airtight and practically treacherous: it treats noisy estimates as truth, so it maximizes into the errors. Estimation error in the means dominates everything.",
+   "cards": [
+    {
+     "h": "The beautiful machine",
+     "md": "Markowitz (1952) turned portfolio construction into an optimization: given expected returns **μ**, covariance matrix **Σ**, and weights **w**,\n\n## maximize wᵀμ − (λ/2)·wᵀΣw\n\n— expected return, penalized by variance, with λ setting risk aversion. Sweep λ and you trace the **efficient frontier**: the set of portfolios no other portfolio dominates (more return at equal risk, or less risk at equal return).\n\nThe insights that survive contact with reality are real and permanent:\n\n- **Covariance is the free lunch.** An asset's contribution to portfolio risk is not its own vol but its covariance with everything else. A volatile, *uncorrelated* asset can reduce total risk.\n- **Diversification is a mathematical fact**, not a slogan: for n uncorrelated equal-vol assets, portfolio vol falls like 1/√n.\n- **Two-fund separation**: with a risk-free asset, every investor should hold the same tangency portfolio, scaled by cash/leverage — differing only in *how much*, not *what*.\n\nThe theory earned its Nobel. The trouble begins when you feed the machine, because the optimizer's inputs — μ and Σ — are not known quantities. They are estimates, and the optimizer has no idea."
+    },
+    {
+     "h": "The error maximizer",
+     "md": "MVO's fatal habit: it treats μ̂ and Σ̂ as *truth*, then leverages hardest into exactly the coordinates where the estimates are most wrong. An asset whose mean is overestimated by luck looks like a bargain; a pair whose correlation is underestimated looks like a hedge — the optimizer piles into both. Michaud's name for this sticks: MVO is an **error maximizer**.\n\nThe asymmetry of the inputs matters:\n\n- **Means dominate.** Chopra & Ziemba's classic result: at typical risk tolerance, errors in expected returns hurt portfolio utility roughly **10×** as much as errors in variances, and ~20× errors in covariances. And means are the thing markets let you estimate *worst* — SE of a mean return shrinks only with total calendar time (√T), not with sampling frequency. Fifty years of data gives you a ±2%-ish error bar on an equity premium of ~5%.\n- **Instability is the tell.** Nudge one asset's μ̂ by 50bp and watch weights swing by tens of points, often slamming into long/short extremes. If small input perturbations produce violent weight changes, the \"optimal\" portfolio is an artifact of this sample's noise.\n- **Σ̂ has its own pathology**: with n assets and T observations, the sample covariance matrix is noisy (and singular if n > T); its smallest eigenvalues are underestimated, and MVO loves to bet on exactly those directions — phantom low-risk combinations.\n\nUnconstrained MVO on sample estimates is, in practice, a machine for converting estimation noise into concentrated positions."
+    },
+    {
+     "h": "What practitioners actually do",
+     "md": "Every working fix accepts the same premise: *your inputs are mostly noise, so stop letting them speak so loudly.*\n\n- **Constraints.** Long-only, position caps, sector bounds. Crude, effective — Jagannathan & Ma showed constraining weights acts like shrinking the covariance estimates. Practitioner priors smuggled in as bounds.\n- **Shrinkage.** Ledoit–Wolf: pull Σ̂ toward a structured target (constant correlation, single factor), weighting by estimated error. Strictly better-conditioned; standard kit.\n- **Black–Litterman.** Start from equilibrium (market-cap weights reverse-engineered into implied returns) and update toward your views Bayesianly, sized by stated confidence. Its real gift: no view ⇒ market weights — a sane default instead of a corner solution.\n- **Risk-based construction.** Risk parity, minimum variance, equal risk contribution: drop μ̂ entirely, allocate on the (better-estimated) risk side. An implicit bet that Sharpe ratios are roughly equal across assets — debatable, but more honest than pretending you know the means.\n- **1/N.** DeMiguel, Garlappi & Uppal (2009): across datasets, naive equal weighting beat 14 optimizing models out-of-sample on Sharpe; the estimation window needed for MVO to reliably win was on the order of *centuries*. 1/N has zero estimation error — its \"wrong\" model beats your noisy \"right\" one.\n\nThe ladder, in order of what it takes seriously: estimation error first, elegance second. That ordering is the whole lesson — and it previews concept 5, where the same humility applies to backtests."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Unconstrained MVO on sample estimates produces extreme, concentrated weights primarily because:",
+     "options": [
+      "The quadratic objective is non-convex, so the solver finds bad local optima",
+      "The optimizer treats noisy μ̂ and Σ̂ as exact, so it loads hardest where estimation error is most flattering",
+      "Markets are efficient, so no diversified optimum exists",
+      "The efficient frontier is undefined without a risk-free asset"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The problem is convex (Σ is PSD) and solvers find the global optimum reliably. The optimum itself is the problem — it's the exact solution to the wrong (noisy) inputs.",
+      "Right — the error-maximizer property. Overestimated means and underestimated correlations look like opportunity, and the optimizer maximizes into them. Garbage in, *leveraged* garbage out.",
+      "Efficiency arguments would push toward the market portfolio, not corner solutions. The extremes come from input noise, not from any property of market equilibrium.",
+      "The risky-asset-only frontier is perfectly well-defined (the classic bullet). Adding a risk-free asset changes its geometry, not its existence."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Chopra & Ziemba's estimation-error hierarchy says the input errors that damage MVO portfolios most are in the:",
+     "options": [
+      "Covariances — they're the most numerous parameters",
+      "Variances — risk drives the penalty term",
+      "Expected returns — roughly an order of magnitude worse than variance errors",
+      "Risk-aversion parameter λ"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Numerous, yes — n(n−1)/2 of them — but individually least damaging (~20× less than mean errors at typical risk aversion). Count of parameters isn't the same as sensitivity.",
+      "Variance errors matter about 10× less than mean errors. And variances are also the *best*-estimated inputs, since vol estimation improves with sampling frequency.",
+      "Right. Doubly cursed: the objective is most sensitive to means, AND means are estimated worst (SE shrinks only with calendar time). This is why risk-based methods that drop μ̂ entirely are coherent.",
+      "λ shifts you along the frontier — it changes which efficient portfolio you pick, not how corrupted the frontier itself is. Input error corrupts the frontier."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "DeMiguel, Garlappi & Uppal found 1/N beat 14 optimizing models out-of-sample. The mechanism is that equal weighting:",
+     "options": [
+      "Happens to approximate the true optimal portfolio in efficient markets",
+      "Carries zero estimation error — the gain from optimizing was smaller than the noise the optimizers ingested",
+      "Rebalances more frequently, harvesting extra diversification return",
+      "Overweights small caps, capturing the size premium"
+     ],
+     "answer": 1,
+     "feedback": [
+      "No claim that 1/N is *optimal* — it's confidently suboptimal. It wins because its bias is smaller than the optimizers' variance. Classic bias-variance tradeoff wearing a portfolio costume.",
+      "Right. The paper's sharpest number: the estimation window needed for sample-based MVO to reliably beat 1/N was on the order of decades to centuries. Until then, the noise you feed the optimizer costs more than the optimality it buys.",
+      "Rebalancing frequency was held comparable across strategies; the rebalancing bonus exists but is second-order here. The first-order effect is estimation error.",
+      "In the equity-portfolio datasets there's a mild small-cap tilt vs cap-weighting, but the result held across asset-class datasets where no size premium story applies."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Black–Litterman's core practical contribution to taming MVO is:",
+     "options": [
+      "A faster algorithm for computing the efficient frontier",
+      "Anchoring on equilibrium-implied returns so that absent views you hold market weights, and views tilt you only in proportion to confidence",
+      "Eliminating the need for a covariance matrix",
+      "Guaranteeing higher out-of-sample Sharpe than 1/N"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Computation was never the bottleneck — the frontier solves in microseconds. The bottleneck is that the inputs are noise; BL attacks the inputs, not the solver.",
+      "Right. Reverse-optimizing market weights into implied returns gives a prior that is by construction non-extreme; Bayesian blending means a weak view moves you slightly, not into a corner. The default behavior is the feature.",
+      "BL leans on Σ *more* — it uses it both in the prior and in the update. What it replaces is the raw sample mean, MVO's most toxic input.",
+      "No such guarantee exists (DeMiguel et al. tested BL-flavored models too). BL fixes the corner-solution pathology; it doesn't manufacture information you don't have."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Wikipedia — Modern portfolio theory",
+     "url": "https://en.wikipedia.org/wiki/Modern_portfolio_theory",
+     "type": "reading",
+     "note": "The full machine: frontier, two-fund separation, and the standard criticisms."
+    },
+    {
+     "label": "Wikipedia — Black–Litterman model",
+     "url": "https://en.wikipedia.org/wiki/Black%E2%80%93Litterman_model",
+     "type": "reading",
+     "note": "The equilibrium-prior fix in detail."
+    },
+    {
+     "label": "DeMiguel, Garlappi & Uppal — 1/N (Optimal Versus Naive Diversification) (SSRN)",
+     "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=911512",
+     "type": "reading",
+     "note": "The 1/N paper — the cleanest published humiliation of sample-based optimization."
+    }
+   ]
+  },
+  {
+   "id": "c04-factors",
+   "title": "Factors: value, momentum, quality — and out-of-sample decay",
+   "summary": "A factor is a systematic, cross-sectionally priced return driver. The classics replicate across markets and decades; the factor zoo mostly doesn't. Published anomalies lose roughly half their edge after publication.",
+   "cards": [
+    {
+     "h": "What a factor is (and how one is built)",
+     "md": "A **factor** is a characteristic that systematically orders the cross-section of returns: sort assets by it, and the top bucket reliably outperforms the bottom by more than market exposure explains. The standard construction: rank the universe on the signal, go long the top decile (or quintile), short the bottom, rebalance on schedule. The long–short spread isolates the factor from the market.\n\nThe classics, with their canonical definitions:\n\n- **Value** — cheap beats expensive: book/price, earnings yield, EBITDA/EV. HML in Fama–French.\n- **Momentum** — recent winners keep winning: return over months **t−12 to t−2**, deliberately *skipping the most recent month* because 1-month returns reverse (short-term reversal is a *different*, opposing factor — including month t−1 contaminates the signal).\n- **Quality** — profitable, stable, conservatively financed firms outperform junk: gross profitability (Novy-Marx), low accruals, low leverage.\n- **Low-vol / low-beta** — boring stocks earn more per unit of risk than the CAPM says they should (betting-against-beta).\n\nWhat elevates these above data-mined curiosities is **pervasiveness**: value and momentum show up in equities across every region tested, in bonds, currencies, commodities, even country indices — Asness, Moskowitz & Pedersen's \"Value and Momentum Everywhere.\" A real driver of returns shouldn't care which ticker tape you point it at. That replication breadth is the strongest single filter you have."
+    },
+    {
+     "h": "Why would a factor pay? Three stories",
+     "md": "A premium needs a reason to persist once everyone can see it. Three families of explanation, with different survival implications:\n\n1. **Risk compensation.** The factor return is payment for bearing a real risk that bites at the worst times — value stocks carry distress/redeployment risk that concentrates in recessions. If true, the premium *should* survive publication: it's not mispricing, it's an insurance premium, and collecting it means being the one holding the pain when it arrives.\n2. **Behavioral mispricing.** Systematic cognitive error: momentum from initial underreaction to news followed by herding overreaction; value from overextrapolation of growth (glamour overpriced, boring underpriced). Persists only while the error persists *and* arbitrage capital stays scarce.\n3. **Limits to arbitrage / structural.** The mispricing is visible but expensive or forbidden to correct: leverage constraints explain low-beta (constrained investors overpay for high-beta lottery instead of levering low-beta), benchmark-hugging mandates, short-sale costs.\n\nThe stories aren't decoration — they're your **prior on decay**. A risk-priced factor should be robust; a behavioral one should erode as capital crowds in; a structural one persists exactly as long as the constraint does. When a factor's returns decay post-publication, that's evidence about *which story was true*. Momentum is the awkward case: a century of data, everywhere, yet the risk story remains unconvincing — which is partly why its crashes (concept 7 territory: 2009's violent junk rally) keep it uncrowded enough to persist."
+    },
+    {
+     "h": "The factor zoo and the OOS graveyard",
+     "md": "By the mid-2010s the literature had published **400+ factors** — Cochrane's \"factor zoo.\" Almost all were discovered the same way: many researchers, one shared dataset (CRSP/Compustat), each running many specifications, with journals publishing only t > 2. That process *manufactures* significant-looking factors from noise — with enough tests on one sample, t > 2 is a certainty, not a discovery (the full mechanics in concept 5).\n\nThe cleanest measurement of the damage is **McLean & Pontiff (2016)**: take 97 published anomalies, track each portfolio after its sample ends and after publication. Returns fall ~**26%** out-of-sample (that's the data-mining share — the part that was never real) and ~**58%** post-publication (data-mining *plus* informed capital arbitraging away what was real). Roughly: **half of the published edge was noise or gets competed away.** Corroborating tell: the decay is strongest in liquid, easily-traded anomalies — exactly where arbitrage capital can act.\n\nSurvival filters worth applying to any candidate factor: does it replicate across geographies and asset classes? Does it survive its own publication decade? Does it have a story with a reason to persist? Is it robust to reasonable perturbation of its definition (12-2 vs 6-1 momentum), or does it live in one magic specification?\n\nAnd one distinction to carry into the next concept: a factor with genuine predictive power — a real information coefficient — is still only a *signal*. Costs, capacity, turnover, and drawdown decide whether it's a *book*. Most selection studies die out-of-sample; some of the survivors die at implementation."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Standard momentum is defined over months t−12 to t−2, skipping the most recent month, because:",
+     "options": [
+      "One month of data is too noisy to measure",
+      "Returns at the 1-month horizon tend to reverse — including month t−1 mixes an opposing effect into the signal",
+      "Exchanges report the latest month's data with a delay",
+      "It reduces turnover, which is the main driver of momentum profits"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Noise isn't the issue — the month is *systematically informative in the wrong direction*. Short-term reversal is a real, opposite-signed effect, not just noise.",
+      "Right. Short-term reversal (Jegadeesh) means last month's winners tend to dip; folding t−1 into the lookback dilutes momentum with its own antagonist. The skip is signal hygiene, not convention.",
+      "Price data is available in real time; there's no reporting lag story here. The skip is about return dynamics at the 1-month horizon.",
+      "The skip barely changes turnover — and momentum profits are gross-of-cost a return phenomenon, with turnover as a cost drag to manage, not the source of the premium."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "McLean & Pontiff tracked 97 published anomalies and found returns dropped ~26% after the sample period and ~58% after publication. The cleanest reading of the two-step decay is:",
+     "options": [
+      "The anomalies were all fraudulent",
+      "~26% was data-mining (never real); the additional decay is informed capital arbitraging away much of what was real",
+      "Markets became efficient in 2016",
+      "Transaction costs rose after publication"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Fraud isn't needed — honest researchers running many tests on one shared dataset will produce inflated in-sample results without any misconduct. The decay pattern is exactly what selection bias plus arbitrage predicts.",
+      "Right. The post-sample gap isolates overfitting (nothing about the world changed, only the data window); the extra post-publication gap adds the crowding effect. Half the published edge, gone — your prior for any paper you read.",
+      "The decay is anomaly-by-anomaly, timed to each paper's own publication date across decades — not a single regime change. And the effect is strongest in liquid names, fingering arbitrage, not enlightenment.",
+      "Costs generally *fell* over the sample (decimalization, electronic trading). The measured decay is in gross returns — the signal itself weakened."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why does \"value and momentum work in equities, bonds, currencies, and commodities across every region tested\" matter so much for believing they're real?",
+     "options": [
+      "It proves the risk-compensation explanation is correct",
+      "Each independent market is an out-of-sample test the factor never saw — pervasiveness is exactly what data-mined noise can't produce",
+      "It shows the factors have no capacity constraints",
+      "Diversified factor portfolios have lower fees"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Pervasiveness supports *realness* but doesn't adjudicate between the risk, behavioral, and structural stories — all three could in principle operate across markets.",
+      "Right. A spec fit to one dataset's noise has no reason to appear in Japanese bonds or commodity futures. Cross-market replication is the closest thing empirical finance has to a controlled experiment, and the zoo's 400 residents overwhelmingly fail it.",
+      "Breadth of *existence* says nothing about how much capital each market's version can absorb — capacity is an implementation question, separate from validity.",
+      "Fees are a product-design matter, orthogonal to whether the underlying premium exists."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "If a factor's premium is genuine risk compensation (rather than behavioral mispricing), publication of the factor should:",
+     "options": [
+      "Eliminate the premium immediately as arbitrageurs pile in",
+      "Leave the premium largely intact — collecting it still requires bearing the risk nobody wants",
+      "Reverse the premium's sign",
+      "Have no observable effect of any kind on the strategy"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Piling in is exactly what risk compensation resists: the arbitrageur who \"harvests\" it inherits the losses that arrive at the worst times. You can't arbitrage away an insurance premium — you can only become the insurer.",
+      "Right — and this is why post-publication decay is *evidence about the explanation*. McLean–Pontiff-style decay suggests a large behavioral/mispricing component; robustness (value's long history) is consistent with priced risk.",
+      "Reversal would require the crowd to systematically overshoot into overcorrection — occasionally alleged, rarely demonstrated. The realistic alternatives are decay (mispricing) or persistence (risk).",
+      "Crowding can still compress even a true risk premium somewhat (more insurers, lower rates) and can change its correlation structure — 'largely intact' is the claim, not 'untouched.'"
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "AQR — Value and Momentum Everywhere",
+     "url": "https://www.aqr.com/Insights/Research/Journal-Article/Value-and-Momentum-Everywhere",
+     "type": "reading",
+     "note": "The pervasiveness evidence: both factors, eight markets and asset classes, one framework."
+    },
+    {
+     "label": "Wikipedia — Fama–French three-factor model",
+     "url": "https://en.wikipedia.org/wiki/Fama%E2%80%93French_three-factor_model",
+     "type": "reading",
+     "note": "The canonical factor framework the whole literature extends."
+    },
+    {
+     "label": "McLean & Pontiff — Does Academic Research Destroy Stock Return Predictability? (SSRN)",
+     "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2156623",
+     "type": "reading",
+     "note": "The decay measurement: ~26% post-sample, ~58% post-publication."
+    }
+   ]
+  },
+  {
+   "id": "c05-backtesting",
+   "title": "Backtesting discipline: overfitting, multiple testing, holdout spending",
+   "summary": "A reported backtest is the maximum over hidden trials, biased upward by construction. Multiple-testing corrections, one-shot holdouts, and portfolio-level kill-gates are the countermeasures — and a real signal can still fail as a book.",
+   "cards": [
+    {
+     "h": "Every backtest you see is a survivor",
+     "md": "The backtest in front of you is never *a* test — it's the winner of a tournament you didn't see. Universe choice, date range, rebalance frequency, signal definition, parameter values, which variants got quietly discarded: each decision was a trial, and the reported result is the **max over trials**. The maximum of N noisy draws is biased upward even when every single strategy is worthless: the expected best in-sample Sharpe of N random strategies grows like **√(2 ln N)** — with a few hundred configurations, an in-sample Sharpe over 1 from pure noise is *expected*, not surprising.\n\nThis is Bailey & López de Prado's core point, and their \"Pseudo-Mathematics and Financial Charlatanism\" paper makes it brutal: with enough trials, *any* target backtest Sharpe is achievable on random data, and the practice of reporting the winner without the trial count is — their word — charlatanism, however sincere the researcher.\n\nOverfitting in this domain has a specific meaning worth pinning: the strategy has fit the **noise of one realized path** — the particular crash dates, the particular sector rotations — features that will not recur. The tell-tale signatures: performance concentrated in a few episodes; sensitivity to small parameter changes (12-month lookback great, 11 and 13 mediocre); degradation the moment any element is perturbed. A real effect sits on a *plateau* in parameter space; an overfit one sits on a spike."
+    },
+    {
+     "h": "Multiple testing in the wild: fourteen ways to time cash",
+     "md": "A live case in the abstract. Question: does *any* rule for timing the deployment of a cash pile beat just investing it immediately? Fourteen candidate methods — valuation gates, drawdown triggers, moving-average filters, staged schedules — were each backtested against the lump-sum baseline over long histories.\n\nRaw results: a couple of methods edged out lump-sum, with p-values that would pass a naive 0.05 gate. The trap: **with 14 trials at α = 0.05, the chance of at least one false positive is 1 − 0.95¹⁴ ≈ 51%.** A coin-flip's odds of producing a \"winner\" from nothing. Applying a multiple-testing correction (Bonferroni divides α by the trial count; the effective bar becomes p < 0.0036), *no method survived*. Verdict: deploy on receipt; every timing method is either noise or worse.\n\nThree durable lessons:\n\n1. **The trial count is part of the result.** \"Method X beat baseline, p = 0.04\" is meaningless without \"…and it was 1 of 14 tested.\" The denominator is not a footnote.\n2. **The baseline earns its status.** Lump-sum wins on structural grounds — markets drift upward, so *waiting has negative expected value* — which is why it's so hard to beat honestly and so easy to beat with enough tries.\n3. **A documented negative is a real product.** \"All 14 failed after correction\" permanently retires a seductive question, prevents every future re-litigation from scratch, and cost exactly one honest study. The alternative — testing methods one at a time across months, each at naive α — would have shipped a false positive with near-certainty."
+    },
+    {
+     "h": "Real signal, dead book",
+     "md": "The subtler failure mode: everything about the *signal* checks out, and the *strategy* still must die.\n\nCase, in the abstract: a cross-sectional momentum signal, retrofitted with strict point-in-time data to kill lookahead, evaluated out-of-sample. Result: **OOS information coefficient ≈ 0.12, t ≈ 2.9** — genuine predictive power, honestly measured, on data the signal had never seen. As *research*, a clean pass.\n\nThen the book built on that signal went through the portfolio-level gate — and failed on drawdown: max drawdown roughly **−29%**, against an incumbent allocation's **−11%** over the same span. Verdict: DON'T DEPLOY. The signal survives as decision-support input; the strategy does not become the book.\n\nThe general lesson has a name worth internalizing: **predictive validity and deployability are different tests, run at different levels.**\n\n- A signal-level statistic (IC, t-stat, quantile spread) answers *\"does this contain information?\"*\n- A book-level gate (drawdown vs incumbent, capacity, turnover cost, tail behavior) answers *\"should capital actually live here?\"*\n\nAn IC of 0.12 is real but modest — plenty of room for a signal that ranks assets correctly on average while the resulting portfolio concentrates, whipsaws through regime breaks, or rides momentum's signature crash exposure (concept 7). Conversely, weak-looking signals sometimes make fine books through diversification. Neither level's verdict implies the other's — which is why an honest pipeline runs **both gates, pre-registered, and lets either one kill.** The kill is not a tragedy. The kill is the system working."
+    },
+    {
+     "h": "Holdout spending: you get one look",
+     "md": "The out-of-sample holdout is the backtester's only clean instrument, and it has a one-shot chemistry: **the first time you act on what you saw in it, it becomes training data.**\n\nThe degradation is mechanical, not moral. Test on the holdout, fail, tweak, test again: the tweak was *chosen because of* the holdout's noise, so the second test is partially in-sample. Iterate a handful of times and the \"OOS pass\" is a max-over-trials statistic wearing an out-of-sample costume — you've re-created the exact pathology the holdout existed to prevent, one peek at a time. Nobody decides to cheat; the holdout just erodes with use, like a shared password.\n\nCountermeasures, in increasing order of rigor:\n\n- **Pre-register the gate.** Metric, threshold, and verdict rule written down *before* the look. The holdout answers one pre-committed question, pass/fail, and the answer stands — no post-hoc \"but look at the sub-period.\"\n- **Budget the looks.** Treat holdout access as a spendable resource with a ledger. A failed gate doesn't refund the look.\n- **After a kill, the holdout is dead for that hypothesis family.** Redesigns get *new* data — a later time period, a different universe — or they wait for the world to generate more history. \"Re-run until green\" is the whole crime in four words.\n- **Walk-forward / combinatorial splits** (López de Prado's CPCV) stretch scarce data further, but they manage the same budget — they don't repeal it.\n\nThe uncomfortable arithmetic: markets produce new, truly unseen data at exactly one year per year. Holdout data is the scarcest resource in the entire research loop. Spend it like it."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "You backtest 20 parameter variants; the best shows an in-sample Sharpe of 1.1. Your best estimate of that variant's true Sharpe is:",
+     "options": [
+      "About 1.1 — it's the measured value",
+      "Substantially below 1.1 — the winner of 20 trials is selected partly for lucky noise, so its estimate is biased upward",
+      "Above 1.1 — live trading usually improves on backtests",
+      "Exactly 0 — all backtested edges are illusory"
+     ],
+     "answer": 1,
+     "feedback": [
+      "1.1 is the measured max over 20 draws, and the max is a biased estimator of any single strategy's mean. The expected best of N *worthless* strategies grows like √(2 ln N) — for N=20 that's already Sharpe-1-territory in-sample.",
+      "Right — selection bias, the winner's curse in backtest form. The honest move: report the trial count, deflate accordingly (concept 8), or confirm the chosen variant on data that played no role in choosing it.",
+      "Backtests systematically flatter live results — costs, slippage, capacity, and regime change all subtract. The direction of the live adjustment is reliably down.",
+      "Too cynical to be useful — real edges exist and some backtests find them. The point is calibrated shrinkage toward zero as trials grow, not a blanket zero."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Fourteen cash-deployment timing methods are tested against lump-sum; the best achieves p = 0.04. The correct conclusion is:",
+     "options": [
+      "The best method beats lump-sum — p < 0.05",
+      "Nothing passes: with 14 trials, the chance of at least one p < 0.05 by luck alone is about 51%, and no method clears a corrected threshold",
+      "Test the best method on more historical data until significance improves",
+      "Average the 14 methods into an ensemble to diversify the model risk"
+     ],
+     "answer": 1,
+     "feedback": [
+      "p = 0.04 answers 'how surprising is THIS result in ONE test' — but you ran fourteen. The family-wise error rate at α=0.05 over 14 independent trials is 1−0.95¹⁴ ≈ 51%. A coin flip produces this 'discovery.'",
+      "Right. Bonferroni puts the per-test bar at 0.05/14 ≈ 0.0036, and nothing clears it. The verdict — deploy on receipt, all timing methods fail — is a documented negative that permanently retires the question.",
+      "The same history is what generated the lucky p-value; re-examining it isn't new evidence. And 'extend the test until it passes' is holdout-spending — the p-value of a test you repeat until green is not a p-value.",
+      "Ensembling fourteen methods, most of which are indistinguishable from noise against a structurally superior baseline, diversifies you into the baseline minus costs. Model averaging can't rescue a family with no demonstrated member."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A momentum signal shows OOS IC ≈ 0.12 (t ≈ 2.9), but the portfolio built on it draws down −29% vs an incumbent's −11%. The signal is real. What's the right disposition?",
+     "options": [
+      "Deploy — a statistically real signal is what research exists to find",
+      "Don't deploy the book; retain the signal as decision-support. Signal validity and book deployability are separate gates, and either may kill",
+      "The drawdown result proves the IC was spurious after all",
+      "Deploy with double the position size to earn back the drawdown faster"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Research exists to find deployable *books*, and this one fails the survivability gate against its incumbent. A real signal that produces an unholdable portfolio is an input, not a product.",
+      "Right. IC measures average cross-sectional ranking skill; drawdown measures the held path — a signal can rank correctly on average while its portfolio concentrates or rides crash-prone exposure. Two levels, two pre-registered gates, either kills. The kill is the process working.",
+      "No contradiction exists: t ≈ 2.9 out-of-sample is real ranking skill, and −29% is real path risk. A modest IC leaves enormous room for ugly portfolio dynamics. Different questions, different answers.",
+      "Position size scales the drawdown too — doubling turns −29% toward the −50%+ regime where compounding arithmetic (a 50% loss needs +100% to recover) becomes the whole story. Sizing up a drawdown failure is the single most reliably fatal move in the field."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Your strategy fails its pre-registered holdout gate. You adjust one parameter and re-test on the same holdout: pass. The pass is unreliable because:",
+     "options": [
+      "One parameter change is too small to matter either way",
+      "The adjustment was chosen in response to that holdout's specific noise, so the second test is partially in-sample — the holdout stopped being out-of-sample the moment you acted on it",
+      "Holdout tests always require fresh randomization seeds",
+      "A pass after a fail averages to inconclusive, so run a third test as tiebreaker"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Size of the change is irrelevant — what poisons the test is the *direction of information flow*: from holdout results into design choices. One bit of leakage per look, compounding.",
+      "Right. This is holdout spending: each peek converts test data into training data, and iterate-until-green reconstructs max-over-trials with an OOS label on it. After a kill, redesigns need genuinely new data.",
+      "Seeds govern simulated randomness; the issue here is information leakage from a fixed historical dataset into the researcher's choices. No re-seeding un-leaks it.",
+      "A third test on the same data spends the holdout further and makes it worse — the tiebreaker logic treats each look as independent evidence, which is exactly what the leakage destroyed."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Bailey, Borwein, López de Prado & Zhu — Pseudo-Mathematics and Financial Charlatanism (AMS Notices)",
+     "url": "https://www.ams.org/notices/201405/rnoti-p458.pdf",
+     "type": "reading",
+     "note": "The max-over-trials argument in full: any backtest Sharpe is achievable on noise."
+    },
+    {
+     "label": "Harvey, Liu & Zhu — ...and the Cross-Section of Expected Returns (SSRN)",
+     "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2249314",
+     "type": "reading",
+     "note": "Why a t-stat of 2 is no longer enough: the multiple-testing case against the factor literature."
+    },
+    {
+     "label": "Wikipedia — Multiple comparisons problem",
+     "url": "https://en.wikipedia.org/wiki/Multiple_comparisons_problem",
+     "type": "reading",
+     "note": "The general statistical machinery: family-wise error, Bonferroni, FDR."
+    }
+   ]
+  },
+  {
+   "id": "c06-position-sizing",
+   "title": "Position sizing: Kelly, its violence, and vol targeting",
+   "summary": "Kelly maximizes long-run growth and delivers gut-wrenching drawdowns with certainty. Overbetting is asymmetrically fatal, estimated edges are overestimates, so everyone sane runs fractional — vol targeting is the same idea in continuous clothing.",
+   "cards": [
+    {
+     "h": "Kelly: the growth-optimal bet",
+     "md": "The Kelly criterion answers one question exactly: what fraction of wealth to stake, repeatedly, to maximize the long-run **growth rate** of wealth. Equivalently: maximize E[ln(wealth)] each period — the logarithm converts multiplicative compounding into an additive problem, and it embeds the volatility drag of concept 1 automatically (that σ²/2 penalty *is* the log's curvature).\n\nTwo forms you'll actually use:\n\n- **Discrete bet** (win-prob p, even odds): f* = 2p − 1. A 55% coin ⇒ stake 10% of bankroll.\n- **Continuous / market form**: for an asset with excess return μ and variance σ²,\n\n## f* = μ / σ²\n\nNote what that is: the Sharpe ratio divided by σ. An asset with 5% excess return and 16% vol ⇒ f* ≈ 0.05/0.0256 ≈ **1.95 — Kelly says lever the equity market roughly 2×.** Your instinct that this is insane is correct, and the next card is about why the formula is right *and* your instinct is too.\n\nKelly's optimality claims are real but narrow: it maximizes the asymptotic growth rate and the probability of eventually dominating any other *fixed-fraction* strategy. It says nothing about the path — and the path is where you live. It also assumes you know μ and σ. You don't. You have μ̂ — and concept 3 already told you what μ̂ is worth."
+    },
+    {
+     "h": "The violence, and the asymmetry of overbetting",
+     "md": "Full Kelly's path statistics are not a side effect — they're a theorem. Betting full Kelly:\n\n- The probability of at some point losing **half your bankroll is 1/2**. Of losing 90% at some point: **1/10**. (In general, P(ever dip to fraction 1/n) = 1/n.) These are certainties of the strategy, not tail scenarios.\n- The growth-rate curve g(f) is an inverted parabola: **g(f) = fμ − f²σ²/2**, peaking at f* and hitting **zero at exactly 2f***. Bet double Kelly and your expected growth is zero — all that risk for nothing. Beyond 2f*, growth is *negative*: you are compounding toward ruin while every individual bet has positive expected value.\n\nThat second point is the asymmetry that governs all practical sizing: **underbetting costs you a little growth; overbetting can cost you everything.** Half Kelly earns 75% of optimal growth (the parabola is flat near the top) at half the position and roughly half the drawdown violence. Betting 1.5× Kelly also earns 75% — with triple the pain and no upside over half Kelly whatsoever.\n\nNow add the estimation problem: your μ̂ came from a backtest — which concept 5 established is biased upward by selection. **An overestimated edge fed into f* = μ/σ² produces systematic overbetting**, and the penalty for overbetting is the catastrophic side of the parabola. This is why 'full Kelly on the backtest edge' is a compound error: optimal sizing for an edge you don't actually have. Fractional Kelly — half or quarter — isn't timidity; it's the correct Bayesian response to knowing your μ̂ is an overestimate of unknown size."
+    },
+    {
+     "h": "Vol targeting: Kelly in continuous clothing",
+     "md": "**Volatility targeting** — hold position ∝ target_vol / σ̂_current, so the portfolio runs at constant *risk* rather than constant *notional* — looks like a different school of sizing. It's not. Rewrite Kelly: f* = μ/σ² = (μ/σ) × (1/σ). If you take the Sharpe μ/σ as roughly stable (your standing estimate of the edge), the Kelly-optimal exposure moves as **1/σ** — scale down when vol rises, up when it falls. That is vol targeting, derived rather than asserted.\n\nWhy it works better than it has any right to rests on two empirical facts (both from concept 7's stylized-fact family):\n\n1. **Vol is forecastable.** Vol clusters — today's σ̂ is a genuinely good predictor of near-future σ. This is the *only* input Kelly needs that markets actually let you estimate well.\n2. **Returns don't rise with vol.** Across equity history, high-vol periods do *not* deliver proportionally higher returns (if anything the relationship is flat-to-negative — high vol clusters around crises). So constant-notional sizing means taking your biggest risk exactly when compensation per unit risk is worst. Scaling by 1/σ̂ fixes that mismatch, which is why vol-managed portfolios historically improved Sharpe and, critically, cut the depth of crash-era drawdowns.\n\nPractical grammar of a sizing stack, bottom to top: estimate vol (honest, current, clustering-aware) → set exposure by target vol → cap the implied Kelly fraction (are we implicitly above half-Kelly on the *believed* edge?) → let the drawdown gate (concept 5) veto the whole book. Each layer guards a different failure: bad vol estimate, bad edge estimate, bad tail model. The layers are redundant by design — redundancy is what you want between you and the 2f* cliff."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "The Kelly growth curve is g(f) = fμ − f²σ²/2. What happens to long-run growth if you persistently bet at exactly twice the Kelly fraction?",
+     "options": [
+      "Growth is twice as fast, with twice the volatility",
+      "Growth is zero — the extra volatility drag exactly cancels the extra edge",
+      "Growth is 75% of optimal, same as half Kelly",
+      "Growth is optimal — Kelly is a minimum, not a maximum"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Expected *arithmetic* return doubles, but growth is geometric: the drag term scales with f², so it quadruples while the edge term only doubles. At 2f* they exactly cancel.",
+      "Right: g(2f*) = 2f*μ − 2f*²σ² = 0. All the risk, none of the growth — and past 2f*, growth is negative while every single bet still has positive expectation. Compounding toward ruin on a positive-EV bet is Kelly's most counterintuitive theorem.",
+      "75% is the symmetric points at 0.5× and 1.5× Kelly — the parabola gives 1.5×, not 2×, the half-Kelly growth rate. 2f* is the zero crossing.",
+      "Kelly f* is the parabola's peak — a maximum. There is no sizing above it that improves growth; there is only the downslope."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "The strongest argument for fractional Kelly (½ or ¼) over full Kelly in real markets is:",
+     "options": [
+      "Fractional Kelly has a higher expected growth rate",
+      "Your μ̂ is an overestimate of unknown size (backtest selection bias), and the penalty for overbetting is catastrophic while the cost of underbetting is mild — so you deliberately size below the apparent optimum",
+      "Full Kelly is illegal under margin regulations",
+      "Fractional Kelly guarantees no drawdowns beyond 10%"
+     ],
+     "answer": 1,
+     "feedback": [
+      "By construction it can't be — f* maximizes growth *if the inputs are true*. Fractional Kelly trades a little theoretical growth for insurance against the inputs being wrong, which they are.",
+      "Right — the asymmetry argument. g(f) is flat near the peak (half Kelly keeps 75% of growth) and cliff-like past 2f*. When μ̂ is biased up by selection (concept 5), 'full Kelly on the estimate' is likely *over* true Kelly already. Fractional sizing is calibrated humility, not cowardice.",
+      "Margin rules constrain some implementations (Reg-T caps leverage), but the argument holds in unlevered settings too — it's statistical, not regulatory.",
+      "No fixed-fraction scheme bounds drawdowns — P(ever halving) = 1/2 at full Kelly, lower but nonzero at fractions. Fractional Kelly reduces the violence; nothing eliminates it."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Vol targeting (exposure ∝ 1/σ̂) improves risk-adjusted outcomes in equities primarily because:",
+     "options": [
+      "High volatility reliably predicts high returns, so the strategy buys more when vol is high",
+      "Vol is persistent and forecastable while expected return is roughly flat across vol regimes — so constant-notional books take maximum risk exactly when compensation per unit risk is worst",
+      "It eliminates the equity risk premium's variance entirely",
+      "It is mathematically unrelated to Kelly but happens to work"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Backwards on both counts: high-vol regimes do NOT pay proportionally more (flat-to-negative relationship, since vol spikes cluster in crises), and vol targeting *reduces* exposure when vol is high.",
+      "Right. The two stylized facts — vol clusters (forecastable), returns don't scale with vol — mean 1/σ̂ scaling keeps risk constant and shifts exposure away from the worst-compensated periods. That's also why its biggest historical benefit is crash-era drawdown reduction.",
+      "It stabilizes *realized* portfolio vol around the target; the premium's uncertainty and the possibility of loss remain fully intact. Constant risk ≠ no risk.",
+      "It IS Kelly: f* = μ/σ² = (μ/σ)·(1/σ) — hold the Sharpe estimate fixed and Kelly exposure moves as 1/σ. Vol targeting is the continuous-time Kelly prescription under a stable-Sharpe assumption."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "At full Kelly, the probability that your bankroll at some point falls to one-tenth of its starting value is:",
+     "options": [
+      "Essentially zero — Kelly is growth-optimal, so deep drawdowns are rare",
+      "Exactly 1/10",
+      "Exactly 1/2",
+      "It depends on the asset's skewness"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Growth-optimal is a statement about the destination, not the path. Kelly's path is violent by theorem: deep drawdowns aren't a risk of the strategy, they're a scheduled feature.",
+      "Right — the elegant and alarming identity P(ever reach fraction 1/n) = 1/n at full Kelly. A 10% chance of a −90% drawdown, a 50% chance of halving. This is the 'violence' that makes fractional Kelly the default among people who've done the math.",
+      "1/2 is the probability of ever *halving* (n = 2). The general formula is 1/n — reaching a tenth is n = 10.",
+      "The 1/n identity is derived for the idealized continuous case where skewness doesn't enter; real fat tails (concept 7) make the practical picture worse, not better — another reason to run fractional."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Wikipedia — Kelly criterion",
+     "url": "https://en.wikipedia.org/wiki/Kelly_criterion",
+     "type": "reading",
+     "note": "Derivations for both the discrete and continuous forms, plus the fractional-Kelly discussion."
+    },
+    {
+     "label": "Investopedia — Using the Kelly Criterion for Asset Allocation",
+     "url": "https://www.investopedia.com/articles/trading/04/091504.asp",
+     "type": "reading",
+     "note": "The practitioner's translation, with the standard warnings."
+    }
+   ]
+  },
+  {
+   "id": "c07-regime-tail",
+   "title": "Regimes and tail risk: fat tails, clustering, correlation breakdown",
+   "summary": "Return distributions have far more tail than any Gaussian; vol clusters into regimes, which both explains the fat tails and makes vol forecastable; and in crises the correlations you diversified over converge toward one.",
+   "cards": [
+    {
+     "h": "Fat tails: the Gaussian is not a small approximation error",
+     "md": "Daily equity returns are violently non-normal, and the failure is concentrated exactly where risk lives. Daily S&P returns have sample kurtosis in the double digits (Gaussian: 3). The workhorse example: October 19, 1987 — a −20%+ day, roughly a **20-sigma event** under a Gaussian calibrated to daily vol. The waiting time for a 20σ Gaussian draw exceeds the age of the universe by dozens of orders of magnitude. It happened, and smaller cousins (2008, 2020) arrive every decade or so.\n\nEmpirically, return tails behave more like a **power law** — P(|r| > x) ~ x^(−α) with α ≈ 3 for equities — than like exp(−x²/2). The practical differences are not academic:\n\n- **Extremes dominate moments.** A handful of days contributes a huge share of sample variance and essentially all of the kurtosis. Your σ̂ is largely a statement about which crashes were in the window.\n- **Sigma-counting is a category error.** \"That was a 6-sigma move\" implicitly invokes Gaussian waiting times to convey impossibility. Under α ≈ 3 tails, large moves are orders of magnitude more likely — the sigma count communicates false safety.\n- **Aggregation is slow.** Fat-tailed daily returns do aggregate toward normality over longer horizons (CLT grinds on), but slowly, and slowest in the tails — monthly returns are still visibly non-Gaussian.\n\nDesign consequence: any risk system whose tail estimates come from a normal distribution fitted to recent vol will systematically understate exactly the events that end strategies. Vol is a fine everyday dial (concept 2); the tails need their own model — or better, their own *gate*."
+    },
+    {
+     "h": "Vol clusters — and mixtures make monsters",
+     "md": "The most robust stylized fact in all of financial econometrics: **returns themselves are nearly uncorrelated day to day, but their magnitudes are strongly autocorrelated for months.** Big days follow big days (of either sign); calm follows calm. Mandelbrot saw it in cotton prices in 1963; Engle's ARCH and Bollerslev's GARCH built the standard machinery for it.\n\nTwo consequences, one comforting and one alarming:\n\n**Comforting: vol is forecastable.** The clustering means current realized vol genuinely predicts near-term vol — the single most reliable forecast the market offers, and the load-bearing input for vol targeting (concept 6). Nothing comparable exists for the *sign* of returns.\n\n**Alarming: regime mixtures manufacture fat tails.** Suppose returns are perfectly Gaussian *within* each regime — calm (σ = 10%) and stressed (σ = 40%) — and the market merely switches between them. The unconditional distribution you observe is a **mixture of Gaussians, and it is fat-tailed**: excess kurtosis appears mechanically, because sometimes you're drawing from a distribution four times wider than your full-sample σ̂ implies. A large share of measured fat-tailedness is exactly this — not exotic within-day dynamics, but *your estimator averaging over regimes with different variances*.\n\nThis reframing earns its keep: it says fat tails and vol clustering are two views of one phenomenon — **the market has states**, and any model with a single constant σ is mis-specified in a way that specifically corrupts tail estimates. It also says conditional risk (this regime's σ) and unconditional risk (all-history σ) are different numbers answering different questions. Sizing should use the first; stress testing must use the second — plus the transitions."
+    },
+    {
+     "h": "Correlation goes to 1: diversification's regime dependence",
+     "md": "The correlation matrix you estimated in calm markets is not the one that shows up to the crash. In stress episodes — 2008 is the canonical case — correlations among risk assets **converge toward 1**: equities across every geography, corporate credit, commodities, EM everything, previously \"uncorrelated\" hedge-fund styles, all down together. The 20-asset portfolio that backtested as diversified turns out to hold one position: *long risk appetite, levered by false confidence in the correlation matrix.*\n\nWhy this is structural, not bad luck:\n\n- **Common factor exposure surfaces under stress.** In calm times, idiosyncratic variation dominates and pairwise correlations look modest. In a crisis, one factor — liquidity, forced deleveraging, margin spirals — drives everything simultaneously. Assets that share tail exposure can easily look uncorrelated in the body of the distribution.\n- **The sellers are the same people.** Fire sales transmit stress across fundamentally unrelated assets: whoever is being margin-called sells *what they can sell*, mechanically correlating it with what they must sell.\n\nWhat still diversifies when it matters is a short and precious list: high-grade duration (usually — the joint-selloff regime of 2022 is the caveat that keeps this honest), cash, explicit convexity (long options, structured to *gain* from stress), and sometimes trend-following, whose crisis performance comes from riding the persistence of the unwind itself.\n\nThe design lesson closes the loop with concept 5: **average-correlation statistics — and everything built on them, including MVO and calm-period vol — systematically overstate crisis protection.** This is precisely why book-level verdicts key on drawdown rather than vol: drawdown is measured *through* the episodes where correlations converged. It is the statistic that has already met the regime the covariance matrix pretends doesn't exist."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Returns are exactly Gaussian within each of two regimes — calm (σ = 10%) and stressed (σ = 40%) — and the market switches between them. The unconditional return distribution you measure will be:",
+     "options": [
+      "Gaussian, since both components are Gaussian",
+      "Fat-tailed — a variance mixture of Gaussians has excess kurtosis mechanically",
+      "Thin-tailed, because the calm regime dominates the sample",
+      "Bimodal, with a peak for each regime"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Sums of Gaussians are Gaussian; *mixtures* are not. When the variance itself varies, the tails inherit the widest component while the σ̂ you compute averages over both — extreme draws become 'impossible' relative to the blended σ.",
+      "Right — and this is a large share of where real-world fat tails come from: not exotic microstructure, but estimators that average over regimes with different variances. Fat tails and vol clustering are two views of the same fact: the market has states.",
+      "More calm-regime weight makes the blended σ̂ *smaller*, which makes stressed-regime draws even more extreme relative to it — fatter tails in sigma units, not thinner.",
+      "Both components are centered near zero, so the mixture stays unimodal — one peak, heavy shoulders and tails. Bimodality would need well-separated means, not different variances."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "The 1987 crash was roughly a 20-sigma daily move under a Gaussian fitted to historical vol. The correct inference is:",
+     "options": [
+      "It was an astronomically unlucky draw that says nothing about the model",
+      "The Gaussian tail model is wrong for daily returns — under power-law-ish tails (α ≈ 3), such moves are rare but entirely expected over decades",
+      "Volatility was simply mis-estimated that October",
+      "Markets stopped being Gaussian in 1987"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A 20σ Gaussian event has waiting time beyond the age of the universe by dozens of orders of magnitude. Observing one doesn't mean you were unlucky; it means the model that called it impossible is falsified.",
+      "Right. Power-law tails make the 'sigma count' a category error — it imports Gaussian waiting times to describe a distribution that doesn't have them. Same lesson at smaller scale in 2008 and 2020: the tails are the model failure zone.",
+      "No plausible vol estimate rescues a one-day −20%: you'd need σ ≈ 5%/day, which no window before the crash remotely supports. The failure is in the tail *shape*, not the scale parameter.",
+      "Fat tails are visible in return data from every era with sufficient records — Mandelbrot documented them in 1963. 1987 was a demonstration, not a regime change."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A 20-asset portfolio spanning global equities, corporate credit, commodities, and EM debt backtests with low average pairwise correlations. In a 2008-style crisis, its diversification will most likely:",
+     "options": [
+      "Hold up — twenty assets across four asset classes is broad diversification",
+      "Largely vanish — these assets share a common stress factor (liquidity/deleveraging), and correlations converge toward 1 exactly when protection is needed",
+      "Improve, because volatility rises and rebalancing harvests it",
+      "Depend only on whether the assets are equally weighted"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Count the *factors*, not the line items. All twenty are long risk appetite; calm-period correlations measured the idiosyncratic body of the distribution, not the shared tail. Twenty tickers, one bet.",
+      "Right. Forced deleveraging correlates fundamentally unrelated assets (sellers sell what they can), and the common risk factor surfaces under stress. This is why drawdown — measured through actual crises — outranks calm-period correlation stats for book decisions.",
+      "Rebalancing bonuses are second-order and require surviving the drawdown to collect; the first-order event is everything falling together. Rising vol with converged correlations is the worst configuration, not a harvest.",
+      "Weighting shifts the damage at the margins, but no weighting of twenty assets that all load on the same stress factor manufactures independence."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Vol clustering means |returns| are autocorrelated while returns themselves are nearly uncorrelated. The practical asymmetry this creates is:",
+     "options": [
+      "Both future vol and future direction are forecastable from recent data",
+      "Near-term volatility is genuinely forecastable, while the sign of returns essentially isn't — so risk can be managed dynamically even though returns can't be timed",
+      "Neither vol nor direction is forecastable — markets are efficient",
+      "Direction is forecastable but vol is not, favoring market timing over risk management"
+     ],
+     "answer": 1,
+     "feedback": [
+      "If direction were forecastable from recent returns at anything like vol's reliability, the autocorrelation of returns would be strong — it's the one thing the data most clearly rules out.",
+      "Right — the deepest asymmetry in market data. It's why vol targeting works (concept 6), why GARCH-family models earn their keep, and why 'manage the risk, don't call the direction' is the structurally supported posture.",
+      "Efficiency arguments bind expected *returns*, not variance dynamics — vol forecastability doesn't offer a free lunch, just better risk control, so it survives arbitrage untouched.",
+      "Exactly backwards. The magnitude process is the persistent, forecastable one; the sign process is the near-martingale. Timing direction from recent returns is the empirically unsupported half."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Wikipedia — Volatility clustering",
+     "url": "https://en.wikipedia.org/wiki/Volatility_clustering",
+     "type": "reading",
+     "note": "The stylized fact and its ARCH/GARCH lineage, compactly."
+    },
+    {
+     "label": "Wikipedia — Fat-tailed distribution",
+     "url": "https://en.wikipedia.org/wiki/Fat-tailed_distribution",
+     "type": "reading",
+     "note": "Power-law vs Gaussian tails, with the finance applications section."
+    },
+    {
+     "label": "Investopedia — Tail Risk",
+     "url": "https://www.investopedia.com/terms/t/tailrisk.asp",
+     "type": "reading",
+     "note": "The practitioner framing: why three-sigma thinking underprices crashes."
+    }
+   ]
+  },
+  {
+   "id": "c08-honest-research",
+   "title": "The honest-research loop",
+   "summary": "Pre-register the hypothesis and the kill criteria before looking; account for every trial with a deflated Sharpe; and treat a clean DON'T-DEPLOY as a first-class output. The loop's product is calibrated belief, not strategies.",
+   "cards": [
+    {
+     "h": "Pre-registration: negotiate with yourself before the data arrives",
+     "md": "Everything in concepts 4–5 — selection bias, holdout spending, max-over-trials — shares one root: **decisions made after seeing results masquerading as decisions made before.** Pre-registration attacks the root. Before running the study, write down:\n\n- **The hypothesis**, stated falsifiably: not \"explore momentum variants\" but \"12-2 cross-sectional momentum on this universe has OOS IC > 0.05 at t > 2.\"\n- **The full specification**: universe, dates, data sources, portfolio construction, costs. Every parameter fixed, or its search range declared (the range counts as trials).\n- **The kill criteria**: exactly what result kills, at what threshold, decided while you still don't know the answer. A drawdown gate against the incumbent book. A multiple-testing-corrected significance bar. Whatever the gates are — *they are chosen blind.*\n- **What happens on each outcome**: deploy / decision-support only / retire the question.\n\nThe psychology is the entire point. After results arrive, every threshold becomes negotiable — \"−29% drawdown, but the IC is real, maybe the gate's too strict...\" is not analysis, it's **negotiating with noise**, and the noise always makes an attractive offer. A threshold set blind has an authority no post-hoc judgment can match: when the momentum book failed its pre-registered drawdown gate, the verdict was DON'T DEPLOY — no relitigation — *because the gate predated the result.* Pre-registration doesn't make you smarter; it makes your past, unconflicted self the judge instead of your present, motivated one."
+    },
+    {
+     "h": "Trial accounting and the deflated Sharpe",
+     "md": "If the reported result is a max over trials, honesty requires reporting — and correcting for — the trial count. The machinery, in ascending sophistication:\n\n- **Bonferroni**: divide α by the number of trials N. Crude, conservative, and the right first reflex: 14 timing methods ⇒ the winner needs p < 0.0036, not 0.05. When nothing survives Bonferroni, the family is dead without further ceremony.\n- **Haircuts on the discovery bar**: Harvey, Liu & Zhu, surveying 300+ published factors, argue a *new* factor claim should clear **t > 3.0**, not 2.0 — because the field collectively has run so many trials that t = 2 discoveries are more likely false than true.\n- **Deflated Sharpe Ratio** (Bailey & López de Prado): the full correction. It asks not \"is the observed Sharpe > 0?\" but \"**is it higher than the expected maximum Sharpe of N skill-less strategies**, given the number of trials, the variance across trial results, the track length, and the observed skew and kurtosis?\" That E[max] benchmark grows like √(2 ln N) — so the more you searched, the more your winner must clear. Non-normality raises the bar further, because fat tails inflate Sharpe sampling error (concept 2's SE formula is the normal-case floor).\n\nAll of it depends on one unglamorous discipline: **the trial ledger.** Every configuration tested — including the embarrassing ones, including the ones abandoned after one glance — gets counted. An unrecorded trial doesn't stop biasing the max; it just stops being correctable. The ledger converts \"trust my process\" into an auditable number, which is the difference between research and anecdote. N is not overhead. **N is part of the result.**"
+    },
+    {
+     "h": "The documented negative is a product",
+     "md": "The loop's rarest discipline is valuing the studies that return **no**.\n\nA **documented negative** — a pre-registered study, run clean, that kills its own hypothesis — is categorically different from a failure. The 14-timing-methods study produced no strategy; it produced the *verdict* \"deploy on receipt, timing is noise,\" which retires an entire seductive question permanently. The momentum study produced a DON'T-DEPLOY plus a signal demoted to decision-support — and, crucially, a *path back*: redeploy is possible if a drawdown-first redesign beats the incumbent's gate on new data. A documented negative has all the epistemic content of a positive. What it lacks is a payoff — which is exactly why undisciplined processes discard it.\n\nThe failure modes it prevents are the expensive ones:\n\n- **The quiet re-run.** Without a recorded verdict, the same attractive hypothesis gets re-tested every year — each re-test another draw from the noise, each draw another chance at a false positive that *will eventually arrive* (concept 5's arithmetic guarantees it). The negative is the immune system's memory.\n- **The file drawer.** Publishing (even to yourself) only the positives makes your own research history a max-over-trials statistic — you become your own biased literature.\n\nTwo requirements make a negative *durable*. First, **verdicts must be findable** — recorded where future-you searches, not buried in a dead notebook. Second — the rule that closes the whole loop — **every verdict must cite the artifact that grounds it**: the report, the code, the dataset. A conclusion whose evidence can't be opened and re-checked is, functionally, indistinguishable from one that was never derived at all — an unfalsifiable memory wearing a verdict's clothes. Cite-on-write isn't bureaucracy; it's what makes the loop *auditable by its future self*, and an unauditable loop reverts — quietly, one unfounded verdict at a time — to the noise-mining it was built to prevent."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "The essential property of a kill criterion is that it is:",
+     "options": [
+      "Strict enough that most strategies fail it",
+      "Set before results are seen — so the judgment isn't negotiated under the influence of the outcome",
+      "Based on Sharpe ratio rather than drawdown",
+      "Approved by an external reviewer"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Strictness is a calibration choice, not the essence — a too-strict gate wastes real edges, a too-loose one ships noise. What makes any threshold *binding* is when it was set.",
+      "Right. Post-hoc, every threshold is negotiable and the noise always makes an attractive offer ('the IC is real, maybe −29% isn't that bad...'). A blind-set gate makes your past unconflicted self the judge. That's the entire mechanism.",
+      "Metric choice is study-specific — the momentum case turned on a drawdown gate precisely because Sharpe-level stats looked fine. Any pre-committed, falsifiable metric can serve.",
+      "External review helps but isn't the load-bearing element — a solo researcher with genuinely pre-registered gates beats a committee that sets thresholds after seeing results."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "The Deflated Sharpe Ratio evaluates an observed Sharpe against:",
+     "options": [
+      "Zero — the standard null of no skill",
+      "The expected maximum Sharpe among N skill-less trials — accounting for the search breadth, track length, and the returns' skew and kurtosis",
+      "The market's Sharpe ratio over the same period",
+      "The strategy's own in-sample Sharpe"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Testing against zero ignores the search: the best of 200 random strategies beats zero almost surely. That's precisely the inference error the DSR exists to fix.",
+      "Right. The null becomes E[max SR] of N worthless trials — growing like √(2 ln N) — with non-normality further inflating the bar. The observed winner must beat what pure search luck would have produced. This is why the trial ledger is a prerequisite, not a nicety.",
+      "Beating the market is a benchmark question, orthogonal to whether the measured edge is a selection artifact. A strategy can trail the market and be real, or beat it in-sample and be noise.",
+      "Comparing OOS to in-sample measures degradation — informative, but it doesn't correct the in-sample number for how hard you searched to find it."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "What separates a documented negative from a mere failed study?",
+     "options": [
+      "Nothing — a negative result is a failure by definition",
+      "A documented negative ran clean under pre-registered gates and its recorded, artifact-cited verdict permanently retires the question — preventing the quiet re-runs that eventually manufacture a false positive",
+      "A documented negative can never be revisited under any circumstances",
+      "Documented negatives are only for studies that cost a lot to run"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A clean 'no' carries the same epistemic content as a 'yes' — it just lacks a payoff, which is why undisciplined processes discard it and then re-test the same hypothesis annually until noise obliges with a false positive.",
+      "Right. The negative is the immune system's memory: recorded, findable, citing its grounding artifact. Each prevented re-run is a prevented draw from the noise — and concept 5's arithmetic says enough draws always produce a 'discovery.'",
+      "Negatives can specify a path back — the momentum verdict did: a drawdown-first redesign, judged on new data against the incumbent's gate. What's forbidden is re-running the *same* test on the *same* data until it flips.",
+      "Cost is irrelevant to the epistemics. Even a cheap study's negative retires a question; the expensive part is the false positive you ship when nobody wrote the negative down."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Why must every recorded verdict cite the artifact (report, code, data) that grounds it?",
+     "options": [
+      "For regulatory compliance",
+      "Because a conclusion whose evidence can't be reopened and re-checked is functionally indistinguishable from one that was never derived — uncited verdicts quietly turn the research memory into unfalsifiable assertion",
+      "Citations make verdicts easier to search by keyword",
+      "So the artifacts can be deleted once the citation exists"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Compliance may coincidentally be served, but the driver is internal epistemics: the audit that matters is future-you checking whether past-you actually had the evidence.",
+      "Right. The verdict store is only as trustworthy as its worst entry — one ungrounded 'we tested that, it fails' can misdirect years of work exactly as effectively as a fabricated result. Cite-on-write keeps the loop auditable by its future self; without it, the system reverts to noise-mining with better paperwork.",
+      "Search convenience is a side benefit. The load-bearing property is *verifiability* — the citation is a promise that the reasoning chain can be re-walked, not a retrieval tag.",
+      "Backwards — the citation is a live pointer, valuable only while the artifact remains openable. Deleting the artifact converts the verdict back into an unfalsifiable memory, which is the exact failure the rule exists to prevent."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Bailey & López de Prado — The Deflated Sharpe Ratio (SSRN)",
+     "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551",
+     "type": "reading",
+     "note": "The full trial-count-and-non-normality correction; the E[max] null in closed form."
+    },
+    {
+     "label": "Harvey, Liu & Zhu — ...and the Cross-Section of Expected Returns (SSRN)",
+     "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2249314",
+     "type": "reading",
+     "note": "The t > 3.0 argument: the field's collective trial count has debased t = 2."
+    },
+    {
+     "label": "Wikipedia — Preregistration (science)",
+     "url": "https://en.wikipedia.org/wiki/Preregistration_(science)",
+     "type": "reading",
+     "note": "The same discipline as practiced (and fought over) in the experimental sciences."
+    }
+   ]
+  }
+ ]
+}
