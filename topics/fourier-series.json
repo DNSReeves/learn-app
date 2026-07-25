@@ -2,7 +2,9 @@
  "id": "fourier-series",
  "title": "Fourier Series",
  "tagline": "Every repeating signal is a chord — here's how to read the notes.",
- "prereqs": ["calculus"],
+ "prereqs": [
+  "calculus"
+ ],
  "description": "From periodic functions to the frequency domain. The one move that matters — extracting a coefficient by integrating against a basis function — gets the depth; the rest is calibrated refresher for an engineer who has seen this before.",
  "concepts": [
   {
@@ -278,7 +280,8 @@
      "type": "interactive",
      "note": "Select 'Square' and watch the 4/π, 0, 4/3π, 0, … pattern appear in the coefficient bars you just derived."
     }
-   ]
+   ],
+   "anim": "epicycles"
   },
   {
    "id": "c04-convergence",

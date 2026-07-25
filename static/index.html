@@ -635,9 +635,70 @@ async function opFlows(ctx,cv,p){ const paths=p.starts.map(s=>rk4Path(p.A,s[0],s
     for(let i=1;i<n;i++) ctx.lineTo(W2X(pts[i][0]),W2Y(pts[i][1])); ctx.stroke();
     const h=pts[n-1]; ctx.fillStyle=p.color||F.post;
     ctx.beginPath(); ctx.arc(W2X(h[0]),W2Y(h[1]),4,0,7); ctx.fill(); } }); }
+/* rotor op (iss_be82cb2f): stacked rotating circles tracing their sum — Fourier partial
+   sums as machinery. p.harmonics=[{n,r}], p.turns, p.dur. The trace persists on the right. */
+async function opRotor(ctx,cv,p){
+  const cx=210, cy=190, TX0=430, SC=95, H=p.harmonics, trace=[];
+  await tween(p.dur||5200, k=>{
+    clear(ctx,cv);
+    ctx.strokeStyle="#3A4656"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(TX0,cy); ctx.lineTo(880,cy); ctx.stroke();
+    if(p.title){ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.title,24,34); }
+    const th=k*(p.turns||2)*2*Math.PI;
+    let x=cx, y=cy;
+    for(const h of H){
+      const r=SC*h.r;
+      ctx.strokeStyle="rgba(124,141,165,0.5)"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.stroke();
+      const x2=x+r*Math.cos(h.n*th), y2=y+r*Math.sin(h.n*th);
+      ctx.strokeStyle=F.post; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x2,y2); ctx.stroke();
+      x=x2; y=y2;
+    }
+    trace.push([TX0+k*440, y]);
+    ctx.strokeStyle="rgba(124,141,165,0.5)"; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(trace[trace.length-1][0],y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle=F.ok; ctx.lineWidth=2; ctx.beginPath();
+    trace.forEach(([tx,ty],i)=> i?ctx.lineTo(tx,ty):ctx.moveTo(tx,ty)); ctx.stroke();
+    ctx.fillStyle=F.post; ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fill();
+  });
+}
+
+/* profile op (iss_be82cb2f): a 1-D field under an explicit finite-difference stepper —
+   p.mode "heat" (u += a·lap) or "wave" (second-order). One op, both PDE characters. */
+async function opProfile(ctx,cv,p){
+  const N=120, X0=90, W=720, Y0=300, SC=210;
+  let u=Array.from({length:N},(_,i)=>{const d=(i-N/2)/4; return Math.exp(-d*d);});
+  const v=new Array(N).fill(0);
+  let done=0;
+  const base=()=>{ clear(ctx,cv); ctx.strokeStyle="#3A4656"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(X0,Y0); ctx.lineTo(X0+W,Y0); ctx.stroke();
+    if(p.label){ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.label,24,34); } };
+  const draw=()=>{ ctx.strokeStyle=F.post; ctx.lineWidth=2; ctx.beginPath();
+    u.forEach((val,i)=>{ const x=X0+W*i/(N-1), y=Y0-SC*val; i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.stroke(); };
+  base(); draw();
+  const total=p.steps||140;
+  await tween(p.dur||3800, k=>{
+    const want=Math.floor(total*k);
+    while(done<want){
+      const nu=u.slice();
+      for(let i=1;i<N-1;i++){
+        const lap=u[i-1]-2*u[i]+u[i+1];
+        if(p.mode==="wave"){ v[i]+=0.35*lap; nu[i]=u[i]+v[i]; }
+        else nu[i]=u[i]+0.24*lap;
+      }
+      u=nu; done++;
+    }
+    base(); draw();
+  });
+}
+
 const DECL_OPS = {
   clear:(ctx,cv)=>clear(ctx,cv),
   axes:opAxes, field:(ctx,cv,p)=>opField(ctx,cv,p,1), flows:opFlows,
+  rotor:opRotor, profile:opProfile,
   label:(ctx,cv,p)=>{ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.text, p.x??24, p.y??34); }
 };
 async function runSpec(cv,ctx,spec){
@@ -665,6 +726,38 @@ const PHASE_PORTRAIT_SPEC = {
   ]};
 ANIMS.phase_portrait = (cv,ctx)=>runSpec(cv,ctx,PHASE_PORTRAIT_SPEC);
 ANIMS.phase_portrait_static = (cv,ctx)=>specStatic(cv,ctx,PHASE_PORTRAIT_SPEC);
+
+/* ---- Tier 1 build-out (iss_be82cb2f): two more specs over the grown vocabulary ---- */
+const SQ = n => 4/(Math.PI*n);      // square-wave Fourier coefficient
+const EPICYCLES_SPEC = {
+  static: [{op:"label",text:"circles stacked on circles — press play"}],
+  stages: [
+    { say:"One spinning circle traces a pure sine wave. Watch the pen: the height of the rotating arm, unrolled over time.",
+      steps:[{op:"rotor",harmonics:[{n:1,r:SQ(1)}],turns:2,dur:4200,title:"1 harmonic"}] },
+    { say:"Stack a smaller circle on its rim, spinning three times as fast. The trace is the SUM — and it already wants to be square.",
+      steps:[{op:"rotor",harmonics:[{n:1,r:SQ(1)},{n:3,r:SQ(3)}],turns:2,dur:4200,title:"2 harmonics"}] },
+    { say:"Five circles: one, three, five, seven, nine. Sharper corners, flatter tops. Every periodic wave is built exactly this way — circles all the way down.",
+      steps:[{op:"rotor",harmonics:[1,3,5,7,9].map(n=>({n,r:SQ(n)})),turns:2,dur:5200,title:"5 harmonics"}] },
+    { say:"Look closely at the jump: a stubborn overshoot that more circles sharpen but never remove. That is the Gibbs phenomenon — the price of building a cliff out of round parts.",
+      steps:[] }
+  ]};
+ANIMS.epicycles = (cv,ctx)=>runSpec(cv,ctx,EPICYCLES_SPEC);
+ANIMS.epicycles_static = (cv,ctx)=>specStatic(cv,ctx,EPICYCLES_SPEC);
+
+const HEAT_SPEC = {
+  static: [{op:"label",text:"a hot spike in a cold bar — press play"}],
+  stages: [
+    { say:"A metal bar, cold everywhere except one hot spike. The heat equation gives every point a simple rule: compare yourself to your neighbors. If you are hotter than their average, cool down. If colder, warm up.",
+      steps:[{op:"profile",mode:"heat",steps:30,dur:1800,label:"heat: u' follows curvature"}] },
+    { say:"Curvature drives flow — peaks fall, valleys fill, and nothing ever overshoots. Diffusion only smooths. Run it forever and the bar forgets the spike entirely.",
+      steps:[{op:"profile",mode:"heat",steps:220,dur:3600,label:"heat: the spike dissolves"}] },
+    { say:"Now the SAME spike under the wave equation. Second-order in time: the bump does not melt — it splits, and the two halves travel. Same starting picture, opposite personality.",
+      steps:[{op:"profile",mode:"wave",steps:120,dur:3600,label:"wave: it travels instead"}] },
+    { say:"That is the parabolic versus hyperbolic distinction, seen once and never forgotten: heat smooths, waves move.",
+      steps:[] }
+  ]};
+ANIMS.heat_diffusion = (cv,ctx)=>runSpec(cv,ctx,HEAT_SPEC);
+ANIMS.heat_diffusion_static = (cv,ctx)=>specStatic(cv,ctx,HEAT_SPEC);
 
 /* ---- arm (b): attention_heatmap, authored imperatively (house style) ---- */
 const ATN_TOKENS=["The","robot","picked","up","the","ball","because","it","was","round"];

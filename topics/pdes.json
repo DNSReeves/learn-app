@@ -3,7 +3,10 @@
  "title": "Partial Differential Equations",
  "tagline": "Local laws, global behavior — the equations the physical world is written in.",
  "description": "The summit of the refresher ladder. The full heat-on-a-rod story end to end — how boundary conditions select the eigenfunctions, how Fourier coefficients carry the initial condition — plus why classification predicts whether a solution smooths, propagates, or settles.",
- "prereqs": ["odes", "fourier-series"],
+ "prereqs": [
+  "odes",
+  "fourier-series"
+ ],
  "concepts": [
   {
    "id": "c01-what-a-pde-states",
@@ -211,7 +214,8 @@
      "type": "reading",
      "note": "d'Alembert's solution and the derivation from a stretched string."
     }
-   ]
+   ],
+   "anim": "heat_diffusion"
   },
   {
    "id": "c03-boundary-and-initial-conditions",
