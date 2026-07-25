@@ -401,20 +401,32 @@ function startCheckpoint(tid){ qIx=0; renderQuestion(tid); }
 function renderQuestion(tid){
   const q=C.questions[qIx % C.questions.length];
   const t0=Date.now();
+  /* P2.9: free-response questions render a textarea instead of options; numeric/regex
+     kinds grade locally on the server (no AI call), rubric kinds via the AI grader.
+     An UNGRADED verdict (AI down) shows the model answer and leaves mastery untouched. */
+  const isFree = q.type === "free";
   $("#stage").innerHTML = stripHTML(C.p_mastery,C.streak,C.mastered) + `
   <section class="stage">
     <div class="kicker">Checkpoint · ${esc(C.title)}</div>
     <p class="qprompt">${esc(q.prompt)}</p>
-    <div id="opts">${q.options.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>
+    ${isFree
+      ? `<div><textarea id="free-in" rows="3" style="width:100%;max-width:640px" placeholder="your answer…"></textarea>
+         <div style="margin-top:8px"><button class="btn" id="free-go">Submit</button></div></div>`
+      : `<div id="opts">${q.options.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`}
     <div id="after"></div>
   </section>`;
-  document.querySelectorAll(".opt").forEach(b=>b.onclick=async()=>{
-    document.querySelectorAll(".opt").forEach(x=>x.disabled=true);
-    const i=+b.dataset.i;
-    const r=await api(`/topic/${tid}/concept/${C.id}/answer`,{method:"POST",
-      body:{question_id:q.id, choice:i, latency_ms:Date.now()-t0}});
+  const finish=(r,pickBtn)=>{
+    if(r.ungraded){
+      $("#after").innerHTML = `
+        <div class="fb">${esc(r.feedback)}</div>
+        <div class="fb good"><b>Model answer:</b> ${esc(r.model_answer||"")}</div>
+        <div class="pager"><span class="spacer"></span>
+          <button class="btn" id="go-on">Next question</button></div>`;
+      $("#go-on").onclick=()=>{qIx++; renderQuestion(tid);};
+      return;
+    }
     C.p_mastery=r.p_after; C.streak=r.streak; C.mastered=r.mastered;
-    b.classList.add(r.correct?"right":"wrongpick");
+    if(pickBtn) pickBtn.classList.add(r.correct?"right":"wrongpick");
     stripSet(r.p_after,r.streak);
     const dir=r.p_after>=r.p_before?"↑":"↓";
     $("#after").innerHTML = `
@@ -438,6 +450,23 @@ function renderQuestion(tid){
       const h=await api(`/topic/${tid}/concept/${C.id}/help`,{method:"POST",body:{question_id:q.id}});
       $("#aihelp").innerHTML=`<div class="fb">${esc(h.text)}${h.source==="ai"?' <span class="mono" style="font-size:11px;color:var(--dim)">— AI tutor</span>':""}</div>`;
     };
+  };
+  if(isFree){
+    $("#free-go").onclick=async()=>{
+      const txt=($("#free-in").value||"").trim(); if(!txt) return;
+      $("#free-go").disabled=true; $("#free-go").textContent="Grading…";
+      const r=await api(`/topic/${tid}/concept/${C.id}/answer`,{method:"POST",
+        body:{question_id:q.id, text:txt, latency_ms:Date.now()-t0}});
+      finish(r,null);
+    };
+    return;
+  }
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=async()=>{
+    document.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+    const i=+b.dataset.i;
+    const r=await api(`/topic/${tid}/concept/${C.id}/answer`,{method:"POST",
+      body:{question_id:q.id, choice:i, latency_ms:Date.now()-t0}});
+    finish(r,b);
   });
 }
 

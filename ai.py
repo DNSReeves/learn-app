@@ -56,3 +56,48 @@ def remediate(concept: dict, misses: list, question: dict | None) -> str | None:
         return "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text") or None
     except Exception:
         return None
+
+
+def grade_free(question: dict, text: str) -> dict | None:
+    """P2.9: grade a free-response answer against the authored rubric.
+    Returns {"correct": bool, "category": str|None, "feedback": str} or None when
+    AI is unavailable/fails (caller then returns an honest UNGRADED verdict —
+    never a guessed one)."""
+    if not available():
+        return None
+    g = question.get("grading", {})
+    rubric = g.get("rubric", [])
+    prompt = (
+        "You are grading ONE short-answer response in a mastery-learning app. Be fair and "
+        "strict: credit understanding, not keyword overlap.\n\n"
+        f"QUESTION: {question.get('prompt','')}\n\n"
+        f"MODEL ANSWER (author's): {g.get('model_answer','')}\n\n"
+        "RUBRIC CATEGORIES (misconception buckets for WRONG answers):\n"
+        + "\n".join(f"- {r['category']}: {r['expects']}" for r in rubric) + "\n\n"
+        f"LEARNER'S ANSWER: {text[:800]}\n\n"
+        'Reply with ONLY a JSON object: {"correct": true|false, "category": "<rubric '
+        'category that best matches, or null if correct/none>", "feedback": "<2-3 '
+        "sentences: what they got right/wrong and the key idea they missed>\"}"
+    )
+    body = json.dumps({"model": MODEL, "max_tokens": 300,
+                       "messages": [{"role": "user", "content": prompt}]}).encode()
+    req = urllib.request.Request(API_URL, data=body, headers={
+        "Content-Type": "application/json",
+        "x-api-key": os.environ["ANTHROPIC_API_KEY"],
+        "anthropic-version": "2023-06-01"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.loads(r.read())
+        raw = "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text")
+        raw = raw[raw.index("{"): raw.rindex("}") + 1]
+        out = json.loads(raw)
+        if not isinstance(out.get("correct"), bool):
+            return None
+        # per-misconception feedback: the rubric's authored line leads, the model's detail follows
+        cat = out.get("category")
+        authored = next((r["feedback"] for r in rubric if r["category"] == cat), None)
+        if authored and not out["correct"]:
+            out["feedback"] = f"{authored} {out.get('feedback','')}".strip()
+        return {"correct": out["correct"], "category": cat, "feedback": out.get("feedback", "")}
+    except Exception:
+        return None

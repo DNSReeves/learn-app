@@ -313,7 +313,8 @@ def placement(tid: str, body: PlacementBody,
 
 class Answer(BaseModel):
     question_id: str
-    choice: int
+    choice: int | None = None          # mcq
+    text: str | None = None           # P2.9 free-response
     latency_ms: int | None = None
 
 
@@ -328,7 +329,24 @@ def answer(tid: str, cid: str, a: Answer,
     q = next((q for q in c["questions"] if q["id"] == a.question_id), None)
     if not q:
         raise HTTPException(404, "No such question.")
-    correct = a.choice == q["answer"]
+    # P2.9 (iss_8c6eb4ee): free-response grading — LOCAL first (numeric tolerance /
+    # regex need no API call); the LLM grades only rubric-kind questions. When the
+    # LLM is unavailable the answer is honestly UNGRADED (mastery untouched, model
+    # answer shown) — never silently marked wrong, never guessed right.
+    fr_feedback = None
+    if q.get("type") == "free":
+        import grading
+        verdict = grading.grade(q, a.text or "")
+        if verdict is None:                       # rubric question, AI down → ungraded
+            db.log_answer(user["id"], tid, cid, a.question_id,
+                          (a.text or "")[:400], 0, a.latency_ms)
+            return {"correct": None, "ungraded": True,
+                    "feedback": "AI grading is unavailable right now — compare your answer "
+                                "with the model answer below; your mastery was not changed.",
+                    "model_answer": (q.get("grading") or {}).get("model_answer", "")}
+        correct, fr_feedback = verdict
+    else:
+        correct = a.choice == q["answer"]
 
     s = db.get_states(user["id"], tid).get(cid, {})
     p_before = s.get("p_mastery", mastery.P_INIT)
@@ -361,10 +379,12 @@ def answer(tid: str, cid: str, a: Answer,
                       mastered_at=time.time())
 
     db.upsert_state(user["id"], tid, cid, **fields)
-    db.log_answer(user["id"], tid, cid, a.question_id, a.choice, correct, a.latency_ms)
+    db.log_answer(user["id"], tid, cid, a.question_id,
+                  (a.text or "")[:400] if q.get("type") == "free" else a.choice,
+                  correct, a.latency_ms)
 
     return {"correct": correct,
-            "feedback": q["feedback"][a.choice],
+            "feedback": fr_feedback if q.get("type") == "free" else q["feedback"][a.choice],
             "p_before": round(p_before, 4), "p_after": round(p_after, 4),
             "streak": streak, "mastered": now_mastered,
             "newly_mastered": now_mastered and not was_mastered,

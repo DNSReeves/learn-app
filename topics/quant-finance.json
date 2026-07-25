@@ -3,7 +3,10 @@
  "title": "Quantitative Finance",
  "tagline": "Edges, error bars, and the discipline that keeps you from fooling yourself.",
  "description": "From return arithmetic to the honest-research loop. The through-line: every number you compute is a noisy estimate, most published edges are selection artifacts, and the machinery that survives is the machinery built to catch its own errors — pre-registered gates, trial accounting, and drawdown-first verdicts.",
- "prereqs": ["calculus", "bayesian-inference"],
+ "prereqs": [
+  "calculus",
+  "bayesian-inference"
+ ],
  "concepts": [
   {
    "id": "c01-returns",
@@ -95,6 +98,19 @@
       "It compounds losses three times as fast too, and the asymmetry of compounding (the −25% round-trip lesson) means chop is strictly costly. Faster compounding of a zero-mean path is a negative, not a positive.",
       "In expectation the direction is clear and negative: same μ = 0, drag scaled by k². The only uncertainty is magnitude, which depends on realized variance."
      ]
+    },
+    {
+     "id": "q4-free",
+     "type": "free",
+     "prompt": "A fund gains 50% in year one, then loses 40% in year two. What is the TOTAL two-year return, in percent? (Type a number.)",
+     "grading": {
+      "kind": "numeric",
+      "answer": -10,
+      "tolerance": 0.5,
+      "unit": "%"
+     },
+     "feedback_correct": "Right: 1.5 × 0.6 = 0.90 — down 10%. Returns compound multiplicatively; the arithmetic sum (+10%) is the classic trap.",
+     "feedback_incorrect": "Compound them: 1.50 × 0.60 = 0.90, i.e. −10%. Adding +50 and −40 to get +10% is the arithmetic-mean trap this concept exists to kill."
     }
    ],
    "resources": [
