@@ -226,8 +226,30 @@ async function viewDash(){
           <span class="num">${t.mastered}/${t.concepts} mastered</span>
         </div>
       </button>`).join("")}
+    <p class="sub" style="margin-top:18px;font-size:13px">
+      <a href="#" id="prog-export">⬇ export progress</a> ·
+      <a href="#" id="prog-import">⬆ import progress</a>
+      <input type="file" id="prog-file" accept=".json,application/json" hidden>
+      <span id="prog-msg" class="mono" style="margin-left:8px"></span></p>
   </div>`;
   main.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
+  /* P4.16: move progress between deployments. Export = download the JSON; import =
+     server-side MERGE that never regresses local progress (stronger evidence wins). */
+  $("#prog-export").onclick = async e=>{ e.preventDefault();
+    const j = await api("/progress/export");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(j,null,1)], {type:"application/json"}));
+    a.download = `learn-progress-${j.username}-${new Date().toISOString().slice(0,10)}.json`;
+    a.click(); URL.revokeObjectURL(a.href); };
+  $("#prog-import").onclick = e=>{ e.preventDefault(); $("#prog-file").click(); };
+  $("#prog-file").onchange = async ()=>{
+    const f = $("#prog-file").files[0]; if(!f) return;
+    try{
+      const body = JSON.parse(await f.text());
+      const r = await api("/progress/import", {method:"POST", body:JSON.stringify(body)});
+      $("#prog-msg").textContent = `imported ${r.imported}, kept-local ${r.skipped}`;
+      setTimeout(viewDash, 1400);
+    }catch(err){ $("#prog-msg").textContent = "import failed: "+(err.message||err); } };
 }
 
 let T=null; // current topic payload

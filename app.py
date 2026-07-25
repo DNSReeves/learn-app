@@ -83,6 +83,69 @@ def do_logout(authorization: str | None = Header(default=None)):
 
 # ---------- dashboard ----------
 
+# ---------- P4.16 progress export/import (iss_bbc24580) ----------
+# Move YOUR progress between deployments: a self-describing JSON of concept_state +
+# placements (+ answer count for honesty — raw answers stay put: they are analytics
+# bulk, not state, and importing them could collide ids). Import is per-user MERGE:
+# a row wins only if its (attempts, p_mastery) evidence is >= the local row's — a
+# stale export can never regress live progress silently.
+@app.get("/api/progress/export")
+def progress_export(authorization: str | None = Header(default=None)):
+    user = require_user(authorization)
+    with db.conn() as c:
+        states = [dict(r) for r in c.execute(
+            "SELECT topic_id, concept_id, p_mastery, attempts, correct, streak, unlocked, "
+            "mastered_at, interval_d, ease, due_at, relearn FROM concept_state WHERE user_id=?",
+            (user["id"],))]
+        placements = [dict(r) for r in c.execute(
+            "SELECT topic_id, level, at FROM placements WHERE user_id=?", (user["id"],))]
+        n_answers = c.execute("SELECT COUNT(*) FROM answers WHERE user_id=?", (user["id"],)).fetchone()[0]
+    return {"format": "learn-progress/1", "exported_at": time.time(),
+            "username": user["username"], "concept_state": states,
+            "placements": placements, "answers_recorded": n_answers,
+            "note": "answers stay on the source deployment (analytics, not state)"}
+
+
+class ProgressImport(BaseModel):
+    format: str
+    concept_state: list = []
+    placements: list = []
+
+
+@app.post("/api/progress/import")
+def progress_import(body: ProgressImport, authorization: str | None = Header(default=None)):
+    user = require_user(authorization)
+    if body.format != "learn-progress/1":
+        raise HTTPException(400, "unknown format (want learn-progress/1)")
+    STATE_COLS = {"topic_id", "concept_id", "p_mastery", "attempts", "correct", "streak",
+                  "unlocked", "mastered_at", "interval_d", "ease", "due_at", "relearn"}
+    imported = skipped = 0
+    with db.conn() as c:
+        for row in body.concept_state:
+            if not STATE_COLS.issuperset(row) or "topic_id" not in row or "concept_id" not in row:
+                skipped += 1; continue
+            cur = c.execute("SELECT attempts, p_mastery FROM concept_state WHERE user_id=? AND "
+                            "topic_id=? AND concept_id=?",
+                            (user["id"], row["topic_id"], row["concept_id"])).fetchone()
+            if cur and (row.get("attempts", 0), row.get("p_mastery", 0)) < (cur[0], cur[1]):
+                skipped += 1; continue        # local evidence is stronger — never regress
+            fields = {k: row[k] for k in row if k in STATE_COLS and k not in ("topic_id", "concept_id")}
+            cols = ", ".join(fields)
+            c.execute(f"INSERT INTO concept_state (user_id, topic_id, concept_id, {cols}) "
+                      f"VALUES ({','.join('?' * (3 + len(fields)))}) "
+                      f"ON CONFLICT(user_id, topic_id, concept_id) DO UPDATE SET "
+                      + ", ".join(f"{k}=excluded.{k}" for k in fields),
+                      (user["id"], row["topic_id"], row["concept_id"], *fields.values()))
+            imported += 1
+        for pl in body.placements:
+            if "topic_id" not in pl: continue
+            c.execute("INSERT OR IGNORE INTO placements (user_id, topic_id, level, at) VALUES (?,?,?,?)",
+                      (user["id"], pl["topic_id"], pl.get("level"), pl.get("at") or time.time()))
+        c.commit()
+    return {"imported": imported, "skipped": skipped,
+            "note": "skipped = malformed OR local progress was already ahead (never regressed)"}
+
+
 @app.get("/api/topics")
 def topics(authorization: str | None = Header(default=None)):
     user = require_user(authorization)
