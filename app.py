@@ -146,6 +146,46 @@ def progress_import(body: ProgressImport, authorization: str | None = Header(def
             "note": "skipped = malformed OR local progress was already ahead (never regressed)"}
 
 
+# ---------- P4.13 per-user analytics + P4.14 session summary (iss_c5379270 / iss_16ad79eb) ----------
+@app.get("/api/analytics")
+def analytics(authorization: str | None = Header(default=None)):
+    """Per-user learning analytics — every number from the answers/state tables, and the
+    sparse-data cases say so instead of charting noise."""
+    user = require_user(authorization)
+    with db.conn() as c:
+        # time-to-mastery: first answer -> mastered_at, per mastered concept
+        ttm = [dict(r) for r in c.execute("""
+            SELECT s.topic_id, s.concept_id,
+                   ROUND((s.mastered_at - MIN(a.at)) / 3600.0, 2) AS hours,
+                   COUNT(a.id) AS attempts
+            FROM concept_state s JOIN answers a
+              ON a.user_id = s.user_id AND a.topic_id = s.topic_id AND a.concept_id = s.concept_id
+            WHERE s.user_id = ? AND s.mastered_at IS NOT NULL AND a.at <= s.mastered_at
+            GROUP BY s.topic_id, s.concept_id ORDER BY hours""", (user["id"],))]
+        # retention: review-mode outcomes bucketed by scheduled interval
+        ret = [dict(r) for r in c.execute("""
+            SELECT CASE WHEN s.interval_d < 2 THEN '1d' WHEN s.interval_d < 5 THEN '2-4d'
+                        WHEN s.interval_d < 10 THEN '5-9d' ELSE '10d+' END AS bucket,
+                   COUNT(*) AS n, ROUND(AVG(a.is_correct), 3) AS recall
+            FROM answers a JOIN concept_state s
+              ON s.user_id = a.user_id AND s.topic_id = a.topic_id AND s.concept_id = a.concept_id
+            WHERE a.user_id = ? AND s.mastered_at IS NOT NULL AND a.at > s.mastered_at
+            GROUP BY bucket""", (user["id"],))]
+        weakest = [dict(r) for r in c.execute("""
+            SELECT topic_id, concept_id, ROUND(p_mastery, 3) AS p, attempts, correct
+            FROM concept_state WHERE user_id = ? AND attempts > 0 AND mastered_at IS NULL
+            ORDER BY p_mastery ASC LIMIT 8""", (user["id"],))]
+        n_review = c.execute("""SELECT COUNT(*) FROM answers a JOIN concept_state s
+            ON s.user_id=a.user_id AND s.topic_id=a.topic_id AND s.concept_id=a.concept_id
+            WHERE a.user_id=? AND s.mastered_at IS NOT NULL AND a.at > s.mastered_at""",
+            (user["id"],)).fetchone()[0]
+    return {"time_to_mastery": ttm, "retention": ret, "weakest": weakest,
+            "review_answers": n_review,
+            "retention_note": (None if n_review >= 30 else
+                               f"only {n_review} review answers so far — the retention curve "
+                               "becomes meaningful as spaced reviews accumulate")}
+
+
 @app.get("/api/topics")
 def topics(authorization: str | None = Header(default=None)):
     user = require_user(authorization)

@@ -214,8 +214,16 @@ function viewAuth(mode="login"){
 async function viewDash(){
   const d = await api("/topics");
   $("#who").textContent=d.user; $("#signout").hidden=false;
+  const _mv=Object.entries(SESH.moves);
+  const sessionCard = _mv.length ? `
+    <div class="tcard" style="cursor:default;border-color:#8a6d2b">
+      <h2>This session</h2>
+      <div class="tag">${SESH.mastered.length?`🏅 mastered: ${SESH.mastered.map(esc).join(", ")} · `:""}${_mv.length} concept${_mv.length>1?"s":""} worked</div>
+      ${_mv.map(([k,m])=>`<div class="mono" style="font-size:12.5px">${esc(m.title)}: ${m.from.toFixed(2)} → <b>${m.to.toFixed(2)}</b> ${m.to>=m.from?"↑":"↓"}</div>`).join("")}
+    </div>` : "";
   main.innerHTML = `<div class="dash">
     <h1>Choose a topic</h1>
+    ${sessionCard}
     <p class="sub">Advance when the evidence says you know it. Come back when reviews fall due.</p>
     ${d.topics.map(t=>`
       <button class="tcard" data-t="${t.id}">
@@ -227,6 +235,7 @@ async function viewDash(){
         </div>
       </button>`).join("")}
     <p class="sub" style="margin-top:18px;font-size:13px">
+      <a href="#" id="an-open">📈 my analytics</a> ·
       <a href="#" id="prog-export">⬇ export progress</a> ·
       <a href="#" id="prog-import">⬆ import progress</a>
       <input type="file" id="prog-file" accept=".json,application/json" hidden>
@@ -235,6 +244,29 @@ async function viewDash(){
   main.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
   /* P4.16: move progress between deployments. Export = download the JSON; import =
      server-side MERGE that never regresses local progress (stronger evidence wins). */
+  /* P4.13: per-user analytics — sparse-data cases SAY so instead of charting noise. */
+  $("#an-open").onclick = async e=>{ e.preventDefault();
+    const a = await api("/analytics");
+    const ttm = a.time_to_mastery.length
+      ? `<table class="mono" style="font-size:13px;border-spacing:10px 2px">
+         <tr><th align="left">concept</th><th>hours→mastery</th><th>attempts</th></tr>
+         ${a.time_to_mastery.map(r=>`<tr><td>${esc(r.topic_id)}/${esc(r.concept_id)}</td><td align="center">${r.hours}</td><td align="center">${r.attempts}</td></tr>`).join("")}</table>`
+      : `<p class="sub">nothing mastered yet.</p>`;
+    const ret = a.retention.length
+      ? `<table class="mono" style="font-size:13px;border-spacing:10px 2px">
+         <tr><th>interval</th><th>reviews</th><th>recall</th></tr>
+         ${a.retention.map(r=>`<tr><td align="center">${r.bucket}</td><td align="center">${r.n}</td><td align="center">${(100*r.recall).toFixed(0)}%</td></tr>`).join("")}</table>`
+      : `<p class="sub">no spaced reviews yet.</p>`;
+    const wk = a.weakest.length
+      ? `<ul style="font-size:13px">${a.weakest.map(r=>`<li class="mono">${esc(r.topic_id)}/${esc(r.concept_id)} — P(known) ${r.p} (${r.correct}/${r.attempts})</li>`).join("")}</ul>`
+      : `<p class="sub">no struggling concepts — nice.</p>`;
+    main.innerHTML = `<div class="dash"><h1>My analytics</h1>
+      ${a.retention_note?`<p class="sub">⚠ ${esc(a.retention_note)}</p>`:""}
+      <h2>Time to mastery</h2>${ttm}
+      <h2>Retention by review interval</h2>${ret}
+      <h2>Weakest open concepts</h2>${wk}
+      <p><button class="btn" id="an-back">← back</button></p></div>`;
+    $("#an-back").onclick=viewDash; };
   $("#prog-export").onclick = async e=>{ e.preventDefault();
     const j = await api("/progress/export");
     const a = document.createElement("a");
@@ -253,6 +285,7 @@ async function viewDash(){
 }
 
 let T=null; // current topic payload
+const SESH={moves:{},mastered:[]};   // P4.14: this visit's posterior moves
 async function viewTopic(tid, focus){
   T = await api("/topic/"+tid);
   const cur = focus || (T.concepts.find(c=>c.unlocked && !c.mastered) || T.concepts[T.concepts.length-1]).id;
@@ -416,6 +449,13 @@ function renderQuestion(tid){
     <div id="after"></div>
   </section>`;
   const finish=(r,pickBtn)=>{
+    /* P4.14 session ledger: first p_before is kept, last p_after wins; mastery noted. */
+    if(!r.ungraded){
+      const key=tid+"/"+C.id;
+      SESH.moves[key] = SESH.moves[key] || {title:C.title, from:r.p_before};
+      SESH.moves[key].to = r.p_after;
+      if(r.newly_mastered) SESH.mastered.push(C.title);
+    }
     if(r.ungraded){
       $("#after").innerHTML = `
         <div class="fb">${esc(r.feedback)}</div>
