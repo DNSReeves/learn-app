@@ -3,7 +3,9 @@
  "title": "Ordinary Differential Equations",
  "tagline": "Laws of change, and the functions that obey them.",
  "description": "A refresher ladder for someone who once knew this cold. The mechanics you'll re-recognize are compressed to worked reminders; the depth goes where the half-memories are — where the integrating factor comes from, what the discriminant says physically, why the Wronskian matters, how to read a phase portrait, and why Euler drifts while RK4 doesn't.",
- "prereqs": ["calculus"],
+ "prereqs": [
+  "calculus"
+ ],
  "concepts": [
   {
    "id": "c01-what-an-ode-says",
@@ -289,7 +291,7 @@
      "h": "One law, many costumes",
      "md": "dy/dt = ky is the most-modeled sentence in science: *the rate of change is proportional to the amount present.* Solution: y = y₀e^(kt).\n\nThe working constants, which you once knew and will use again:\n\n- **Doubling time** (k > 0): t₂ = ln 2 / k ≈ 0.693/k\n- **Half-life** (k < 0): t½ = ln 2 / |k| — the same formula in decay clothing. Each half-life halves what's left, so after n half-lives the fraction remaining is (1/2)ⁿ, regardless of the starting amount.\n- **Time constant** τ = 1/|k|: after one τ a decaying quantity is down to e⁻¹ ≈ 37% of its start; after 3τ, about 5%; after 5τ, gone for engineering purposes. Your RC instinct — '63% charged after one RC' — is exactly this, because τ = RC.\n\nCompound interest, radiocarbon dating, capacitor discharge, drug clearance: one equation, four vocabularies."
     },
-     {
+    {
      "h": "Decay toward a target: Newton's cooling",
      "md": "Most real systems don't decay to zero — they relax toward a *target*. Coffee cools to room temperature, not to absolute zero:\n\n## dT/dt = −k(T − T_env)\n\nThe rate is proportional to the **gap**, not the amount. Substitute u = T − T_env (the gap itself): u′ = −ku, plain exponential decay of the gap. Hence\n\nT(t) = T_env + (T₀ − T_env)·e^(−kt)\n\n— the temperature slides exponentially from where it started to where it's headed.\n\nThis 'rate ∝ gap' shape is the same law as an RC circuit charging toward its supply voltage, a room approaching thermostat temperature, and a drug approaching steady-state concentration under constant infusion. Whenever data shows an exponential leveling off at a **nonzero plateau**, this equation — decay of a gap — is what's underneath. The plateau is the equilibrium; the exponential is the transient. Concept 3's decomposition, again."
     },
@@ -581,7 +583,8 @@
      "type": "reading",
      "note": "Gallery of the standard portraits; useful as a visual flashcard set for the reading dictionary."
     }
-   ]
+   ],
+   "anim": "phase_portrait"
   },
   {
    "id": "c07-equilibria-stability",

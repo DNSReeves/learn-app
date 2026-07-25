@@ -599,6 +599,114 @@ function drawBeta(ctx,cv,a,b,ai,bi){
   ctx.fillText(`mean ≈ ${(a/(a+b)).toFixed(2)}`, 620, 40);
 }
 
+/* ================= P3.10 authoring-path experiment (iss_ef1e0e3c) =================
+   Arm (a): a DECLARATIVE spec + generic interpreter — new animations become data
+   (stages of {say, steps} over a small vetted op vocabulary), so vetting a new anim
+   means reading params + prose, not arbitrary canvas code.
+   Arm (b): attention_heatmap below, authored imperatively like the four originals.
+   Decision + comparison recorded in ANIMATION_BACKLOG.md / the P3.10 issue. */
+
+/* ---- the op vocabulary (each primitive vetted ONCE) ---- */
+const W2X = (x)=>450+x*120, W2Y=(y)=>190-y*54;   // world [-3.5,3.5]x[-3,3] -> canvas
+function opAxes(ctx,cv,p){ ctx.strokeStyle="#3A4656"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(W2X(-3.5),W2Y(0)); ctx.lineTo(W2X(3.5),W2Y(0));
+  ctx.moveTo(W2X(0),W2Y(-3)); ctx.lineTo(W2X(0),W2Y(3)); ctx.stroke();
+  if(p && p.label){ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.label, 24, 34);} }
+function opField(ctx,cv,p,k=1){ const A=p.A;
+  for(let x=-3;x<=3;x+=0.75) for(let y=-2.5;y<=2.5;y+=0.75){
+    const vx=A[0][0]*x+A[0][1]*y, vy=A[1][0]*x+A[1][1]*y;
+    const n=Math.hypot(vx,vy)||1, L=0.28*Math.min(1,n)*k;
+    const x2=x+vx/n*L, y2=y+vy/n*L;
+    ctx.strokeStyle="rgba(124,141,165,0.55)"; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(W2X(x),W2Y(y)); ctx.lineTo(W2X(x2),W2Y(y2)); ctx.stroke();
+    ctx.fillStyle="rgba(124,141,165,0.8)";
+    ctx.beginPath(); ctx.arc(W2X(x2),W2Y(y2),1.6*k,0,7); ctx.fill(); } }
+function rk4Path(A,x0,y0,dt,steps){ const pts=[[x0,y0]]; let x=x0,y=y0;
+  const f=(x,y)=>[A[0][0]*x+A[0][1]*y, A[1][0]*x+A[1][1]*y];
+  for(let i=0;i<steps;i++){ const k1=f(x,y), k2=f(x+dt/2*k1[0],y+dt/2*k1[1]),
+    k3=f(x+dt/2*k2[0],y+dt/2*k2[1]), k4=f(x+dt*k3[0],y+dt*k3[1]);
+    x+=dt/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); y+=dt/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+    pts.push([x,y]); if(Math.hypot(x,y)>6) break; } return pts; }
+async function opFlows(ctx,cv,p){ const paths=p.starts.map(s=>rk4Path(p.A,s[0],s[1],0.03,220));
+  await tween(p.dur||2200, k=>{ for(const pts of paths){
+    const n=Math.max(2,Math.floor(pts.length*k));
+    ctx.strokeStyle=p.color||F.post; ctx.lineWidth=2; ctx.beginPath();
+    ctx.moveTo(W2X(pts[0][0]),W2Y(pts[0][1]));
+    for(let i=1;i<n;i++) ctx.lineTo(W2X(pts[i][0]),W2Y(pts[i][1])); ctx.stroke();
+    const h=pts[n-1]; ctx.fillStyle=p.color||F.post;
+    ctx.beginPath(); ctx.arc(W2X(h[0]),W2Y(h[1]),4,0,7); ctx.fill(); } }); }
+const DECL_OPS = {
+  clear:(ctx,cv)=>clear(ctx,cv),
+  axes:opAxes, field:(ctx,cv,p)=>opField(ctx,cv,p,1), flows:opFlows,
+  label:(ctx,cv,p)=>{ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.text, p.x??24, p.y??34); }
+};
+async function runSpec(cv,ctx,spec){
+  for (const stage of spec.stages){
+    if (stage.say) await narrate(stage.say);
+    for (const step of stage.steps||[]) await DECL_OPS[step.op](ctx,cv,step);
+  } }
+function specStatic(cv,ctx,spec){ for (const step of spec.static||[]) DECL_OPS[step.op](ctx,cv,step); }
+
+/* ---- arm (a): phase_portrait IS DATA — vet the params and the prose ---- */
+const SPIRAL=[[-0.2,-1],[1,-0.2]], SADDLE=[[0.7,0.9],[0.9,-0.7]];
+const SIX_STARTS=[[2.6,1.2],[-2.6,-1.2],[1.8,-2.2],[-1.8,2.2],[0.4,2.6],[-0.4,-2.6]];
+const PHASE_PORTRAIT_SPEC = {
+  static: [{op:"axes",label:"x' = A x — every point gets a velocity"},{op:"field",A:SPIRAL}],
+  stages: [
+    { say:"A system of two differential equations turns the plane into a current: every point is assigned a velocity arrow. This is the vector field — the law of motion, drawn.",
+      steps:[{op:"clear"},{op:"axes",label:"x' = A x"},{op:"field",A:SPIRAL}] },
+    { say:"Drop a point in and it has no choices left — it must follow the arrows. Watch it ride the current.",
+      steps:[{op:"flows",A:SPIRAL,starts:[[2.6,1.2]],dur:2400}] },
+    { say:"Six different starting points, one law. The family of paths is the phase portrait — and this one spirals home: a stable focus. Every trajectory forgets where it started.",
+      steps:[{op:"flows",A:SPIRAL,starts:SIX_STARTS,dur:2600}] },
+    { say:"Now change only the matrix. Same idea, opposite character: a saddle. Trajectories are drawn in along one direction and flung out along another — and almost nothing stays.",
+      steps:[{op:"clear"},{op:"axes",label:"same picture, different A — a saddle"},{op:"field",A:SADDLE},
+             {op:"flows",A:SADDLE,starts:SIX_STARTS,dur:2600,color:"#D46A62"}] }
+  ]};
+ANIMS.phase_portrait = (cv,ctx)=>runSpec(cv,ctx,PHASE_PORTRAIT_SPEC);
+ANIMS.phase_portrait_static = (cv,ctx)=>specStatic(cv,ctx,PHASE_PORTRAIT_SPEC);
+
+/* ---- arm (b): attention_heatmap, authored imperatively (house style) ---- */
+const ATN_TOKENS=["The","robot","picked","up","the","ball","because","it","was","round"];
+const ATN_W=[ /* hand-crafted plausible attention rows, query x key */
+  [0.30,0.20,0.10,0.05,0.10,0.10,0.05,0.05,0.03,0.02],
+  [0.15,0.40,0.15,0.05,0.05,0.10,0.03,0.03,0.02,0.02],
+  [0.05,0.30,0.35,0.10,0.05,0.10,0.02,0.01,0.01,0.01],
+  [0.03,0.15,0.40,0.30,0.04,0.05,0.01,0.01,0.005,0.005],
+  [0.10,0.05,0.05,0.05,0.30,0.35,0.04,0.03,0.02,0.01],
+  [0.04,0.10,0.15,0.05,0.20,0.35,0.05,0.03,0.02,0.01],
+  [0.03,0.05,0.10,0.03,0.04,0.10,0.45,0.10,0.05,0.05],
+  [0.02,0.15,0.05,0.02,0.05,0.45,0.10,0.10,0.03,0.03],
+  [0.02,0.05,0.05,0.02,0.03,0.15,0.08,0.30,0.20,0.10],
+  [0.02,0.04,0.03,0.01,0.03,0.30,0.06,0.15,0.10,0.26]];
+function drawAttn(ctx,cv,rowsDone,rowFrac,hi){
+  clear(ctx,cv);
+  const x0=90, cw=72, y0=54, ch=26, my0=120;
+  ctx.font="13px 'IBM Plex Mono'";
+  ATN_TOKENS.forEach((t,i)=>{ ctx.fillStyle=(hi===8&&(i===7||i===5))?F.post:F.txt;
+    ctx.fillText(t, x0+i*cw+6, y0); });
+  ctx.fillStyle=F.ax; ctx.fillText("query ↓ attends to key →", x0, 30);
+  for(let r=0;r<10;r++){
+    const frac = r<rowsDone?1 : r===rowsDone?rowFrac : 0;
+    if(frac<=0) continue;
+    ctx.fillStyle=(hi===8&&r===7)?F.post:F.txt;
+    ctx.fillText(ATN_TOKENS[r].slice(0,6), 8, my0+r*ch-8+ch/2);
+    for(let c=0;c<10;c++){
+      const w=ATN_W[r][c]*frac;
+      ctx.fillStyle=`rgba(232,161,60,${Math.min(0.92,w*2.4)})`;
+      ctx.fillRect(x0+c*cw, my0+(r*ch)-16, cw-4, ch-4);
+      if(hi===8&&r===7&&c===5){ ctx.strokeStyle=F.ok; ctx.lineWidth=2;
+        ctx.strokeRect(x0+c*cw, my0+(r*ch)-16, cw-4, ch-4); } } } }
+ANIMS.attention_heatmap_static=(cv,ctx)=>drawAttn(ctx,cv,0,0,-1);
+ANIMS.attention_heatmap=async(cv,ctx)=>{
+  drawAttn(ctx,cv,0,0,-1);
+  await narrate("Ten tokens. For every token, attention asks one question: which OTHER tokens matter for understanding me? The answer is a row of weights.");
+  for(let r=0;r<10;r++){ await tween(260,k=>drawAttn(ctx,cv,r,k,-1)); }
+  await narrate("Every row sums to one — a budget of attention, spent across the sentence. Most rows look local and boring. One is doing something remarkable.");
+  await tween(600,k=>drawAttn(ctx,cv,10,1,k>0.5?8:-1));
+  await narrate("The word IT. Its heaviest weight lands on BALL, six positions back. No rule said pronouns resolve backwards — the weighting was learned, and this lookup is the mechanism the whole architecture is named for.");
+};
+
 route();
 </script>
 </body>

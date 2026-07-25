@@ -2,7 +2,9 @@
  "id": "llms",
  "title": "Large Language Models",
  "tagline": "You run one every day. Here's what's actually happening inside.",
- "prereqs": ["neural-networks"],
+ "prereqs": [
+  "neural-networks"
+ ],
  "description": "From tokens to evaluation: the mechanics under the systems you already operate. Every concept is gated — you advance when the evidence says you know it.",
  "concepts": [
   {
@@ -306,7 +308,8 @@
      "type": "reading",
      "note": "Routing, load balancing, and why total-vs-active parameters diverge — the '122B-A10B' naming decoded."
     }
-   ]
+   ],
+   "anim": "attention_heatmap"
   },
   {
    "id": "c04-pretraining",

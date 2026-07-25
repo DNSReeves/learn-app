@@ -1,5 +1,17 @@
 # Animation backlog — P1.3 coverage pass (2026-07-25, iss_eb4f851e)
 
+> **P3.10 DECISION (2026-07-25, iss_ef1e0e3c — one built each way, as specced):**
+> **Declarative wins**, as the operator expected — now with evidence. Arm (a):
+> `phase_portrait` is a ~20-line spec (matrices, starts, narration prose) over a 5-op
+> vetted vocabulary (`axes/field/flows/label/clear` + RK4) — vetting a new in-vocabulary
+> anim means reading numbers and English. Arm (b): `attention_heatmap` is ~55 lines of
+> arbitrary canvas code — full code review every time, reuse only by copy-paste. The
+> engine cost (~70 lines) amortizes from the second spec onward. **Path forward:**
+> declarative by default; grow `DECL_OPS` by vetted increments (a `heatgrid` op would
+> retro-absorb arm b's pattern); imperative stays permitted for genuinely bespoke
+> one-offs under normal code review. Both experiment anims are LIVE (odes
+> c06-systems-phase, llms c03-transformer).
+
 **Scope:** LIST ONLY, per the issue — 1–2 concepts per topic where a moving picture teaches
 what static prose cannot. **Build happens in P3.10** (iss_ef1e0e3c), which also decides the
 authoring path. Ranked so P3.10 can work top-down.
