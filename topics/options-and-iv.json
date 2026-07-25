@@ -474,7 +474,8 @@
      "type": "reading",
      "note": "The practitioner's tour: delta, gamma, theta, vega with worked position examples."
     }
-   ]
+   ],
+   "anim": "delta_gamma_surface"
   },
   {
    "id": "c05-implied-vol",

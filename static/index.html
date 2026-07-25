@@ -809,10 +809,83 @@ async function opPaths(ctx,cv,p){
   }
 }
 
+/* descend op (Tier 2): elliptical loss contours + a ball following a PRECOMPUTED step
+   path (steps are data — the spec decides the learning-rate story, the op just walks). */
+async function opDescend(ctx,cv,p){
+  const cx=450, cy=200, sx=110, sy=58;
+  const toPix=([x,y])=>[cx+sx*x, cy+sy*y];
+  const draw=(uptoK)=>{
+    clear(ctx,cv);
+    if(p.title){ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.title,24,34); }
+    ctx.strokeStyle="rgba(124,141,165,0.4)"; ctx.lineWidth=1;
+    for(const r of [0.5,1,1.5,2,2.5]){ ctx.beginPath();
+      ctx.ellipse(cx,cy,sx*r,sy*r,0,0,7); ctx.stroke(); }
+    ctx.fillStyle=F.ax; ctx.font="12px 'IBM Plex Mono'"; ctx.fillText("loss contours — the bowl, seen from above", cx-150, cy+sy*2.5+26);
+    const n=Math.max(1,Math.floor(p.steps.length*uptoK));
+    ctx.strokeStyle=p.color||F.post; ctx.lineWidth=2; ctx.beginPath();
+    p.steps.slice(0,n).map(toPix).forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+    ctx.stroke();
+    const [bx,by]=toPix(p.steps[n-1]);
+    ctx.fillStyle=p.color||F.post; ctx.beginPath(); ctx.arc(bx,by,6,0,7); ctx.fill();
+    if(p.note){ ctx.fillStyle=p.color||F.ax; ctx.font="13px 'IBM Plex Mono'"; ctx.fillText(p.note,24,360); }
+  };
+  await tween(p.dur||2600, draw);
+}
+function gdSteps(lr, n=24){ // gradient steps on f = x² + (y·sx/sy-ish)² — data generator, reviewable
+  const pts=[[2.6,1.6]]; let [x,y]=pts[0];
+  for(let i=0;i<n;i++){ x-=lr*2*x; y-=lr*3.4*y; pts.push([x,y]);
+    if(Math.abs(x)>6||Math.abs(y)>6) break; }
+  return pts;
+}
+
+/* network op (Tier 2): layered nodes; forward pass lights left→right, backward pass
+   right→left with edge width ∝ |signal|. Layers/weights are data. */
+async function opNetwork(ctx,cv,p){
+  const layers=p.layers, X=[140,450,760].slice(0,layers.length);
+  const pos=layers.map((n,li)=>Array.from({length:n},(_,i)=>[X[li], 80+(240/(n+1))*(i+1)+(n===1?120:0)]));
+  const draw=(dir,k)=>{
+    clear(ctx,cv);
+    if(p.title){ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.title,24,34); }
+    for(let li=0;li<layers.length-1;li++)
+      for(let a=0;a<layers[li];a++)
+        for(let b=0;b<layers[li+1];b++){
+          const w=((a*7+b*13+li*3)%10)/10*1.6+0.4;   // deterministic pseudo-weights
+          const lit = dir==="fwd" ? (k>li/(layers.length-1)) : (k>1-(li+1)/(layers.length-1));
+          ctx.strokeStyle=lit?(dir==="fwd"?"rgba(232,161,60,0.8)":"rgba(212,106,98,0.85)"):"rgba(74,90,114,0.5)";
+          ctx.lineWidth=lit&&dir==="bwd"?w*2:1;
+          ctx.beginPath(); ctx.moveTo(...pos[li][a]); ctx.lineTo(...pos[li+1][b]); ctx.stroke(); }
+    pos.flat().forEach(([x,y])=>{ ctx.fillStyle="#141B26"; ctx.strokeStyle="#4A5A72";
+      ctx.beginPath(); ctx.arc(x,y,14,0,7); ctx.fill(); ctx.stroke(); });
+    if(p.note){ ctx.fillStyle=F.ax; ctx.font="13px 'IBM Plex Mono'"; ctx.fillText(p.note,24,360); }
+  };
+  await tween(p.dur||1800, k=>draw(p.dir||"fwd",k));
+}
+
+/* bars op (Tier 3): labeled category bars, optionally a second overlaid generation. */
+async function opBars(ctx,cv,p){
+  const X0=110, W=680, Y0=330, SC=250, n=p.cats.length, bw=W/n*0.32;
+  await tween(p.dur||1600, k=>{
+    clear(ctx,cv);
+    if(p.title){ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.title,24,34); }
+    ctx.strokeStyle="#3A4656"; ctx.beginPath(); ctx.moveTo(X0-20,Y0); ctx.lineTo(X0+W,Y0); ctx.stroke();
+    p.cats.forEach((c,i)=>{
+      const x=X0+W*i/n;
+      ctx.fillStyle="rgba(124,141,165,0.75)";
+      ctx.fillRect(x, Y0-SC*c.a*k, bw, SC*c.a*k);
+      if(p.overlay) { ctx.fillStyle="rgba(232,161,60,0.85)";
+        ctx.fillRect(x+bw+3, Y0-SC*c.b*k, bw, SC*c.b*k); }
+      ctx.fillStyle=F.ax; ctx.font="11px 'IBM Plex Mono'";
+      ctx.save(); ctx.translate(x+bw, Y0+12); ctx.rotate(0.5); ctx.fillText(c.label,0,0); ctx.restore();
+    });
+    if(p.note){ ctx.fillStyle=F.ax; ctx.font="13px 'IBM Plex Mono'"; ctx.fillText(p.note,24,368); }
+  });
+}
+
 const DECL_OPS = {
   clear:(ctx,cv)=>clear(ctx,cv),
   axes:opAxes, field:(ctx,cv,p)=>opField(ctx,cv,p,1), flows:opFlows,
   rotor:opRotor, profile:opProfile, curve:opCurve, paths:opPaths,
+  descend:opDescend, network:opNetwork, bars:opBars,
   label:(ctx,cv,p)=>{ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.text, p.x??24, p.y??34); }
 };
 async function runSpec(cv,ctx,spec){
@@ -929,6 +1002,161 @@ const DRAWDOWN_SPEC = {
   ]};
 ANIMS.drawdown_paths = (cv,ctx)=>runSpec(cv,ctx,DRAWDOWN_SPEC);
 ANIMS.drawdown_paths_static = (cv,ctx)=>specStatic(cv,ctx,DRAWDOWN_SPEC);
+
+/* ---- Tier 2 completion + Tier 3 (iss_be82cb2f) ---- */
+const LOSS_SPEC = {
+  static: [{op:"label",text:"a ball in a bowl, three step sizes — press play"}],
+  stages: [
+    { say:"Training is a ball in a bowl: the loss surface, seen from above as contours. Gradient descent takes steps downhill, and the ONLY dial is the step size. Too small, and you crawl — every step correct, convergence somewhere next week.",
+      steps:[{op:"descend",steps:gdSteps(0.04,40),dur:2600,color:"#7C8DA5",title:"learning rate: too small",note:"correct but crawling"}] },
+    { say:"Get it right and the ball strides down, settling into the minimum in a handful of steps.",
+      steps:[{op:"descend",steps:gdSteps(0.22,18),dur:2200,color:"#5FBF95",title:"learning rate: right",note:"converges in a few strides"}] },
+    { say:"Too large, and each step overshoots the valley — the ball ricochets between the walls, and past a threshold it climbs OUT. Divergence is not a bug in the math; it is the step size lying about the local slope's reach.",
+      steps:[{op:"descend",steps:gdSteps(0.58,16),dur:2400,color:"#D46A62",title:"learning rate: too large",note:"ricochet → divergence"}] }
+  ]};
+ANIMS.loss_descent=(cv,ctx)=>runSpec(cv,ctx,LOSS_SPEC);
+ANIMS.loss_descent_static=(cv,ctx)=>specStatic(cv,ctx,LOSS_SPEC);
+
+const BACKPROP_SPEC = {
+  static: [{op:"label",text:"forward lights, backward widths — press play"}],
+  stages: [
+    { say:"Forward pass: the input flows left to right, each layer transforming it, ending in a prediction — and a loss.",
+      steps:[{op:"network",layers:[3,4,1],dir:"fwd",dur:1800,title:"forward: input → prediction → loss"}] },
+    { say:"Backward pass: the error flows right to left. Each edge learns exactly how much IT contributed — the chain rule, distributed. Watch the widths: thick edges carry big gradients and will change most.",
+      steps:[{op:"network",layers:[3,4,1],dir:"bwd",dur:2200,title:"backward: blame, apportioned",note:"edge width ∝ gradient magnitude"}] },
+    { say:"One forward to find out how wrong, one backward to find out who's responsible, one small step for every weight. Repeat a million times — that is all training is.",
+      steps:[] }
+  ]};
+ANIMS.backprop_flow=(cv,ctx)=>runSpec(cv,ctx,BACKPROP_SPEC);
+ANIMS.backprop_flow_static=(cv,ctx)=>specStatic(cv,ctx,BACKPROP_SPEC);
+
+/* delta/gamma: the value curve melting onto the payoff kink — the curve op's morph,
+   three time beats. Precomputed arrays (strike 100, x=price 70..130 normalized). */
+function _payoff(){ return Array.from({length:81},(_,i)=>{const s=70+i*0.75; return [(s-100)/30, Math.max(s-100,0)/22]; }); }
+function _bsish(t){  // smooth call-value shape at time-to-expiry t (illustrative curvature, not priced)
+  return Array.from({length:81},(_,i)=>{const s=70+i*0.75, m=(s-100)/(9*Math.sqrt(t)+3);
+    const soft=(9*Math.sqrt(t)+3)*0.4*Math.exp(-m*m/2)+Math.max(s-100,0);
+    return [(s-100)/30, soft/22]; });
+}
+const GREEKS_SPEC = {
+  static: [{op:"label",text:"the value curve melts onto the kink — press play"}],
+  stages: [
+    { say:"At expiry, a call option is a kink: worthless below the strike, one-for-one above. Before expiry it is this smooth curve floating over the kink. Delta is the SLOPE of the smooth curve; gamma is how fast that slope changes — the curvature.",
+      steps:[{op:"curve",xmin:-1,xmax:1,ymin:-0.05,ymax:1.4,dur:1600,title:"3 months out",
+              static_lines:[{pts:_payoff(),color:"#7C8DA5",w:1.5,dash:[4,3]}],
+              morph:{from:_bsish(0.25),to:_bsish(0.25)}}] },
+    { say:"Watch time pass. The smooth curve melts toward the kink — and the curvature CONCENTRATES near the strike. Away from it, delta hardens to zero or one; at it, gamma grows.",
+      steps:[{op:"curve",xmin:-1,xmax:1,ymin:-0.05,ymax:1.4,dur:3000,title:"3 months → 1 week",
+              static_lines:[{pts:_payoff(),color:"#7C8DA5",w:1.5,dash:[4,3]}],
+              morph:{from:_bsish(0.25),to:_bsish(0.02)},note:"gamma piles up at the strike as expiry nears"}] },
+    { say:"That is why short-dated at-the-money options are the wild ones: near the kink, at the end, the slope itself whips. Delta tells you your exposure; gamma tells you how fast that answer goes stale.",
+      steps:[] }
+  ]};
+ANIMS.delta_gamma_surface=(cv,ctx)=>runSpec(cv,ctx,GREEKS_SPEC);
+ANIMS.delta_gamma_surface_static=(cv,ctx)=>specStatic(cv,ctx,GREEKS_SPEC);
+
+const FEE_LINES=(()=>{  // two 30-year growth paths at 7%: 0.05% vs 1.0% annual fees — pure arithmetic
+  const mk=f=>{const v=[1]; let x=1; for(let y=0;y<30;y++){x*=1.07*(1-f); v.push(x);} return x&&v;};
+  return [{values:mk(0.0005),flag:false},{values:mk(0.01),flag:true}];
+})();
+const FEE_SPEC = {
+  static: [{op:"label",text:"two funds, one difference: 0.05% vs 1.0% fees — press play"}],
+  stages: [
+    { say:"Two portfolios, identical seven percent returns, thirty years. One charges five basis points, the other a seemingly harmless one percent.",
+      steps:[{op:"paths",lines:FEE_LINES,ymin:0,ymax:8,dur:3400,title:"30 years @ 7% — 0.05% (green) vs 1.00% (red) fees"}] },
+    { say:"The gap opens slowly, then yawns: the cheap fund ends near seven point four times your money; the expensive one near five point seven. The fee didn't take one percent — compounding turned it into roughly a quarter of your final wealth. Costs are certain; returns are not.",
+      steps:[] }
+  ]};
+ANIMS.fee_drag=(cv,ctx)=>runSpec(cv,ctx,FEE_SPEC);
+ANIMS.fee_drag_static=(cv,ctx)=>specStatic(cv,ctx,FEE_SPEC);
+
+const JAGGED_SPEC = {
+  static: [{op:"label",text:"capability is spiky, not round — press play"}],
+  stages: [
+    { say:"One model, eight task families, scored side by side. Notice the shape: not a level line but a mountain range — graduate-level here, error-prone there.",
+      steps:[{op:"bars",cats:[
+        {label:"grad exams",a:0.9,b:0.95},{label:"comp. math",a:0.75,b:0.93},
+        {label:"coding",a:0.7,b:0.9},{label:"summarize",a:0.85,b:0.92},
+        {label:"arithmetic",a:0.55,b:0.7},{label:"long autonomy",a:0.2,b:0.45},
+        {label:"spatial",a:0.35,b:0.5},{label:"cite exactly",a:0.4,b:0.6}],
+        dur:1800,title:"the jagged frontier — one model, eight task families"}] },
+    { say:"Now overlay the next generation. The peaks leap; the valleys crawl. Both the enthusiast quoting the peaks and the skeptic quoting the valleys are reading real data — off the same jagged profile.",
+      steps:[{op:"bars",overlay:true,cats:[
+        {label:"grad exams",a:0.9,b:0.95},{label:"comp. math",a:0.75,b:0.93},
+        {label:"coding",a:0.7,b:0.9},{label:"summarize",a:0.85,b:0.92},
+        {label:"arithmetic",a:0.55,b:0.7},{label:"long autonomy",a:0.2,b:0.45},
+        {label:"spatial",a:0.35,b:0.5},{label:"cite exactly",a:0.4,b:0.6}],
+        dur:1800,title:"two generations (grey → amber)",note:"illustrative profile, not benchmark data — the SHAPE is the lesson"}] }
+  ]};
+ANIMS.jagged_frontier=(cv,ctx)=>runSpec(cv,ctx,JAGGED_SPEC);
+ANIMS.jagged_frontier_static=(cv,ctx)=>specStatic(cv,ctx,JAGGED_SPEC);
+
+/* spring_phase + arch_thrust: bespoke choreography — imperative one-offs. */
+ANIMS.spring_phase_static=(cv,ctx)=>drawSpring(ctx,cv,0);
+ANIMS.spring_phase=async(cv,ctx)=>{
+  await narrate("A mass on a spring, and beside it, the same motion drawn in phase space: position across, velocity up.");
+  await tween(6400,k=>drawSpring(ctx,cv,k*4*Math.PI));
+  await narrate("The bounce traces a circle: when position is extreme, velocity is zero; when position crosses center, velocity peaks. Simple harmonic motion IS circular motion, viewed edge-on — that is why sines appear.");
+};
+function drawSpring(ctx,cv,th){
+  clear(ctx,cv);
+  const y0=90, amp=90, x=Math.cos(th), v=-Math.sin(th);
+  const my=y0+110+amp*x;
+  ctx.strokeStyle="#4A5A72"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(150,y0-30); ctx.lineTo(250,y0-30); ctx.stroke();
+  ctx.strokeStyle="#7C8DA5"; ctx.beginPath(); ctx.moveTo(200,y0-30);
+  const coils=9, len=my-(y0-30);
+  for(let i=0;i<=coils;i++) ctx.lineTo(200+(i%2?16:-16)*(i&&i<coils?1:0), y0-30+len*i/coils);
+  ctx.stroke();
+  ctx.fillStyle=F.post; ctx.beginPath(); ctx.roundRect(178,my,44,34,6); ctx.fill();
+  ctx.fillStyle=F.ax; ctx.font="13px 'IBM Plex Mono'"; ctx.fillText("position",158,352);
+  const cx=580,cy=195,R=95;
+  ctx.strokeStyle="#3A4656"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(cx-130,cy); ctx.lineTo(cx+130,cy); ctx.moveTo(cx,cy-125); ctx.lineTo(cx,cy+125); ctx.stroke();
+  ctx.strokeStyle="rgba(124,141,165,0.5)"; ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.stroke();
+  ctx.fillStyle=F.ok; ctx.beginPath(); ctx.arc(cx+R*x, cy-R*v, 6,0,7); ctx.fill();
+  ctx.fillStyle=F.ax; ctx.fillText("x →",cx+110,cy+16); ctx.fillText("v ↑",cx+8,cy-108);
+  ctx.fillText("phase space: the same motion, as a circle",cx-160,352);
+}
+
+ANIMS.arch_thrust_static=(cv,ctx)=>drawArch(ctx,cv,1,0,false);
+ANIMS.arch_thrust=async(cv,ctx)=>{
+  await narrate("Nine wedge-shaped stones over a wooden form. None of them is glued. None of them can fall — because falling would mean squeezing past its neighbors.");
+  await tween(1800,k=>drawArch(ctx,cv,k,0,false));
+  await narrate("Load the crown and watch the force: straight down becomes sideways-and-down, wedge to wedge, flowing around the ring into the abutments. The arch turns weight into squeeze — and stone LOVES squeeze.");
+  await tween(2200,k=>drawArch(ctx,cv,1,k,false));
+  await narrate("Remove the keystone and the ring has a gap: the thrust line has nowhere to land, and the whole span lets go at once. One stone is not one ninth of the arch — it is all of it.");
+  await tween(1400,k=>drawArch(ctx,cv,1,1,true,k));
+};
+function drawArch(ctx,cv,built,load,fall,fk=0){
+  clear(ctx,cv);
+  const cx=450, cy=330, R=170, N=9;
+  ctx.fillStyle="#2A3444"; ctx.fillRect(cx-R-70,cy,120,40); ctx.fillRect(cx+R-50,cy,120,40);
+  const nB=Math.max(1,Math.round(N*built));
+  for(let i=0;i<nB;i++){
+    const a0=Math.PI-(Math.PI/N)*i, a1=Math.PI-(Math.PI/N)*(i+1);
+    const key=i===Math.floor(N/2);
+    let dy=0; if(fall&&key) dy=260*fk; else if(fall) dy=120*fk*Math.abs(i-N/2)/N;
+    ctx.fillStyle=key?"#8A5A2B":"#5A6A80"; ctx.strokeStyle="#141B26";
+    ctx.beginPath();
+    ctx.moveTo(cx+(R-34)*Math.cos(a0), cy-(R-34)*Math.sin(a0)+dy);
+    ctx.lineTo(cx+R*Math.cos(a0), cy-R*Math.sin(a0)+dy);
+    ctx.lineTo(cx+R*Math.cos(a1), cy-R*Math.sin(a1)+dy);
+    ctx.lineTo(cx+(R-34)*Math.cos(a1), cy-(R-34)*Math.sin(a1)+dy);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    if(load>0&&!fall){
+      const am=(a0+a1)/2, r2=R-17;
+      const fx=Math.cos(am-Math.PI/2), fy=Math.sin(am-Math.PI/2);
+      ctx.strokeStyle=F.post; ctx.lineWidth=2;
+      const sx=cx+r2*Math.cos(am), sy=cy-r2*Math.sin(am);
+      ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+18*load*fx, sy-18*load*fy*(-1)); ctx.stroke();
+      ctx.lineWidth=1;
+    }
+  }
+  if(load>0&&!fall){ ctx.fillStyle=F.post; ctx.font="15px 'IBM Plex Mono'";
+    ctx.fillText("↓ load", cx-24, cy-R-14); }
+  if(fall){ ctx.fillStyle="#D46A62"; ctx.font="15px 'IBM Plex Mono'";
+    ctx.fillText("keystone out — the ring is no longer a ring", cx-210, 40); }
+}
 
 /* react_loop: genuinely bespoke box-and-pulse choreography — imperative, per the
    decided path (one-offs allowed under code review). */

@@ -3,7 +3,9 @@
  "title": "Newtonian Physics",
  "tagline": "The machine you learned in 1972 still runs. Time to blow the dust off.",
  "description": "A refresher ladder for an engineer who once owned this material: definitions compressed to reminders, depth spent on the classic half-remembered confusions — weight vs normal force, why centripetal isn't a force, momentum vs energy, the small-angle lie, and where the whole edifice finally breaks.",
- "prereqs": ["calculus"],
+ "prereqs": [
+  "calculus"
+ ],
  "concepts": [
   {
    "id": "c01-frames",
@@ -770,7 +772,8 @@
      "type": "reading",
      "note": "The full nonlinear treatment with the amplitude-correction series — the small-angle lie itemized to any precision you like."
     }
-   ]
+   ],
+   "anim": "spring_phase"
   },
   {
    "id": "c08-limits",
