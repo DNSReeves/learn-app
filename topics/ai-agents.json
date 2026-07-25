@@ -263,7 +263,8 @@
      "type": "paper",
      "note": "The loop that defines modern agents, in its original form. Skim §2 for the pattern."
     }
-   ]
+   ],
+   "anim": "react_loop"
   },
   {
    "id": "planning",

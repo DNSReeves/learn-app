@@ -746,10 +746,73 @@ async function opProfile(ctx,cv,p){
   });
 }
 
+/* curve op (Tier 2): plot static polylines + one MORPHING polyline (from->to over the
+   tween) + an optional tracking point. Pure data: polylines are precomputed arrays. */
+function _plotXY(pts, X0=90, W=720, Y0=330, SC=260, xmin=-1, xmax=1, ymin=0, ymax=1){
+  return pts.map(([x,y])=>[X0+W*(x-xmin)/(xmax-xmin), Y0-SC*(y-ymin)/(ymax-ymin)]);
+}
+async function opCurve(ctx,cv,p){
+  const stat=(p.static_lines||[]).map(l=>({..._l(l)}));
+  function _l(l){ return {pix:_plotXY(l.pts,90,720,330,260,p.xmin,p.xmax,p.ymin,p.ymax),
+                          color:l.color||"rgba(124,141,165,0.7)", w:l.w||1.5, dash:l.dash}; }
+  const from=p.morph? _plotXY(p.morph.from,90,720,330,260,p.xmin,p.xmax,p.ymin,p.ymax):null;
+  const to  =p.morph? _plotXY(p.morph.to,  90,720,330,260,p.xmin,p.xmax,p.ymin,p.ymax):null;
+  await tween(p.dur||2800, k=>{
+    clear(ctx,cv);
+    if(p.title){ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.title,24,34); }
+    ctx.strokeStyle="#3A4656"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(90,330); ctx.lineTo(810,330); ctx.stroke();
+    for(const l of stat){ ctx.strokeStyle=l.color; ctx.lineWidth=l.w;
+      if(l.dash) ctx.setLineDash(l.dash);
+      ctx.beginPath(); l.pix.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.stroke();
+      ctx.setLineDash([]); }
+    if(from){ ctx.strokeStyle=p.morph.color||F.post; ctx.lineWidth=2; ctx.beginPath();
+      from.forEach(([fx,fy],i)=>{ const x=fx+(to[i][0]-fx)*k, y=fy+(to[i][1]-fy)*k;
+        i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke(); }
+    if(p.dot){ const d=_plotXY([p.dot],90,720,330,260,p.xmin,p.xmax,p.ymin,p.ymax)[0];
+      ctx.fillStyle=F.ok; ctx.beginPath(); ctx.arc(d[0],d[1],5,0,7); ctx.fill(); }
+    if(p.note){ ctx.fillStyle=F.ax; ctx.font="13px 'IBM Plex Mono'"; ctx.fillText(p.note,90,360); }
+  });
+}
+
+/* paths op (Tier 2): many polylines revealed left-to-right (Monte-Carlo fans etc.),
+   colored by a per-line flag, with an optional end-value histogram beat. */
+async function opPaths(ctx,cv,p){
+  const X0=70, W=560, Y0=340, SC=270, ymin=p.ymin??0, ymax=p.ymax??2;
+  const px=l=>l.map((v,i)=>[X0+W*i/(l.length-1), Y0-SC*(v-ymin)/(ymax-ymin)]);
+  const lines=p.lines.map(l=>({pix:px(l.values), bad:l.flag}));
+  await tween(p.dur||3200, k=>{
+    clear(ctx,cv);
+    if(p.title){ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.title,24,34); }
+    ctx.strokeStyle="#3A4656"; ctx.beginPath();
+    const y1=Y0-SC*(1-ymin)/(ymax-ymin);
+    ctx.moveTo(X0,y1); ctx.lineTo(X0+W,y1); ctx.stroke();   // the break-even line
+    for(const l of lines){
+      const n=Math.max(2,Math.floor(l.pix.length*k));
+      ctx.strokeStyle=l.bad?"rgba(212,106,98,0.75)":"rgba(95,191,149,0.55)"; ctx.lineWidth=1.3;
+      ctx.beginPath(); for(let i=0;i<n;i++){const [x,y]=l.pix[i]; i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+      ctx.stroke(); }
+  });
+  if(p.hist){  // end-value histogram on the right
+    const ends=p.lines.map(l=>l.values[l.values.length-1]);
+    const HB=10, x0=X0+W+30;
+    const bins=new Array(HB).fill(0);
+    for(const e of ends){ const b=Math.min(HB-1,Math.max(0,Math.floor(HB*(e-ymin)/(ymax-ymin)))); bins[b]++; }
+    const bmax=Math.max(...bins);
+    await tween(900,k=>{
+      ctx.clearRect(x0-4,0,240,380);
+      ctx.fillStyle=F.ax; ctx.font="12px 'IBM Plex Mono'"; ctx.fillText("terminal values",x0,44);
+      bins.forEach((b,i)=>{ const y=Y0-SC*(i+0.5)/HB;
+        ctx.fillStyle=(ymin+(i+0.5)*(ymax-ymin)/HB)<1?"rgba(212,106,98,0.8)":"rgba(95,191,149,0.8)";
+        ctx.fillRect(x0, y-9, 180*(b/bmax)*k, 14); });
+    });
+  }
+}
+
 const DECL_OPS = {
   clear:(ctx,cv)=>clear(ctx,cv),
   axes:opAxes, field:(ctx,cv,p)=>opField(ctx,cv,p,1), flows:opFlows,
-  rotor:opRotor, profile:opProfile,
+  rotor:opRotor, profile:opProfile, curve:opCurve, paths:opPaths,
   label:(ctx,cv,p)=>{ ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText(p.text, p.x??24, p.y??34); }
 };
 async function runSpec(cv,ctx,spec){
@@ -809,6 +872,102 @@ const HEAT_SPEC = {
   ]};
 ANIMS.heat_diffusion = (cv,ctx)=>runSpec(cv,ctx,HEAT_SPEC);
 ANIMS.heat_diffusion_static = (cv,ctx)=>specStatic(cv,ctx,HEAT_SPEC);
+
+/* ---- Tier 2 (iss_be82cb2f): secant→tangent + drawdown paths, declarative ---- */
+const PARAB = Array.from({length:81},(_,i)=>{const x=-1+i/40; return [x, x*x];});
+const _sec = h => { const x0=0.3, m=((x0+h)**2-x0**2)/h, b=x0*x0-m*x0;
+  return [[-1, m*-1+b],[1, m*1+b]]; };
+const SECANT_SPEC = {
+  static: [{op:"label",text:"the derivative is a LIMIT — press play"}],
+  stages: [
+    { say:"Here is a curve, and a point on it. The slope AT a point seems like nonsense — slope needs two points. So take two: the point, and a neighbor a distance h away. The line through them is the secant.",
+      steps:[{op:"curve",xmin:-1,xmax:1,ymin:-0.2,ymax:1.1,dur:1400,title:"f(x) = x² · secant with h = 0.6",
+              static_lines:[{pts:PARAB,color:"#7C8DA5",w:2}], dot:[0.3,0.09],
+              morph:{from:_sec(0.6),to:_sec(0.6)}}] },
+    { say:"Now shrink h. Watch the secant swing as its second point slides down the curve toward the first.",
+      steps:[{op:"curve",xmin:-1,xmax:1,ymin:-0.2,ymax:1.1,dur:2600,title:"h: 0.6 → 0.15",
+              static_lines:[{pts:PARAB,color:"#7C8DA5",w:2}], dot:[0.3,0.09],
+              morph:{from:_sec(0.6),to:_sec(0.15)}}] },
+    { say:"Smaller still. The line is settling — the swings get tinier even though h keeps shrinking. That settling IS the limit.",
+      steps:[{op:"curve",xmin:-1,xmax:1,ymin:-0.2,ymax:1.1,dur:2600,title:"h: 0.15 → 0.001",
+              static_lines:[{pts:PARAB,color:"#7C8DA5",w:2}], dot:[0.3,0.09],
+              morph:{from:_sec(0.15),to:_sec(0.001)},note:"slope → 0.6 = 2·x₀ — the tangent"}] },
+    { say:"The tangent is not a secant with h equal to zero — that would be one point and no line. It is what the secants APPROACH. The derivative is that destination: a limit, not a substitution.",
+      steps:[] }
+  ]};
+ANIMS.secant_to_tangent = (cv,ctx)=>runSpec(cv,ctx,SECANT_SPEC);
+ANIMS.secant_to_tangent_static = (cv,ctx)=>specStatic(cv,ctx,SECANT_SPEC);
+
+/* drawdown paths: 30 seeded GBM-ish equity curves, same arithmetic mean, two vol
+   regimes. Seeded PRNG (mulberry32) so every replay shows the SAME truth. */
+function _mulberry(seed){ return ()=>{ seed|=0; seed=seed+0x6D2B79F5|0;
+  let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t;
+  return ((t^t>>>14)>>>0)/4294967296; }; }
+function _mcPaths(vol, seed){
+  const rnd=_mulberry(seed), lines=[];
+  for(let p=0;p<30;p++){
+    const v=[1]; let x=1;
+    for(let t=0;t<120;t++){
+      const u1=Math.max(rnd(),1e-9), u2=rnd();
+      const z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+      x*=1+0.004+vol*z; v.push(x);
+    }
+    lines.push({values:v, flag:v[v.length-1]<1});
+  }
+  return lines;
+}
+const DD_CALM=_mcPaths(0.012,42), DD_WILD=_mcPaths(0.045,42);
+const DRAWDOWN_SPEC = {
+  static: [{op:"label",text:"same average return, two volatilities — press play"}],
+  stages: [
+    { say:"Thirty portfolios, each earning the same average return per period, at LOW volatility. Watch the fan: nearly everyone compounds above the break-even line.",
+      steps:[{op:"paths",lines:DD_CALM,ymin:0,ymax:3.2,dur:3000,hist:true,title:"low vol · same mean"}] },
+    { say:"Same average return. Only the volatility is higher. The fan splays — and look how many paths end BELOW break-even despite a positive average.",
+      steps:[{op:"clear"},{op:"paths",lines:DD_WILD,ymin:0,ymax:3.2,dur:3200,hist:true,title:"high vol · SAME mean"}] },
+    { say:"That is volatility drag: you live one path, not the average of all of them. Gain fifty percent then lose forty and the arithmetic mean says plus five — your account says minus ten. Compounding punishes variance, which is why drawdown control is not timidity. It is arithmetic.",
+      steps:[] }
+  ]};
+ANIMS.drawdown_paths = (cv,ctx)=>runSpec(cv,ctx,DRAWDOWN_SPEC);
+ANIMS.drawdown_paths_static = (cv,ctx)=>specStatic(cv,ctx,DRAWDOWN_SPEC);
+
+/* react_loop: genuinely bespoke box-and-pulse choreography — imperative, per the
+   decided path (one-offs allowed under code review). */
+ANIMS.react_loop_static=(cv,ctx)=>{ drawReactLoop(ctx,cv,-1,"",0); };
+ANIMS.react_loop=async(cv,ctx)=>{
+  const legs=[["GOAL → MODEL","The model reads the goal and everything observed so far."],
+              ["MODEL → TOOL","It proposes ONE action — a tool call, not an answer."],
+              ["TOOL → OBSERVATION","The harness executes and appends the real result."],
+              ["OBSERVATION → MODEL","The next thought conditions on that result. Around again."]];
+  await narrate("The agentic loop. Four stations, one circulating token of control.");
+  for(let lap=0;lap<2;lap++)
+    for(let i=0;i<4;i++){
+      await tween(700,k=>drawReactLoop(ctx,cv,i,lap?"":legs[i][1],k));
+      if(!lap) await narrate(legs[i][1]);
+    }
+  await tween(700,k=>drawReactLoop(ctx,cv,2,"ERROR: no such table 'etf_metric'",k,true));
+  await narrate("A failure is not the end — it is an observation. The error text steers the very next proposal: fix the table name, try again.");
+  await tween(700,k=>drawReactLoop(ctx,cv,3,"budget: 0 calls left → synthesize now",k,false,true));
+  await narrate("And a loop needs brakes: when the step budget hits zero, tools are withdrawn and the model must answer from what it has. Reason, act, observe — bounded.");
+};
+function drawReactLoop(ctx,cv,active,caption,k,err=false,stop=false){
+  clear(ctx,cv);
+  const B=[["GOAL",120,90],["MODEL",420,90],["TOOL",720,90],["OBSERVATION",420,270]];
+  const EDGE=[[0,1],[1,2],[2,3],[3,1]];
+  ctx.font="14px 'IBM Plex Mono'";
+  EDGE.forEach(([a,b],i)=>{ const [,x1,y1]=B[a],[,x2,y2]=B[b];
+    ctx.strokeStyle=i===active?(err?"#D46A62":F.post):"#3A4656";
+    ctx.lineWidth=i===active?2.5:1.2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    if(i===active){ const px=x1+(x2-x1)*k, py=y1+(y2-y1)*k;
+      ctx.fillStyle=err?"#D46A62":F.post; ctx.beginPath(); ctx.arc(px,py,6,0,7); ctx.fill(); } });
+  B.forEach(([t,x,y],i)=>{ ctx.fillStyle="#141B26";
+    ctx.strokeStyle=(stop&&i===1)?F.ok:"#4A5A72"; ctx.lineWidth=1.5;
+    const w=t.length*10+28;
+    ctx.beginPath(); ctx.roundRect(x-w/2,y-22,w,44,8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=F.txt; ctx.textAlign="center"; ctx.fillText(t,x,y+5); ctx.textAlign="left"; });
+  if(caption){ ctx.fillStyle=err?"#D46A62":F.ax; ctx.font="13px 'IBM Plex Mono'";
+    ctx.fillText(caption,120,350); }
+}
 
 /* ---- arm (b): attention_heatmap, authored imperatively (house style) ---- */
 const ATN_TOKENS=["The","robot","picked","up","the","ball","because","it","was","round"];
