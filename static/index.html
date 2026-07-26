@@ -3897,6 +3897,645 @@ ANIMS.bayes_decision=async(cv,ctx)=>{bayes_dec_draw(ctx,cv,{k:0,showCost:false})
  await narrate("Investigate B — 220× the expected loss ($2,000 vs $9). Bayes owns the probability; you must supply the payoff. Expected utility is where they meet.");
 };
 })();
+
+(function(){
+/* etf / etf_openclosed */
+var TOP=80, BOT=320, NAV=200;
+var LX0=100, LX1=340, RX0=560, RX1=800;
+var LCX=(LX0+LX1)/2, RCX=(RX0+RX1)/2;
+var AMBER="rgba(232,161,60,0.78)";
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function fillWater(ctx,x0,x1,level,amp,phase,color){
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x0,TOP,x1-x0,BOT-TOP);
+  ctx.clip();
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(x0,BOT);
+  for(var x=x0;x<=x1;x+=3){
+    var y=level+Math.sin(x*0.06+phase)*amp;
+    ctx.lineTo(x,y);
+  }
+  ctx.lineTo(x1,BOT);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function tankOutline(ctx,x0,x1){
+  ctx.strokeStyle="#3A4C68";
+  ctx.lineWidth=2;
+  roundRect(ctx,x0-4,TOP-4,(x1-x0)+8,(BOT-TOP)+8,8);
+  ctx.stroke();
+}
+
+function navLine(ctx,x0,x1){
+  ctx.strokeStyle=F.prior;
+  ctx.lineWidth=1;
+  ctx.setLineDash([6,5]);
+  ctx.beginPath();ctx.moveTo(x0-4,NAV);ctx.lineTo(x1+4,NAV);ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawValve(ctx,cx,open){
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;
+  ctx.fillStyle=open?F.ok:"#2E3D57";
+  roundRect(ctx,cx-16,TOP-16,32,16,3);
+  ctx.fill();ctx.stroke();
+  if(open){
+    ctx.strokeStyle=F.ok;ctx.lineWidth=2;
+    for(var i=0;i<2;i++){
+      var yy=TOP-22-i*8;
+      ctx.beginPath();
+      ctx.moveTo(cx-6,yy);ctx.lineTo(cx,yy-6);ctx.lineTo(cx+6,yy);
+      ctx.stroke();
+    }
+  }
+}
+
+function drawSeal(ctx,cx){
+  ctx.fillStyle="#2E3D57";ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;
+  roundRect(ctx,cx-20,TOP-12,40,12,3);ctx.fill();ctx.stroke();
+  ctx.strokeStyle=F.wrong;ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(cx,TOP-16,5,Math.PI,0);ctx.stroke();
+  ctx.fillStyle=F.wrong;
+  roundRect(ctx,cx-6,TOP-16,12,9,2);ctx.fill();
+}
+
+function drawScene(ctx,cv,st){
+  clear(ctx,cv);
+
+  ctx.textAlign="center";
+  ctx.fillStyle=F.txt;
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillText("OPEN-END vs CLOSED-END — the wrapper decides the price",450,22);
+
+  // ---- LEFT: open-end ----
+  tankOutline(ctx,LX0,LX1);
+  fillWater(ctx,LX0,LX1,st.left,3,st.phL,AMBER);
+  navLine(ctx,LX0,LX1);
+  drawValve(ctx,LCX,st.valve);
+  ctx.fillStyle=F.prior;ctx.textAlign="right";ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("NAV",LX0-8,NAV+4);
+  ctx.textAlign="center";
+  ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("OPEN-END · ETF",LCX,344);
+  ctx.fillStyle=F.ok;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("CREATE / REDEEM VALVE",LCX,362);
+
+  // ---- RIGHT: closed-end ----
+  tankOutline(ctx,RX0,RX1);
+  fillWater(ctx,RX0,RX1,st.right,5,st.phR,AMBER);
+  if(st.discount && st.right>NAV){
+    ctx.fillStyle="rgba(212,106,98,0.30)";
+    ctx.fillRect(RX0,NAV,RX1-RX0,st.right-NAV);
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(RX0,st.right);ctx.lineTo(RX1,st.right);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  navLine(ctx,RX0,RX1);
+  drawSeal(ctx,RCX);
+  ctx.fillStyle=F.prior;ctx.textAlign="left";ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("NAV",RX1+8,NAV+4);
+  ctx.textAlign="center";
+  ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("CLOSED-END · CEF",RCX,344);
+  ctx.fillStyle=F.wrong;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("NO VALVE — SEALED",RCX,362);
+  if(st.label && st.discount && st.right>NAV){
+    ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";
+    ctx.fillText("PERSISTENT DISCOUNT",RCX,NAV+(st.right-NAV)/2+4);
+  }
+}
+
+ANIMS.etf_openclosed=async(cv,ctx)=>{
+  var st={left:NAV,right:NAV,phL:0,phR:0,valve:false,discount:false,label:false};
+  function frame(){ drawScene(ctx,cv,st); }
+  frame();
+
+  await narrate("Two funds can hold the identical basket. The wrapper decides whether the price obeys NAV.");
+  await tween(900,function(k){ st.phL=k*6; st.phR=k*6; frame(); });
+
+  await narrate("Demand surges. Buyers bid the price above net asset value in both tanks.");
+  await tween(1100,function(k){ st.left=NAV-40*k; st.right=NAV-40*k; st.phL=k*8; st.phR=k*8; frame(); });
+
+  await narrate("Open-end: the create/redeem valve opens. Authorized participants mint shares — arbitrage snaps price back to NAV.");
+  st.valve=true; frame();
+  await tween(1100,function(k){ st.left=(NAV-40)+40*k; st.phL=8+k*4; frame(); });
+  st.valve=false; frame();
+
+  await narrate("Closed-end is sealed. Fixed shares, no valve — sentiment just sloshes the price around.");
+  await tween(1400,function(k){ st.right=(NAV-40)+80*k; st.phR=8+k*10; frame(); });
+
+  st.discount=true; st.label=true;
+  await narrate("It settles below NAV and stays there: a persistent discount the wrapper can never close.");
+  await tween(900,function(k){ st.phR=18+Math.sin(k*6.28)*0.6; frame(); });
+  frame();
+};
+
+ANIMS.etf_openclosed_static=(cv,ctx)=>{
+  var st={left:NAV,right:240,phL:2,phR:3,valve:false,discount:true,label:true};
+  drawScene(ctx,cv,st);
+};
+})();
+(function(){
+/* etf / etf_etn */
+const PX0=70, PX1=620, PY0=310, PY1=60;
+const td=0.62;
+const barX=700, barW=46, barTop=70, barBot=310;
+const LOW=0.035;
+const AX="#3A4C68", GRID="#22314a", MUT="#5A6E8C";
+
+function X(t){ return PX0 + t*(PX1-PX0); }
+function Y(v){ return PY0 - v*(PY0-PY1); }
+function idx(t){ return 0.15 + 0.72*t; }
+function etf(t){ return 0.15 + 0.685*t; }
+
+function axes(ctx){
+  ctx.strokeStyle=GRID; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){ let gy=PY1+i*(PY0-PY1)/4; ctx.beginPath(); ctx.moveTo(PX0,gy); ctx.lineTo(PX1,gy); ctx.stroke(); }
+  ctx.strokeStyle=AX; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(PX0,PY1); ctx.lineTo(PX0,PY0); ctx.lineTo(PX1,PY0); ctx.stroke();
+  ctx.fillStyle=MUT; ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("price", PX0-2, PY1-10);
+  ctx.fillText("time", PX1-34, PY0+22);
+}
+
+function series(ctx,fn,tMax,color,w){
+  if(tMax<=0) return;
+  ctx.strokeStyle=color; ctx.lineWidth=w; ctx.beginPath();
+  let n=Math.max(2,Math.floor(tMax*120));
+  for(let i=0;i<=n;i++){ let t=tMax*i/n; let px=X(t), py=Y(fn(t)); if(i===0)ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+  ctx.stroke();
+}
+
+function dot(ctx,x,y,c,r){ ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill(); }
+
+function label(ctx,text,x,y,color,size){
+  size=size||14; ctx.font=size+"px 'IBM Plex Mono'"; ctx.fillStyle=color;
+  let w=text.length*(size*0.6);
+  let cx=Math.min(x, 900-w-6); if(cx<4)cx=4;
+  ctx.fillText(text,cx,y); return cx;
+}
+
+function solvency(ctx,s){
+  ctx.strokeStyle=AX; ctx.lineWidth=1.5;
+  ctx.strokeRect(barX,barTop,barW,barBot-barTop);
+  let h=(barBot-barTop)*Math.max(0,s);
+  let col = s>0.5?F.ok : (s>0.2?F.post:F.wrong);
+  ctx.fillStyle=col;
+  ctx.fillRect(barX, barBot-h, barW, h);
+  label(ctx,"Issuer",   barX-6, barTop-24, F.txt,13);
+  label(ctx,"solvency", barX-6, barTop-9,  F.txt,13);
+  label(ctx, Math.round(Math.max(0,s)*100)+"%", barX+4, barBot+20, col,13);
+}
+
+function render(cv,ctx,st){
+  clear(ctx,cv); axes(ctx);
+  label(ctx,"ETN = unsecured bank debt", 20, 26, F.txt,14);
+  series(ctx,idx,st.p,F.prior,5);
+  if(st.collapse<=0){
+    series(ctx,idx,st.p,F.post,2.5);
+    label(ctx,"ETN tracks Index", X(0.42)-40, Y(idx(0.5))-44, F.post,14);
+    label(ctx,"0 tracking error", X(0.42)-40, Y(idx(0.5))-27, F.txt,13);
+    label(ctx,"ETN + Index", X(st.p)+6, Y(idx(st.p))-2, F.post,13);
+  } else {
+    series(ctx,idx,td,F.post,2.5);
+    let cv0=idx(td);
+    let cvNow=cv0*(1-st.collapse)+LOW*st.collapse;
+    ctx.strokeStyle=F.wrong; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(X(td),Y(cv0)); ctx.lineTo(X(td),Y(cvNow)); ctx.stroke();
+    let tailEnd=td+st.collapse*(1-td);
+    ctx.beginPath(); ctx.moveTo(X(td),Y(cvNow)); ctx.lineTo(X(tailEnd),Y(cvNow)); ctx.stroke();
+    label(ctx,"Index (rolls on)", X(1)+6, Y(idx(1))+4, F.prior,13);
+    label(ctx,"ETN worthless", X(tailEnd)+8, Y(cvNow)-8, F.wrong,13);
+    if(st.flash){ dot(ctx,X(td),Y(cv0),F.wrong,4); label(ctx,"DEFAULT", X(td)+8, 210, F.wrong,15); }
+  }
+  if(st.etf>0){
+    series(ctx,etf,st.etf,F.ok,2.5);
+    label(ctx,"ETF: held in trust", X(st.etf)-150, Y(etf(st.etf))+18, F.ok,13);
+  }
+  solvency(ctx,st.s);
+}
+
+ANIMS.etf_etn_static=(cv,ctx)=>{
+  clear(ctx,cv); axes(ctx);
+  label(ctx,"ETN = unsecured bank debt", 20, 26, F.txt,14);
+  series(ctx,idx,1,F.prior,5);
+  series(ctx,idx,1,F.post,2.5);
+  label(ctx,"ETN + Index", X(1)+6, Y(idx(1))-2, F.post,13);
+  label(ctx,"ETN tracks Index", X(0.42)-40, Y(idx(0.5))-44, F.post,14);
+  label(ctx,"0 tracking error", X(0.42)-40, Y(idx(0.5))-27, F.txt,13);
+  solvency(ctx,1);
+};
+
+ANIMS.etf_etn=async(cv,ctx)=>{
+  let st={p:0,s:1,collapse:0,etf:0,flash:false};
+  render(cv,ctx,st);
+  await narrate("An ETN isn't a fund — it's a bank's unsecured DEBT note that promises to pay an index.");
+  await tween(1400,k=>{ st.p=k; render(cv,ctx,st); });
+  await narrate("The appeal: with no holdings to manage, it tracks its index PERFECTLY — zero tracking error.");
+  await sleep(300);
+  await narrate("But you're an unsecured creditor. Watch the issuer's solvency erode.");
+  await tween(1600,k=>{ st.s=1-0.92*k; render(cv,ctx,st); });
+  st.flash=true;
+  await narrate("Issuer DEFAULTS — the note is only a promise, and the promise is broken.");
+  await tween(1500,k=>{ st.collapse=k; render(cv,ctx,st); });
+  await narrate("The ETN collapses toward zero while the index rolls on. A real ETF survives — its assets sit in trust.");
+  await tween(1400,k=>{ st.etf=k; render(cv,ctx,st); });
+  await sleep(400);
+};
+})();
+(function(){
+/* etf / etf_cagr */
+const PX=80, PW=850, PYt=50, PYb=330;
+const vMin=80, vMax=220;
+function X(t){ return PX + t*(PW-PX)/10; }
+function Y(v){ return PYb - (v-vMin)/(vMax-vMin)*(PYb-PYt); }
+
+const real   =[100,118,108,132,120,145,133,158,150,172,180];
+const violent=[100,146, 96,160, 92,176,104,166,122,192,180];
+
+function cagrPts(){ const p=[]; for(let i=0;i<=40;i++){ const t=i/4; p.push({x:X(t), y:Y(100*Math.pow(1.8,t/10))}); } return p; }
+function arithPts(){ const p=[]; for(let i=0;i<=40;i++){ const t=i/4; p.push({x:X(t), y:Y(100*Math.pow(1.0742,t))}); } return p; }
+function jagPts(arr){ return arr.map((v,i)=>({x:X(i), y:Y(v)})); }
+
+function drawAxes(ctx){
+  ctx.save();
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PX,PYt); ctx.lineTo(PX,PYb); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PX,PYb); ctx.lineTo(PW,PYb); ctx.stroke();
+  ctx.font="14px 'IBM Plex Mono'";
+  const ticks=[100,140,180,220];
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  for(const tv of ticks){
+    const y=Y(tv);
+    ctx.strokeStyle="#22314a";
+    ctx.beginPath(); ctx.moveTo(PX,y); ctx.lineTo(PW,y); ctx.stroke();
+    ctx.fillStyle="#5A6E8C"; ctx.fillText(String(tv), PX-8, y);
+  }
+  ctx.textAlign="center"; ctx.textBaseline="top"; ctx.fillStyle="#5A6E8C";
+  for(let t=0;t<=10;t+=2){ ctx.fillText(String(t), X(t), PYb+8); }
+  ctx.textBaseline="alphabetic"; ctx.textAlign="left";
+  ctx.fillText("Portfolio value", PX-10, PYt-16);
+  ctx.textAlign="center";
+  ctx.fillText("years", (PX+PW)/2, PYb+34);
+  ctx.restore();
+}
+
+function plotCurve(ctx, pts, k, color, width){
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=width||2; ctx.lineJoin="round"; ctx.lineCap="round";
+  ctx.beginPath();
+  const total=pts.length-1; const prog=k*total;
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(let i=1;i<pts.length;i++){
+    if(prog>=i){ ctx.lineTo(pts[i].x, pts[i].y); }
+    else {
+      const f=prog-(i-1);
+      if(f>0){
+        ctx.lineTo(pts[i-1].x+(pts[i].x-pts[i-1].x)*f, pts[i-1].y+(pts[i].y-pts[i-1].y)*f);
+      }
+      break;
+    }
+  }
+  ctx.stroke(); ctx.restore();
+}
+
+function shadeDrag(ctx, alpha){
+  const c=cagrPts(), a=arithPts();
+  ctx.save(); ctx.globalAlpha=alpha; ctx.fillStyle=F.wrong;
+  ctx.beginPath();
+  ctx.moveTo(a[0].x,a[0].y);
+  for(let i=1;i<a.length;i++) ctx.lineTo(a[i].x,a[i].y);
+  for(let i=c.length-1;i>=0;i--) ctx.lineTo(c[i].x,c[i].y);
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+
+function dot(ctx, x, y, color){
+  ctx.save(); ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill(); ctx.restore();
+}
+
+function label(ctx, text, x, y, color, align){
+  ctx.save(); ctx.font="14px 'IBM Plex Mono'"; ctx.fillStyle=color;
+  ctx.textAlign=align||"left"; ctx.textBaseline="alphabetic";
+  ctx.fillText(text,x,y); ctx.restore();
+}
+
+function scene(ctx, cv, st){
+  clear(ctx,cv);
+  drawAxes(ctx);
+  if(st.mode==="compare"){
+    if(st.cagrK>0) plotCurve(ctx, cagrPts(), st.cagrK, F.ok, 2.5);
+    if(st.violentK>0) plotCurve(ctx, jagPts(violent), st.violentK, F.wrong, 2.2);
+    if(st.cagrK>=1) dot(ctx, X(0), Y(100), F.txt);
+    if(st.cagrK>=1) dot(ctx, X(10), Y(180), F.txt);
+    if(st.labels){
+      label(ctx,"smooth ride", X(7)+6, 183, F.ok, "left");
+      label(ctx,"violent ride", 700, 100, F.wrong, "left");
+      label(ctx,"same endpoint 180", 845, 120, F.txt, "right");
+      label(ctx,"same start 100", X(0)-4, Y(100)+18, F.prior, "left");
+    }
+    return;
+  }
+  if(st.dragAlpha>0) shadeDrag(ctx, st.dragAlpha);
+  if(st.realK>0) plotCurve(ctx, jagPts(real), st.realK, F.post, 2.5);
+  if(st.arithK>0) plotCurve(ctx, arithPts(), st.arithK, F.wrong, 2);
+  if(st.cagrK>0) plotCurve(ctx, cagrPts(), st.cagrK, F.ok, 2.5);
+  if(st.realK>=1){ dot(ctx, X(0), Y(100), F.txt); dot(ctx, X(10), Y(180), F.txt); }
+  if(st.labels){
+    if(st.realK>=1) label(ctx,"real path", 315, 214, F.post, "left");
+    if(st.cagrK>=1) label(ctx,"CAGR 6.0%/yr", 548, 200, F.ok, "left");
+    if(st.arithK>=1) label(ctx,"arithmetic mean", 845, 92, F.wrong, "right");
+    if(st.dragAlpha>0) label(ctx,"volatility drag", 635, 150, F.wrong, "center");
+    if(st.realK>=1) label(ctx,"ends at 180", 845, 120, F.txt, "right");
+  }
+}
+
+ANIMS.etf_cagr = async (cv, ctx) => {
+  const st={ mode:"main", realK:0, cagrK:0, arithK:0, dragAlpha:0, violentK:0, labels:true };
+
+  scene(ctx,cv,st);
+  await narrate("A real portfolio: some up years, some down years.");
+  await tween(1100, k=>{ st.realK=k; scene(ctx,cv,st); });
+
+  await narrate("CAGR is the ONE smooth rate that lands on the same ending wealth.");
+  await tween(1000, k=>{ st.cagrK=k; scene(ctx,cv,st); });
+
+  await narrate("Average the yearly returns instead and you overshoot the real endpoint.");
+  await tween(900, k=>{ st.arithK=k; scene(ctx,cv,st); });
+
+  await narrate("That gap between arithmetic and CAGR is volatility drag.");
+  await tween(800, k=>{ st.dragAlpha=0.28*k; scene(ctx,cv,st); });
+  await sleep(400);
+
+  st.mode="compare"; st.cagrK=1; st.violentK=0; st.labels=false;
+  scene(ctx,cv,st);
+  await narrate("But one CAGR hides the path: same start, same end, very different ride.");
+  await tween(1000, k=>{ st.violentK=k; scene(ctx,cv,st); });
+  st.labels=true; scene(ctx,cv,st);
+  await sleep(300);
+};
+
+ANIMS.etf_cagr_static = (cv, ctx) => {
+  const st={ mode:"main", realK:1, cagrK:1, arithK:0, dragAlpha:0, violentK:0, labels:true };
+  scene(ctx,cv,st);
+};
+})();
+(function(){
+/* etf / etf_irr */
+const N=5, baseY=235, scale=0.2, rMax=0.20, BW=26;
+const cfA=[{t:0,a:-100},{t:1,a:-100},{t:2,a:-100},{t:3,a:-100},{t:4,a:-100},{t:5,a:650}];
+const cfB=[{t:0,a:-260},{t:1,a:-60},{t:2,a:-60},{t:3,a:-60},{t:4,a:-60},{t:5,a:650}];
+function xAt(t){return 120+t*136;}
+function npv(cfs,r){let s=0;for(const c of cfs)s+=c.a/Math.pow(1+r,c.t);return s;}
+function irrOf(cfs){let lo=0,hi=1;for(let i=0;i<64;i++){const m=(lo+hi)/2;if(npv(cfs,m)>0)lo=m;else hi=m;}return (lo+hi)/2;}
+function interp(m){return cfA.map((c,i)=>({t:c.t,a:c.a+(cfB[i].a-c.a)*m}));}
+const irrA=irrOf(cfA);
+
+function drawGrid(ctx){
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let t=0;t<=N;t++){const x=xAt(t);ctx.beginPath();ctx.moveTo(x,105);ctx.lineTo(x,300);ctx.stroke();}
+}
+function drawAxis(ctx){
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(100,baseY);ctx.lineTo(824,baseY);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";
+  for(let t=0;t<=N;t++){const x=xAt(t);ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,baseY-3);ctx.lineTo(x,baseY+3);ctx.stroke();ctx.fillText(String(t),x,318);}
+  ctx.fillText("time (years)",460,336);
+}
+function drawBars(ctx,st){
+  const r=st.r, grow=(st.grow==null?1:st.grow), hi=st.highlight;
+  for(const c of st.cfs){
+    const x=xAt(c.t);
+    const pv=c.a/Math.pow(1+r,c.t);
+    const h=Math.abs(pv)*scale*grow;
+    if(c.a>=0){ctx.fillStyle=F.ok;ctx.fillRect(x-BW/2,baseY-h,BW,h);}
+    else{ctx.fillStyle=(hi&&c.t===0)?F.wrong:F.prior;ctx.fillRect(x-BW/2,baseY,BW,h);}
+    ctx.textAlign="center";ctx.font="11px 'IBM Plex Mono'";ctx.fillStyle=F.txt;
+    const val=(pv>=0?"+":"")+Math.round(pv);
+    if(grow>0.2){ if(c.a>=0) ctx.fillText(val,x,baseY-h-6); else ctx.fillText(val,x,baseY+h+12); }
+  }
+}
+function drawDial(ctx,r){
+  const cx=105,cy=118,rad=58;
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=8;ctx.lineCap="round";
+  ctx.beginPath();ctx.arc(cx,cy,rad,Math.PI,2*Math.PI);ctx.stroke();
+  const rr=Math.min(r,rMax), ang=Math.PI+(rr/rMax)*Math.PI;
+  ctx.strokeStyle=F.post;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+rad*Math.cos(ang),cy+rad*Math.sin(ang));ctx.stroke();
+  ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(cx,cy,4,0,2*Math.PI);ctx.fill();
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="center";
+  ctx.fillText("r = "+(r*100).toFixed(1)+"%",cx,cy+34);
+  ctx.fillStyle="#5A6E8C";ctx.font="11px 'IBM Plex Mono'";
+  ctx.fillText("discount rate",cx,cy+50);
+}
+function drawNPV(ctx,cfs,r){
+  const val=npv(cfs,r), x0=360,x1=770,xc=(x0+x1)/2, y=70;
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=6;ctx.lineCap="round";
+  ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();
+  ctx.strokeStyle="#5A6E8C";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(xc,y-12);ctx.lineTo(xc,y+12);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.font="11px 'IBM Plex Mono'";ctx.textAlign="center";
+  ctx.fillText("0",xc,y+26);
+  const off=Math.max(-150,Math.min(150,val))*(200/160), near=Math.abs(val)<2;
+  ctx.fillStyle=near?F.ok:F.post;
+  ctx.beginPath();ctx.arc(xc+off,y,7,0,2*Math.PI);ctx.fill();
+  ctx.textAlign="left";ctx.font="14px 'IBM Plex Mono'";ctx.fillStyle=near?F.ok:F.txt;
+  ctx.fillText("NPV = "+(val>=0?"+":"")+val.toFixed(1),x0,y-16);
+  ctx.fillStyle="#5A6E8C";ctx.font="11px 'IBM Plex Mono'";
+  ctx.fillText("net present value of all cash flows",x0,y-32);
+}
+function drawIRRlabel(ctx){
+  ctx.fillStyle=F.post;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText("that rate is your IRR",150,205);
+  ctx.fillStyle="#5A6E8C";ctx.font="11px 'IBM Plex Mono'";
+  ctx.fillText("money-weighted return",150,221);
+}
+function render(ctx,cv,st){
+  clear(ctx,cv);
+  drawGrid(ctx);drawAxis(ctx);drawBars(ctx,st);
+  if(st.showDial)drawDial(ctx,st.r);
+  if(st.showNPV)drawNPV(ctx,st.cfs,st.r);
+  if(st.showIRRlabel)drawIRRlabel(ctx);
+}
+
+ANIMS.etf_irr_static=(cv,ctx)=>{
+  render(ctx,cv,{r:irrA,cfs:cfA,grow:1,showDial:true,showNPV:true,showIRRlabel:true,highlight:false});
+};
+ANIMS.etf_irr=async(cv,ctx)=>{
+  render(ctx,cv,{r:0,cfs:cfA,grow:0,showDial:false,showNPV:false,showIRRlabel:false});
+  await narrate("Your real cash flows on a timeline: five contributions out (down, grey), the ending value in (up, green).");
+  await tween(900,k=>render(ctx,cv,{r:0,cfs:cfA,grow:k,showDial:false,showNPV:false,showIRRlabel:false}));
+  await narrate("Now discount each bar by 1/(1+r)^t and track the net present value. Turn the rate up…");
+  await tween(1500,k=>render(ctx,cv,{r:irrA*k,cfs:cfA,grow:1,showDial:true,showNPV:true,showIRRlabel:false}));
+  await narrate("At one special rate the discounted inflow exactly offsets the outflows — NPV hits zero. That rate is your IRR.");
+  await tween(700,k=>render(ctx,cv,{r:irrA,cfs:cfA,grow:1,showDial:true,showNPV:true,showIRRlabel:k>0.5}));
+  render(ctx,cv,{r:irrA,cfs:cfA,grow:1,showDial:true,showNPV:true,showIRRlabel:true});
+  await sleep(400);
+  await narrate("Timing matters: pile more dollars in early and your money-weighted rate — the IRR — drops, even for the same total contributed.");
+  await tween(1600,k=>{const cfs=interp(k);render(ctx,cv,{r:irrOf(cfs),cfs,grow:1,showDial:true,showNPV:true,showIRRlabel:true,highlight:k>0.05});});
+  await sleep(500);
+};
+})();
+(function(){
+/* etf / etf_twr_mwr */
+const X0=70,X1=580,PT=70,PB=250;
+const xOf=t=>X0+t*(X1-X0);
+const yOf=v=>PB-v*(PB-PT);
+const ANCH=[[0,0.55],[0.25,0.82],[0.55,0.20],[0.80,0.58],[1,0.85]];
+function vAt(t){
+  if(t<=0)return ANCH[0][1];
+  if(t>=1)return ANCH[ANCH.length-1][1];
+  for(let i=0;i<ANCH.length-1;i++){
+    const a=ANCH[i],b=ANCH[i+1];
+    if(t>=a[0]&&t<=b[0]){
+      const u=(t-a[0])/(b[0]-a[0]);
+      const s=u*u*(3-2*u);
+      return a[1]+(b[1]-a[1])*s;
+    }
+  }
+  return ANCH[ANCH.length-1][1];
+}
+const N=160,PTS=[];
+for(let i=0;i<N;i++){const t=i/(N-1);PTS.push([xOf(t),yOf(vAt(t))]);}
+const BAD_T=0.25,GOOD_T=0.55;
+const badPt=[xOf(BAD_T),yOf(vAt(BAD_T))];
+const goodPt=[xOf(GOOD_T),yOf(vAt(GOOD_T))];
+const RLX=610,RLX2=845,TWRY=160,DOTX=680,GY=110,BY=210;
+
+function drawMarker(ctx,p,color,prog,dir){
+  const r=6*Math.min(1,prog*1.3);
+  ctx.strokeStyle=color;
+  ctx.globalAlpha=0.5;ctx.lineWidth=1;
+  const ly=dir<0?p[1]-16:p[1]+18;
+  ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(p[0],ly);ctx.stroke();
+  ctx.globalAlpha=1;
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(p[0],p[1]-r);ctx.lineTo(p[0]+r,p[1]);
+  ctx.lineTo(p[0],p[1]+r);ctx.lineTo(p[0]-r,p[1]);
+  ctx.closePath();ctx.fill();
+}
+
+function render(ctx,cv,o){
+  o=o||{};
+  const pathFrac=o.pathFrac==null?1:o.pathFrac;
+  const mk=o.markerProg==null?0:o.markerProg;
+  const twrDraw=o.twrDraw==null?0:o.twrDraw;
+  const mwr=o.mwrProg==null?0:o.mwrProg;
+  const tk=o.takeawayA==null?0:o.takeawayA;
+  clear(ctx,cv);
+  ctx.textAlign="left";ctx.textBaseline="alphabetic";
+
+  // header
+  ctx.font="16px 'IBM Plex Mono'";ctx.fillStyle=F.post;
+  ctx.fillText("TWR vs MWR",70,32);
+  ctx.font="13px 'IBM Plex Mono'";ctx.fillStyle="#5A6E8C";
+  ctx.fillText("the two truths of return",190,32);
+
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let gy=90;gy<=240;gy+=30){ctx.beginPath();ctx.moveTo(X0,gy);ctx.lineTo(X1,gy);ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,PT-6);ctx.lineTo(X0,PB+6);ctx.lineTo(X1,PB+6);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("price",X0-4,PT-12);
+  ctx.fillText("time →",X1-52,PB+22);
+
+  // fund path (progressive)
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.5;
+  const upto=Math.max(1,Math.floor(pathFrac*(N-1)));
+  ctx.beginPath();ctx.moveTo(PTS[0][0],PTS[0][1]);
+  for(let i=1;i<=upto;i++){ctx.lineTo(PTS[i][0],PTS[i][1]);}
+  ctx.stroke();
+  if(pathFrac>0.55){
+    ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";
+    ctx.fillText("same fund · same TWR for both",300,64);
+  }
+
+  // contribution markers + investor labels
+  if(mk>0){
+    drawMarker(ctx,badPt,F.wrong,mk,-1);
+    drawMarker(ctx,goodPt,F.ok,mk,1);
+    ctx.font="13px 'IBM Plex Mono'";
+    ctx.globalAlpha=Math.min(1,mk*1.3);
+    ctx.fillStyle=F.wrong;ctx.fillText("Bad timer buys peak",210,90);
+    ctx.fillStyle=F.ok;ctx.fillText("Good timer buys dip",360,246);
+    ctx.globalAlpha=1;
+  }
+
+  // returns panel title
+  ctx.textAlign="left";ctx.font="13px 'IBM Plex Mono'";ctx.fillStyle="#5A6E8C";
+  ctx.fillText("your outcome",RLX,90);
+
+  // TWR reference line
+  if(twrDraw>0){
+    ctx.strokeStyle=F.post;ctx.lineWidth=2;ctx.setLineDash([6,5]);
+    const lx2=RLX+(RLX2-RLX)*Math.min(1,twrDraw);
+    ctx.beginPath();ctx.moveTo(RLX,TWRY);ctx.lineTo(lx2,TWRY);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=F.post;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="right";
+    ctx.fillText("TWR = the fund",RLX2,TWRY-6);ctx.textAlign="left";
+  }
+
+  // MWR dots diverging
+  if(mwr>0){
+    const gy=TWRY+(GY-TWRY)*mwr;
+    const by=TWRY+(BY-TWRY)*mwr;
+    ctx.globalAlpha=0.4;ctx.lineWidth=1;
+    ctx.strokeStyle=F.ok;ctx.beginPath();ctx.moveTo(DOTX,TWRY);ctx.lineTo(DOTX,gy);ctx.stroke();
+    ctx.strokeStyle=F.wrong;ctx.beginPath();ctx.moveTo(DOTX,TWRY);ctx.lineTo(DOTX,by);ctx.stroke();
+    ctx.globalAlpha=1;
+    ctx.fillStyle=F.ok;ctx.beginPath();ctx.arc(DOTX,gy,5,0,7);ctx.fill();
+    ctx.fillStyle=F.wrong;ctx.beginPath();ctx.arc(DOTX,by,5,0,7);ctx.fill();
+    ctx.font="12px 'IBM Plex Mono'";ctx.globalAlpha=Math.min(1,mwr*1.4);
+    ctx.fillStyle=F.ok;ctx.fillText("Good MWR ▲",DOTX+12,gy+4);
+    ctx.fillStyle=F.wrong;ctx.fillText("Bad MWR ▼",DOTX+12,by+4);
+    ctx.globalAlpha=1;
+  }
+
+  // takeaway
+  if(tk>0){
+    ctx.globalAlpha=tk;ctx.font="15px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillStyle=F.post;ctx.fillText("TWR = the fund.",250,352);
+    ctx.fillStyle=F.ok;ctx.fillText("MWR = your timing.",430,352);
+    ctx.globalAlpha=1;
+  }
+}
+
+ANIMS.etf_twr_mwr=async(cv,ctx)=>{
+  render(ctx,cv,{pathFrac:0});
+  await narrate("Same fund, one price path: a peak, a dip, then a rally.");
+  await tween(1300,k=>render(ctx,cv,{pathFrac:k}));
+  render(ctx,cv,{pathFrac:1});
+  await narrate("Two investors. The good timer adds money in the dip; the bad timer adds at the peak.");
+  await tween(900,k=>render(ctx,cv,{pathFrac:1,markerProg:k}));
+  await narrate("Time-weighted return strips out the flows — it's the fund itself, identical for both.");
+  await tween(700,k=>render(ctx,cv,{pathFrac:1,markerProg:1,twrDraw:k}));
+  await narrate("Money-weighted return follows the dollars: good timing lifts MWR above the line, bad timing drags it below.");
+  await tween(1100,k=>render(ctx,cv,{pathFrac:1,markerProg:1,twrDraw:1,mwrProg:k}));
+  await narrate("Same TWR, different MWR. TWR judges the fund; MWR judges your timing.");
+  await tween(600,k=>render(ctx,cv,{pathFrac:1,markerProg:1,twrDraw:1,mwrProg:1,takeawayA:k}));
+  render(ctx,cv,{pathFrac:1,markerProg:1,twrDraw:1,mwrProg:1,takeawayA:1});
+};
+ANIMS.etf_twr_mwr_static=(cv,ctx)=>{
+  render(ctx,cv,{pathFrac:1,markerProg:1,twrDraw:1,mwrProg:1,takeawayA:1});
+};
+})();
 </script>
 </body>
 </html>

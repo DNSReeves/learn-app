@@ -193,6 +193,7 @@
      ]
     }
    ],
+   "anim": "etf_openclosed",
    "resources": [
     {
      "label": "Closed-End Fund (CEF) — definition & mechanics",
@@ -288,6 +289,7 @@
      ]
     }
    ],
+   "anim": "etf_etn",
    "resources": [
     {
      "label": "Exchange-Traded Note (ETN) — Investopedia",
@@ -720,6 +722,7 @@
      ]
     }
    ],
+   "anim": "etf_cagr",
    "resources": [
     {
      "label": "Compound Annual Growth Rate (CAGR) — definition and formula",
@@ -815,6 +818,7 @@
      ]
     }
    ],
+   "anim": "etf_irr",
    "resources": [
     {
      "label": "Internal Rate of Return (IRR) — Investopedia",
@@ -910,6 +914,7 @@
      ]
     }
    ],
+   "anim": "etf_twr_mwr",
    "resources": [
     {
      "label": "Time-Weighted Rate of Return (TWR)",
