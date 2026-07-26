@@ -1,5 +1,26 @@
 # Animation backlog — P1.3 coverage pass (2026-07-25, iss_eb4f851e)
 
+> ## ▶ STATUS (2026-07-26) — backlog largely DELIVERED
+> The list below was the *plan*; most of it has shipped. Current state:
+> - **Coverage ~18% → 64%** (72 of 112 concepts carry a bespoke animation) — the
+>   52-animation expansion across 13 topics landed in `f6729f6`.
+> - **IV visuals** added to `options-and-iv`: `c05` `iv_inversion` + `c06` `vol_smile`
+>   (`c5299c2`).
+> - **Validator modernized** — understands free-response questions, real resource
+>   types, and a *dynamic* anim registry (no more hardcoded allowlist) (`36e8085`).
+> - **Review sweep** — an adversarial audit of the 52 new animations found + fixed
+>   **8 real bugs** (envelope σ, term-structure skew, off-canvas labels, a tangent
+>   overshoot, a narration rounding, a bars/narration contradiction, a wrong
+>   Wilbraham–Gibbs constant); gate green (`e9d6710`).
+> - **IN PROGRESS — ETF-module expansion:** 5 new concepts with dedicated animations —
+>   `c01b` open-vs-closed (create/redeem tanks), `c01c` ETNs (issuer-default wipeout),
+>   `c04b` CAGR, `c04c` IRR/money-weighted, `c04d` TWR-vs-MWR. Authored + finance-verified
+>   via fan-out, integrated behind the same `predeploy.sh` gate.
+>
+> This doc is retained for the **P3.10 declarative-vs-imperative decision record** below,
+> which is still the standing guidance for how new animations get built.
+
+
 > **P3.10 DECISION (2026-07-25, iss_ef1e0e3c — one built each way, as specced):**
 > **Declarative wins**, as the operator expected — now with evidence. Arm (a):
 > `phase_portrait` is a ~20-line spec (matrices, starts, narration prose) over a 5-op
