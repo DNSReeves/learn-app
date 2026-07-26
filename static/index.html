@@ -1095,6 +1095,78 @@ const GREEKS_SPEC = {
 ANIMS.delta_gamma_surface=(cv,ctx)=>runSpec(cv,ctx,GREEKS_SPEC);
 ANIMS.delta_gamma_surface_static=(cv,ctx)=>specStatic(cv,ctx,GREEKS_SPEC);
 
+/* ===== Options & IV bespoke visuals (2026-07-25) — imperative one-offs per the ANIMATION_BACKLOG rule ===== */
+/* c05 — implied volatility as Black-Scholes run BACKWARDS: quote a price, read off the σ that produced it. */
+const IVG={ox:100,oy:44,W:520,H:266,Pmax:42,k:3.0,sigMax:0.8};
+const _ivPrice=s=>IVG.Pmax*(1-Math.exp(-IVG.k*s));                              // monotone, saturating (illustrative BS-call shape)
+const _ivInv=p=>-Math.log(1-Math.min(p,IVG.Pmax*0.985)/IVG.Pmax)/IVG.k;
+const _ivx=s=>IVG.ox+(s/IVG.sigMax)*IVG.W, _ivy=p=>IVG.oy+IVG.H-(p/IVG.Pmax)*IVG.H;
+function drawIV(ctx,cv,{price,lineK=0,dropK=0,fear=0}){
+  const g=IVG; clear(ctx,cv);
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5; ctx.beginPath();
+  ctx.moveTo(g.ox,g.oy); ctx.lineTo(g.ox,g.oy+g.H); ctx.lineTo(g.ox+g.W,g.oy+g.H); ctx.stroke();
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("option price", 16, g.oy+8); ctx.fillText("volatility σ →", g.ox+g.W-118, g.oy+g.H+28);
+  for(let s=0.2;s<=0.8001;s+=0.2){ const x=_ivx(s); ctx.strokeStyle="#22314a"; ctx.beginPath(); ctx.moveTo(x,g.oy); ctx.lineTo(x,g.oy+g.H); ctx.stroke();
+    ctx.fillStyle="#5A6E8C"; ctx.fillText((s*100).toFixed(0)+"%", x-12, g.oy+g.H+18); }
+  ctx.strokeStyle=F.ax; ctx.lineWidth=2.6; ctx.beginPath();
+  for(let i=0;i<=120;i++){ const s=g.sigMax*i/120,X=_ivx(s),Y=_ivy(_ivPrice(s)); i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);} ctx.stroke();
+  ctx.fillStyle=F.ax; ctx.fillText("Black-Scholes  price(σ)", g.ox+g.W-200, _ivy(_ivPrice(0.8))+18);
+  if(lineK>0){ const y=_ivy(price); ctx.strokeStyle=F.post; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.moveTo(g.ox,y); ctx.lineTo(g.ox+g.W*lineK,y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=F.post; ctx.fillText("market quotes a PRICE = $"+price.toFixed(0), g.ox+8, y-8); }
+  if(dropK>0){ const sig=_ivInv(price),X=_ivx(sig),Yt=_ivy(price),Yb=g.oy+g.H;
+    ctx.strokeStyle=F.ok; ctx.lineWidth=2; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(X,Yt); ctx.lineTo(X,Yt+(Yb-Yt)*dropK); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=F.post; ctx.beginPath(); ctx.arc(X,Yt,5,0,7); ctx.fill();
+    if(dropK>=1){ ctx.fillStyle=F.ok; ctx.font="16px 'IBM Plex Mono'"; ctx.fillText("implied vol = "+(sig*100).toFixed(0)+"%", X-44, Yb+40); } }
+  if(fear>0){ ctx.fillStyle=F.wrong; ctx.font="14px 'IBM Plex Mono'"; ctx.fillText("fear ↑ → price ↑ → IV ↑", g.ox+g.W-224, g.oy+28); }
+}
+ANIMS.iv_inversion_static=(cv,ctx)=>drawIV(ctx,cv,{price:16});
+ANIMS.iv_inversion=async(cv,ctx)=>{
+  let price=16; drawIV(ctx,cv,{price});
+  await narrate("Here is the engine. Black-Scholes turns a volatility into an option price, and feeding it a bigger sigma always makes the option worth more - the curve only ever climbs. That one-way street is the whole trick.");
+  await narrate("But the market never hands you a volatility. It hands you a PRICE. Say this option trades for sixteen dollars - draw that as a level line.");
+  await tween(1100,k=>drawIV(ctx,cv,{price,lineK:k}));
+  await narrate("The price line meets the curve at exactly one place. Drop straight down to the sigma-axis and read off the volatility that MUST have produced this price. That number is the implied volatility - Black-Scholes run backwards.");
+  await tween(1200,k=>drawIV(ctx,cv,{price,lineK:1,dropK:k}));
+  await sleep(300);
+  await narrate("Now fear grips the market and the same contract jumps to thirty dollars. The crossing slides right and implied vol leaps. IV is not a fact about the past - it is the market's live price of uncertainty about the future.");
+  await tween(1700,k=>drawIV(ctx,cv,{price:16+14*k,lineK:1,dropK:1,fear:1}));
+};
+
+/* c06 — the volatility surface: the flat assumption breaks into smile, then skew, then a term-structure family. */
+const VSG={ox:100,oy:40,W:520,H:270,mMax:0.6,ivBase:0.20,ivMax:0.70};
+const _vsIV=(m,sm,sk)=>VSG.ivBase+sm*(m*m)/(VSG.mMax*VSG.mMax)-sk*m/VSG.mMax;
+const _vsx=m=>VSG.ox+((m+VSG.mMax)/(2*VSG.mMax))*VSG.W;
+const _vsy=iv=>Math.max(VSG.oy+2, VSG.oy+VSG.H-(Math.min(iv,VSG.ivMax)/VSG.ivMax)*VSG.H);
+function _vsCurve(ctx,sm,sk,scale,col,w){ const g=VSG; ctx.strokeStyle=col; ctx.lineWidth=w; ctx.beginPath();
+  for(let i=0;i<=100;i++){ const m=-g.mMax+2*g.mMax*i/100, X=_vsx(m), Y=_vsy(_vsIV(m,sm,sk)*scale); i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);} ctx.stroke(); }
+function drawSmile(ctx,cv,{smile=0,skew=0,exp=0}){
+  const g=VSG; clear(ctx,cv);
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5; ctx.beginPath();
+  ctx.moveTo(g.ox,g.oy); ctx.lineTo(g.ox,g.oy+g.H); ctx.lineTo(g.ox+g.W,g.oy+g.H); ctx.stroke();
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("implied vol", 16, g.oy+8); ctx.fillText("puts / downside", g.ox+2, g.oy+g.H+26); ctx.fillText("calls / upside", g.ox+g.W-128, g.oy+g.H+26);
+  const xa=_vsx(0); ctx.strokeStyle="#22314a"; ctx.beginPath(); ctx.moveTo(xa,g.oy); ctx.lineTo(xa,g.oy+g.H); ctx.stroke();
+  ctx.fillStyle="#5A6E8C"; ctx.fillText("at-the-money", xa-40, g.oy+g.H+18);
+  for(const iv of [0.2,0.3,0.4,0.5,0.6]){ const y=_vsy(iv); ctx.fillStyle="#5A6E8C"; ctx.fillText((iv*100).toFixed(0)+"%", 58, y+4); }
+  if(exp>0){ for(let e=1;e<=3;e++){ const sc=1+0.18*e*exp, a=(0.34-0.09*e).toFixed(2);
+    _vsCurve(ctx, smile, skew*(1+0.25*e), sc, "rgba(124,141,165,"+a+")", 1.6); } }
+  _vsCurve(ctx, smile, skew, 1, F.post, 2.8);
+}
+ANIMS.vol_smile_static=(cv,ctx)=>drawSmile(ctx,cv,{smile:0,skew:0});
+ANIMS.vol_smile=async(cv,ctx)=>{
+  drawSmile(ctx,cv,{smile:0,skew:0});
+  await narrate("Black-Scholes assumes ONE volatility for every strike - a flat line. If the world obeyed the model, this is all you would ever see.");
+  await narrate("It doesn't. Options far from the money - the tail bets - trade richer than a single vol can explain, because real returns have fat tails. The line lifts at both wings into the volatility SMILE.");
+  await tween(1400,k=>drawSmile(ctx,cv,{smile:0.30*k,skew:0}));
+  await narrate("In equities the smile tilts into a SKEW: downside puts cost far more than upside calls. That asymmetry is crash fear, priced - investors pay up for protection against the fall.");
+  await tween(1400,k=>drawSmile(ctx,cv,{smile:0.30,skew:0.16*k}));
+  await narrate("And every expiry carries its own smile. Stack them and you get a surface - the term structure of fear across time. Read the whole surface and you are reading what the market believes about every strike, at every horizon, right now.");
+  await tween(1700,k=>drawSmile(ctx,cv,{smile:0.30,skew:0.16,exp:k}));
+};
+
 const FEE_LINES=(()=>{  // two 30-year growth paths at 7%: 0.05% vs 1.0% annual fees — pure arithmetic
   const mk=f=>{const v=[1]; let x=1; for(let y=0;y<30;y++){x*=1.07*(1-f); v.push(x);} return x&&v;};
   return [{values:mk(0.0005),flag:false},{values:mk(0.01),flag:true}];

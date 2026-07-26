@@ -7,12 +7,32 @@ Usage:
 Exit 0 = pass. Nonzero = list of violations. Nothing goes live without a pass.
 """
 import json
+import pathlib
 import re
 import urllib.error
 import sys
 import urllib.request
 
 errs = []
+
+
+def _registered_anims():
+    """Anim keys actually registered in static/index.html — read dynamically so new
+    animations (declarative ANIMS.key= specs AND the ANIMS{} method shorthand) don't
+    require editing this validator. Falls back to the original set if the file is
+    unreadable, so the gate never crashes on an env issue."""
+    try:
+        html = (pathlib.Path(__file__).parent / "static" / "index.html").read_text()
+    except OSError:
+        return {"square", "grid", "chain", "beta"}
+    keys = set(re.findall(r"ANIMS\.([a-z0-9_]+)\s*=", html))            # ANIMS.key = ...
+    block = re.search(r"const ANIMS\s*=\s*\{(.*?)\n\};", html, re.S)     # the ANIMS{} literal
+    if block:
+        keys |= set(re.findall(r"(?:async\s+)?([a-z0-9_]+)\s*\(cv,ctx\)", block.group(1)))
+    return {k[:-7] if k.endswith("_static") else k for k in keys}
+
+
+_ANIMS = _registered_anims()
 
 
 def err(m):
@@ -68,8 +88,9 @@ def check(pack):
                 err(f"{tag} resource: bad url {r.get('url')}")
             if r.get("type") not in ("video", "interactive", "reading"):
                 err(f"{tag} resource {r.get('label')}: type must be video|interactive|reading")
-        if c.get("anim") and c["anim"] not in ("square", "grid", "chain", "beta"):
-            err(f"{tag}: unknown anim '{c['anim']}' (register it in static/index.html ANIMS first)")
+        if c.get("anim") and c["anim"] not in _ANIMS:
+            err(f"{tag}: unknown anim '{c['anim']}' (register it in static/index.html ANIMS first; "
+                f"known: {', '.join(sorted(_ANIMS))})")
     # P5.17 (iss_8d424360): migration declarations. renamed_concepts maps
     # old-id -> new-id; the TARGET must exist in this pack, the SOURCE must not
     # (it was renamed away). packver.sync_pack migrates concept_state on load.
