@@ -71,23 +71,45 @@ def check(pack):
             if q.get("id") in qids:
                 err(f"{qt}: duplicate question id")
             qids.add(q.get("id"))
-            opts = q.get("options", [])
-            if not (2 <= len(opts) <= 6):
-                err(f"{qt}: {len(opts)} options")
-            a = q.get("answer")
-            if not isinstance(a, int) or not (0 <= a < len(opts)):
-                err(f"{qt}: answer index out of range")
-            fb = q.get("feedback", [])
-            if len(fb) != len(opts):
-                err(f"{qt}: feedback count {len(fb)} != options {len(opts)} — every distractor needs its own explanation")
-            for f in fb:
-                if len(f.strip()) < 15:
-                    err(f"{qt}: feedback too thin ('{f[:30]}…') — explain the misconception")
+            if q.get("type") == "free":
+                # P2.9 free-response (graded by grading.py: numeric | regex | rubric) — no options.
+                if not str(q.get("prompt", "")).strip():
+                    err(f"{qt}: free-response needs a 'prompt'")
+                g = q.get("grading") or {}
+                if g.get("kind") not in ("numeric", "regex", "rubric"):
+                    err(f"{qt}: free grading.kind must be numeric|regex|rubric (got {g.get('kind')!r})")
+                if g.get("kind") in ("numeric", "regex") and "answer" not in g:
+                    err(f"{qt}: free {g.get('kind')} grading needs an 'answer'")
+                if g.get("kind") == "rubric":
+                    # rubric-graded: per-category feedback lives in grading.rubric, so a single
+                    # feedback_incorrect is not required (the rubric supplies it).
+                    if not (g.get("rubric") and all(r.get("feedback") for r in g["rubric"])):
+                        err(f"{qt}: rubric grading needs a 'rubric' with per-category feedback")
+                    if len(str(q.get("feedback_correct", "")).strip()) < 15:
+                        err(f"{qt}: feedback_correct too thin")
+                else:  # numeric | regex — single-shot correct/incorrect feedback
+                    for key in ("feedback_correct", "feedback_incorrect"):
+                        if len(str(q.get(key, "")).strip()) < 15:
+                            err(f"{qt}: {key} too thin — explain the answer/misconception")
+            else:
+                opts = q.get("options", [])
+                if not (2 <= len(opts) <= 6):
+                    err(f"{qt}: {len(opts)} options")
+                a = q.get("answer")
+                if not isinstance(a, int) or not (0 <= a < len(opts)):
+                    err(f"{qt}: answer index out of range")
+                fb = q.get("feedback", [])
+                if len(fb) != len(opts):
+                    err(f"{qt}: feedback count {len(fb)} != options {len(opts)} — every distractor needs its own explanation")
+                for f in fb:
+                    if len(f.strip()) < 15:
+                        err(f"{qt}: feedback too thin ('{f[:30]}…') — explain the misconception")
         for r in c.get("resources", []):
             if not str(r.get("url", "")).startswith("https://") and not str(r.get("url","")).startswith("http://"):
                 err(f"{tag} resource: bad url {r.get('url')}")
-            if r.get("type") not in ("video", "interactive", "reading"):
-                err(f"{tag} resource {r.get('label')}: type must be video|interactive|reading")
+            if r.get("type") not in ("video", "interactive", "reading", "paper", "article", "essay", "book", "docs", "data"):
+                err(f"{tag} resource {r.get('label')}: unknown type {r.get('type')!r} "
+                    "(video|interactive|reading|paper|article|essay|book|docs|data)")
         if c.get("anim") and c["anim"] not in _ANIMS:
             err(f"{tag}: unknown anim '{c['anim']}' (register it in static/index.html ANIMS first; "
                 f"known: {', '.join(sorted(_ANIMS))})")

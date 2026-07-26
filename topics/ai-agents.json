@@ -1,891 +1,891 @@
 {
- "id": "ai-agents",
- "title": "AI Agents",
- "tagline": "What happens when a language model gets hands.",
- "description": "From a model that can only talk to a system that acts: tools, loops, plans, memory, coordination — and the guardrails that keep an acting system honest. The running case study is a real production agent.",
- "concepts": [
-  {
-   "id": "what-is-an-agent",
-   "title": "What makes it an agent",
-   "summary": "Model + tools + a loop + state. The model proposes; the harness executes; the result feeds back.",
-   "cards": [
+  "id": "ai-agents",
+  "title": "AI Agents",
+  "tagline": "What happens when a language model gets hands.",
+  "description": "From a model that can only talk to a system that acts: tools, loops, plans, memory, coordination — and the guardrails that keep an acting system honest. The running case study is a real production agent.",
+  "concepts": [
     {
-     "h": "A chatbot answers. An agent acts.",
-     "md": "Ask a chatbot to 'check whether the backup ran' and it can only tell you *how you might check*. An **agent** runs the command, reads the output, and answers from evidence.\n\nThe difference is not a smarter model — it is **architecture**. An agent is a loop wrapped around a model:\n\n1. The model reads the goal and the state so far.\n2. It proposes an **action** (call a tool, run a query, send a message).\n3. The harness **executes** the action and appends the result.\n4. Repeat until the model decides it is done.\n\nEvery serious agent — coding assistants, research agents, the personal agent this course uses as its case study — is some version of that loop. The model never touches the world directly; it emits *intentions*, and a harness with permissions decides what actually runs."
-    },
-    {
-     "h": "The four load-bearing parts",
-     "md": "Strip any agent to its frame and you find the same four parts:\n\n- **The model** — proposes the next action. Swappable; the frame outlives any given model.\n- **Tools** — the verbs: read a file, query a database, send an email. Each is a typed function the model can request.\n- **The loop** — feeds tool results back so the next proposal is informed by what just happened.\n- **State** — the conversation, tool outputs, and whatever memory persists across turns.\n\nA useful mental test: *where does new information enter?* In a chatbot, only from the user. In an agent, mostly from **tool results** — the world talks back. That feedback channel is what makes agents powerful, and it is also where most of their failure modes live: a wrong tool result, trusted blindly, corrupts everything downstream."
-    },
-    {
-     "h": "Case study: one loop, one hundred verbs",
-     "md": "The case-study agent (a personal quant assistant called DNSR) is a plain Python loop — deliberately **not** a framework. One process reads a Telegram message, builds a prompt with relevant memory, and lets the model call from ~100+ registered tools: market-data queries, email, calendar, portfolio lookups, a web dashboard.\n\nWhy hand-rolled? **Control over the loop is control over safety.** Every tool call passes through one gate that knows each tool's risk level (read-only vs write vs money-adjacent), rate limits, and whether it needs operator confirmation.\n\nThe designers' rule of thumb, learned the hard way: *the part that must not fail should contain no intelligence at all.* Reminders, backups, and alerts run on deterministic schedules — the model composes and reasons, but arithmetic decides when the alarm fires."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "What most fundamentally separates an agent from a chatbot?",
-     "options": [
-      "A larger, smarter language model",
-      "A loop in which the model's proposed actions are executed and the results fed back",
-      "Access to more training data",
-      "A personality and long-term goals"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Model quality helps everything, but a bigger model with no tools and no loop is still just a better talker.",
-      "Right. Act → observe → act again. The feedback loop through the real world is the defining structure.",
-      "Training data shapes what the model knows, not whether it can act on the world.",
-      "Persona is cosmetic. Plenty of agents have no personality at all — schedulers, pipelines, CI bots."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "In a well-designed agent, who actually executes a dangerous action like deleting a file?",
-     "options": [
-      "The model, directly — that's what makes it an agent",
-      "The harness, after checking permissions and possibly requiring confirmation",
-      "The user, always, by hand",
-      "Nobody — agents are read-only by definition"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The model only ever emits a *request*. If the model could act directly, no permission system could ever be trusted.",
-      "Right. The model proposes; the harness disposes. The gate between intention and execution is where safety lives.",
-      "Requiring a human for every action gives up the point of an agent. The design question is *which* actions need a human.",
-      "Agents write, send, and trade in production every day — behind gates, not behind a blanket ban."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why did the case-study agent move reminders OUT of the model's hands onto a deterministic scheduler?",
-     "options": [
-      "The model was too slow to fire alarms on time",
-      "Deterministic code is cheaper to run than model calls",
-      "Every model-dependent hop is a place a critical action can silently fail",
-      "Language models cannot read clocks"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Latency wasn't the issue — a reminder fired two seconds late is fine. A reminder silently *lost* is not.",
-      "True but not the reason. The cost of a model call is trivial next to the cost of a missed deadline.",
-      "Right. A reminder once vanished across three model-dependent hops. The lesson became a design rule: the part that must not fail contains no intelligence.",
-      "Models handle time fine. The problem is reliability of the whole chain, not clock-reading."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Anthropic — Building effective agents",
-     "url": "https://www.anthropic.com/research/building-effective-agents",
-     "type": "article",
-     "note": "The practitioner's taxonomy: workflows vs agents, and why simple composable patterns beat frameworks."
-    },
-    {
-     "label": "Lilian Weng — LLM Powered Autonomous Agents",
-     "url": "https://lilianweng.github.io/posts/2023-06-23-agent/",
-     "type": "article",
-     "note": "The canonical survey: planning, memory, tool use — one long, careful read."
-    }
-   ]
-  },
-  {
-   "id": "tool-use",
-   "title": "Tool use",
-   "summary": "Tools are typed functions the model can request. Schemas tell it how; risk levels decide what happens next.",
-   "cards": [
-    {
-     "h": "How a model calls a function",
-     "md": "A tool is described to the model as a **schema**: a name, a purpose sentence, and typed parameters.\n\n```json\n{\"name\": \"etf_query\",\n \"description\": \"Run a read-only SQL query against the ETF warehouse\",\n \"parameters\": {\"sql\": {\"type\": \"string\"}}}\n```\n\nWhen the model wants the tool, it emits a structured call — `etf_query(sql=\"SELECT ...\")` — instead of prose. The harness validates the arguments against the schema, runs the real function, and appends the result to the conversation.\n\nTwo things follow. First, **the description is an interface contract**: the model chooses tools by reading it, so a vague description produces wrong tool choices. Second, **validation is the harness's job** — the model will sometimes emit malformed or even dangerous arguments, and the schema layer is the first place to catch that."
-    },
-    {
-     "h": "Not all verbs are equal",
-     "md": "Reading a price is not the same risk as sending an email, which is not the same as moving money. Mature agents encode this as **per-tool risk levels**.\n\nThe case-study agent tags every tool: `read-only` tools run freely; `write-local` tools (file writes, DB inserts) run with logging; `write-network` tools (email, messages) pass policy checks — recipient allowlists, rate limits, body caps; anything financial is **recommend-only**: the agent produces an order sheet, a human executes it.\n\nThe pattern generalizes: **capability should be granted per-verb, not per-agent.** An agent with a hundred tools where five are dangerous needs five gates — not blanket trust, not blanket paranoia. And the gate lives in the harness, where the model cannot talk its way past it."
-    },
-    {
-     "h": "The tool result is testimony, not truth",
-     "md": "A subtle failure class: the tool ran fine, but its *output* is wrong or stale — an API served another fund's holdings, a cache went sour, a scraper read a redesigned page.\n\nAgents that treat every tool result as ground truth inherit every upstream data bug. The case-study agent learned this repeatedly: a data vendor once served fund X's holdings under fund Y's name, and only a *cross-write hash guard* (does this payload exactly match another fund's book?) caught it.\n\nDefenses worth copying: **provenance** on every stored result (which source, when), **plausibility gates** at the write door (a $437B claim for a fund reporting $1.77B does not get written), and **verify-before-overwrite** when two sources disagree. The loop makes the model powerful; the guards make the loop trustworthy."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Why does the quality of a tool's description matter so much?",
-     "options": [
-      "It is displayed to end users in the UI",
-      "The model selects and uses tools by reading their descriptions — it is the interface contract",
-      "Longer descriptions make tool calls run faster",
-      "It is legally required documentation"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Users rarely see tool schemas. The reader that matters is the model itself.",
-      "Right. A vague description produces wrong tool choices and malformed arguments. Writing tool descriptions is prompt engineering.",
-      "Description length has no effect on execution speed.",
-      "Nothing legal about it — it's an engineering interface."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "An agent has 100 tools; 5 can move money or send external messages. The sound design is:",
-     "options": [
-      "Require human confirmation for all 100 tools",
-      "Trust the agent fully — it was tested",
-      "Per-tool risk levels: free reads, logged writes, gated or human-executed high-risk verbs",
-      "Remove the 5 dangerous tools entirely"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Blanket confirmation trains the human to click 'yes' without reading — which is worse than fewer, meaningful gates.",
-      "Testing shows presence of capability, not absence of failure. One bad tool call can be unrecoverable.",
-      "Right. Capability per verb: the gate matches the blast radius, and it lives in the harness where the model can't argue with it.",
-      "Sometimes right! But if the capability is needed, the answer is gating — e.g. recommend-only order sheets a human executes."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "A tool call succeeds (no error) and returns data. What can still be wrong?",
-     "options": [
-      "Nothing — a successful call means correct data",
-      "The data itself: stale, mislabeled, or wrong at the source",
-      "Only formatting issues",
-      "Success codes are random, so everything"
-     ],
-     "answer": 1,
-     "feedback": [
-      "A 200 OK means the pipe worked, not that the water is clean. Upstream data bugs arrive with success codes.",
-      "Right. A vendor once served one fund's holdings under another fund's name — clean call, poisoned payload. Provenance and plausibility gates exist for exactly this.",
-      "Formatting is the easy case — schemas catch it. The hard case is well-formed wrong data.",
-      "Success codes are meaningful; the point is they certify transport, not truth."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Schick et al. — Toolformer (arXiv)",
-     "url": "https://arxiv.org/abs/2302.04761",
-     "type": "paper",
-     "note": "The research moment tool-calling became mainstream: models teaching themselves when to call APIs."
-    },
-    {
-     "label": "Model Context Protocol",
-     "url": "https://modelcontextprotocol.io/",
-     "type": "docs",
-     "note": "The emerging open standard for exposing tools to any agent — schemas, servers, permissions."
-    }
-   ]
-  },
-  {
-   "id": "the-agentic-loop",
-   "title": "The reasoning loop",
-   "summary": "ReAct: interleave thinking and acting, observation by observation — and know when to stop.",
-   "cards": [
-    {
-     "h": "Reason, act, observe, repeat",
-     "md": "The pattern that unlocked modern agents is embarrassingly simple. Instead of asking a model to answer in one shot, you let it alternate:\n\n**Thought:** 'The question needs the fund's expense ratio — I should query the warehouse.'\n**Action:** `etf_query(...)`\n**Observation:** `0.19%`\n**Thought:** 'Now I can compare it against the category median...'\n\nThis is **ReAct** (Reason + Act, Yao et al. 2022). Its power comes from *grounding*: each reasoning step conditions on real observations rather than on the model's guesses. The model doesn't have to know the expense ratio — it has to know **how to find it**, which is a much easier and much more reliable skill.\n\nThe practical consequence: an agent's competence is bounded less by what its model memorized and more by what its tools can reach."
-    },
-    {
-     "h": "Termination: the underrated hard problem",
-     "md": "A loop needs a reason to stop. Agents fail at both ends:\n\n- **Stopping too early** — answering from memory when one more tool call would have grounded the claim.\n- **Not stopping** — re-trying a failing action forever, or wandering through irrelevant tool calls, burning budget.\n\nProduction agents bound the loop three ways: **step budgets** (max tool calls per turn), **cost budgets** (tokens/dollars), and **progress checks** (is the latest observation new information, or are we circling?). The case-study agent adds per-task-type budgets — a quick lookup gets a small budget; a research task gets a big one.\n\nDesign intuition: budgets are not just cost control. A model that knows it has three calls left *prioritizes differently* — scarcity forces the plan to surface."
-    },
-    {
-     "h": "Failure inside the loop is information",
-     "md": "In a one-shot system, an error is the end. In a loop, an error is an **observation** — often the most informative one.\n\nA tool returns 'no such table'? The agent lists tables and corrects the name. A rate limit? Wait and retry, or switch sources. The file doesn't exist? Search for where it moved.\n\nThis is why agents feel qualitatively different from chatbots in practice: they **debug their own attempts**. The skill of using error text as a steering signal — read the message, form a hypothesis, adjust — is most of what separates a capable agent from a flailing one.\n\nBut note the precondition: errors must *reach* the loop honestly. A harness that swallows failures and returns something error-shaped-but-vague ('task failed') robs the model of exactly the signal it needs. Honest plumbing is an intelligence multiplier."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Why does the ReAct pattern reduce hallucination compared with one-shot answering?",
-     "options": [
-      "Interleaved reasoning steps make the model more careful by nature",
-      "Each reasoning step can condition on real observations from tools instead of the model's guesses",
-      "It uses more tokens, and more tokens mean more accuracy",
-      "It doesn't — ReAct is about speed"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The care isn't in the model's nature — it's in the structure: claims get checked against the world as it goes.",
-      "Right. The model needs to know how to FIND facts, not to have memorized them. Retrieval-grounded steps beat recalled 'facts'.",
-      "Token count alone buys nothing. Grounding is what changes: guesses get replaced by observations.",
-      "ReAct is usually slower than one-shot. The win is reliability, not latency."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "An agent keeps calling the same failing API with the same arguments, 40 times. What design element is missing?",
-     "options": [
-      "A bigger model",
-      "Progress checks and budgets that bound the loop",
-      "More tools to choose from",
-      "A friendlier error message from the API"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Even strong models loop when nothing in the harness measures progress. This is a loop-design bug, not an IQ bug.",
-      "Right. Step budgets, cost budgets, and 'is this observation new information?' checks are the brakes a loop needs.",
-      "More options don't help an agent that isn't noticing it's stuck.",
-      "Clearer errors help the first retry. The 40th identical retry is a missing-brakes problem."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why is a harness that silently swallows tool errors ('task failed, moving on') harmful to agent quality?",
-     "options": [
-      "It slows down execution",
-      "Error text is the steering signal the model uses to debug its next attempt — hiding it removes the signal",
-      "It makes logs larger",
-      "It isn't harmful; errors just upset the model"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Speed is unaffected — quality is what dies.",
-      "Right. 'No such table: etf_metric' tells the model exactly what to fix. 'Task failed' teaches it nothing. Honest plumbing is an intelligence multiplier.",
-      "Log size is irrelevant here.",
-      "Models don't get upset — they get uninformed, which is worse."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Yao et al. — ReAct: Synergizing Reasoning and Acting (arXiv)",
-     "url": "https://arxiv.org/abs/2210.03629",
-     "type": "paper",
-     "note": "The loop that defines modern agents, in its original form. Skim §2 for the pattern."
-    }
-   ],
-   "anim": "react_loop"
-  },
-  {
-   "id": "planning",
-   "title": "Planning and decomposition",
-   "summary": "Big tasks need structure: plan-then-execute, interleaved planning, and the art of right-sized steps.",
-   "cards": [
-    {
-     "h": "Two planning styles",
-     "md": "**Plan-then-execute:** the agent writes a full plan up front ('1. fetch the data, 2. clean it, 3. run the comparison, 4. write the report'), then works through it. Predictable, auditable, easy to show a human for approval — but brittle when step 2 reveals that the plan was wrong.\n\n**Interleaved planning** (the ReAct default): plan only as far as the next action; re-plan after every observation. Adaptive — but can lose the thread on long tasks and wander.\n\nProduction systems blend them: a **coarse plan** for shape and approval, **fine-grained interleaving** inside each step. The case-study agent's build pipeline does exactly this — an approved objective and staged milestones on the outside, free tool-by-tool adaptation inside each stage.\n\nRule of thumb: plan at the level where surprises are rare; interleave at the level where they are common."
-    },
-    {
-     "h": "Decomposition is where quality is won",
-     "md": "Ask an agent to 'audit the database' and you get shallow coverage of everything. Ask it to run **twelve named checks** — duplicate identifiers, shared prospectus URLs, cloned holdings, impossible inception dates... — and you get depth on each.\n\nDecomposition converts one vague goal into many verifiable sub-goals. Each sub-goal gets its own success criterion, which means failures localize: check #7 failed, the rest stand.\n\nThis is also the honest-reporting trick: a decomposed task can report **partial success truthfully** ('11 of 12 checks clean; holdings-clone found 2 pairs'). A monolithic task can only report vibes. When you see an agent produce a crisp, itemized result, the quality was usually won at decomposition time, not at answer time."
-    },
-    {
-     "h": "Plans meet budgets",
-     "md": "Every plan is implicitly a spend: tool calls, tokens, minutes. Mature agents make it explicit.\n\nThe case-study system routes tasks by **type**, and each type carries a budget: a market-data lookup gets a handful of calls on a fast local model; a nightly research study may get hours on a large one. When a task starts blowing through its budget, that itself is a signal — either the task was misclassified, or it is stuck.\n\nA subtler point: **budget shapes behavior**. Agents given unlimited steps procrastinate — verifying trivia, re-checking done work. Agents with tight budgets skip verification they should have done. Somewhere between is a budget that forces prioritization without forcing corner-cutting; finding it per task-type is real tuning work, not a default you can guess."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "When is plan-then-execute the wrong choice?",
-     "options": [
-      "When the task needs human approval before starting",
-      "When early steps are likely to reveal information that invalidates later steps",
-      "When the task has more than three steps",
-      "It is never wrong — planning always helps"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Approval is exactly where up-front plans shine — a human can read the plan before anything runs.",
-      "Right. If step 2's observation routinely rewrites steps 3-6, plan at coarse grain and interleave the detail.",
-      "Step count alone doesn't decide it — predictability of the terrain does.",
-      "A rigid plan over surprising terrain is actively worse than adaptive stepping."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why does decomposing 'audit the database' into 12 named checks improve honesty, not just quality?",
-     "options": [
-      "Smaller prompts are cheaper",
-      "Each check has its own pass/fail, so the agent can report partial results truthfully instead of vibes",
-      "It prevents the model from seeing the whole database",
-      "Twelve is a lucky number in QA"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Cheaper, sometimes — but that's economics, not honesty.",
-      "Right. '11 of 12 clean, holdings-clone found 2 pairs' is checkable. 'The database looks fine' is not.",
-      "Scope control isn't the point; verifiable sub-goals are.",
-      "If only."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "An agent with an unlimited step budget tends to:",
-     "options": [
-      "Perform identically to a budgeted one, just cheaper",
-      "Fail immediately",
-      "Procrastinate — re-verify done work and polish trivia, because nothing forces prioritization",
-      "Always find better answers"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Behavior actually changes with budget — scarcity is a forcing function.",
-      "No — it fails slowly, which is more expensive.",
-      "Right. Budgets aren't just cost control; a model that knows it has three calls left plans differently.",
-      "More steps past the useful point add cost and stale-context risk, not quality."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Anthropic — Building effective agents (workflows section)",
-     "url": "https://www.anthropic.com/research/building-effective-agents",
-     "type": "article",
-     "note": "Prompt-chaining, routing, orchestrator-workers — the decomposition patterns, named."
-    }
-   ]
-  },
-  {
-   "id": "memory",
-   "title": "Memory",
-   "summary": "Context is rented, memory is owned: what to persist, how to retrieve it, and why write-time beats read-time.",
-   "cards": [
-    {
-     "h": "The context window is not memory",
-     "md": "A model's context window is **working memory**: whatever fits, it can use; the moment the conversation ends (or overflows), it is gone. Agents that 'remember' do so with an external store the harness consults.\n\nThe standard split:\n\n- **Short-term:** the current conversation + recent tool results. Free, automatic, evaporates.\n- **Long-term:** facts worth keeping — preferences, decisions, verdicts, past failures. Must be *deliberately written* and *deliberately retrieved*.\n\nThe deliberate part is the design problem. Store everything and retrieval drowns in noise; store too little and the agent re-asks what it was told last week. The working answer in most production agents: store **conclusions, not transcripts** — the verdict with its evidence pointer, not the 40-message conversation that produced it."
-    },
-    {
-     "h": "Retrieval: the memory is only as good as the lookup",
-     "md": "A memory nobody can find is a memory that doesn't exist. The two dominant retrieval styles:\n\n- **Keyword / full-text search:** exact and predictable — great when your vocabulary is stable ('TC-1c', 'Convex Core').\n- **Embedding similarity:** finds semantically related notes with different wording — and also finds seductive near-matches that are actually irrelevant.\n\nThe case-study agent audited its own 'memory misses' and found something instructive: the search engine was fine — the misses were **wrong-tool choices** (the model didn't search at all) and **content gaps** (the fact was never written down). They kept plain FTS and rejected a fancier hybrid, because without a relevance floor, semantic search mostly added noise.\n\nMoral: before upgrading the search algorithm, measure *why* recall fails. It is usually the write side, not the read side."
-    },
-    {
-     "h": "Write-time discipline: cite or it didn't happen",
-     "md": "The nastiest memory failure is not forgetting — it is **remembering something false**. An agent that writes a wrong 'fact' to memory will confidently repeat it for months.\n\nThe case-study system was burned exactly once: the agent wrote a fabricated note into its knowledge vault. The fix was structural, not hopeful: **every durable note must cite a checkable source** — a file, a commit, an email id — and an automatic audit rejects notes whose numbers don't appear in the cited artifact. A note the audit cannot open is treated as indistinguishable from a fabricated one.\n\nGeneral principle: memory quality is enforced at **write time**, when the evidence is at hand — not at read time, when the evidence is long gone and the note just looks authoritative."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Why do production agents store 'conclusions, not transcripts' in long-term memory?",
-     "options": [
-      "Transcripts are legally sensitive",
-      "Retrieval quality: a concise verdict with an evidence pointer is findable and reusable; 40 raw messages are noise",
-      "Storage is expensive",
-      "Models are not allowed to read old conversations"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Sensitivity varies, but that's a different policy question.",
-      "Right. The failure mode of store-everything is drowned retrieval. Memory is a curation problem before it is a storage problem.",
-      "Text is cheap. Attention — at retrieval time — is what's scarce.",
-      "They can; it's just rarely the best use of context."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The case-study team audited memory 'misses' and found the search engine was fine. What were the real causes?",
-     "options": [
-      "Hardware failures corrupting the index",
-      "Wrong-tool choices (never searched) and content gaps (never written) — write-side and routing problems",
-      "The embeddings were too small",
-      "Users asking unanswerable questions"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The index was healthy — the audit checked.",
-      "Right. Their fix was steering (when to search) and write discipline (what to store) — and they deliberately REJECTED a fancier hybrid search that would have added noise.",
-      "They weren't using embeddings — plain full-text search, kept on purpose.",
-      "The questions were answerable; the facts just weren't stored or weren't looked for."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why enforce memory quality at WRITE time (citations, audits) instead of read time?",
-     "options": [
-      "Writing happens less often, so it's cheaper to check there",
-      "At write time the evidence is at hand and checkable; at read time a false note just looks authoritative",
-      "Read-time checks would slow down conversations",
-      "It's arbitrary — either works"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Frequency helps, but that's not the core reason.",
-      "Right. A note that cites a commit can be audited the moment it's written. Months later, a confident-sounding note is nearly impossible to falsify in-flight.",
-      "Latency is a minor factor next to falsifiability.",
-      "They are not symmetric: evidence decays. Write-time is when the receipt exists."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Lilian Weng — Agents survey, memory section",
-     "url": "https://lilianweng.github.io/posts/2023-06-23-agent/",
-     "type": "article",
-     "note": "Short/long-term memory and retrieval, placed in the full agent architecture."
-    }
-   ]
-  },
-  {
-   "id": "grounding",
-   "title": "Grounding and hallucination",
-   "summary": "An acting system must not invent facts. Grounding ties every claim to a tool result — mechanically, not aspirationally.",
-   "cards": [
-    {
-     "h": "Hallucination gets expensive when systems act",
-     "md": "In a chatbot, a made-up number is embarrassing. In an agent, it can become an **action**: an email sent to the wrong person with wrong figures, an order sheet with an invented price, a 'confirmed' backup that never ran.\n\nThe root cause is unchanged — a language model is a plausibility machine, and plausible-but-false is its natural failure mode. What changes with agents is the **remedy**: because the agent has tools, every factual claim *can in principle be traced to a tool result*. Grounding is the discipline of making that tracing real.\n\nWeak grounding: 'the model usually checks.' Strong grounding: the harness **verifies mechanically** that the numbers in the answer actually appeared in the evidence — and blocks the reply when they didn't."
-    },
-    {
-     "h": "Case study: a guard that reads every reply",
-     "md": "The case-study agent runs an anti-fabrication guard on financial responses. The idea is simple and brutal: build a **grounding pool** — every number that appeared in this turn's tool results (plus numbers the user themselves supplied) — then scan the model's reply for numeric claims. A number with no source in the pool blocks the reply.\n\nWhat production taught them:\n\n- **False positives are the real war.** CSS colors (`#666`), years, tickers-that-look-like-numbers — each needed an explicit carve-out, found by replaying blocked turns.\n- **The guard needs an escalation path**, not just a wall: a blocked turn can retry with a hint ('ground the numbers or drop them').\n- Verdicts like 'this subtotal is wrong' were sometimes the *guard being right* against a confidently wrong model — the audit trail settles the argument."
-    },
-    {
-     "h": "Verify claims the way an auditor would",
-     "md": "Grounding numbers is the mechanical layer. Above it sits a broader honesty discipline for agent claims:\n\n- **'It works' requires a run.** An agent claiming success on a task it never executed is the same failure as a fabricated number. The case-study system added a sentinel: a turn that claims completion with zero tool calls gets flagged.\n- **'It's fixed' requires the failing case to pass.** Re-run the exact reproduction, not a vibe-check.\n- **'The data says X' requires the query to be shown.** Answers that cite their own evidence can be re-checked later; answers that don't are folklore in a week.\n\nThe pattern across all three: convert claims into **checkable artifacts**. An agent whose statements come with receipts can be trusted with bigger verbs; one whose statements don't, cannot — no matter how smart its model is."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Why is hallucination strictly more dangerous in an agent than in a chatbot?",
-     "options": [
-      "Agents hallucinate more often",
-      "A fabricated fact can become an executed action — an email, an order, a config change",
-      "Agent hallucinations are harder to detect by reading",
-      "It isn't — same risk, same stakes"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Rates are similar for the same model; the *consequences* differ.",
-      "Right. Action converts a wrong belief into a wrong state of the world. That's why grounding must be mechanical, not aspirational.",
-      "Detection is comparable; blast radius is not.",
-      "The stakes change the moment claims drive actions."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The case-study fabrication guard blocks replies containing numbers absent from the grounding pool. What was the hardest ongoing engineering problem?",
-     "options": [
-      "The guard was too slow",
-      "False positives — legitimate numbers (CSS colors, years) misread as ungrounded claims",
-      "The model learned to evade the guard",
-      "Nobody could read the guard's code"
-     ],
-     "answer": 1,
-     "feedback": [
-      "A regex pass over a reply is microseconds.",
-      "Right. Guards live or die on FP rate: every false block erodes trust in the guard. They replayed blocked turns to find and carve out each FP class.",
-      "The model doesn't see the guard to game it — it's harness-side.",
-      "It's a small, auditable module — that's rather the point."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "An agent reports 'done ✅' on a task, and the log shows zero tool calls that turn. What is the correct system response?",
-     "options": [
-      "Trust it — the model probably remembered the task was easy",
-      "Flag it: a completion claim with no actions is the action-shaped version of a fabricated number",
-      "Ask the model if it is sure",
-      "Lower the temperature"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Tasks don't complete themselves. Zero actions + a success claim is the signature of a confabulated completion.",
-      "Right. The case-study system calls this the silent-failure gate: no false '✅ complete' on zero-tool turns.",
-      "The model that fabricated the claim will happily confirm it.",
-      "Temperature tweaks don't fix structural honesty gaps."
-     ]
-    },
-    {
-     "id": "q4-free",
-     "type": "free",
-     "prompt": "In one or two sentences: why is a successful tool call's output 'testimony, not truth'?",
-     "grading": {
-      "kind": "rubric",
-      "model_answer": "A success code certifies the transport, not the content — the data can still be stale, mislabeled, or wrong at the source, so it must be treated as a claim to check (provenance, plausibility) rather than ground truth.",
-      "rubric": [
-       {
-        "category": "transport-vs-content",
-        "expects": "confuses 'the call worked' with 'the data is right'",
-        "feedback": "The key split is transport vs content: a 200 OK certifies the pipe, not the water."
-       },
-       {
-        "category": "no-failure-mode",
-        "expects": "asserts tools are reliable so output can be trusted",
-        "feedback": "Upstream sources DO serve wrong data with clean success codes — the case study's vendor served one fund's holdings under another fund's name."
-       },
-       {
-        "category": "off-topic",
-        "expects": "answers about something else (hallucination, latency…)",
-        "feedback": "This one isn't about the model hallucinating — it's about the TOOL's data being wrong while the call succeeds."
-       }
+      "id": "what-is-an-agent",
+      "title": "What makes it an agent",
+      "summary": "Model + tools + a loop + state. The model proposes; the harness executes; the result feeds back.",
+      "cards": [
+        {
+          "h": "A chatbot answers. An agent acts.",
+          "md": "Ask a chatbot to 'check whether the backup ran' and it can only tell you *how you might check*. An **agent** runs the command, reads the output, and answers from evidence.\n\nThe difference is not a smarter model — it is **architecture**. An agent is a loop wrapped around a model:\n\n1. The model reads the goal and the state so far.\n2. It proposes an **action** (call a tool, run a query, send a message).\n3. The harness **executes** the action and appends the result.\n4. Repeat until the model decides it is done.\n\nEvery serious agent — coding assistants, research agents, the personal agent this course uses as its case study — is some version of that loop. The model never touches the world directly; it emits *intentions*, and a harness with permissions decides what actually runs."
+        },
+        {
+          "h": "The four load-bearing parts",
+          "md": "Strip any agent to its frame and you find the same four parts:\n\n- **The model** — proposes the next action. Swappable; the frame outlives any given model.\n- **Tools** — the verbs: read a file, query a database, send an email. Each is a typed function the model can request.\n- **The loop** — feeds tool results back so the next proposal is informed by what just happened.\n- **State** — the conversation, tool outputs, and whatever memory persists across turns.\n\nA useful mental test: *where does new information enter?* In a chatbot, only from the user. In an agent, mostly from **tool results** — the world talks back. That feedback channel is what makes agents powerful, and it is also where most of their failure modes live: a wrong tool result, trusted blindly, corrupts everything downstream."
+        },
+        {
+          "h": "Case study: one loop, one hundred verbs",
+          "md": "The case-study agent (a personal quant assistant called DNSR) is a plain Python loop — deliberately **not** a framework. One process reads a Telegram message, builds a prompt with relevant memory, and lets the model call from ~100+ registered tools: market-data queries, email, calendar, portfolio lookups, a web dashboard.\n\nWhy hand-rolled? **Control over the loop is control over safety.** Every tool call passes through one gate that knows each tool's risk level (read-only vs write vs money-adjacent), rate limits, and whether it needs operator confirmation.\n\nThe designers' rule of thumb, learned the hard way: *the part that must not fail should contain no intelligence at all.* Reminders, backups, and alerts run on deterministic schedules — the model composes and reasons, but arithmetic decides when the alarm fires."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What most fundamentally separates an agent from a chatbot?",
+          "options": [
+            "A larger, smarter language model",
+            "A loop in which the model's proposed actions are executed and the results fed back",
+            "Access to more training data",
+            "A personality and long-term goals"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Model quality helps everything, but a bigger model with no tools and no loop is still just a better talker.",
+            "Right. Act → observe → act again. The feedback loop through the real world is the defining structure.",
+            "Training data shapes what the model knows, not whether it can act on the world.",
+            "Persona is cosmetic. Plenty of agents have no personality at all — schedulers, pipelines, CI bots."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In a well-designed agent, who actually executes a dangerous action like deleting a file?",
+          "options": [
+            "The model, directly — that's what makes it an agent",
+            "The harness, after checking permissions and possibly requiring confirmation",
+            "The user, always, by hand",
+            "Nobody — agents are read-only by definition"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The model only ever emits a *request*. If the model could act directly, no permission system could ever be trusted.",
+            "Right. The model proposes; the harness disposes. The gate between intention and execution is where safety lives.",
+            "Requiring a human for every action gives up the point of an agent. The design question is *which* actions need a human.",
+            "Agents write, send, and trade in production every day — behind gates, not behind a blanket ban."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why did the case-study agent move reminders OUT of the model's hands onto a deterministic scheduler?",
+          "options": [
+            "The model was too slow to fire alarms on time",
+            "Deterministic code is cheaper to run than model calls",
+            "Every model-dependent hop is a place a critical action can silently fail",
+            "Language models cannot read clocks"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Latency wasn't the issue — a reminder fired two seconds late is fine. A reminder silently *lost* is not.",
+            "True but not the reason. The cost of a model call is trivial next to the cost of a missed deadline.",
+            "Right. A reminder once vanished across three model-dependent hops. The lesson became a design rule: the part that must not fail contains no intelligence.",
+            "Models handle time fine. The problem is reliability of the whole chain, not clock-reading."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Anthropic — Building effective agents",
+          "url": "https://www.anthropic.com/research/building-effective-agents",
+          "type": "article",
+          "note": "The practitioner's taxonomy: workflows vs agents, and why simple composable patterns beat frameworks."
+        },
+        {
+          "label": "Lilian Weng — LLM Powered Autonomous Agents",
+          "url": "https://lilianweng.github.io/posts/2023-06-23-agent/",
+          "type": "article",
+          "note": "The canonical survey: planning, memory, tool use — one long, careful read."
+        }
       ]
-     },
-     "feedback_correct": "Exactly — success codes certify transport; content needs its own checks.",
-     "feedback_incorrect": ""
+    },
+    {
+      "id": "tool-use",
+      "title": "Tool use",
+      "summary": "Tools are typed functions the model can request. Schemas tell it how; risk levels decide what happens next.",
+      "cards": [
+        {
+          "h": "How a model calls a function",
+          "md": "A tool is described to the model as a **schema**: a name, a purpose sentence, and typed parameters.\n\n```json\n{\"name\": \"etf_query\",\n \"description\": \"Run a read-only SQL query against the ETF warehouse\",\n \"parameters\": {\"sql\": {\"type\": \"string\"}}}\n```\n\nWhen the model wants the tool, it emits a structured call — `etf_query(sql=\"SELECT ...\")` — instead of prose. The harness validates the arguments against the schema, runs the real function, and appends the result to the conversation.\n\nTwo things follow. First, **the description is an interface contract**: the model chooses tools by reading it, so a vague description produces wrong tool choices. Second, **validation is the harness's job** — the model will sometimes emit malformed or even dangerous arguments, and the schema layer is the first place to catch that."
+        },
+        {
+          "h": "Not all verbs are equal",
+          "md": "Reading a price is not the same risk as sending an email, which is not the same as moving money. Mature agents encode this as **per-tool risk levels**.\n\nThe case-study agent tags every tool: `read-only` tools run freely; `write-local` tools (file writes, DB inserts) run with logging; `write-network` tools (email, messages) pass policy checks — recipient allowlists, rate limits, body caps; anything financial is **recommend-only**: the agent produces an order sheet, a human executes it.\n\nThe pattern generalizes: **capability should be granted per-verb, not per-agent.** An agent with a hundred tools where five are dangerous needs five gates — not blanket trust, not blanket paranoia. And the gate lives in the harness, where the model cannot talk its way past it."
+        },
+        {
+          "h": "The tool result is testimony, not truth",
+          "md": "A subtle failure class: the tool ran fine, but its *output* is wrong or stale — an API served another fund's holdings, a cache went sour, a scraper read a redesigned page.\n\nAgents that treat every tool result as ground truth inherit every upstream data bug. The case-study agent learned this repeatedly: a data vendor once served fund X's holdings under fund Y's name, and only a *cross-write hash guard* (does this payload exactly match another fund's book?) caught it.\n\nDefenses worth copying: **provenance** on every stored result (which source, when), **plausibility gates** at the write door (a $437B claim for a fund reporting $1.77B does not get written), and **verify-before-overwrite** when two sources disagree. The loop makes the model powerful; the guards make the loop trustworthy."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why does the quality of a tool's description matter so much?",
+          "options": [
+            "It is displayed to end users in the UI",
+            "The model selects and uses tools by reading their descriptions — it is the interface contract",
+            "Longer descriptions make tool calls run faster",
+            "It is legally required documentation"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Users rarely see tool schemas. The reader that matters is the model itself.",
+            "Right. A vague description produces wrong tool choices and malformed arguments. Writing tool descriptions is prompt engineering.",
+            "Description length has no effect on execution speed.",
+            "Nothing legal about it — it's an engineering interface."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "An agent has 100 tools; 5 can move money or send external messages. The sound design is:",
+          "options": [
+            "Require human confirmation for all 100 tools",
+            "Trust the agent fully — it was tested",
+            "Per-tool risk levels: free reads, logged writes, gated or human-executed high-risk verbs",
+            "Remove the 5 dangerous tools entirely"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Blanket confirmation trains the human to click 'yes' without reading — which is worse than fewer, meaningful gates.",
+            "Testing shows presence of capability, not absence of failure. One bad tool call can be unrecoverable.",
+            "Right. Capability per verb: the gate matches the blast radius, and it lives in the harness where the model can't argue with it.",
+            "Sometimes right! But if the capability is needed, the answer is gating — e.g. recommend-only order sheets a human executes."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A tool call succeeds (no error) and returns data. What can still be wrong?",
+          "options": [
+            "Nothing — a successful call means correct data",
+            "The data itself: stale, mislabeled, or wrong at the source",
+            "Only formatting issues",
+            "Success codes are random, so everything"
+          ],
+          "answer": 1,
+          "feedback": [
+            "A 200 OK means the pipe worked, not that the water is clean. Upstream data bugs arrive with success codes.",
+            "Right. A vendor once served one fund's holdings under another fund's name — clean call, poisoned payload. Provenance and plausibility gates exist for exactly this.",
+            "Formatting is the easy case — schemas catch it. The hard case is well-formed wrong data.",
+            "Success codes are meaningful; the point is they certify transport, not truth."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Schick et al. — Toolformer (arXiv)",
+          "url": "https://arxiv.org/abs/2302.04761",
+          "type": "paper",
+          "note": "The research moment tool-calling became mainstream: models teaching themselves when to call APIs."
+        },
+        {
+          "label": "Model Context Protocol",
+          "url": "https://modelcontextprotocol.io/",
+          "type": "docs",
+          "note": "The emerging open standard for exposing tools to any agent — schemas, servers, permissions."
+        }
+      ]
+    },
+    {
+      "id": "the-agentic-loop",
+      "title": "The reasoning loop",
+      "summary": "ReAct: interleave thinking and acting, observation by observation — and know when to stop.",
+      "cards": [
+        {
+          "h": "Reason, act, observe, repeat",
+          "md": "The pattern that unlocked modern agents is embarrassingly simple. Instead of asking a model to answer in one shot, you let it alternate:\n\n**Thought:** 'The question needs the fund's expense ratio — I should query the warehouse.'\n**Action:** `etf_query(...)`\n**Observation:** `0.19%`\n**Thought:** 'Now I can compare it against the category median...'\n\nThis is **ReAct** (Reason + Act, Yao et al. 2022). Its power comes from *grounding*: each reasoning step conditions on real observations rather than on the model's guesses. The model doesn't have to know the expense ratio — it has to know **how to find it**, which is a much easier and much more reliable skill.\n\nThe practical consequence: an agent's competence is bounded less by what its model memorized and more by what its tools can reach."
+        },
+        {
+          "h": "Termination: the underrated hard problem",
+          "md": "A loop needs a reason to stop. Agents fail at both ends:\n\n- **Stopping too early** — answering from memory when one more tool call would have grounded the claim.\n- **Not stopping** — re-trying a failing action forever, or wandering through irrelevant tool calls, burning budget.\n\nProduction agents bound the loop three ways: **step budgets** (max tool calls per turn), **cost budgets** (tokens/dollars), and **progress checks** (is the latest observation new information, or are we circling?). The case-study agent adds per-task-type budgets — a quick lookup gets a small budget; a research task gets a big one.\n\nDesign intuition: budgets are not just cost control. A model that knows it has three calls left *prioritizes differently* — scarcity forces the plan to surface."
+        },
+        {
+          "h": "Failure inside the loop is information",
+          "md": "In a one-shot system, an error is the end. In a loop, an error is an **observation** — often the most informative one.\n\nA tool returns 'no such table'? The agent lists tables and corrects the name. A rate limit? Wait and retry, or switch sources. The file doesn't exist? Search for where it moved.\n\nThis is why agents feel qualitatively different from chatbots in practice: they **debug their own attempts**. The skill of using error text as a steering signal — read the message, form a hypothesis, adjust — is most of what separates a capable agent from a flailing one.\n\nBut note the precondition: errors must *reach* the loop honestly. A harness that swallows failures and returns something error-shaped-but-vague ('task failed') robs the model of exactly the signal it needs. Honest plumbing is an intelligence multiplier."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why does the ReAct pattern reduce hallucination compared with one-shot answering?",
+          "options": [
+            "Interleaved reasoning steps make the model more careful by nature",
+            "Each reasoning step can condition on real observations from tools instead of the model's guesses",
+            "It uses more tokens, and more tokens mean more accuracy",
+            "It doesn't — ReAct is about speed"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The care isn't in the model's nature — it's in the structure: claims get checked against the world as it goes.",
+            "Right. The model needs to know how to FIND facts, not to have memorized them. Retrieval-grounded steps beat recalled 'facts'.",
+            "Token count alone buys nothing. Grounding is what changes: guesses get replaced by observations.",
+            "ReAct is usually slower than one-shot. The win is reliability, not latency."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "An agent keeps calling the same failing API with the same arguments, 40 times. What design element is missing?",
+          "options": [
+            "A bigger model",
+            "Progress checks and budgets that bound the loop",
+            "More tools to choose from",
+            "A friendlier error message from the API"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Even strong models loop when nothing in the harness measures progress. This is a loop-design bug, not an IQ bug.",
+            "Right. Step budgets, cost budgets, and 'is this observation new information?' checks are the brakes a loop needs.",
+            "More options don't help an agent that isn't noticing it's stuck.",
+            "Clearer errors help the first retry. The 40th identical retry is a missing-brakes problem."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why is a harness that silently swallows tool errors ('task failed, moving on') harmful to agent quality?",
+          "options": [
+            "It slows down execution",
+            "Error text is the steering signal the model uses to debug its next attempt — hiding it removes the signal",
+            "It makes logs larger",
+            "It isn't harmful; errors just upset the model"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Speed is unaffected — quality is what dies.",
+            "Right. 'No such table: etf_metric' tells the model exactly what to fix. 'Task failed' teaches it nothing. Honest plumbing is an intelligence multiplier.",
+            "Log size is irrelevant here.",
+            "Models don't get upset — they get uninformed, which is worse."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Yao et al. — ReAct: Synergizing Reasoning and Acting (arXiv)",
+          "url": "https://arxiv.org/abs/2210.03629",
+          "type": "paper",
+          "note": "The loop that defines modern agents, in its original form. Skim §2 for the pattern."
+        }
+      ],
+      "anim": "react_loop"
+    },
+    {
+      "id": "planning",
+      "title": "Planning and decomposition",
+      "summary": "Big tasks need structure: plan-then-execute, interleaved planning, and the art of right-sized steps.",
+      "cards": [
+        {
+          "h": "Two planning styles",
+          "md": "**Plan-then-execute:** the agent writes a full plan up front ('1. fetch the data, 2. clean it, 3. run the comparison, 4. write the report'), then works through it. Predictable, auditable, easy to show a human for approval — but brittle when step 2 reveals that the plan was wrong.\n\n**Interleaved planning** (the ReAct default): plan only as far as the next action; re-plan after every observation. Adaptive — but can lose the thread on long tasks and wander.\n\nProduction systems blend them: a **coarse plan** for shape and approval, **fine-grained interleaving** inside each step. The case-study agent's build pipeline does exactly this — an approved objective and staged milestones on the outside, free tool-by-tool adaptation inside each stage.\n\nRule of thumb: plan at the level where surprises are rare; interleave at the level where they are common."
+        },
+        {
+          "h": "Decomposition is where quality is won",
+          "md": "Ask an agent to 'audit the database' and you get shallow coverage of everything. Ask it to run **twelve named checks** — duplicate identifiers, shared prospectus URLs, cloned holdings, impossible inception dates... — and you get depth on each.\n\nDecomposition converts one vague goal into many verifiable sub-goals. Each sub-goal gets its own success criterion, which means failures localize: check #7 failed, the rest stand.\n\nThis is also the honest-reporting trick: a decomposed task can report **partial success truthfully** ('11 of 12 checks clean; holdings-clone found 2 pairs'). A monolithic task can only report vibes. When you see an agent produce a crisp, itemized result, the quality was usually won at decomposition time, not at answer time."
+        },
+        {
+          "h": "Plans meet budgets",
+          "md": "Every plan is implicitly a spend: tool calls, tokens, minutes. Mature agents make it explicit.\n\nThe case-study system routes tasks by **type**, and each type carries a budget: a market-data lookup gets a handful of calls on a fast local model; a nightly research study may get hours on a large one. When a task starts blowing through its budget, that itself is a signal — either the task was misclassified, or it is stuck.\n\nA subtler point: **budget shapes behavior**. Agents given unlimited steps procrastinate — verifying trivia, re-checking done work. Agents with tight budgets skip verification they should have done. Somewhere between is a budget that forces prioritization without forcing corner-cutting; finding it per task-type is real tuning work, not a default you can guess."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "When is plan-then-execute the wrong choice?",
+          "options": [
+            "When the task needs human approval before starting",
+            "When early steps are likely to reveal information that invalidates later steps",
+            "When the task has more than three steps",
+            "It is never wrong — planning always helps"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Approval is exactly where up-front plans shine — a human can read the plan before anything runs.",
+            "Right. If step 2's observation routinely rewrites steps 3-6, plan at coarse grain and interleave the detail.",
+            "Step count alone doesn't decide it — predictability of the terrain does.",
+            "A rigid plan over surprising terrain is actively worse than adaptive stepping."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why does decomposing 'audit the database' into 12 named checks improve honesty, not just quality?",
+          "options": [
+            "Smaller prompts are cheaper",
+            "Each check has its own pass/fail, so the agent can report partial results truthfully instead of vibes",
+            "It prevents the model from seeing the whole database",
+            "Twelve is a lucky number in QA"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Cheaper, sometimes — but that's economics, not honesty.",
+            "Right. '11 of 12 clean, holdings-clone found 2 pairs' is checkable. 'The database looks fine' is not.",
+            "Scope control isn't the point; verifiable sub-goals are.",
+            "A joke option — the number of steps follows from the task's structure and the agent's own decomposition, not superstition."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "An agent with an unlimited step budget tends to:",
+          "options": [
+            "Perform identically to a budgeted one, just cheaper",
+            "Fail immediately",
+            "Procrastinate — re-verify done work and polish trivia, because nothing forces prioritization",
+            "Always find better answers"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Behavior actually changes with budget — scarcity is a forcing function.",
+            "No — it fails slowly, which is more expensive.",
+            "Right. Budgets aren't just cost control; a model that knows it has three calls left plans differently.",
+            "More steps past the useful point add cost and stale-context risk, not quality."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Anthropic — Building effective agents (workflows section)",
+          "url": "https://www.anthropic.com/research/building-effective-agents",
+          "type": "article",
+          "note": "Prompt-chaining, routing, orchestrator-workers — the decomposition patterns, named."
+        }
+      ]
+    },
+    {
+      "id": "memory",
+      "title": "Memory",
+      "summary": "Context is rented, memory is owned: what to persist, how to retrieve it, and why write-time beats read-time.",
+      "cards": [
+        {
+          "h": "The context window is not memory",
+          "md": "A model's context window is **working memory**: whatever fits, it can use; the moment the conversation ends (or overflows), it is gone. Agents that 'remember' do so with an external store the harness consults.\n\nThe standard split:\n\n- **Short-term:** the current conversation + recent tool results. Free, automatic, evaporates.\n- **Long-term:** facts worth keeping — preferences, decisions, verdicts, past failures. Must be *deliberately written* and *deliberately retrieved*.\n\nThe deliberate part is the design problem. Store everything and retrieval drowns in noise; store too little and the agent re-asks what it was told last week. The working answer in most production agents: store **conclusions, not transcripts** — the verdict with its evidence pointer, not the 40-message conversation that produced it."
+        },
+        {
+          "h": "Retrieval: the memory is only as good as the lookup",
+          "md": "A memory nobody can find is a memory that doesn't exist. The two dominant retrieval styles:\n\n- **Keyword / full-text search:** exact and predictable — great when your vocabulary is stable ('TC-1c', 'Convex Core').\n- **Embedding similarity:** finds semantically related notes with different wording — and also finds seductive near-matches that are actually irrelevant.\n\nThe case-study agent audited its own 'memory misses' and found something instructive: the search engine was fine — the misses were **wrong-tool choices** (the model didn't search at all) and **content gaps** (the fact was never written down). They kept plain FTS and rejected a fancier hybrid, because without a relevance floor, semantic search mostly added noise.\n\nMoral: before upgrading the search algorithm, measure *why* recall fails. It is usually the write side, not the read side."
+        },
+        {
+          "h": "Write-time discipline: cite or it didn't happen",
+          "md": "The nastiest memory failure is not forgetting — it is **remembering something false**. An agent that writes a wrong 'fact' to memory will confidently repeat it for months.\n\nThe case-study system was burned exactly once: the agent wrote a fabricated note into its knowledge vault. The fix was structural, not hopeful: **every durable note must cite a checkable source** — a file, a commit, an email id — and an automatic audit rejects notes whose numbers don't appear in the cited artifact. A note the audit cannot open is treated as indistinguishable from a fabricated one.\n\nGeneral principle: memory quality is enforced at **write time**, when the evidence is at hand — not at read time, when the evidence is long gone and the note just looks authoritative."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why do production agents store 'conclusions, not transcripts' in long-term memory?",
+          "options": [
+            "Transcripts are legally sensitive",
+            "Retrieval quality: a concise verdict with an evidence pointer is findable and reusable; 40 raw messages are noise",
+            "Storage is expensive",
+            "Models are not allowed to read old conversations"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Sensitivity varies, but that's a different policy question.",
+            "Right. The failure mode of store-everything is drowned retrieval. Memory is a curation problem before it is a storage problem.",
+            "Text is cheap. Attention — at retrieval time — is what's scarce.",
+            "They can; it's just rarely the best use of context."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The case-study team audited memory 'misses' and found the search engine was fine. What were the real causes?",
+          "options": [
+            "Hardware failures corrupting the index",
+            "Wrong-tool choices (never searched) and content gaps (never written) — write-side and routing problems",
+            "The embeddings were too small",
+            "Users asking unanswerable questions"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The index was healthy — the audit checked.",
+            "Right. Their fix was steering (when to search) and write discipline (what to store) — and they deliberately REJECTED a fancier hybrid search that would have added noise.",
+            "They weren't using embeddings — plain full-text search, kept on purpose.",
+            "The questions were answerable; the facts just weren't stored or weren't looked for."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why enforce memory quality at WRITE time (citations, audits) instead of read time?",
+          "options": [
+            "Writing happens less often, so it's cheaper to check there",
+            "At write time the evidence is at hand and checkable; at read time a false note just looks authoritative",
+            "Read-time checks would slow down conversations",
+            "It's arbitrary — either works"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Frequency helps, but that's not the core reason.",
+            "Right. A note that cites a commit can be audited the moment it's written. Months later, a confident-sounding note is nearly impossible to falsify in-flight.",
+            "Latency is a minor factor next to falsifiability.",
+            "They are not symmetric: evidence decays. Write-time is when the receipt exists."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Lilian Weng — Agents survey, memory section",
+          "url": "https://lilianweng.github.io/posts/2023-06-23-agent/",
+          "type": "article",
+          "note": "Short/long-term memory and retrieval, placed in the full agent architecture."
+        }
+      ]
+    },
+    {
+      "id": "grounding",
+      "title": "Grounding and hallucination",
+      "summary": "An acting system must not invent facts. Grounding ties every claim to a tool result — mechanically, not aspirationally.",
+      "cards": [
+        {
+          "h": "Hallucination gets expensive when systems act",
+          "md": "In a chatbot, a made-up number is embarrassing. In an agent, it can become an **action**: an email sent to the wrong person with wrong figures, an order sheet with an invented price, a 'confirmed' backup that never ran.\n\nThe root cause is unchanged — a language model is a plausibility machine, and plausible-but-false is its natural failure mode. What changes with agents is the **remedy**: because the agent has tools, every factual claim *can in principle be traced to a tool result*. Grounding is the discipline of making that tracing real.\n\nWeak grounding: 'the model usually checks.' Strong grounding: the harness **verifies mechanically** that the numbers in the answer actually appeared in the evidence — and blocks the reply when they didn't."
+        },
+        {
+          "h": "Case study: a guard that reads every reply",
+          "md": "The case-study agent runs an anti-fabrication guard on financial responses. The idea is simple and brutal: build a **grounding pool** — every number that appeared in this turn's tool results (plus numbers the user themselves supplied) — then scan the model's reply for numeric claims. A number with no source in the pool blocks the reply.\n\nWhat production taught them:\n\n- **False positives are the real war.** CSS colors (`#666`), years, tickers-that-look-like-numbers — each needed an explicit carve-out, found by replaying blocked turns.\n- **The guard needs an escalation path**, not just a wall: a blocked turn can retry with a hint ('ground the numbers or drop them').\n- Verdicts like 'this subtotal is wrong' were sometimes the *guard being right* against a confidently wrong model — the audit trail settles the argument."
+        },
+        {
+          "h": "Verify claims the way an auditor would",
+          "md": "Grounding numbers is the mechanical layer. Above it sits a broader honesty discipline for agent claims:\n\n- **'It works' requires a run.** An agent claiming success on a task it never executed is the same failure as a fabricated number. The case-study system added a sentinel: a turn that claims completion with zero tool calls gets flagged.\n- **'It's fixed' requires the failing case to pass.** Re-run the exact reproduction, not a vibe-check.\n- **'The data says X' requires the query to be shown.** Answers that cite their own evidence can be re-checked later; answers that don't are folklore in a week.\n\nThe pattern across all three: convert claims into **checkable artifacts**. An agent whose statements come with receipts can be trusted with bigger verbs; one whose statements don't, cannot — no matter how smart its model is."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why is hallucination strictly more dangerous in an agent than in a chatbot?",
+          "options": [
+            "Agents hallucinate more often",
+            "A fabricated fact can become an executed action — an email, an order, a config change",
+            "Agent hallucinations are harder to detect by reading",
+            "It isn't — same risk, same stakes"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Rates are similar for the same model; the *consequences* differ.",
+            "Right. Action converts a wrong belief into a wrong state of the world. That's why grounding must be mechanical, not aspirational.",
+            "Detection is comparable; blast radius is not.",
+            "The stakes change the moment claims drive actions."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The case-study fabrication guard blocks replies containing numbers absent from the grounding pool. What was the hardest ongoing engineering problem?",
+          "options": [
+            "The guard was too slow",
+            "False positives — legitimate numbers (CSS colors, years) misread as ungrounded claims",
+            "The model learned to evade the guard",
+            "Nobody could read the guard's code"
+          ],
+          "answer": 1,
+          "feedback": [
+            "A regex pass over a reply is microseconds.",
+            "Right. Guards live or die on FP rate: every false block erodes trust in the guard. They replayed blocked turns to find and carve out each FP class.",
+            "The model doesn't see the guard to game it — it's harness-side.",
+            "It's a small, auditable module — that's rather the point."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "An agent reports 'done ✅' on a task, and the log shows zero tool calls that turn. What is the correct system response?",
+          "options": [
+            "Trust it — the model probably remembered the task was easy",
+            "Flag it: a completion claim with no actions is the action-shaped version of a fabricated number",
+            "Ask the model if it is sure",
+            "Lower the temperature"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Tasks don't complete themselves. Zero actions + a success claim is the signature of a confabulated completion.",
+            "Right. The case-study system calls this the silent-failure gate: no false '✅ complete' on zero-tool turns.",
+            "The model that fabricated the claim will happily confirm it.",
+            "Temperature tweaks don't fix structural honesty gaps."
+          ]
+        },
+        {
+          "id": "q4-free",
+          "type": "free",
+          "prompt": "In one or two sentences: why is a successful tool call's output 'testimony, not truth'?",
+          "grading": {
+            "kind": "rubric",
+            "model_answer": "A success code certifies the transport, not the content — the data can still be stale, mislabeled, or wrong at the source, so it must be treated as a claim to check (provenance, plausibility) rather than ground truth.",
+            "rubric": [
+              {
+                "category": "transport-vs-content",
+                "expects": "confuses 'the call worked' with 'the data is right'",
+                "feedback": "The key split is transport vs content: a 200 OK certifies the pipe, not the water."
+              },
+              {
+                "category": "no-failure-mode",
+                "expects": "asserts tools are reliable so output can be trusted",
+                "feedback": "Upstream sources DO serve wrong data with clean success codes — the case study's vendor served one fund's holdings under another fund's name."
+              },
+              {
+                "category": "off-topic",
+                "expects": "answers about something else (hallucination, latency…)",
+                "feedback": "This one isn't about the model hallucinating — it's about the TOOL's data being wrong while the call succeeds."
+              }
+            ]
+          },
+          "feedback_correct": "Exactly — success codes certify transport; content needs its own checks.",
+          "feedback_incorrect": ""
+        }
+      ],
+      "resources": [
+        {
+          "label": "Anthropic — Constitutional AI (arXiv)",
+          "url": "https://arxiv.org/abs/2212.08073",
+          "type": "paper",
+          "note": "Training-side honesty pressure — complementary to the harness-side guards this concept covers."
+        }
+      ]
+    },
+    {
+      "id": "multi-agent",
+      "title": "Multi-agent systems",
+      "summary": "Fan out for breadth, verify adversarially, synthesize once — and pay the coordination tax knowingly.",
+      "cards": [
+        {
+          "h": "Why more than one agent?",
+          "md": "Three honest reasons to split work across agents:\n\n1. **Breadth** — ten reviewers each reading one subsystem cover a codebase no single context window can hold.\n2. **Independence** — five ideators who cannot see each other's answers produce genuinely different options; one model asked five times produces variations on its first idea.\n3. **Adversarial checking** — a verifier prompted to *refute* a finding catches what the finder's confirmation bias missed.\n\nAnd one dishonest reason, worth naming: *it sounds impressive.* Multi-agent systems pay a real *coordination tax* — results must be merged, conflicts resolved, context re-explained to every worker. A single competent agent with good tools beats a committee of confused ones. The case-study shop's rule: fan out when the task exceeds one context or one perspective — not before."
+        },
+        {
+          "h": "The orchestrator-worker shape",
+          "md": "The dominant production pattern is a hub: an **orchestrator** decomposes the task, dispatches **workers** with self-contained briefs, and synthesizes their reports.\n\nThe load-bearing detail is the **brief**. A worker arrives with empty context; everything it needs — the goal, the constraints, where to look, what shape to return — must be in its instructions. Vague briefs produce confident essays about the wrong thing. The case-study shop writes worker briefs with a return-schema ('respond with JSON: {finding, file, line, severity}'), which forces structure and makes synthesis mechanical.\n\nPeer-to-peer agent swarms exist in research, but audits of production systems keep finding the same thing: hierarchies win, because synthesis needs one place where conflicting reports get resolved — and one throat to choke when the answer is wrong."
+        },
+        {
+          "h": "Verification is the killer app",
+          "md": "The most reliable use of multiple agents is not parallel *production* — it is parallel *verification*.\n\nThe pattern, from the case-study shop's review fleet: finders sweep a codebase for bugs; each candidate finding then goes to independent **skeptics** prompted to refute it ('assume this is a false positive; prove it'). A finding survives only if the refuters fail. This kills the plausible-but-wrong findings that a single reviewer waves through — at roughly 3× the cost, which is cheap next to one bad finding shipped.\n\nVariants: give each verifier a different *lens* (correctness, security, does-it-reproduce) rather than three identical skeptics; or score proposals with a judge panel and synthesize from the winner. The shared principle: **independence at generation time, adversarial pressure at acceptance time.**"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Which task genuinely benefits from multiple agents rather than one good agent?",
+          "options": [
+            "Renaming a variable across one file",
+            "Auditing a codebase far larger than any single context window, then merging findings",
+            "Answering a factual question",
+            "Formatting a document"
+          ],
+          "answer": 1,
+          "feedback": [
+            "One agent, one minute. Fan-out here is pure coordination tax.",
+            "Right. Breadth beyond one context is the cleanest justification for fan-out — with a synthesis step at the end.",
+            "A lookup needs a tool, not a committee.",
+            "Deterministic scripts beat agents entirely for this."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why do production multi-agent systems put a return-schema in every worker's brief?",
+          "options": [
+            "It reduces token costs",
+            "Structured returns make synthesis mechanical and force the worker to answer the actual question",
+            "Schemas prevent workers from using tools",
+            "It's a legacy convention from REST APIs"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Sometimes marginally — but that's not why.",
+            "Right. Free-prose reports from five workers are five essays to reconcile. Five JSON objects merge in a loop.",
+            "Schemas shape the OUTPUT, not the tool access.",
+            "Convergent, but the reason is synthesis, not tradition."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "In the finder/skeptic verification pattern, why are the skeptics prompted to REFUTE findings rather than to 'double-check' them?",
+          "options": [
+            "Refutation prompts are shorter",
+            "A 'double-check' inherits the finder's framing and confirms it; an adversarial stance actively hunts the failure mode",
+            "Skeptics are cheaper models",
+            "It makes the logs more dramatic"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Length is irrelevant.",
+            "Right. 'Verify this' produces agreement; 'assume it's false and prove it' produces scrutiny. The asymmetry is the entire value.",
+            "Skeptics are often the SAME model — the prompt stance is what differs.",
+            "The drama is a side effect."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Wu et al. — AutoGen (arXiv)",
+          "url": "https://arxiv.org/abs/2308.08155",
+          "type": "paper",
+          "note": "The reference framework paper for conversational multi-agent patterns."
+        },
+        {
+          "label": "Anthropic — How we built our multi-agent research system",
+          "url": "https://www.anthropic.com/engineering/built-multi-agent-research-system",
+          "type": "article",
+          "note": "Production notes on orchestrator-worker research agents — briefs, parallelism, and what broke."
+        }
+      ]
+    },
+    {
+      "id": "evaluation",
+      "title": "Evaluating agents",
+      "summary": "Did it actually work? Task-level success, regression pins, shadow modes — and the benchmark trap.",
+      "cards": [
+        {
+          "h": "Evaluate the task, not the vibes",
+          "md": "Agent evaluation has one honest question: **did the task end in the state the user wanted?** Not 'was the answer fluent' — did the test pass, the email send, the number match the warehouse.\n\nThat makes agent evals harder *and* easier than chatbot evals. Harder: you need an environment where actions have checkable effects (a repo, a database, a sandbox). Easier: success is often binary and mechanical — `SWE-bench` counts a fix as solved only if the repo's own tests pass afterward.\n\nThe trap is **proxy drift**: measuring steps-taken, tokens-used, or self-reported confidence because outcome checking is expensive. Every proxy invites the agent (and its developers) to optimize the proxy. If the outcome can be checked mechanically, check the outcome."
+        },
+        {
+          "h": "Regression pins: freezing the lessons",
+          "md": "Production agents improve by accumulating **pins** — tiny tests that encode a specific past failure so it can never silently return.\n\nThe case-study repo is full of them, each with a story: the reminder that vanished across model-dependent hops (pin: capture path has zero LLM hops), the snooze that instantly re-fired (pin: the next tick after a snooze is silent), the guard that blocked a CSS color as a fabricated number (pin: `#666` passes).\n\nThis is the agent-era version of regression testing, with a twist: many pins test the *harness around* the model rather than the model itself, because the harness is where reliability actually lives. A model upgrade can shift behavior overnight; the pins are what tell you which lessons survived the upgrade."
+        },
+        {
+          "h": "Shadow mode: evaluate in production, act later",
+          "md": "The safest way to evaluate a risky new capability: run it in **shadow** — it sees real inputs and produces real decisions, but its output is logged instead of executed.\n\nThe case-study shop shadows almost everything before arming it: a data-quality guard runs for weeks in log-only mode (how many false positives *would* it have blocked?), a self-healing retry logs the fix it *would* have applied, a fleet watchdog runs 48 hours of dry-run before its alerts go live — armed only after a clean record.\n\nShadow mode resolves the evaluation dilemma for systems whose mistakes are costly: offline benchmarks are unrealistic, live trial-by-fire is reckless. The pattern costs patience and a little logging code, and it converts 'we think it's safe' into a measured false-positive rate you can defend."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "SWE-bench counts a coding-agent run as successful only when the repository's own tests pass on the patched code. Why is this a better metric than expert ratings of the patch?",
+          "options": [
+            "Experts are too expensive",
+            "It is a mechanical outcome check — the state of the world, not an opinion about the artifact",
+            "Tests are always right",
+            "Ratings are illegal for benchmarks"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Cost matters but isn't the principle.",
+            "Right. Outcome-grounded evals resist charm: a beautiful-looking patch that breaks the suite scores zero.",
+            "Tests can be wrong — but they're checkable and fixed in advance, which ratings are not.",
+            "Not a real constraint — rating-based evaluation is standard practice; its genuine problems are subjectivity and cost, not legality."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "What is a regression 'pin' in an agent codebase?",
+          "options": [
+            "A bookmark to important code",
+            "A small test encoding a specific past failure so it can never silently recur",
+            "A version-locked dependency",
+            "A high-priority ticket"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Close in spirit, but pins EXECUTE.",
+            "Right. Each pin is a frozen lesson — and because many pin the harness, they also tell you which lessons survive a model swap.",
+            "That's dependency pinning — same word, different tool.",
+            "Tickets describe; pins enforce."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why run a new alerting system in dry-run/shadow mode for 48 hours before arming it?",
+          "options": [
+            "To warm up caches",
+            "To measure its would-fire behavior (especially false positives) on real inputs before its mistakes can cost anything",
+            "Because systemd requires it",
+            "To give the model time to learn"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Caches are irrelevant here.",
+            "Right. Shadow mode converts 'we think it's safe' into a measured record — the case-study watchdog armed only after 0 false alerts in the window.",
+            "No such requirement.",
+            "Nothing is training during shadow — it's the HUMANS learning the system's behavior."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Jimenez et al. — SWE-bench (arXiv)",
+          "url": "https://arxiv.org/abs/2310.06770",
+          "type": "paper",
+          "note": "The outcome-grounded coding benchmark: real issues, real repos, the repo's own tests as judge."
+        }
+      ]
+    },
+    {
+      "id": "guardrails",
+      "title": "Guardrails and containment",
+      "summary": "Permissions, confirmation gates, sandboxes, and the principle of least privilege — safety as architecture.",
+      "cards": [
+        {
+          "h": "Least privilege, per verb",
+          "md": "The foundational rule of agent safety predates agents by decades: **grant the minimum capability the task needs.**\n\nApplied to agents it becomes concrete: the model gets tools, not shells; each tool gets the narrowest scope that works (a `read_file` restricted to the workspace directory, not the filesystem); secrets stay in the harness (the model composes an email — it never sees the SMTP password); and money-adjacent actions are **recommend-only** by construction.\n\nThe payoff shows up on the worst day: when the model is confused, deceived by a malicious input, or just wrong, the damage is bounded by the permission map — not by the model's judgment. Safety you can compute from config beats safety you have to trust from behavior."
+        },
+        {
+          "h": "Gates that mean something",
+          "md": "Confirmation prompts fail in a predictable way: put one on *everything* and the human learns to click yes — the gate becomes theater.\n\nProduction discipline: **gate rarely, gate hard, and never let the gate be bypassed upstream.** The case-study agent reserves confirmation for genuinely irreversible verbs (external emails to new recipients, destructive file ops), keeps reads free, and — after losing a reminder to a confirmation that never got answered — moved *capture* paths to zero-gate deterministic code entirely.\n\nSecond, subtler rule: a gate must **fail closed and honestly**. If the audit log isn't writable, the risky verb refuses to run — a gate that silently passes when its bookkeeping is broken is worse than no gate, because it launders unaudited actions as audited ones."
+        },
+        {
+          "h": "Sandboxing third-party capability",
+          "md": "Agents increasingly install other people's capabilities — community 'skills', plugins, MCP servers. Each one is **someone else's instructions and code running inside your agent**, and the supply-chain risk is real: a malicious skill can exfiltrate whatever the agent can see.\n\nThe case-study approach, worth copying wholesale: **pin, scan, jail.** Pin the exact version (a git SHA — upstream can't silently swap the code later); scan it before install (and read the findings — their scanner's repo-level CRITICAL turned out to be false positives on image bytes, while the actual payload was clean; both facts mattered); run it in a credential-free container with no network unless the skill's function requires it.\n\nAnd the meta-rule: treat *content* a skill fetches as data, never as instructions — the prompt-injection boundary is a guardrail too."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why is 'the model never sees the SMTP password' a stronger guarantee than 'the model is instructed not to reveal it'?",
+          "options": [
+            "Instructions cost tokens",
+            "Architecture cannot be talked out of: what the model never had, it cannot leak, no matter how it is manipulated",
+            "Passwords confuse models",
+            "It isn't stronger — both work equally well"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Trivially true, irrelevant.",
+            "Right. Behavioral rules bend under clever prompting; capability boundaries don't. Compute safety from config, don't trust it from behavior.",
+            "Models handle secrets fine — that's the problem.",
+            "A determined prompt injection defeats instructions; it cannot conjure a secret the harness never exposed."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Putting a confirmation prompt on every single agent action leads to:",
+          "options": [
+            "Maximum safety",
+            "Habituated approval — the human rubber-stamps everything, and the gates that matter drown in the ones that don't",
+            "Faster workflows",
+            "Better audit logs"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It optimizes the FEELING of safety while destroying the mechanism.",
+            "Right. Gate rarely and hard. The case-study shop even removed gates from capture paths after one unanswered confirmation ate a critical reminder.",
+            "Obviously slower — and less safe, which is the surprise.",
+            "Logs improve with logging, not with prompts."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Before installing a third-party skill, the case-study shop pins the git SHA, scans the tree, and runs it in a credential-free jail. What threat does the PIN specifically counter?",
+          "options": [
+            "Prompt injection in the skill's output",
+            "Upstream silently replacing the vetted code with something malicious after you audited it",
+            "Excessive token usage",
+            "License violations"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That's what the data-not-instructions boundary is for.",
+            "Right. A vet is only as durable as the immutability of what you vetted. The pin freezes the audited artifact; a drift-watch flags when upstream moves.",
+            "Budgets handle that.",
+            "A license check is separate diligence."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Simon Willison — Prompt injection series",
+          "url": "https://simonwillison.net/series/prompt-injection/",
+          "type": "article",
+          "note": "The clearest ongoing writing on why 'content as instructions' is the agent-era vulnerability class."
+        }
+      ]
+    },
+    {
+      "id": "failure-modes",
+      "title": "Failure modes and honesty",
+      "summary": "Loops, confabulated success, silent death — and why honest failure is a feature you must build.",
+      "cards": [
+        {
+          "h": "The taxonomy of agent failure",
+          "md": "Agent failures cluster into a few recurring shapes:\n\n- **The loop** — same action, same failure, forever. Missing progress checks.\n- **The wander** — plausible-looking tool calls drifting away from the goal. Missing plan discipline.\n- **The confabulated success** — 'done ✅' with nothing done. The worst one, because it *reports* as health.\n- **The poisoned observation** — a wrong tool result trusted and propagated.\n- **The silent death** — the process stops and nothing notices.\n\nNotice what's common: four of the five are **detectable by the harness** without any intelligence — step counters, completion sentinels, plausibility gates, watchdogs. Reliability engineering for agents is mostly classical systems engineering wearing a new hat."
+        },
+        {
+          "h": "Silence must be provable",
+          "md": "The scariest state for an autonomous system is *quiet*. Healthy-quiet and dead-quiet look identical from the outside — unless you engineer the difference.\n\nThe case-study stack, bottom to top: the agent pushes a **heartbeat** to an external service every 10 minutes (if the pings stop, something off-box notices); a second, independent probe on another machine watches from inside the LAN; watchdog crons check data freshness and service health with debounced state machines; and an unacknowledged critical alert **escalates** rather than expiring — an unanswered reminder is treated as a failed one.\n\nThe design principle: **silence is only allowed to mean health if something would provably scream otherwise.** Every quiet channel needs a dead-man behind it — belt, suspenders, and a second pair of suspenders on another machine."
+        },
+        {
+          "h": "Honesty is a capability",
+          "md": "The deepest lesson from running agents in production is cultural, not technical: **an agent's value is capped by how much you can trust its reports.**\n\nAn agent that says 'I ran 46 checks; 3 failed, here are the failing cases' is useful even when it fails. An agent that rounds every outcome up to '✅ done!' is dangerous even when it succeeds — because you can no longer tell the difference. That's why the machinery in this course keeps recurring on one theme: grounding guards, completion sentinels, cite-on-write memory, shadow modes, pins. They are all **honesty infrastructure**.\n\nThe compounding effect is real: every honest failure report tightens the loop (the failure gets a pin, the pin prevents the recurrence); every dishonest success report poisons it. Capability gets the demos. Honesty gets the production deployment."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why is 'confabulated success' ranked the worst failure mode?",
+          "options": [
+            "It costs the most tokens",
+            "It reports as health — the system's own signals say everything is fine while the task silently didn't happen",
+            "It crashes the process",
+            "It only happens with small models"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Cost is trivial next to trust.",
+            "Right. A crash pages someone; a false '✅' teaches you to stop checking. It corrupts the only channel you monitor.",
+            "Exactly the opposite — everything keeps running, which is the trap.",
+            "Every model does it under the wrong incentives; the fix is harness sentinels, not model size."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "What does the dead-man's-switch pattern guarantee that ordinary error alerting cannot?",
+          "options": [
+            "Errors get prettier formatting",
+            "Detection of SILENT death: if the system stops entirely, the absence of its heartbeat is itself the alarm — raised off-box",
+            "Fewer false alarms",
+            "Faster reboots"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Cosmetics don't matter to a dead process.",
+            "Right. A dead system cannot send its own error alert. Only an external observer expecting a heartbeat can notice nothing arriving.",
+            "It adds an alarm class; false-positive tuning is separate (debounce).",
+            "Detection first — recovery is a different layer."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "'Honesty is a capability' — what is the engineering content of that slogan?",
+          "options": [
+            "Models should be fine-tuned to be polite",
+            "Trustworthy self-reporting is BUILT — sentinels, grounding guards, cited memory, shadow modes — and it, not raw skill, gates what you can safely delegate",
+            "Honest agents are slower, and that's fine",
+            "It's a marketing phrase without engineering content"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Politeness is orthogonal to truthfulness.",
+            "Right. Every honest failure tightens the loop (failure → pin → never again); every false success poisons it. The infrastructure that enforces receipts is what makes delegation rational.",
+            "The overhead is small, and the alternative caps the agent's usable autonomy regardless of speed.",
+            "It compresses a real design doctrine — most of this course's machinery is honesty infrastructure."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Shinn et al. — Reflexion (arXiv)",
+          "url": "https://arxiv.org/abs/2303.11366",
+          "type": "paper",
+          "note": "Agents that learn from their own failure traces — the research face of 'honest failure tightens the loop'."
+        },
+        {
+          "label": "Anthropic — Building effective agents (closing guidance)",
+          "url": "https://www.anthropic.com/research/building-effective-agents",
+          "type": "article",
+          "note": "Ends where this course does: start simple, add autonomy only as trust is earned."
+        }
+      ]
     }
-   ],
-   "resources": [
-    {
-     "label": "Anthropic — Constitutional AI (arXiv)",
-     "url": "https://arxiv.org/abs/2212.08073",
-     "type": "paper",
-     "note": "Training-side honesty pressure — complementary to the harness-side guards this concept covers."
-    }
-   ]
-  },
-  {
-   "id": "multi-agent",
-   "title": "Multi-agent systems",
-   "summary": "Fan out for breadth, verify adversarially, synthesize once — and pay the coordination tax knowingly.",
-   "cards": [
-    {
-     "h": "Why more than one agent?",
-     "md": "Three honest reasons to split work across agents:\n\n1. **Breadth** — ten reviewers each reading one subsystem cover a codebase no single context window can hold.\n2. **Independence** — five ideators who cannot see each other's answers produce genuinely different options; one model asked five times produces variations on its first idea.\n3. **Adversarial checking** — a verifier prompted to *refute* a finding catches what the finder's confirmation bias missed.\n\nAnd one dishonest reason, worth naming: *it sounds impressive.* Multi-agent systems pay a real *coordination tax* — results must be merged, conflicts resolved, context re-explained to every worker. A single competent agent with good tools beats a committee of confused ones. The case-study shop's rule: fan out when the task exceeds one context or one perspective — not before."
-    },
-    {
-     "h": "The orchestrator-worker shape",
-     "md": "The dominant production pattern is a hub: an **orchestrator** decomposes the task, dispatches **workers** with self-contained briefs, and synthesizes their reports.\n\nThe load-bearing detail is the **brief**. A worker arrives with empty context; everything it needs — the goal, the constraints, where to look, what shape to return — must be in its instructions. Vague briefs produce confident essays about the wrong thing. The case-study shop writes worker briefs with a return-schema ('respond with JSON: {finding, file, line, severity}'), which forces structure and makes synthesis mechanical.\n\nPeer-to-peer agent swarms exist in research, but audits of production systems keep finding the same thing: hierarchies win, because synthesis needs one place where conflicting reports get resolved — and one throat to choke when the answer is wrong."
-    },
-    {
-     "h": "Verification is the killer app",
-     "md": "The most reliable use of multiple agents is not parallel *production* — it is parallel *verification*.\n\nThe pattern, from the case-study shop's review fleet: finders sweep a codebase for bugs; each candidate finding then goes to independent **skeptics** prompted to refute it ('assume this is a false positive; prove it'). A finding survives only if the refuters fail. This kills the plausible-but-wrong findings that a single reviewer waves through — at roughly 3× the cost, which is cheap next to one bad finding shipped.\n\nVariants: give each verifier a different *lens* (correctness, security, does-it-reproduce) rather than three identical skeptics; or score proposals with a judge panel and synthesize from the winner. The shared principle: **independence at generation time, adversarial pressure at acceptance time.**"
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Which task genuinely benefits from multiple agents rather than one good agent?",
-     "options": [
-      "Renaming a variable across one file",
-      "Auditing a codebase far larger than any single context window, then merging findings",
-      "Answering a factual question",
-      "Formatting a document"
-     ],
-     "answer": 1,
-     "feedback": [
-      "One agent, one minute. Fan-out here is pure coordination tax.",
-      "Right. Breadth beyond one context is the cleanest justification for fan-out — with a synthesis step at the end.",
-      "A lookup needs a tool, not a committee.",
-      "Deterministic scripts beat agents entirely for this."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why do production multi-agent systems put a return-schema in every worker's brief?",
-     "options": [
-      "It reduces token costs",
-      "Structured returns make synthesis mechanical and force the worker to answer the actual question",
-      "Schemas prevent workers from using tools",
-      "It's a legacy convention from REST APIs"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Sometimes marginally — but that's not why.",
-      "Right. Free-prose reports from five workers are five essays to reconcile. Five JSON objects merge in a loop.",
-      "Schemas shape the OUTPUT, not the tool access.",
-      "Convergent, but the reason is synthesis, not tradition."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "In the finder/skeptic verification pattern, why are the skeptics prompted to REFUTE findings rather than to 'double-check' them?",
-     "options": [
-      "Refutation prompts are shorter",
-      "A 'double-check' inherits the finder's framing and confirms it; an adversarial stance actively hunts the failure mode",
-      "Skeptics are cheaper models",
-      "It makes the logs more dramatic"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Length is irrelevant.",
-      "Right. 'Verify this' produces agreement; 'assume it's false and prove it' produces scrutiny. The asymmetry is the entire value.",
-      "Skeptics are often the SAME model — the prompt stance is what differs.",
-      "The drama is a side effect."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Wu et al. — AutoGen (arXiv)",
-     "url": "https://arxiv.org/abs/2308.08155",
-     "type": "paper",
-     "note": "The reference framework paper for conversational multi-agent patterns."
-    },
-    {
-     "label": "Anthropic — How we built our multi-agent research system",
-     "url": "https://www.anthropic.com/engineering/built-multi-agent-research-system",
-     "type": "article",
-     "note": "Production notes on orchestrator-worker research agents — briefs, parallelism, and what broke."
-    }
-   ]
-  },
-  {
-   "id": "evaluation",
-   "title": "Evaluating agents",
-   "summary": "Did it actually work? Task-level success, regression pins, shadow modes — and the benchmark trap.",
-   "cards": [
-    {
-     "h": "Evaluate the task, not the vibes",
-     "md": "Agent evaluation has one honest question: **did the task end in the state the user wanted?** Not 'was the answer fluent' — did the test pass, the email send, the number match the warehouse.\n\nThat makes agent evals harder *and* easier than chatbot evals. Harder: you need an environment where actions have checkable effects (a repo, a database, a sandbox). Easier: success is often binary and mechanical — `SWE-bench` counts a fix as solved only if the repo's own tests pass afterward.\n\nThe trap is **proxy drift**: measuring steps-taken, tokens-used, or self-reported confidence because outcome checking is expensive. Every proxy invites the agent (and its developers) to optimize the proxy. If the outcome can be checked mechanically, check the outcome."
-    },
-    {
-     "h": "Regression pins: freezing the lessons",
-     "md": "Production agents improve by accumulating **pins** — tiny tests that encode a specific past failure so it can never silently return.\n\nThe case-study repo is full of them, each with a story: the reminder that vanished across model-dependent hops (pin: capture path has zero LLM hops), the snooze that instantly re-fired (pin: the next tick after a snooze is silent), the guard that blocked a CSS color as a fabricated number (pin: `#666` passes).\n\nThis is the agent-era version of regression testing, with a twist: many pins test the *harness around* the model rather than the model itself, because the harness is where reliability actually lives. A model upgrade can shift behavior overnight; the pins are what tell you which lessons survived the upgrade."
-    },
-    {
-     "h": "Shadow mode: evaluate in production, act later",
-     "md": "The safest way to evaluate a risky new capability: run it in **shadow** — it sees real inputs and produces real decisions, but its output is logged instead of executed.\n\nThe case-study shop shadows almost everything before arming it: a data-quality guard runs for weeks in log-only mode (how many false positives *would* it have blocked?), a self-healing retry logs the fix it *would* have applied, a fleet watchdog runs 48 hours of dry-run before its alerts go live — armed only after a clean record.\n\nShadow mode resolves the evaluation dilemma for systems whose mistakes are costly: offline benchmarks are unrealistic, live trial-by-fire is reckless. The pattern costs patience and a little logging code, and it converts 'we think it's safe' into a measured false-positive rate you can defend."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "SWE-bench counts a coding-agent run as successful only when the repository's own tests pass on the patched code. Why is this a better metric than expert ratings of the patch?",
-     "options": [
-      "Experts are too expensive",
-      "It is a mechanical outcome check — the state of the world, not an opinion about the artifact",
-      "Tests are always right",
-      "Ratings are illegal for benchmarks"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Cost matters but isn't the principle.",
-      "Right. Outcome-grounded evals resist charm: a beautiful-looking patch that breaks the suite scores zero.",
-      "Tests can be wrong — but they're checkable and fixed in advance, which ratings are not.",
-      "No."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "What is a regression 'pin' in an agent codebase?",
-     "options": [
-      "A bookmark to important code",
-      "A small test encoding a specific past failure so it can never silently recur",
-      "A version-locked dependency",
-      "A high-priority ticket"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Close in spirit, but pins EXECUTE.",
-      "Right. Each pin is a frozen lesson — and because many pin the harness, they also tell you which lessons survive a model swap.",
-      "That's dependency pinning — same word, different tool.",
-      "Tickets describe; pins enforce."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why run a new alerting system in dry-run/shadow mode for 48 hours before arming it?",
-     "options": [
-      "To warm up caches",
-      "To measure its would-fire behavior (especially false positives) on real inputs before its mistakes can cost anything",
-      "Because systemd requires it",
-      "To give the model time to learn"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Caches are irrelevant here.",
-      "Right. Shadow mode converts 'we think it's safe' into a measured record — the case-study watchdog armed only after 0 false alerts in the window.",
-      "No such requirement.",
-      "Nothing is training during shadow — it's the HUMANS learning the system's behavior."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Jimenez et al. — SWE-bench (arXiv)",
-     "url": "https://arxiv.org/abs/2310.06770",
-     "type": "paper",
-     "note": "The outcome-grounded coding benchmark: real issues, real repos, the repo's own tests as judge."
-    }
-   ]
-  },
-  {
-   "id": "guardrails",
-   "title": "Guardrails and containment",
-   "summary": "Permissions, confirmation gates, sandboxes, and the principle of least privilege — safety as architecture.",
-   "cards": [
-    {
-     "h": "Least privilege, per verb",
-     "md": "The foundational rule of agent safety predates agents by decades: **grant the minimum capability the task needs.**\n\nApplied to agents it becomes concrete: the model gets tools, not shells; each tool gets the narrowest scope that works (a `read_file` restricted to the workspace directory, not the filesystem); secrets stay in the harness (the model composes an email — it never sees the SMTP password); and money-adjacent actions are **recommend-only** by construction.\n\nThe payoff shows up on the worst day: when the model is confused, deceived by a malicious input, or just wrong, the damage is bounded by the permission map — not by the model's judgment. Safety you can compute from config beats safety you have to trust from behavior."
-    },
-    {
-     "h": "Gates that mean something",
-     "md": "Confirmation prompts fail in a predictable way: put one on *everything* and the human learns to click yes — the gate becomes theater.\n\nProduction discipline: **gate rarely, gate hard, and never let the gate be bypassed upstream.** The case-study agent reserves confirmation for genuinely irreversible verbs (external emails to new recipients, destructive file ops), keeps reads free, and — after losing a reminder to a confirmation that never got answered — moved *capture* paths to zero-gate deterministic code entirely.\n\nSecond, subtler rule: a gate must **fail closed and honestly**. If the audit log isn't writable, the risky verb refuses to run — a gate that silently passes when its bookkeeping is broken is worse than no gate, because it launders unaudited actions as audited ones."
-    },
-    {
-     "h": "Sandboxing third-party capability",
-     "md": "Agents increasingly install other people's capabilities — community 'skills', plugins, MCP servers. Each one is **someone else's instructions and code running inside your agent**, and the supply-chain risk is real: a malicious skill can exfiltrate whatever the agent can see.\n\nThe case-study approach, worth copying wholesale: **pin, scan, jail.** Pin the exact version (a git SHA — upstream can't silently swap the code later); scan it before install (and read the findings — their scanner's repo-level CRITICAL turned out to be false positives on image bytes, while the actual payload was clean; both facts mattered); run it in a credential-free container with no network unless the skill's function requires it.\n\nAnd the meta-rule: treat *content* a skill fetches as data, never as instructions — the prompt-injection boundary is a guardrail too."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Why is 'the model never sees the SMTP password' a stronger guarantee than 'the model is instructed not to reveal it'?",
-     "options": [
-      "Instructions cost tokens",
-      "Architecture cannot be talked out of: what the model never had, it cannot leak, no matter how it is manipulated",
-      "Passwords confuse models",
-      "It isn't stronger — both work equally well"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Trivially true, irrelevant.",
-      "Right. Behavioral rules bend under clever prompting; capability boundaries don't. Compute safety from config, don't trust it from behavior.",
-      "Models handle secrets fine — that's the problem.",
-      "A determined prompt injection defeats instructions; it cannot conjure a secret the harness never exposed."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Putting a confirmation prompt on every single agent action leads to:",
-     "options": [
-      "Maximum safety",
-      "Habituated approval — the human rubber-stamps everything, and the gates that matter drown in the ones that don't",
-      "Faster workflows",
-      "Better audit logs"
-     ],
-     "answer": 1,
-     "feedback": [
-      "It optimizes the FEELING of safety while destroying the mechanism.",
-      "Right. Gate rarely and hard. The case-study shop even removed gates from capture paths after one unanswered confirmation ate a critical reminder.",
-      "Obviously slower — and less safe, which is the surprise.",
-      "Logs improve with logging, not with prompts."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Before installing a third-party skill, the case-study shop pins the git SHA, scans the tree, and runs it in a credential-free jail. What threat does the PIN specifically counter?",
-     "options": [
-      "Prompt injection in the skill's output",
-      "Upstream silently replacing the vetted code with something malicious after you audited it",
-      "Excessive token usage",
-      "License violations"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That's what the data-not-instructions boundary is for.",
-      "Right. A vet is only as durable as the immutability of what you vetted. The pin freezes the audited artifact; a drift-watch flags when upstream moves.",
-      "Budgets handle that.",
-      "A license check is separate diligence."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Simon Willison — Prompt injection series",
-     "url": "https://simonwillison.net/series/prompt-injection/",
-     "type": "article",
-     "note": "The clearest ongoing writing on why 'content as instructions' is the agent-era vulnerability class."
-    }
-   ]
-  },
-  {
-   "id": "failure-modes",
-   "title": "Failure modes and honesty",
-   "summary": "Loops, confabulated success, silent death — and why honest failure is a feature you must build.",
-   "cards": [
-    {
-     "h": "The taxonomy of agent failure",
-     "md": "Agent failures cluster into a few recurring shapes:\n\n- **The loop** — same action, same failure, forever. Missing progress checks.\n- **The wander** — plausible-looking tool calls drifting away from the goal. Missing plan discipline.\n- **The confabulated success** — 'done ✅' with nothing done. The worst one, because it *reports* as health.\n- **The poisoned observation** — a wrong tool result trusted and propagated.\n- **The silent death** — the process stops and nothing notices.\n\nNotice what's common: four of the five are **detectable by the harness** without any intelligence — step counters, completion sentinels, plausibility gates, watchdogs. Reliability engineering for agents is mostly classical systems engineering wearing a new hat."
-    },
-    {
-     "h": "Silence must be provable",
-     "md": "The scariest state for an autonomous system is *quiet*. Healthy-quiet and dead-quiet look identical from the outside — unless you engineer the difference.\n\nThe case-study stack, bottom to top: the agent pushes a **heartbeat** to an external service every 10 minutes (if the pings stop, something off-box notices); a second, independent probe on another machine watches from inside the LAN; watchdog crons check data freshness and service health with debounced state machines; and an unacknowledged critical alert **escalates** rather than expiring — an unanswered reminder is treated as a failed one.\n\nThe design principle: **silence is only allowed to mean health if something would provably scream otherwise.** Every quiet channel needs a dead-man behind it — belt, suspenders, and a second pair of suspenders on another machine."
-    },
-    {
-     "h": "Honesty is a capability",
-     "md": "The deepest lesson from running agents in production is cultural, not technical: **an agent's value is capped by how much you can trust its reports.**\n\nAn agent that says 'I ran 46 checks; 3 failed, here are the failing cases' is useful even when it fails. An agent that rounds every outcome up to '✅ done!' is dangerous even when it succeeds — because you can no longer tell the difference. That's why the machinery in this course keeps recurring on one theme: grounding guards, completion sentinels, cite-on-write memory, shadow modes, pins. They are all **honesty infrastructure**.\n\nThe compounding effect is real: every honest failure report tightens the loop (the failure gets a pin, the pin prevents the recurrence); every dishonest success report poisons it. Capability gets the demos. Honesty gets the production deployment."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Why is 'confabulated success' ranked the worst failure mode?",
-     "options": [
-      "It costs the most tokens",
-      "It reports as health — the system's own signals say everything is fine while the task silently didn't happen",
-      "It crashes the process",
-      "It only happens with small models"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Cost is trivial next to trust.",
-      "Right. A crash pages someone; a false '✅' teaches you to stop checking. It corrupts the only channel you monitor.",
-      "Exactly the opposite — everything keeps running, which is the trap.",
-      "Every model does it under the wrong incentives; the fix is harness sentinels, not model size."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "What does the dead-man's-switch pattern guarantee that ordinary error alerting cannot?",
-     "options": [
-      "Errors get prettier formatting",
-      "Detection of SILENT death: if the system stops entirely, the absence of its heartbeat is itself the alarm — raised off-box",
-      "Fewer false alarms",
-      "Faster reboots"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Cosmetics don't matter to a dead process.",
-      "Right. A dead system cannot send its own error alert. Only an external observer expecting a heartbeat can notice nothing arriving.",
-      "It adds an alarm class; false-positive tuning is separate (debounce).",
-      "Detection first — recovery is a different layer."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "'Honesty is a capability' — what is the engineering content of that slogan?",
-     "options": [
-      "Models should be fine-tuned to be polite",
-      "Trustworthy self-reporting is BUILT — sentinels, grounding guards, cited memory, shadow modes — and it, not raw skill, gates what you can safely delegate",
-      "Honest agents are slower, and that's fine",
-      "It's a marketing phrase without engineering content"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Politeness is orthogonal to truthfulness.",
-      "Right. Every honest failure tightens the loop (failure → pin → never again); every false success poisons it. The infrastructure that enforces receipts is what makes delegation rational.",
-      "The overhead is small, and the alternative caps the agent's usable autonomy regardless of speed.",
-      "It compresses a real design doctrine — most of this course's machinery is honesty infrastructure."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Shinn et al. — Reflexion (arXiv)",
-     "url": "https://arxiv.org/abs/2303.11366",
-     "type": "paper",
-     "note": "Agents that learn from their own failure traces — the research face of 'honest failure tightens the loop'."
-    },
-    {
-     "label": "Anthropic — Building effective agents (closing guidance)",
-     "url": "https://www.anthropic.com/research/building-effective-agents",
-     "type": "article",
-     "note": "Ends where this course does: start simple, add autonomy only as trust is earned."
-    }
-   ]
-  }
- ]
+  ]
 }
