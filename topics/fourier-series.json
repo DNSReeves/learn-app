@@ -295,7 +295,7 @@
         },
         {
           "h": "Gibbs: the overshoot that never dies",
-          "md": "Now the famous asterisk. Truncate the square-wave series at N terms and plot it. Near each jump the partial sum **overshoots** — a spike past the true level, then a decaying ripple.\n\nThe natural expectation: more terms → smaller overshoot. **False.** As N grows:\n\n- the spike gets **narrower** (it hugs the jump ever more tightly),\n- but its **height converges to ≈ 8.9% of the jump size** — and stays there. Forever.\n\nFor the ±1 square wave (jump of 2), the partial sums keep peaking near 1.18 no matter how many thousands of terms you add.\n\nThe number is universal: (1/π)∫₀^π (sin t)/t dt ≈ 1.0895 of the half-jump — the Wilbraham–Gibbs constant. Every jump discontinuity, any function, same 9%."
+          "md": "Now the famous asterisk. Truncate the square-wave series at N terms and plot it. Near each jump the partial sum **overshoots** — a spike past the true level, then a decaying ripple.\n\nThe natural expectation: more terms → smaller overshoot. **False.** As N grows:\n\n- the spike gets **narrower** (it hugs the jump ever more tightly),\n- but its **height converges to ≈ 8.9% of the jump size** — and stays there. Forever.\n\nFor the ±1 square wave (jump of 2), the partial sums keep peaking near 1.18 no matter how many thousands of terms you add.\n\nThe number is universal: (2/π)∫₀^π (sin t)/t dt ≈ 1.1789 of the half-jump — the Wilbraham–Gibbs constant. Every jump discontinuity, any function, same 9%."
         },
         {
           "h": "How 'converges' and 'overshoots forever' coexist",

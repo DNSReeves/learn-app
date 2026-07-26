@@ -1152,7 +1152,8 @@ function drawSmile(ctx,cv,{smile=0,skew=0,exp=0}){
   ctx.fillStyle="#5A6E8C"; ctx.fillText("at-the-money", xa-40, g.oy+g.H+18);
   for(const iv of [0.2,0.3,0.4,0.5,0.6]){ const y=_vsy(iv); ctx.fillStyle="#5A6E8C"; ctx.fillText((iv*100).toFixed(0)+"%", 58, y+4); }
   if(exp>0){ for(let e=1;e<=3;e++){ const sc=1+0.18*e*exp, a=(0.34-0.09*e).toFixed(2);
-    _vsCurve(ctx, smile, skew*(1+0.25*e), sc, "rgba(124,141,165,"+a+")", 1.6); } }
+    // longer-dated expiries: overall vol a touch higher (sc) but per-strike SKEW FLATTENS with maturity
+    _vsCurve(ctx, smile, skew*(1-0.18*e), sc, "rgba(124,141,165,"+a+")", 1.6); } }
   _vsCurve(ctx, smile, skew, 1, F.post, 2.8);
 }
 ANIMS.vol_smile_static=(cv,ctx)=>drawSmile(ctx,cv,{smile:0,skew:0});
@@ -1192,7 +1193,7 @@ const JAGGED_SPEC = {
         {label:"arithmetic",a:0.55,b:0.7},{label:"long autonomy",a:0.2,b:0.45},
         {label:"spatial",a:0.35,b:0.5},{label:"cite exactly",a:0.4,b:0.6}],
         dur:1800,title:"the jagged frontier — one model, eight task families"}] },
-    { say:"Now overlay the next generation. The peaks leap; the valleys crawl. Both the enthusiast quoting the peaks and the skeptic quoting the valleys are reading real data — off the same jagged profile.",
+    { say:"Now overlay the next generation. Every family gains, but unevenly — the profile stays jagged, not level. Both the enthusiast quoting the peaks and the skeptic quoting the valleys are reading real data — off the same spiky profile.",
       steps:[{op:"bars",overlay:true,cats:[
         {label:"grad exams",a:0.9,b:0.95},{label:"comp. math",a:0.75,b:0.93},
         {label:"coding",a:0.7,b:0.9},{label:"summarize",a:0.85,b:0.92},
@@ -1530,7 +1531,7 @@ ANIMS.calc_extrema=async(cv,ctx)=>{
   calc_drawExt(ctx,cv,{x:0.6});
   await narrate("Slide a tangent line along the curve — its slope at each point is f′(x).");
   await narrate("Green where the curve rises (f′>0), red where it falls (f′<0).");
-  await tween(2600,k=>calc_drawExt(ctx,cv,{x:0.4+k*5.3}));
+  await tween(2600,k=>calc_drawExt(ctx,cv,{x:0.4+k*4.6}));
   await narrate("At a peak or a valley the tangent goes flat: f′(x)=0. Those are the critical points.");
   await tween(900,k=>calc_drawExt(ctx,cv,{x:4,marks:true}));
   await narrate("f′=0 finds the candidates; f″ sorts them — f″<0 is a peak (x=2), f″>0 a valley (x=4).");
@@ -2985,7 +2986,7 @@ function mvg_draw(ctx,cv,s){
       ctx.moveTo(tx-5,ln.y-5);ctx.lineTo(tx+5,ln.y+5);ctx.moveTo(tx+5,ln.y-5);ctx.lineTo(tx-5,ln.y+5);ctx.stroke();
       ctx.fillStyle=F.wrong;ctx.fillText("refuted — discarded",tx+18,ln.y+4);
     }
-    if(won){ctx.fillStyle=F.ok;ctx.fillText("✓ survived all → accepted",tx+16,ln.y+4);}
+    if(won){ctx.fillStyle=F.ok;ctx.fillText("✓ accepted",tx+16,ln.y+4);}
   }
 }
 ANIMS.agent_verify_gauntlet_static=(cv,ctx)=>mvg_draw(ctx,cv,{k:0.4});
@@ -3044,8 +3045,8 @@ function agi_drawScaling(ctx,cv,s){
     for(let i=0;i<=60;i++){const x=obs+(endX-obs)*i/60;const l=lEnd-0.02*(x-obs);const px=X(x),py=Y(l);i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
     ctx.stroke();
     ctx.setLineDash([]);
-    if(f>0.85){ctx.fillStyle=F.txt;ctx.font="16px 'IBM Plex Mono'";ctx.textAlign="left";
-      ctx.fillText("?  what do the nats buy",X(endX)+8,Y(lEnd-0.06));}
+    if(f>0.85){ctx.fillStyle=F.txt;ctx.font="16px 'IBM Plex Mono'";ctx.textAlign="right";
+      ctx.fillText("?  what do the nats buy",X(endX)-6,Y(lEnd-0.06));ctx.textAlign="left";}
   }
 }
 ANIMS.agi_scaling_law_static=(cv,ctx)=>agi_drawScaling(ctx,cv,{sol:1,fan:1});
@@ -3736,7 +3737,7 @@ const qf_mt_NMAX=300;
 const qf_mt_SMIN=-1.2, qf_mt_SMAX=1.65;
 const qf_mt_xFor=(n)=> qf_mt_L + (Math.log(n)/Math.log(qf_mt_NMAX))*(qf_mt_R-qf_mt_L);
 const qf_mt_yFor=(s)=> qf_mt_B - ((s-qf_mt_SMIN)/(qf_mt_SMAX-qf_mt_SMIN))*(qf_mt_B-qf_mt_T);
-const qf_mt_emax=(n)=> 0.30*Math.sqrt(2*Math.log(Math.max(1.001,n)));
+const qf_mt_emax=(n)=> 0.40*Math.sqrt(2*Math.log(Math.max(1.001,n)));  // σ must match the dot dispersion (box()*0.40) so the envelope truly tracks best-of-N
 const qf_mt_dots=(()=>{
   let seed=20260726; const rnd=()=>{ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; };
   const box=()=>{ const u=Math.max(1e-6,rnd()), v=rnd(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
@@ -3893,7 +3894,7 @@ ANIMS.bayes_decision=async(cv,ctx)=>{bayes_dec_draw(ctx,cv,{k:0,showCost:false})
  await tween(600,k=>bayes_dec_draw(ctx,cv,{k:0,showCost:true}));
  await narrate("Expected loss = probability × cost. A: 0.9×$10 = $9. B: 0.02×$100k = $2,000. The ranking flips.");
  await tween(1400,k=>bayes_dec_draw(ctx,cv,{k:k,showCost:true}));
- await narrate("Investigate B — 200× the expected loss. Bayes owns the probability; you must supply the payoff. Expected utility is where they meet.");
+ await narrate("Investigate B — 220× the expected loss ($2,000 vs $9). Bayes owns the probability; you must supply the payoff. Expected utility is where they meet.");
 };
 })();
 </script>
