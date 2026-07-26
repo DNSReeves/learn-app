@@ -1,663 +1,667 @@
 {
- "id": "neural-networks",
- "title": "Neural Networks",
- "tagline": "Functions that learn from being wrong.",
- "description": "From a single neuron to backpropagation to why deep learning works. Root of the AI chain: LLMs, AI agents, and AGI build on this.",
- "prereqs": [
-  "calculus"
- ],
- "concepts": [
-  {
-   "id": "c01-neuron",
-   "title": "The neuron: weighted sum plus squash",
-   "summary": "An artificial neuron computes a weighted sum of inputs plus a bias, then applies a nonlinear activation. The weights are the knowledge.",
-   "cards": [
+  "id": "neural-networks",
+  "title": "Neural Networks",
+  "tagline": "Functions that learn from being wrong.",
+  "description": "From a single neuron to backpropagation to why deep learning works. Root of the AI chain: LLMs, AI agents, and AGI build on this.",
+  "prereqs": [
+    "calculus"
+  ],
+  "concepts": [
     {
-     "h": "Three moving parts",
-     "md": "Strip the biology away and a neuron is a small formula:\n\n## output = activation(w₁x₁ + w₂x₂ + … + b)\n\n- **Weights (w)**: how much each input matters — positive amplifies, negative opposes\n- **Bias (b)**: the neuron's default inclination before seeing any input\n- **Activation**: a nonlinear squash applied to the sum — ReLU (max(0, x)) is the modern default; sigmoid squashes into (0,1)\n\nA spam-detector neuron might weight *contains 'free money'* at +3.0, *sender in contacts* at −4.0, bias −1.0: evidence for and against, summed, squashed into a verdict."
+      "id": "c01-neuron",
+      "title": "The neuron: weighted sum plus squash",
+      "summary": "An artificial neuron computes a weighted sum of inputs plus a bias, then applies a nonlinear activation. The weights are the knowledge.",
+      "cards": [
+        {
+          "h": "Three moving parts",
+          "md": "Strip the biology away and a neuron is a small formula:\n\n## output = activation(w₁x₁ + w₂x₂ + … + b)\n\n- **Weights (w)**: how much each input matters — positive amplifies, negative opposes\n- **Bias (b)**: the neuron's default inclination before seeing any input\n- **Activation**: a nonlinear squash applied to the sum — ReLU (max(0, x)) is the modern default; sigmoid squashes into (0,1)\n\nA spam-detector neuron might weight *contains 'free money'* at +3.0, *sender in contacts* at −4.0, bias −1.0: evidence for and against, summed, squashed into a verdict."
+        },
+        {
+          "h": "Why the nonlinearity is non-negotiable",
+          "md": "Stack layers of *linear* neurons and the whole stack collapses: a weighted sum of weighted sums is just one weighted sum. A thousand linear layers have exactly the power of one.\n\nThe activation breaks that collapse. With a nonlinearity between layers, depth buys genuinely new functions — bends, plateaus, switches — and stacked bends can approximate essentially any function.\n\nSo remember the division of labor: **weights and biases store what the network knows; the nonlinearity is what makes stacking them worthwhile.** Learning = adjusting the weights. Nothing else changes during training."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A neuron has weights [2, −1], bias 0.5, inputs [1, 3], and ReLU activation. Its output:",
+          "options": [
+            "−0.5",
+            "0",
+            "0.5",
+            "2.5"
+          ],
+          "answer": 1,
+          "feedback": [
+            "−0.5 is the pre-activation sum (2·1 + (−1)·3 + 0.5) — ReLU still applies.",
+            "Right: sum = −0.5, and ReLU(−0.5) = max(0, −0.5) = 0. The neuron stays silent.",
+            "You may have dropped the negative weight's contribution: −1 · 3 = −3.",
+            "Recheck: 2 − 3 + 0.5 = −0.5, then the squash."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In a trained network, where does the learned knowledge live?",
+          "options": [
+            "In the activation functions",
+            "In the weights and biases",
+            "In the training data, which the network stores verbatim",
+            "In the number of layers"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Activations are fixed, identical functions everywhere — they carry zero learned content.",
+            "Right. Training touches nothing but weights and biases; they ARE the model.",
+            "The data is discarded after training; only its statistical imprint survives in the weights.",
+            "Architecture sets capacity, like shelf space — the weights are what's on the shelves."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Remove every activation function from a 50-layer network. The result is equivalent to:",
+          "options": [
+            "A 50× more powerful network",
+            "A single linear layer",
+            "A random function",
+            "An untrainable network"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Power collapses rather than compounds — that's the punchline.",
+            "Right: compositions of linear maps are linear. Depth without nonlinearity is decoration.",
+            "It's perfectly deterministic — just disappointingly simple.",
+            "It trains fine; it just can't represent anything beyond a straight-line fit."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — But what is a neural network?",
+          "url": "https://www.3blue1brown.com/lessons/neural-networks",
+          "type": "video",
+          "note": "The canonical visual introduction — watch before or right after this concept."
+        },
+        {
+          "label": "TensorFlow Playground",
+          "url": "https://playground.tensorflow.org",
+          "type": "interactive",
+          "note": "Train tiny networks in the browser; toggle the activation to linear and watch capability collapse — concept 1's punchline, live."
+        }
+      ],
+      "anim": "nn_neuron"
     },
     {
-     "h": "Why the nonlinearity is non-negotiable",
-     "md": "Stack layers of *linear* neurons and the whole stack collapses: a weighted sum of weighted sums is just one weighted sum. A thousand linear layers have exactly the power of one.\n\nThe activation breaks that collapse. With a nonlinearity between layers, depth buys genuinely new functions — bends, plateaus, switches — and stacked bends can approximate essentially any function.\n\nSo remember the division of labor: **weights and biases store what the network knows; the nonlinearity is what makes stacking them worthwhile.** Learning = adjusting the weights. Nothing else changes during training."
+      "id": "c02-layers",
+      "title": "Layers and learned representations",
+      "summary": "Layers transform data step by step into representations where the answer becomes simple; early layers detect simple features, later layers compose them.",
+      "cards": [
+        {
+          "h": "A pipeline of re-descriptions",
+          "md": "A network is neurons arranged in **layers**: input → hidden layers → output, each layer's outputs feeding the next.\n\nThe useful mental model: each layer **re-describes** the data in new terms. Raw pixels are a terrible vocabulary for 'is this a cat?' — but pixels → edges → textures → parts → objects is a chain of vocabularies, each making the question easier. The last layer's job is trivial *because* of the vocabulary built beneath it.\n\nThis is representation learning, and it's the difference from classical programming: nobody designs the intermediate vocabularies. They emerge from training."
+        },
+        {
+          "h": "Width, depth, and what 'deep' buys",
+          "md": "**Width** = neurons per layer (more features per vocabulary). **Depth** = number of layers (more stages of composition).\n\nDepth is the leverage: complex features compose from simple ones, so deep networks express hierarchies exponentially more efficiently than shallow-but-wide ones. A face isn't learned as a pixel template — it's eyes-and-mouth, which are curves-and-corners, which are edges. Reuse at every level.\n\nCaveat for honesty: a wide-enough single hidden layer can *in principle* approximate any function (universal approximation) — but 'in principle' hides absurd widths. Depth is what makes it practical."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "In a trained image network, the earliest hidden layers typically respond to:",
+          "options": [
+            "Whole objects like faces",
+            "Simple local patterns — edges, spots, color gradients",
+            "The training labels",
+            "Nothing — early layers pass data through"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Whole objects appear late — they're compositions of compositions.",
+            "Right. Simple features first; everything downstream is built from them.",
+            "Labels touch only the output during training; early layers never see them directly.",
+            "Every layer transforms; a pass-through layer would be wasted capacity."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why does the final layer of a good network have an easy job?",
+          "options": [
+            "It has the most neurons",
+            "The layers beneath it transformed the data into a representation where classes are nearly separable",
+            "It sees the raw input directly",
+            "Final layers use special activations"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Final layers are often the *smallest*.",
+            "Right — the network's real work is building the representation; the last layer just draws a simple boundary in it.",
+            "It sees only the previous layer's re-description — that's the whole point.",
+            "Output activations (like softmax) format the answer; they don't create the separability."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The key difference between a deep network and hand-engineered feature pipelines:",
+          "options": [
+            "Deep networks are always more accurate",
+            "The intermediate features are learned from data rather than designed by people",
+            "Deep networks don't use features",
+            "Hand-engineered pipelines can't be automated"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Not always — on small structured data, engineered features still win plenty.",
+            "Right — representation learning is the defining move. The vocabularies emerge to serve the objective.",
+            "They're *made of* features — just discovered ones.",
+            "They're automated fine; they're limited by human imagination about which features matter."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "TensorFlow Playground",
+          "url": "https://playground.tensorflow.org",
+          "type": "interactive",
+          "note": "Watch hidden neurons carve the input space — add layers on the spiral dataset and see composition happen."
+        }
+      ]
+    },
+    {
+      "id": "c03-loss",
+      "title": "Loss: measuring wrong",
+      "summary": "A loss function reduces all of a network's errors to one number to minimize; its choice defines what the network actually optimizes for.",
+      "cards": [
+        {
+          "h": "One number to rule the training",
+          "md": "Training needs a target, and the target is a single scalar: the **loss** — a function scoring how wrong the network's outputs are against the true answers, averaged over data.\n\n- **Mean squared error** (regression): average of (prediction − truth)² — large misses punished quadratically\n- **Cross-entropy** (classification): punishes confident wrong answers brutally — being 99% sure of the wrong class costs vastly more than being unsure\n\nLow loss = good fit. Training is nothing but: *make this number smaller.*"
+        },
+        {
+          "h": "You get what you measure",
+          "md": "The loss is the network's **entire value system** — it optimizes exactly that number and nothing else. Every shortcut allowed by the loss will eventually be taken.\n\nClassic failure: 99% of transactions are legitimate, loss is plain accuracy-style error → the network learns 'predict legitimate, always' and scores 99%. The loss was satisfied; the goal wasn't. Fixes live in the loss too: weight the rare class, or optimize a different objective.\n\nThis gap between the measure and the intent scales up with capability — it returns as reward hacking in the AI Agents topic and as the alignment problem itself in AGI. Same phenomenon, higher stakes."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why must the loss be a single scalar rather than a list of per-example errors?",
+          "options": [
+            "Computers can't store lists",
+            "Optimization needs one number to decrease; the gradient of a scalar gives one direction to move",
+            "Scalars are more accurate",
+            "Tradition"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Storage is not the issue — direction is.",
+            "Right. 'Make this number smaller' is a well-posed instruction; 'improve this list' isn't, until you choose how to weigh it into one number — which is the loss.",
+            "The scalar throws information away by design; that's the point, not a defect.",
+            "It's forced by how gradient-based optimization works."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A classifier is 95% confident in the wrong class on one example. Under cross-entropy loss this example contributes:",
+          "options": [
+            "A small penalty — one example among many",
+            "A very large penalty — confident errors are punished hardest",
+            "Zero, since classification is all-or-nothing",
+            "A negative loss"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Its weight in the average may be 1/n, but its individual value is huge.",
+            "Right — cross-entropy grows without bound as confidence in the wrong answer approaches certainty. It teaches calibration, not just correctness.",
+            "Cross-entropy reads the *probabilities*, not just the argmax.",
+            "Loss is bounded below by zero — negative loss would mean better than perfect."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A trading model trained to minimize prediction error on next-day prices performs beautifully on that loss but loses money live. The most likely diagnosis:",
+          "options": [
+            "The network is too small",
+            "The loss measured prediction error, but the goal was profitable decisions — the network optimized the measure, not the intent",
+            "Markets are random so nothing works",
+            "The learning rate was wrong"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Capacity problems show up as bad loss, not as good-loss-bad-outcome.",
+            "Right — small errors on big moves can outweigh perfect calls on flat days; P&L-aware objectives exist for exactly this reason. You get what you measure.",
+            "Even in hard markets, the measure/goal mismatch is the fixable part.",
+            "Tuning changes how fast you optimize the wrong thing."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Karpathy — Neural Networks: Zero to Hero",
+          "url": "https://karpathy.ai/zero-to-hero.html",
+          "type": "video",
+          "note": "Build loss functions and everything else from raw Python. The best hands-on course for this entire topic."
+        }
+      ],
+      "anim": "nn_loss_xent"
+    },
+    {
+      "id": "c04-gradient-descent",
+      "title": "Gradient descent",
+      "summary": "The gradient points uphill in loss; step every weight a little downhill, repeat millions of times. Learning rate sets the step size.",
+      "cards": [
+        {
+          "h": "Downhill in a million dimensions",
+          "md": "Picture the loss as a landscape where each weight is a dimension and altitude is the loss. Training = descending it.\n\nThe **gradient** is the vector of ∂loss/∂weight for every weight — the local uphill direction. So step the other way:\n\n## w ← w − η · ∂L/∂w\n\nη is the **learning rate**: too large and you overshoot valleys and diverge; too small and training crawls. In practice: mini-batches (estimate the gradient on 32–512 examples, not the whole dataset — noisier but far cheaper, and the noise even helps escape bad spots), with momentum/Adam smoothing the ride."
+        },
+        {
+          "h": "Why 'just go downhill' works at all",
+          "md": "This is calculus concept 4 — find the minimum — at a scale where 'solve f′ = 0' is hopeless: billions of weights, no closed form. So instead of *solving* for the bottom, you *walk* toward it.\n\nThe honest caveats: the landscape is not a bowl — it's riddled with local dips, plateaus, and saddle points, and descent only finds *a* low point, not *the* lowest. The empirical surprise of deep learning is that in very high dimensions this barely matters: the low points found are plentiful and good. That was discovered by doing, not predicted by theory."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "For one particular weight, ∂L/∂w = −2.0. To reduce the loss, that weight should:",
+          "options": [
+            "Decrease",
+            "Increase — step opposite the gradient, and the gradient here is negative",
+            "Stay fixed",
+            "Be set to zero"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Decreasing moves *with* a negative gradient — uphill in loss.",
+            "Right: w ← w − η(−2.0) = w + 2η. Negative slope means loss falls as w rises.",
+            "A nonzero gradient means improvement is available.",
+            "The gradient prescribes a direction to nudge, never an absolute value."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The loss bounces wildly and then explodes to NaN during training. First suspect:",
+          "options": [
+            "Learning rate too small",
+            "Learning rate too large — steps overshoot and amplify",
+            "Too much training data",
+            "The loss function is too accurate"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Too small looks like a flat, glacial loss curve — the opposite signature.",
+            "Right — classic divergence. Each oversized step lands higher on the far wall of the valley. Cut η by 10× and retry.",
+            "More data smooths the gradient estimate; it doesn't destabilize it.",
+            "Accuracy of the loss isn't a failure mode."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why estimate gradients on mini-batches instead of the full dataset each step?",
+          "options": [
+            "Full-dataset gradients are mathematically wrong",
+            "Mini-batches give a good-enough gradient at a fraction of the cost, so you take many cheap steps instead of few perfect ones",
+            "Small batches guarantee the global minimum",
+            "It's required by the chain rule"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The full gradient is the exact one — just brutally expensive per step.",
+            "Right — and the gradient noise has a bonus effect of shaking descent out of shallow traps.",
+            "No method guarantees the global minimum here; mini-batching doesn't change that.",
+            "The chain rule is indifferent to batch size."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — Gradient descent, how machines learn",
+          "url": "https://www.3blue1brown.com/lessons/gradient-descent",
+          "type": "video",
+          "note": "The loss-landscape picture from this concept, animated on a real network."
+        }
+      ],
+      "anim": "loss_descent"
+    },
+    {
+      "id": "c05-backprop",
+      "title": "Backpropagation",
+      "summary": "Backprop computes every ∂loss/∂weight in one backward sweep by applying the chain rule layer by layer, reusing shared intermediate results.",
+      "cards": [
+        {
+          "h": "The chain rule, industrialized",
+          "md": "Gradient descent needs ∂L/∂w for *every* weight. A network is a giant nested function — loss(layerN(…(layer1(x)))) — and derivatives of nested functions are the **chain rule**: multiply the local rates along the path from weight to loss.\n\nBackprop's insight is bookkeeping: paths from different weights to the loss share most of their segments. So sweep **backward** once — from the loss toward the input — computing each layer's contribution and reusing it for everything upstream. Every gradient in the network, for roughly the cost of two forward passes. Without this reuse, training modern networks would be computationally absurd."
+        },
+        {
+          "h": "Credit assignment, mechanically",
+          "md": "What backprop really computes is an answer to: *how much did each of a billion weights contribute to this error?* Each ∂L/∂w is that weight's share of the blame, with sign and magnitude.\n\nTwo practical consequences worth knowing:\n- Every operation in the network must be differentiable — that's why activations are smooth-ish functions and why frameworks (PyTorch, JAX) are, at their core, automatic differentiation engines.\n- Multiplying many small local derivatives can shrink gradients toward zero in early layers (**vanishing gradients**) — the historical reason deep nets wouldn't train, and the problem ReLU, careful initialization, and residual connections were invented to fix."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Backprop is essentially:",
+          "options": [
+            "A new learning theory separate from calculus",
+            "The chain rule applied through the network, organized backward to reuse shared computation",
+            "A way to choose the learning rate",
+            "Random search over weights"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It's calculus you already know — concept 3 of that topic — at industrial scale.",
+            "Right. Mathematically the chain rule; algorithmically, dynamic programming over the network graph.",
+            "The learning rate is chosen by you (or a schedule); backprop supplies the directions.",
+            "It's exact and deterministic — the opposite of search."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why sweep backward from the loss rather than computing each weight's gradient independently?",
+          "options": [
+            "Backward is the only direction the math allows",
+            "Paths to the loss share segments; the backward sweep computes each shared piece once and reuses it",
+            "It uses less memory",
+            "Forward computation is impossible"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Forward-mode differentiation exists — it's just wildly inefficient when outputs (one loss) are fewer than inputs (billions of weights).",
+            "Right — that reuse turns an intractable computation into ~2× a forward pass.",
+            "Backprop actually *costs* memory (it stores forward activations); it buys time, not space.",
+            "The forward pass happens first — backprop consumes its stored results."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A 40-layer network trains fine in its last layers, but the earliest layers barely change. Classic diagnosis:",
+          "options": [
+            "Early layers are already perfect",
+            "Vanishing gradients — chained small derivatives shrink toward zero by the time they reach early layers",
+            "The loss function is broken",
+            "Early layers have no weights"
+          ],
+          "answer": 1,
+          "feedback": [
+            "From random initialization? They're not perfect; they're unreached.",
+            "Right — the multiplicative chain decays. Standard fixes: ReLU, better initialization, residual connections.",
+            "A broken loss stalls *all* layers, not specifically the early ones.",
+            "Every layer has weights; the gradient just isn't arriving with any strength."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — What is backpropagation really doing?",
+          "url": "https://www.3blue1brown.com/lessons/backpropagation",
+          "type": "video",
+          "note": "Credit assignment visualized — pairs exactly with this concept's second card."
+        },
+        {
+          "label": "Karpathy — micrograd (build backprop from scratch)",
+          "url": "https://karpathy.ai/zero-to-hero.html",
+          "type": "video",
+          "note": "Implement autodiff in ~100 lines of Python. Nothing demystifies backprop faster."
+        }
+      ],
+      "anim": "backprop_flow"
+    },
+    {
+      "id": "c06-generalization",
+      "title": "Overfitting and generalization",
+      "summary": "The goal is performance on unseen data. Held-out validation detects memorization; regularization, early stopping, and more data fight it.",
+      "cards": [
+        {
+          "h": "The exam it never studied for",
+          "md": "A network can ace its training data by **memorizing** it — and fail completely on anything new. Training loss measures fit; the goal is **generalization**.\n\nSo the data is split: train on one part, evaluate on a held-out **validation set** the network never learns from. The telltale curve: training loss falls and keeps falling, validation loss falls… then turns upward. That turn is the moment learning becomes memorizing.\n\nA final **test set**, touched only once at the very end, guards against a subtler leak: by tuning your design choices to validation performance, *you* slowly overfit the validation set on the model's behalf."
+        },
+        {
+          "h": "The countermeasures",
+          "md": "- **More data** — the cure that always works when available; memorizing a million examples is harder than learning the pattern\n- **Early stopping** — halt at the validation-loss minimum\n- **Regularization** — penalize large weights (weight decay) so the model prefers simple explanations\n- **Dropout** — randomly silence neurons during training, forcing redundant, robust features\n\nOne domain-specific trap deserves its own line: in time-series and trading work, validation data must come from *after* the training period. Random shuffling leaks the future into training, and the backtest lies to you at full precision."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Training loss: steadily falling. Validation loss: fell, bottomed, now rising. The model is:",
+          "options": [
+            "Underfitting — train longer",
+            "Overfitting — it has begun memorizing training specifics at the expense of general patterns",
+            "Perfectly trained",
+            "Broken"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Underfitting is both losses stuck high — the opposite corner.",
+            "Right — the diverging curves are the definitive signature. Stop at the validation minimum or add regularization.",
+            "Perfect would be both losses low and tracking together.",
+            "Nothing is broken; this is the *expected* failure mode of unlimited training."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why keep a test set separate from the validation set?",
+          "options": [
+            "Redundancy in case of file corruption",
+            "Repeated design decisions tuned on validation performance gradually overfit the validation set; the untouched test set gives one honest final reading",
+            "Test sets use different math",
+            "No reason — one held-out set suffices"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It's a statistical safeguard, not a backup.",
+            "Right — model selection is itself a fitting process. The test set is the exam nobody, including you, has seen.",
+            "Same metrics; different role in the protocol.",
+            "One set works only if you evaluate on it exactly once — which is what the test set formalizes."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "For a model predicting next-day returns, the validation split must be:",
+          "options": [
+            "A random 20% of all days",
+            "A contiguous block of days *after* the training period",
+            "The same days as training",
+            "The most volatile days"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Random shuffling puts tomorrow in the training set and yesterday in validation — future leakage, and the backtest will flatter you.",
+            "Right — walk-forward splitting mirrors deployment: train on the past, validate on the future.",
+            "That measures memorization and nothing else.",
+            "Cherry-picking regimes biases the estimate; chronology is the constraint that matters."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Nielsen — Neural Networks and Deep Learning, ch. 3",
+          "url": "http://neuralnetworksanddeeplearning.com/chap3.html",
+          "type": "reading",
+          "note": "Free classic text; the overfitting and regularization treatment is unusually clear."
+        }
+      ],
+      "anim": "nn_generalization"
+    },
+    {
+      "id": "c07-architectures",
+      "title": "Architectures: building in assumptions",
+      "summary": "CNNs assume locality and translation-invariance for images; sequence models handle order; attention lets every position consult every other. Architecture = prior knowledge about data structure.",
+      "cards": [
+        {
+          "h": "Why one shape doesn't fit all",
+          "md": "A plain fully-connected network treats input dimensions as unrelated — pixel (0,0) and pixel (0,1) are strangers. Architectures fix this by **building the data's known structure into the wiring**:\n\n- **CNNs** (images): small filters slide across the image — a cat detector shouldn't care *where* the cat is (translation invariance), and nearby pixels matter to each other (locality). Massive weight-sharing falls out for free.\n- **Sequence models** (text, time series): consume tokens in order, carrying state — because order *is* information."
+        },
+        {
+          "h": "Attention",
+          "md": "The architecture behind modern AI. Older sequence models squeezed everything read so far through a fixed-size memory — distant context faded. **Attention** removes the bottleneck: every position computes relevance scores against every other position and pulls information directly from what matters, however far away.\n\n'The keys to the cabinet **were** on the table' — resolving *were* vs *was* requires linking back to *keys* across the gap. Attention makes that link explicit, learned, and parallel.\n\nStack attention layers with standard feed-forward layers and you have the **Transformer** — the architecture that, scaled up and trained on text, becomes a large language model. That story is the LLM topic; this concept is its foundation."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Weight sharing in a CNN — one small filter reused across all image positions — encodes which assumption?",
+          "options": [
+            "All images are the same size",
+            "A feature's meaning doesn't depend on where it appears (translation invariance)",
+            "Color is irrelevant",
+            "Images have no structure"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Input size is handled separately; sharing is about position.",
+            "Right — an edge is an edge anywhere, so one detector serves every location. Fewer weights, better generalization.",
+            "CNNs handle color as input channels; sharing is orthogonal to it.",
+            "The opposite — sharing exists precisely to exploit known structure."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The core advantage of attention over a fixed-size recurrent memory:",
+          "options": [
+            "It needs less computation",
+            "Any position can directly retrieve information from any other, instead of hoping it survived compression through intermediate steps",
+            "It removes the need for training",
+            "It only works on short sequences"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Attention costs *more* compute (it scales with the square of length); it wins on capability and parallelism.",
+            "Right — direct, learned lookups replace a lossy relay race. Long-range dependencies stop fading.",
+            "Attention weights are learned like everything else.",
+            "Long sequences are exactly where it shines relative to recurrence."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Choosing an architecture is best understood as:",
+          "options": [
+            "Picking the biggest model that fits in memory",
+            "Encoding what you already know about the data's structure into the network's wiring",
+            "A purely aesthetic choice",
+            "Avoiding the need for data"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Size is capacity; architecture is *shape* — they're different levers.",
+            "Right — locality for images, order for sequences, relational lookup for language. Structure in the wiring is prior knowledge the data doesn't have to teach.",
+            "The choices have measurable, often decisive consequences.",
+            "Good architecture stretches data further; it never replaces it."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — Attention in transformers",
+          "url": "https://www.3blue1brown.com/lessons/attention",
+          "type": "video",
+          "note": "The clearest visual explanation of attention — bridge material to the LLM topic."
+        }
+      ],
+      "anim": "nn_attention"
+    },
+    {
+      "id": "c08-training-practice",
+      "title": "Training in practice",
+      "summary": "The practical loop: prepare and normalize data, initialize sensibly, tune the learning rate first, monitor train/val curves, and iterate on diagnosis.",
+      "cards": [
+        {
+          "h": "The loop nobody skips",
+          "md": "Real training is an empirical loop:\n\n1. **Data**: clean, label, normalize inputs to comparable scales (wildly different scales distort the loss landscape into a canyon that's miserable to descend)\n2. **Initialize**: small random weights, scaled per layer — all-zeros makes every neuron identical forever (symmetry never breaks)\n3. **Tune the learning rate first** — it's the highest-leverage hyperparameter; sweep powers of ten\n4. **Watch both curves**: train AND validation loss, from concept 6\n5. **Diagnose, adjust, repeat**"
+        },
+        {
+          "h": "Reading the curves like an operator",
+          "md": "- Both losses high and flat → underfitting: bigger model, longer training, or better features\n- Train low, validation rising → overfitting: regularize, stop earlier, get data\n- Loss exploding or NaN → learning rate too high, or bad data (a single mislabeled outlier with huge values can do it)\n- Loss stuck at exactly the 'predict the average' value → the network found the lazy baseline; check for bugs before celebrating structure in your data that isn't there\n\nThe skill of deep learning in practice is mostly this: reading curves, forming a hypothesis, changing one thing, rerunning. Science at the speed of GPUs. You're now equipped for the next rungs of the chain: LLMs (this machinery scaled to language) and AI Agents (models wrapped in tools and goals)."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why does initializing all weights to zero fail?",
+          "options": [
+            "Zero is not a valid number for weights",
+            "Every neuron in a layer computes identical outputs and receives identical gradients — they can never differentiate",
+            "It makes the loss undefined",
+            "It only fails for small networks"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Zero is valid — individual weights pass through zero constantly during training.",
+            "Right — perfect symmetry, perfectly preserved. Random initialization exists to break it.",
+            "The loss computes fine; it just never improves structurally.",
+            "It fails at every scale for the same symmetry reason."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "One input feature ranges 0–1, another 0–1,000,000. Without normalization, the likely effect:",
+          "options": [
+            "None — networks are scale-free",
+            "The big feature dominates early behavior and the distorted loss landscape makes one learning rate wrong for different weights",
+            "The small feature dominates",
+            "Training becomes deterministic"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Networks are decidedly not scale-free; the loss geometry depends on input scales.",
+            "Right — a canyon-shaped landscape: too big a step for one direction is too small for another. Normalize and the canyon rounds out.",
+            "Magnitude dominates in the raw sums — the big one shouts.",
+            "Scale has no effect on determinism."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A return-prediction model's validation loss exactly matches always-predicting-zero, and its outputs hug zero. Most informative reading:",
+          "options": [
+            "The model is broken — restart from scratch",
+            "The model has found the baseline and no exploitable signal beyond it — which is itself important evidence about the data",
+            "The model is perfect",
+            "Validation loss is the wrong metric"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Restarting without a new hypothesis reruns the same experiment.",
+            "Right — in near-efficient domains, 'predict the mean' is a formidable baseline. Beating it needs better features or structure, not more epochs. Absence of signal is a finding; treat it with the same respect as presence.",
+            "Perfect at matching the laziest possible strategy.",
+            "The metric did its job — it told you the truth."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Karpathy — A Recipe for Training Neural Networks",
+          "url": "https://karpathy.github.io/2019/04/25/recipe/",
+          "type": "reading",
+          "note": "The canonical practitioner's checklist — this concept, expanded by someone with scars."
+        },
+        {
+          "label": "Nielsen — Neural Networks and Deep Learning (full book)",
+          "url": "http://neuralnetworksanddeeplearning.com",
+          "type": "reading",
+          "note": "Free, rigorous, readable — the consolidation read after mastering this ladder."
+        }
+      ]
     }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A neuron has weights [2, −1], bias 0.5, inputs [1, 3], and ReLU activation. Its output:",
-     "options": [
-      "−0.5",
-      "0",
-      "0.5",
-      "2.5"
-     ],
-     "answer": 1,
-     "feedback": [
-      "−0.5 is the pre-activation sum (2·1 + (−1)·3 + 0.5) — ReLU still applies.",
-      "Right: sum = −0.5, and ReLU(−0.5) = max(0, −0.5) = 0. The neuron stays silent.",
-      "You may have dropped the negative weight's contribution: −1 · 3 = −3.",
-      "Recheck: 2 − 3 + 0.5 = −0.5, then the squash."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "In a trained network, where does the learned knowledge live?",
-     "options": [
-      "In the activation functions",
-      "In the weights and biases",
-      "In the training data, which the network stores verbatim",
-      "In the number of layers"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Activations are fixed, identical functions everywhere — they carry zero learned content.",
-      "Right. Training touches nothing but weights and biases; they ARE the model.",
-      "The data is discarded after training; only its statistical imprint survives in the weights.",
-      "Architecture sets capacity, like shelf space — the weights are what's on the shelves."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Remove every activation function from a 50-layer network. The result is equivalent to:",
-     "options": [
-      "A 50× more powerful network",
-      "A single linear layer",
-      "A random function",
-      "An untrainable network"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Power collapses rather than compounds — that's the punchline.",
-      "Right: compositions of linear maps are linear. Depth without nonlinearity is decoration.",
-      "It's perfectly deterministic — just disappointingly simple.",
-      "It trains fine; it just can't represent anything beyond a straight-line fit."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — But what is a neural network?",
-     "url": "https://www.3blue1brown.com/lessons/neural-networks",
-     "type": "video",
-     "note": "The canonical visual introduction — watch before or right after this concept."
-    },
-    {
-     "label": "TensorFlow Playground",
-     "url": "https://playground.tensorflow.org",
-     "type": "interactive",
-     "note": "Train tiny networks in the browser; toggle the activation to linear and watch capability collapse — concept 1's punchline, live."
-    }
-   ]
-  },
-  {
-   "id": "c02-layers",
-   "title": "Layers and learned representations",
-   "summary": "Layers transform data step by step into representations where the answer becomes simple; early layers detect simple features, later layers compose them.",
-   "cards": [
-    {
-     "h": "A pipeline of re-descriptions",
-     "md": "A network is neurons arranged in **layers**: input → hidden layers → output, each layer's outputs feeding the next.\n\nThe useful mental model: each layer **re-describes** the data in new terms. Raw pixels are a terrible vocabulary for 'is this a cat?' — but pixels → edges → textures → parts → objects is a chain of vocabularies, each making the question easier. The last layer's job is trivial *because* of the vocabulary built beneath it.\n\nThis is representation learning, and it's the difference from classical programming: nobody designs the intermediate vocabularies. They emerge from training."
-    },
-    {
-     "h": "Width, depth, and what 'deep' buys",
-     "md": "**Width** = neurons per layer (more features per vocabulary). **Depth** = number of layers (more stages of composition).\n\nDepth is the leverage: complex features compose from simple ones, so deep networks express hierarchies exponentially more efficiently than shallow-but-wide ones. A face isn't learned as a pixel template — it's eyes-and-mouth, which are curves-and-corners, which are edges. Reuse at every level.\n\nCaveat for honesty: a wide-enough single hidden layer can *in principle* approximate any function (universal approximation) — but 'in principle' hides absurd widths. Depth is what makes it practical."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "In a trained image network, the earliest hidden layers typically respond to:",
-     "options": [
-      "Whole objects like faces",
-      "Simple local patterns — edges, spots, color gradients",
-      "The training labels",
-      "Nothing — early layers pass data through"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Whole objects appear late — they're compositions of compositions.",
-      "Right. Simple features first; everything downstream is built from them.",
-      "Labels touch only the output during training; early layers never see them directly.",
-      "Every layer transforms; a pass-through layer would be wasted capacity."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why does the final layer of a good network have an easy job?",
-     "options": [
-      "It has the most neurons",
-      "The layers beneath it transformed the data into a representation where classes are nearly separable",
-      "It sees the raw input directly",
-      "Final layers use special activations"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Final layers are often the *smallest*.",
-      "Right — the network's real work is building the representation; the last layer just draws a simple boundary in it.",
-      "It sees only the previous layer's re-description — that's the whole point.",
-      "Output activations (like softmax) format the answer; they don't create the separability."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "The key difference between a deep network and hand-engineered feature pipelines:",
-     "options": [
-      "Deep networks are always more accurate",
-      "The intermediate features are learned from data rather than designed by people",
-      "Deep networks don't use features",
-      "Hand-engineered pipelines can't be automated"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Not always — on small structured data, engineered features still win plenty.",
-      "Right — representation learning is the defining move. The vocabularies emerge to serve the objective.",
-      "They're *made of* features — just discovered ones.",
-      "They're automated fine; they're limited by human imagination about which features matter."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "TensorFlow Playground",
-     "url": "https://playground.tensorflow.org",
-     "type": "interactive",
-     "note": "Watch hidden neurons carve the input space — add layers on the spiral dataset and see composition happen."
-    }
-   ]
-  },
-  {
-   "id": "c03-loss",
-   "title": "Loss: measuring wrong",
-   "summary": "A loss function reduces all of a network's errors to one number to minimize; its choice defines what the network actually optimizes for.",
-   "cards": [
-    {
-     "h": "One number to rule the training",
-     "md": "Training needs a target, and the target is a single scalar: the **loss** — a function scoring how wrong the network's outputs are against the true answers, averaged over data.\n\n- **Mean squared error** (regression): average of (prediction − truth)² — large misses punished quadratically\n- **Cross-entropy** (classification): punishes confident wrong answers brutally — being 99% sure of the wrong class costs vastly more than being unsure\n\nLow loss = good fit. Training is nothing but: *make this number smaller.*"
-    },
-    {
-     "h": "You get what you measure",
-     "md": "The loss is the network's **entire value system** — it optimizes exactly that number and nothing else. Every shortcut allowed by the loss will eventually be taken.\n\nClassic failure: 99% of transactions are legitimate, loss is plain accuracy-style error → the network learns 'predict legitimate, always' and scores 99%. The loss was satisfied; the goal wasn't. Fixes live in the loss too: weight the rare class, or optimize a different objective.\n\nThis gap between the measure and the intent scales up with capability — it returns as reward hacking in the AI Agents topic and as the alignment problem itself in AGI. Same phenomenon, higher stakes."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Why must the loss be a single scalar rather than a list of per-example errors?",
-     "options": [
-      "Computers can't store lists",
-      "Optimization needs one number to decrease; the gradient of a scalar gives one direction to move",
-      "Scalars are more accurate",
-      "Tradition"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Storage is not the issue — direction is.",
-      "Right. 'Make this number smaller' is a well-posed instruction; 'improve this list' isn't, until you choose how to weigh it into one number — which is the loss.",
-      "The scalar throws information away by design; that's the point, not a defect.",
-      "It's forced by how gradient-based optimization works."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A classifier is 95% confident in the wrong class on one example. Under cross-entropy loss this example contributes:",
-     "options": [
-      "A small penalty — one example among many",
-      "A very large penalty — confident errors are punished hardest",
-      "Zero, since classification is all-or-nothing",
-      "A negative loss"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Its weight in the average may be 1/n, but its individual value is huge.",
-      "Right — cross-entropy grows without bound as confidence in the wrong answer approaches certainty. It teaches calibration, not just correctness.",
-      "Cross-entropy reads the *probabilities*, not just the argmax.",
-      "Loss is bounded below by zero — negative loss would mean better than perfect."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "A trading model trained to minimize prediction error on next-day prices performs beautifully on that loss but loses money live. The most likely diagnosis:",
-     "options": [
-      "The network is too small",
-      "The loss measured prediction error, but the goal was profitable decisions — the network optimized the measure, not the intent",
-      "Markets are random so nothing works",
-      "The learning rate was wrong"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Capacity problems show up as bad loss, not as good-loss-bad-outcome.",
-      "Right — small errors on big moves can outweigh perfect calls on flat days; P&L-aware objectives exist for exactly this reason. You get what you measure.",
-      "Even in hard markets, the measure/goal mismatch is the fixable part.",
-      "Tuning changes how fast you optimize the wrong thing."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Karpathy — Neural Networks: Zero to Hero",
-     "url": "https://karpathy.ai/zero-to-hero.html",
-     "type": "video",
-     "note": "Build loss functions and everything else from raw Python. The best hands-on course for this entire topic."
-    }
-   ]
-  },
-  {
-   "id": "c04-gradient-descent",
-   "title": "Gradient descent",
-   "summary": "The gradient points uphill in loss; step every weight a little downhill, repeat millions of times. Learning rate sets the step size.",
-   "cards": [
-    {
-     "h": "Downhill in a million dimensions",
-     "md": "Picture the loss as a landscape where each weight is a dimension and altitude is the loss. Training = descending it.\n\nThe **gradient** is the vector of ∂loss/∂weight for every weight — the local uphill direction. So step the other way:\n\n## w ← w − η · ∂L/∂w\n\nη is the **learning rate**: too large and you overshoot valleys and diverge; too small and training crawls. In practice: mini-batches (estimate the gradient on 32–512 examples, not the whole dataset — noisier but far cheaper, and the noise even helps escape bad spots), with momentum/Adam smoothing the ride."
-    },
-    {
-     "h": "Why 'just go downhill' works at all",
-     "md": "This is calculus concept 4 — find the minimum — at a scale where 'solve f′ = 0' is hopeless: billions of weights, no closed form. So instead of *solving* for the bottom, you *walk* toward it.\n\nThe honest caveats: the landscape is not a bowl — it's riddled with local dips, plateaus, and saddle points, and descent only finds *a* low point, not *the* lowest. The empirical surprise of deep learning is that in very high dimensions this barely matters: the low points found are plentiful and good. That was discovered by doing, not predicted by theory."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "For one particular weight, ∂L/∂w = −2.0. To reduce the loss, that weight should:",
-     "options": [
-      "Decrease",
-      "Increase — step opposite the gradient, and the gradient here is negative",
-      "Stay fixed",
-      "Be set to zero"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Decreasing moves *with* a negative gradient — uphill in loss.",
-      "Right: w ← w − η(−2.0) = w + 2η. Negative slope means loss falls as w rises.",
-      "A nonzero gradient means improvement is available.",
-      "The gradient prescribes a direction to nudge, never an absolute value."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The loss bounces wildly and then explodes to NaN during training. First suspect:",
-     "options": [
-      "Learning rate too small",
-      "Learning rate too large — steps overshoot and amplify",
-      "Too much training data",
-      "The loss function is too accurate"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Too small looks like a flat, glacial loss curve — the opposite signature.",
-      "Right — classic divergence. Each oversized step lands higher on the far wall of the valley. Cut η by 10× and retry.",
-      "More data smooths the gradient estimate; it doesn't destabilize it.",
-      "Accuracy of the loss isn't a failure mode."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why estimate gradients on mini-batches instead of the full dataset each step?",
-     "options": [
-      "Full-dataset gradients are mathematically wrong",
-      "Mini-batches give a good-enough gradient at a fraction of the cost, so you take many cheap steps instead of few perfect ones",
-      "Small batches guarantee the global minimum",
-      "It's required by the chain rule"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The full gradient is the exact one — just brutally expensive per step.",
-      "Right — and the gradient noise has a bonus effect of shaking descent out of shallow traps.",
-      "No method guarantees the global minimum here; mini-batching doesn't change that.",
-      "The chain rule is indifferent to batch size."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — Gradient descent, how machines learn",
-     "url": "https://www.3blue1brown.com/lessons/gradient-descent",
-     "type": "video",
-     "note": "The loss-landscape picture from this concept, animated on a real network."
-    }
-   ],
-   "anim": "loss_descent"
-  },
-  {
-   "id": "c05-backprop",
-   "title": "Backpropagation",
-   "summary": "Backprop computes every ∂loss/∂weight in one backward sweep by applying the chain rule layer by layer, reusing shared intermediate results.",
-   "cards": [
-    {
-     "h": "The chain rule, industrialized",
-     "md": "Gradient descent needs ∂L/∂w for *every* weight. A network is a giant nested function — loss(layerN(…(layer1(x)))) — and derivatives of nested functions are the **chain rule**: multiply the local rates along the path from weight to loss.\n\nBackprop's insight is bookkeeping: paths from different weights to the loss share most of their segments. So sweep **backward** once — from the loss toward the input — computing each layer's contribution and reusing it for everything upstream. Every gradient in the network, for roughly the cost of two forward passes. Without this reuse, training modern networks would be computationally absurd."
-    },
-    {
-     "h": "Credit assignment, mechanically",
-     "md": "What backprop really computes is an answer to: *how much did each of a billion weights contribute to this error?* Each ∂L/∂w is that weight's share of the blame, with sign and magnitude.\n\nTwo practical consequences worth knowing:\n- Every operation in the network must be differentiable — that's why activations are smooth-ish functions and why frameworks (PyTorch, JAX) are, at their core, automatic differentiation engines.\n- Multiplying many small local derivatives can shrink gradients toward zero in early layers (**vanishing gradients**) — the historical reason deep nets wouldn't train, and the problem ReLU, careful initialization, and residual connections were invented to fix."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Backprop is essentially:",
-     "options": [
-      "A new learning theory separate from calculus",
-      "The chain rule applied through the network, organized backward to reuse shared computation",
-      "A way to choose the learning rate",
-      "Random search over weights"
-     ],
-     "answer": 1,
-     "feedback": [
-      "It's calculus you already know — concept 3 of that topic — at industrial scale.",
-      "Right. Mathematically the chain rule; algorithmically, dynamic programming over the network graph.",
-      "The learning rate is chosen by you (or a schedule); backprop supplies the directions.",
-      "It's exact and deterministic — the opposite of search."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why sweep backward from the loss rather than computing each weight's gradient independently?",
-     "options": [
-      "Backward is the only direction the math allows",
-      "Paths to the loss share segments; the backward sweep computes each shared piece once and reuses it",
-      "It uses less memory",
-      "Forward computation is impossible"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Forward-mode differentiation exists — it's just wildly inefficient when outputs (one loss) are fewer than inputs (billions of weights).",
-      "Right — that reuse turns an intractable computation into ~2× a forward pass.",
-      "Backprop actually *costs* memory (it stores forward activations); it buys time, not space.",
-      "The forward pass happens first — backprop consumes its stored results."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "A 40-layer network trains fine in its last layers, but the earliest layers barely change. Classic diagnosis:",
-     "options": [
-      "Early layers are already perfect",
-      "Vanishing gradients — chained small derivatives shrink toward zero by the time they reach early layers",
-      "The loss function is broken",
-      "Early layers have no weights"
-     ],
-     "answer": 1,
-     "feedback": [
-      "From random initialization? They're not perfect; they're unreached.",
-      "Right — the multiplicative chain decays. Standard fixes: ReLU, better initialization, residual connections.",
-      "A broken loss stalls *all* layers, not specifically the early ones.",
-      "Every layer has weights; the gradient just isn't arriving with any strength."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — What is backpropagation really doing?",
-     "url": "https://www.3blue1brown.com/lessons/backpropagation",
-     "type": "video",
-     "note": "Credit assignment visualized — pairs exactly with this concept's second card."
-    },
-    {
-     "label": "Karpathy — micrograd (build backprop from scratch)",
-     "url": "https://karpathy.ai/zero-to-hero.html",
-     "type": "video",
-     "note": "Implement autodiff in ~100 lines of Python. Nothing demystifies backprop faster."
-    }
-   ],
-   "anim": "backprop_flow"
-  },
-  {
-   "id": "c06-generalization",
-   "title": "Overfitting and generalization",
-   "summary": "The goal is performance on unseen data. Held-out validation detects memorization; regularization, early stopping, and more data fight it.",
-   "cards": [
-    {
-     "h": "The exam it never studied for",
-     "md": "A network can ace its training data by **memorizing** it — and fail completely on anything new. Training loss measures fit; the goal is **generalization**.\n\nSo the data is split: train on one part, evaluate on a held-out **validation set** the network never learns from. The telltale curve: training loss falls and keeps falling, validation loss falls… then turns upward. That turn is the moment learning becomes memorizing.\n\nA final **test set**, touched only once at the very end, guards against a subtler leak: by tuning your design choices to validation performance, *you* slowly overfit the validation set on the model's behalf."
-    },
-    {
-     "h": "The countermeasures",
-     "md": "- **More data** — the cure that always works when available; memorizing a million examples is harder than learning the pattern\n- **Early stopping** — halt at the validation-loss minimum\n- **Regularization** — penalize large weights (weight decay) so the model prefers simple explanations\n- **Dropout** — randomly silence neurons during training, forcing redundant, robust features\n\nOne domain-specific trap deserves its own line: in time-series and trading work, validation data must come from *after* the training period. Random shuffling leaks the future into training, and the backtest lies to you at full precision."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Training loss: steadily falling. Validation loss: fell, bottomed, now rising. The model is:",
-     "options": [
-      "Underfitting — train longer",
-      "Overfitting — it has begun memorizing training specifics at the expense of general patterns",
-      "Perfectly trained",
-      "Broken"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Underfitting is both losses stuck high — the opposite corner.",
-      "Right — the diverging curves are the definitive signature. Stop at the validation minimum or add regularization.",
-      "Perfect would be both losses low and tracking together.",
-      "Nothing is broken; this is the *expected* failure mode of unlimited training."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why keep a test set separate from the validation set?",
-     "options": [
-      "Redundancy in case of file corruption",
-      "Repeated design decisions tuned on validation performance gradually overfit the validation set; the untouched test set gives one honest final reading",
-      "Test sets use different math",
-      "No reason — one held-out set suffices"
-     ],
-     "answer": 1,
-     "feedback": [
-      "It's a statistical safeguard, not a backup.",
-      "Right — model selection is itself a fitting process. The test set is the exam nobody, including you, has seen.",
-      "Same metrics; different role in the protocol.",
-      "One set works only if you evaluate on it exactly once — which is what the test set formalizes."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "For a model predicting next-day returns, the validation split must be:",
-     "options": [
-      "A random 20% of all days",
-      "A contiguous block of days *after* the training period",
-      "The same days as training",
-      "The most volatile days"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Random shuffling puts tomorrow in the training set and yesterday in validation — future leakage, and the backtest will flatter you.",
-      "Right — walk-forward splitting mirrors deployment: train on the past, validate on the future.",
-      "That measures memorization and nothing else.",
-      "Cherry-picking regimes biases the estimate; chronology is the constraint that matters."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Nielsen — Neural Networks and Deep Learning, ch. 3",
-     "url": "http://neuralnetworksanddeeplearning.com/chap3.html",
-     "type": "reading",
-     "note": "Free classic text; the overfitting and regularization treatment is unusually clear."
-    }
-   ]
-  },
-  {
-   "id": "c07-architectures",
-   "title": "Architectures: building in assumptions",
-   "summary": "CNNs assume locality and translation-invariance for images; sequence models handle order; attention lets every position consult every other. Architecture = prior knowledge about data structure.",
-   "cards": [
-    {
-     "h": "Why one shape doesn't fit all",
-     "md": "A plain fully-connected network treats input dimensions as unrelated — pixel (0,0) and pixel (0,1) are strangers. Architectures fix this by **building the data's known structure into the wiring**:\n\n- **CNNs** (images): small filters slide across the image — a cat detector shouldn't care *where* the cat is (translation invariance), and nearby pixels matter to each other (locality). Massive weight-sharing falls out for free.\n- **Sequence models** (text, time series): consume tokens in order, carrying state — because order *is* information."
-    },
-    {
-     "h": "Attention",
-     "md": "The architecture behind modern AI. Older sequence models squeezed everything read so far through a fixed-size memory — distant context faded. **Attention** removes the bottleneck: every position computes relevance scores against every other position and pulls information directly from what matters, however far away.\n\n'The keys to the cabinet **were** on the table' — resolving *were* vs *was* requires linking back to *keys* across the gap. Attention makes that link explicit, learned, and parallel.\n\nStack attention layers with standard feed-forward layers and you have the **Transformer** — the architecture that, scaled up and trained on text, becomes a large language model. That story is the LLM topic; this concept is its foundation."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Weight sharing in a CNN — one small filter reused across all image positions — encodes which assumption?",
-     "options": [
-      "All images are the same size",
-      "A feature's meaning doesn't depend on where it appears (translation invariance)",
-      "Color is irrelevant",
-      "Images have no structure"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Input size is handled separately; sharing is about position.",
-      "Right — an edge is an edge anywhere, so one detector serves every location. Fewer weights, better generalization.",
-      "CNNs handle color as input channels; sharing is orthogonal to it.",
-      "The opposite — sharing exists precisely to exploit known structure."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The core advantage of attention over a fixed-size recurrent memory:",
-     "options": [
-      "It needs less computation",
-      "Any position can directly retrieve information from any other, instead of hoping it survived compression through intermediate steps",
-      "It removes the need for training",
-      "It only works on short sequences"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Attention costs *more* compute (it scales with the square of length); it wins on capability and parallelism.",
-      "Right — direct, learned lookups replace a lossy relay race. Long-range dependencies stop fading.",
-      "Attention weights are learned like everything else.",
-      "Long sequences are exactly where it shines relative to recurrence."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Choosing an architecture is best understood as:",
-     "options": [
-      "Picking the biggest model that fits in memory",
-      "Encoding what you already know about the data's structure into the network's wiring",
-      "A purely aesthetic choice",
-      "Avoiding the need for data"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Size is capacity; architecture is *shape* — they're different levers.",
-      "Right — locality for images, order for sequences, relational lookup for language. Structure in the wiring is prior knowledge the data doesn't have to teach.",
-      "The choices have measurable, often decisive consequences.",
-      "Good architecture stretches data further; it never replaces it."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — Attention in transformers",
-     "url": "https://www.3blue1brown.com/lessons/attention",
-     "type": "video",
-     "note": "The clearest visual explanation of attention — bridge material to the LLM topic."
-    }
-   ]
-  },
-  {
-   "id": "c08-training-practice",
-   "title": "Training in practice",
-   "summary": "The practical loop: prepare and normalize data, initialize sensibly, tune the learning rate first, monitor train/val curves, and iterate on diagnosis.",
-   "cards": [
-    {
-     "h": "The loop nobody skips",
-     "md": "Real training is an empirical loop:\n\n1. **Data**: clean, label, normalize inputs to comparable scales (wildly different scales distort the loss landscape into a canyon that's miserable to descend)\n2. **Initialize**: small random weights, scaled per layer — all-zeros makes every neuron identical forever (symmetry never breaks)\n3. **Tune the learning rate first** — it's the highest-leverage hyperparameter; sweep powers of ten\n4. **Watch both curves**: train AND validation loss, from concept 6\n5. **Diagnose, adjust, repeat**"
-    },
-    {
-     "h": "Reading the curves like an operator",
-     "md": "- Both losses high and flat → underfitting: bigger model, longer training, or better features\n- Train low, validation rising → overfitting: regularize, stop earlier, get data\n- Loss exploding or NaN → learning rate too high, or bad data (a single mislabeled outlier with huge values can do it)\n- Loss stuck at exactly the 'predict the average' value → the network found the lazy baseline; check for bugs before celebrating structure in your data that isn't there\n\nThe skill of deep learning in practice is mostly this: reading curves, forming a hypothesis, changing one thing, rerunning. Science at the speed of GPUs. You're now equipped for the next rungs of the chain: LLMs (this machinery scaled to language) and AI Agents (models wrapped in tools and goals)."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Why does initializing all weights to zero fail?",
-     "options": [
-      "Zero is not a valid number for weights",
-      "Every neuron in a layer computes identical outputs and receives identical gradients — they can never differentiate",
-      "It makes the loss undefined",
-      "It only fails for small networks"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Zero is valid — individual weights pass through zero constantly during training.",
-      "Right — perfect symmetry, perfectly preserved. Random initialization exists to break it.",
-      "The loss computes fine; it just never improves structurally.",
-      "It fails at every scale for the same symmetry reason."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "One input feature ranges 0–1, another 0–1,000,000. Without normalization, the likely effect:",
-     "options": [
-      "None — networks are scale-free",
-      "The big feature dominates early behavior and the distorted loss landscape makes one learning rate wrong for different weights",
-      "The small feature dominates",
-      "Training becomes deterministic"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Networks are decidedly not scale-free; the loss geometry depends on input scales.",
-      "Right — a canyon-shaped landscape: too big a step for one direction is too small for another. Normalize and the canyon rounds out.",
-      "Magnitude dominates in the raw sums — the big one shouts.",
-      "Scale has no effect on determinism."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "A return-prediction model's validation loss exactly matches always-predicting-zero, and its outputs hug zero. Most informative reading:",
-     "options": [
-      "The model is broken — restart from scratch",
-      "The model has found the baseline and no exploitable signal beyond it — which is itself important evidence about the data",
-      "The model is perfect",
-      "Validation loss is the wrong metric"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Restarting without a new hypothesis reruns the same experiment.",
-      "Right — in near-efficient domains, 'predict the mean' is a formidable baseline. Beating it needs better features or structure, not more epochs. Absence of signal is a finding; treat it with the same respect as presence.",
-      "Perfect at matching the laziest possible strategy.",
-      "The metric did its job — it told you the truth."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Karpathy — A Recipe for Training Neural Networks",
-     "url": "https://karpathy.github.io/2019/04/25/recipe/",
-     "type": "reading",
-     "note": "The canonical practitioner's checklist — this concept, expanded by someone with scars."
-    },
-    {
-     "label": "Nielsen — Neural Networks and Deep Learning (full book)",
-     "url": "http://neuralnetworksanddeeplearning.com",
-     "type": "reading",
-     "note": "Free, rigorous, readable — the consolidation read after mastering this ladder."
-    }
-   ]
-  }
- ]
+  ]
 }

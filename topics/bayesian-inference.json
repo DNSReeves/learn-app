@@ -1,872 +1,876 @@
 {
- "id": "bayesian-inference",
- "title": "Bayesian Inference",
- "tagline": "How to change your mind by exactly the right amount.",
- "description": "From probability-as-belief to posterior distributions. Every concept is gated: you advance when the evidence says you know it.",
- "concepts": [
-  {
-   "id": "c01-belief",
-   "title": "Probability as degree of belief",
-   "summary": "A probability can measure how strongly you believe something, on a 0-to-1 scale, and beliefs must obey the rules of probability to be coherent.",
-   "cards": [
+  "id": "bayesian-inference",
+  "title": "Bayesian Inference",
+  "tagline": "How to change your mind by exactly the right amount.",
+  "description": "From probability-as-belief to posterior distributions. Every concept is gated: you advance when the evidence says you know it.",
+  "concepts": [
     {
-     "h": "Two readings of the same number",
-     "md": "Say a weather app shows **70% chance of rain**. There is only one tomorrow — it will either rain or it won't. So what is the 70% *about*?\n\nThe **frequentist** reading: probability is a long-run frequency. Across many days *like* tomorrow, it rains on 70% of them.\n\nThe **Bayesian** reading: probability is a **degree of belief**. 70% measures how confident the forecaster is about *this* tomorrow, given everything known right now.\n\nBoth readings use identical math. Bayesian inference simply takes the belief reading seriously — which lets you put probabilities on one-off things: this trade, this diagnosis, this hypothesis."
+      "id": "c01-belief",
+      "title": "Probability as degree of belief",
+      "summary": "A probability can measure how strongly you believe something, on a 0-to-1 scale, and beliefs must obey the rules of probability to be coherent.",
+      "cards": [
+        {
+          "h": "Two readings of the same number",
+          "md": "Say a weather app shows **70% chance of rain**. There is only one tomorrow — it will either rain or it won't. So what is the 70% *about*?\n\nThe **frequentist** reading: probability is a long-run frequency. Across many days *like* tomorrow, it rains on 70% of them.\n\nThe **Bayesian** reading: probability is a **degree of belief**. 70% measures how confident the forecaster is about *this* tomorrow, given everything known right now.\n\nBoth readings use identical math. Bayesian inference simply takes the belief reading seriously — which lets you put probabilities on one-off things: this trade, this diagnosis, this hypothesis."
+        },
+        {
+          "h": "The scale",
+          "md": "Degrees of belief live on a 0-to-1 scale:\n\n- **0** — certain it's false\n- **0.5** — maximally unsure (for a yes/no question)\n- **1** — certain it's true\n\nA belief of 0.9 isn't a vibe; it's a commitment. It says you'd judge 9:1 odds as fair. If you *say* 0.9 but would only bet at even odds, your stated belief and your real belief disagree — and the real one is the one at 0.5."
+        },
+        {
+          "h": "Coherence",
+          "md": "Beliefs can be anything you like — except self-contradictory. If you believe *rain* at 0.7, you must believe *no rain* at 0.3. If your beliefs violate the probability rules, a bookie can construct a set of bets you'd accept individually that guarantee you lose money (a *Dutch book*).\n\nThat's the whole foundation: **Bayesian inference is the accounting system that keeps beliefs coherent as evidence arrives.** Everything that follows is bookkeeping done correctly."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A Bayesian says 'the probability this startup succeeds is 20%.' What does the 20% measure?",
+          "options": [
+            "The fraction of similar startups that succeed",
+            "Their degree of belief that this startup succeeds, given current information",
+            "The startup's objective success rate",
+            "Nothing — one-off events can't have probabilities"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That's the frequentist reading — reference-class frequency. A Bayesian can use that as an input, but the 20% itself is about belief in this case.",
+            "Right. It quantifies confidence about this specific case given what's known now.",
+            "There's no separate 'objective rate' living inside a one-off event — that's the point the belief reading solves.",
+            "Backwards — putting probabilities on one-off events is exactly what the belief interpretation permits."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "You believe P(market up tomorrow) = 0.6. Coherence requires your P(market not up) to be:",
+          "options": [
+            "Anything, beliefs are personal",
+            "0.6",
+            "0.4",
+            "Unknown until tomorrow"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Beliefs are personal but not lawless — they must sum correctly or you're Dutch-bookable.",
+            "Then P(up) + P(not up) = 1.2 — incoherent; you'd accept a guaranteed-loss set of bets.",
+            "Correct: complements must sum to 1. That's the minimum price of coherence.",
+            "Coherence is about your beliefs now, not the outcome later."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Which claim is a *Bayesian* probability statement that a strict frequentist would refuse to make?",
+          "options": [
+            "This coin lands heads 50% of flips in the long run",
+            "About 1% of these parts are defective",
+            "There's a 75% probability this specific hypothesis is true",
+            "The die shows a 6 on 1/6 of rolls"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Long-run frequency — fully frequentist.",
+            "A population rate — frequentist territory.",
+            "Yes. A hypothesis is either true or false; only the belief interpretation lets you put 75% on it.",
+            "Long-run frequency again."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Veritasium — The Bayesian Trap",
+          "url": "https://www.youtube.com/watch?v=R13BD8qKeTg",
+          "type": "video",
+          "note": "9 min. Probability-as-belief and why updating matters in real life."
+        },
+        {
+          "label": "Seeing Theory — Bayesian Inference (interactive)",
+          "url": "https://seeing-theory.brown.edu/bayesian-inference/index.html",
+          "type": "interactive",
+          "note": "Brown University. Drag-and-see visualizations of the core ideas."
+        }
+      ]
     },
     {
-     "h": "The scale",
-     "md": "Degrees of belief live on a 0-to-1 scale:\n\n- **0** — certain it's false\n- **0.5** — maximally unsure (for a yes/no question)\n- **1** — certain it's true\n\nA belief of 0.9 isn't a vibe; it's a commitment. It says you'd judge 9:1 odds as fair. If you *say* 0.9 but would only bet at even odds, your stated belief and your real belief disagree — and the real one is the one at 0.5."
+      "id": "c02-conditional",
+      "title": "Joint and conditional probability",
+      "summary": "P(A|B) is belief in A after learning B. The product rule P(A and B) = P(A|B)P(B) ties joint, conditional, and marginal beliefs together.",
+      "cards": [
+        {
+          "h": "Learning changes the question",
+          "md": "P(A) is your belief in A knowing nothing special. **P(A | B)** — 'probability of A *given* B' — is your belief in A *after learning B is true*.\n\nExample: P(a random person is over 6 ft) might be 0.15. P(over 6 ft | plays pro basketball) is much higher. Same person-property, different information state.\n\nConditioning is not a minor notation. It is *the* operation of learning. All of Bayesian inference is: **condition your beliefs on what you observed.**"
+        },
+        {
+          "h": "The product rule",
+          "md": "The joint probability that two things are both true factors cleanly:\n\n**P(A and B) = P(A | B) × P(B)**\n\nRead it as a story: for both to hold, first B happens (P(B)), then A happens *in a world where B is true* (P(A|B)).\n\nIt factors the other way too: P(A and B) = P(B | A) × P(A).\n\nThose two factorizations describe the same joint quantity — hold that thought; setting them equal is where Bayes' theorem comes from."
+        },
+        {
+          "h": "The classic trap",
+          "md": "**P(A|B) is not P(B|A).** The probability a person is a pro basketball player *given* they're over 6 ft is tiny; the probability they're over 6 ft *given* they're pro is huge.\n\nConfusing the two is called the *inverse fallacy*, and it's not academic: prosecutors have argued 'P(evidence | innocent) is tiny, so P(innocent | evidence) is tiny.' Those are different numbers, and the gap between them is exactly what Bayes' theorem computes."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "P(cloudy) = 0.4 and P(rain | cloudy) = 0.5. P(cloudy and rain) = ?",
+          "options": [
+            "0.9",
+            "0.2",
+            "0.5",
+            "0.1"
+          ],
+          "answer": 1,
+          "feedback": [
+            "You added. The product rule multiplies: joint = conditional × marginal.",
+            "Right: 0.5 × 0.4 = 0.2.",
+            "That's just P(rain|cloudy); you still need to weight by how likely 'cloudy' is.",
+            "Check the arithmetic: 0.5 × 0.4."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Roughly 90% of spam emails contain a link. Can you conclude that ~90% of emails containing a link are spam?",
+          "options": [
+            "Yes — same statement",
+            "No — that reverses the conditional, and P(spam|link) depends on how common spam and links are overall",
+            "Yes, if the sample is large",
+            "No, because 90% is too high to be real"
+          ],
+          "answer": 1,
+          "feedback": [
+            "P(link|spam) and P(spam|link) are different quantities.",
+            "Exactly. Plenty of legitimate email contains links; the reversed conditional needs base rates.",
+            "Sample size doesn't fix a reversed conditional.",
+            "The number's size is irrelevant; the direction of the conditional is the issue."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Which expression equals P(A and B)?",
+          "options": [
+            "P(A) + P(B)",
+            "P(A|B) + P(B|A)",
+            "P(B|A) × P(A)",
+            "P(A) × P(B), always"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Addition is for 'or' (and only for exclusive events).",
+            "Conditionals don't add into a joint.",
+            "Yes — the product rule, factored through A.",
+            "Only when A and B are independent. The product rule holds always; this shortcut doesn't."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Seeing Theory — Compound Probability",
+          "url": "https://seeing-theory.brown.edu/compound-probability/index.html",
+          "type": "interactive",
+          "note": "Joint, conditional, and the product rule, interactively."
+        },
+        {
+          "label": "3Blue1Brown — The quick proof of Bayes' theorem",
+          "url": "https://www.youtube.com/watch?v=U_85TaXbeIo",
+          "type": "video",
+          "note": "3 min. Derives the theorem from the two factorizations of the joint — exactly this concept's punchline."
+        }
+      ]
     },
     {
-     "h": "Coherence",
-     "md": "Beliefs can be anything you like — except self-contradictory. If you believe *rain* at 0.7, you must believe *no rain* at 0.3. If your beliefs violate the probability rules, a bookie can construct a set of bets you'd accept individually that guarantee you lose money (a *Dutch book*).\n\nThat's the whole foundation: **Bayesian inference is the accounting system that keeps beliefs coherent as evidence arrives.** Everything that follows is bookkeeping done correctly."
+      "id": "c03-bayes-theorem",
+      "title": "Bayes' theorem",
+      "summary": "P(H|E) = P(E|H)P(H)/P(E). It is the product rule rearranged — the rule for reversing a conditional legally.",
+      "cards": [
+        {
+          "h": "One line of algebra",
+          "md": "From the last concept, the joint factors both ways:\n\nP(H and E) = P(H|E)·P(E) = P(E|H)·P(H)\n\nDivide both sides by P(E):\n\n## P(H|E) = P(E|H) · P(H) / P(E)\n\nThat's the entire theorem. Nothing mystical — it's the product rule rearranged. Its power is *direction*: it converts the conditional you can usually compute, P(evidence | hypothesis), into the one you actually want, P(hypothesis | evidence)."
+        },
+        {
+          "h": "Why direction matters",
+          "md": "Models naturally run forward: *if* the coin is fair, *then* P(3 heads) is easy. *If* the patient has the disease, *then* P(positive test) is in the test's spec sheet.\n\nBut you observe the evidence and want the hypothesis: P(fair | 3 heads), P(disease | positive). Bayes' theorem is the legal move from forward to backward — the inverse fallacy done right, with P(H) and P(E) supplying exactly the correction the fallacy omits."
+        },
+        {
+          "h": "The denominator",
+          "md": "P(E) — the total probability of the evidence — is computed by summing over all the ways E could happen:\n\nP(E) = P(E|H)·P(H) + P(E|not H)·P(not H)\n\nIt's the *normalizer*: it makes the posteriors across all hypotheses sum to 1. A useful instinct: evidence that is likely under many hypotheses (big P(E)) moves you little; evidence that is *only* likely under one hypothesis moves you a lot."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "P(H) = 0.5, P(E|H) = 0.8, P(E|not H) = 0.4. What is P(H|E)?",
+          "options": [
+            "0.8",
+            "2/3",
+            "0.4",
+            "0.5"
+          ],
+          "answer": 1,
+          "feedback": [
+            "0.8 is P(E|H) — the forward direction, not the answer.",
+            "Right: P(E) = 0.8(0.5) + 0.4(0.5) = 0.6, so P(H|E) = 0.4/0.6 = 2/3.",
+            "That's the numerator 0.8×0.5 without normalizing by P(E).",
+            "The evidence favored H 2:1 — the belief must move off 0.5."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In P(H|E) = P(E|H)P(H)/P(E), what job does P(E) do?",
+          "options": [
+            "Measures how good the hypothesis is",
+            "Normalizes, so posteriors over all hypotheses sum to 1",
+            "It's a fudge factor chosen to get the answer you want",
+            "It equals P(E|H)"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Hypothesis quality lives in P(E|H) and P(H).",
+            "Correct — it's total probability of the evidence across all hypotheses.",
+            "It's fully determined by the model: sum P(E|Hᵢ)P(Hᵢ).",
+            "Only if H were certain. In general P(E) averages over all hypotheses."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Evidence E is almost equally likely whether H is true or false. What does observing E do to your belief in H?",
+          "options": [
+            "Confirms H strongly",
+            "Refutes H strongly",
+            "Moves it very little",
+            "Sets it to 0.5"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Strong confirmation needs P(E|H) >> P(E|not H).",
+            "Refutation needs the reverse asymmetry.",
+            "Right — uninformative evidence, ratio near 1, posterior ≈ prior.",
+            "The posterior stays near the *prior*, wherever that was — not at 0.5."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — Bayes theorem, the geometry of changing beliefs",
+          "url": "https://www.youtube.com/watch?v=HZGCoVF3YvM",
+          "type": "video",
+          "note": "15 min. The definitive visual treatment; the librarian/farmer example."
+        },
+        {
+          "label": "3Blue1Brown — written lesson version",
+          "url": "https://www.3blue1brown.com/lessons/bayes-theorem/",
+          "type": "reading",
+          "note": "Same material as the video, readable at your own pace."
+        }
+      ],
+      "anim": "square"
+    },
+    {
+      "id": "c04-vocabulary",
+      "title": "Prior, likelihood, posterior",
+      "summary": "Posterior ∝ likelihood × prior. The prior is belief before data, the likelihood scores hypotheses by how well they predict the data, the posterior is belief after.",
+      "cards": [
+        {
+          "h": "Naming the parts",
+          "md": "Bayes' theorem, with its parts named:\n\n**posterior = likelihood × prior / evidence**\n\n- **Prior** P(H): belief before this data arrived\n- **Likelihood** P(E|H): how well hypothesis H predicts the observed data — *a function of H*, with the data held fixed\n- **Posterior** P(H|E): belief after\n- **Evidence** P(E): the normalizer\n\nBecause the normalizer doesn't depend on H, the working form is:\n\n## posterior ∝ likelihood × prior"
+        },
+        {
+          "h": "The likelihood is not a probability over hypotheses",
+          "md": "Subtle but load-bearing: the likelihood asks, for each candidate hypothesis, *'how surprised would this hypothesis be by the data I actually saw?'*\n\nFix the data. Vary the hypothesis. The resulting scores don't need to sum to 1 — they're not a distribution over hypotheses, they're a *scorecard*. Hypotheses that predicted the data well score high; hypotheses that would have been shocked score low.\n\nThe posterior then blends that scorecard with the prior."
+        },
+        {
+          "h": "A division of labor",
+          "md": "Each part has one job:\n\n- The **prior** carries everything you knew *before* — base rates, past results, structure.\n- The **likelihood** carries everything the *new data* says.\n- The **posterior** is their product, renormalized.\n\nNeither part is optional. Data without priors ignores what you already knew (see the next concept for how badly that goes); priors without data is just stubbornness. The posterior is the negotiated settlement — and it's tomorrow's prior."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "You flip a coin 10 times and see 7 heads. In evaluating 'this coin is fair,' the number P(7 heads in 10 | fair) ≈ 0.117 is the:",
+          "options": [
+            "Prior",
+            "Likelihood",
+            "Posterior",
+            "Evidence"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The prior is your belief in fairness before flipping.",
+            "Right — data fixed, hypothesis assumed, it scores how well 'fair' predicts what you saw.",
+            "The posterior is P(fair | 7 heads) — it also needs the prior and normalizer.",
+            "The evidence averages over all hypotheses, not just 'fair.'"
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why can we write posterior ∝ likelihood × prior, dropping P(E)?",
+          "options": [
+            "P(E) is always 1",
+            "P(E) doesn't depend on which hypothesis you're scoring, so it rescales all posteriors equally",
+            "P(E) is unknowable",
+            "The proportionality is an approximation"
+          ],
+          "answer": 1,
+          "feedback": [
+            "P(E) is rarely 1.",
+            "Correct — it's a common denominator across hypotheses; relative belief is unaffected, and you can renormalize at the end.",
+            "It's computable — sum likelihood×prior over hypotheses. It's just not needed for comparing them.",
+            "It's exact, not approximate; normalization is deferred, not lost."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Likelihood values across all candidate hypotheses sum to 1.4. Is something wrong?",
+          "options": [
+            "Yes — probabilities must sum to 1",
+            "No — the likelihood is a function of the hypothesis, not a distribution over hypotheses",
+            "Yes — the data must be corrupted",
+            "No — but only because 1.4 is close to 1"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The likelihood isn't a probability distribution over H. Each value is a probability *of the data*, under a different H.",
+            "Exactly. It's a scorecard, not a distribution; no sum-to-1 constraint applies.",
+            "Nothing about the data is implicated.",
+            "The sum could be 0.03 or 12 — any value is fine."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Think Bayes 2 — Chapter 1-2 (free book)",
+          "url": "https://allendowney.github.io/ThinkBayes2/",
+          "type": "reading",
+          "note": "Allen Downey. Prior/likelihood/posterior with runnable Python — matches your stack."
+        }
+      ],
+      "anim": "bayes_vocab"
+    },
+    {
+      "id": "c05-base-rates",
+      "title": "The diagnostic test: base rates bite",
+      "summary": "With a rare condition, even an accurate test yields mostly false positives. The prior (base rate) dominates when evidence is moderate.",
+      "cards": [
+        {
+          "h": "The setup",
+          "md": "A disease affects **1 in 1,000** people. A test catches 99% of true cases (sensitivity) and wrongly flags 5% of healthy people (false-positive rate).\n\nYou test positive. What's the probability you have the disease?\n\nMost people — including most physicians in published studies (Casscells 1978, and replications since) — answer near 95%. Lock in your own answer before the next card."
+        },
+        {
+          "h": "Count a town",
+          "md": "Skip the formula; count 100,000 people.\n\n- Sick: 100. Of these, **99** test positive.\n- Healthy: 99,900. Of these, 5% — **4,995** — test positive.\n\nPositives total 99 + 4,995 = 5,094. True positives: 99.\n\n## P(disease | positive) = 99 / 5,094 ≈ 1.9%\n\nNot 95%. The false positives outnumber the true ones 50-to-1, because the healthy population is enormous. The 'accurate test' intuition ignored the prior."
+        },
+        {
+          "h": "The general lesson",
+          "md": "This is base-rate neglect, and it's the single most consequential Bayesian error in the wild — medicine, fraud detection, security alerts, trading signals.\n\nThe pattern: **when the prior is extreme, moderate evidence cannot overcome it.** A 20:1 likelihood ratio applied to a 1-in-1000 prior still leaves you overwhelmingly likely healthy.\n\nCorollary for any alert system: if the condition you're screening for is rare, most alerts are false — no matter how good the detector looks on paper. The fix is either a stronger detector or a second, independent test (next concept)."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Same test (99% sensitivity, 5% false positives), but the disease affects 1 in 10 people. Roughly what is P(disease | positive)?",
+          "options": [
+            "About 2%",
+            "About 30%",
+            "About 69%",
+            "About 99%"
+          ],
+          "answer": 2,
+          "feedback": [
+            "That was the 1-in-1000 answer; the prior is now 100× larger.",
+            "Recount: per 1,000 people — 100 sick → 99 positive; 900 healthy → 45 positive.",
+            "Right: 99/(99+45) ≈ 69%. Same test, different prior, wildly different posterior.",
+            "Even at a 10% base rate, false positives still drag it well below 99%."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Your fraud model flags transactions with a 1% false-positive rate and 95% detection. Fraud is 1 in 10,000 transactions. Of flagged transactions, roughly what fraction are actually fraud?",
+          "options": [
+            "~95%",
+            "~50%",
+            "~1%",
+            "~0.9%"
+          ],
+          "answer": 3,
+          "feedback": [
+            "That's the detector's spec, not the posterior.",
+            "The base rate is far too low for a coin-flip posterior.",
+            "Close — but compute it: per 1M txns, 95 true flags vs ~10,000 false flags.",
+            "Yes: 95/(95+9,999) ≈ 0.9%. Over 99% of flags are false. Rare condition + moderate evidence = alert fatigue."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "What single change most efficiently rescues the rare-disease test's posterior?",
+          "options": [
+            "Raise sensitivity from 99% to 99.9%",
+            "Cut the false-positive rate from 5% toward 0.1%",
+            "Test more people",
+            "Report results with more decimals"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Sensitivity barely matters here — the 99 true positives weren't the problem; the 4,995 false ones were.",
+            "Right. False positives dominate the denominator; cutting them 50× lifts the posterior from ~2% to ~50%.",
+            "More tests scale both counts equally.",
+            "Precision of reporting doesn't touch the math."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — The medical test paradox",
+          "url": "https://www.youtube.com/watch?v=lG4VkPoG3ko",
+          "type": "video",
+          "note": "21 min. This exact problem, plus the odds/likelihood-ratio reframing used in the next concepts."
+        }
+      ],
+      "anim": "grid"
+    },
+    {
+      "id": "c06-updating",
+      "title": "Sequential updating",
+      "summary": "Today's posterior is tomorrow's prior. Independent evidence can be absorbed piece by piece, in any order, and lands on the same posterior.",
+      "anim": "chain",
+      "cards": [
+        {
+          "h": "The loop",
+          "md": "Bayes' theorem isn't a one-shot formula — it's a **loop**:\n\n1. Hold a prior.\n2. Observe evidence.\n3. Compute the posterior.\n4. **That posterior is your new prior.** Go to 2.\n\nThis is why Bayesian inference fits streaming reality — markets, sensors, test results. You never start over; every belief you hold is the compressed summary of everything you've seen so far."
+        },
+        {
+          "h": "Order doesn't matter",
+          "md": "If two pieces of evidence are independent given the hypothesis, you can process E₁ then E₂, or E₂ then E₁, or both at once — the final posterior is identical. Multiplication commutes:\n\nposterior ∝ P(E₂|H) · P(E₁|H) · prior\n\nThis is a powerful sanity check: if your updating procedure gives different answers depending on the order you read the news, it isn't Bayesian — something is leaking."
+        },
+        {
+          "h": "Double-counting",
+          "md": "The loop has one failure mode worth tattooing somewhere: **evidence may be counted once.**\n\nIf two news stories both trace back to the same source, they are one piece of evidence wearing two hats. Updating on both is like flipping a coin once and recording it twice. Correlated signals — analysts quoting each other, indicators derived from the same price series — must be discounted or your posterior becomes confident far beyond what the world actually told you."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "After updating on this morning's data, your posterior for a hypothesis is 0.7. New independent data arrives this afternoon. What prior do you use?",
+          "options": [
+            "The original prior from last week",
+            "0.5, to stay neutral",
+            "0.7 — this morning's posterior",
+            "Whichever gives the higher posterior"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Re-using the old prior throws away this morning's evidence.",
+            "Resetting to neutral erases everything you learned.",
+            "Right — posterior in, prior out. The chain is the whole method.",
+            "Choosing to reach a conclusion isn't inference; it's motivated reasoning."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Three independent studies each favor a drug with likelihood ratio 2:1. Processed sequentially from a 1:1 prior, the final odds are:",
+          "options": [
+            "2:1",
+            "6:1",
+            "8:1",
+            "Depends on the order processed"
+          ],
+          "answer": 2,
+          "feedback": [
+            "That's one study's worth.",
+            "You added the ratios; independent evidence multiplies.",
+            "Yes: 2 × 2 × 2 = 8:1. Independent likelihood ratios multiply.",
+            "Multiplication commutes — order can't matter for independent evidence."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Five financial newsletters all turn bearish the same week, and all five cite the same bank's report. As evidence, this is closest to:",
+          "options": [
+            "Five independent updates — strong bear signal",
+            "Roughly one update — the newsletters are correlated through their source",
+            "Zero updates — newsletters are never evidence",
+            "A contrarian buy signal"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Counting them separately double- (quintuple-) counts one report.",
+            "Right. One underlying source ≈ one piece of evidence; the echoes add almost nothing.",
+            "The underlying report is real evidence — once.",
+            "Bayes says discount the echo, not invert it; contrarianism needs its own evidence."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Think Bayes 2 — Ch. 4, sequential estimation",
+          "url": "https://allendowney.github.io/ThinkBayes2/",
+          "type": "reading",
+          "note": "The update loop in runnable code."
+        }
+      ]
+    },
+    {
+      "id": "c07-odds",
+      "title": "Odds form and Bayes factors",
+      "summary": "posterior odds = prior odds × likelihood ratio. The Bayes factor cleanly separates what the evidence says from what you believed before.",
+      "cards": [
+        {
+          "h": "Probabilities → odds",
+          "md": "Odds are just probability in ratio clothing: p = 0.75 is odds of 3:1 (0.75/0.25). Odds of 1:4 is p = 0.2.\n\nWhy bother? Because in odds form, Bayes' theorem loses its denominator entirely:\n\n## posterior odds = prior odds × likelihood ratio\n\nwhere the **likelihood ratio** (or **Bayes factor**) is P(E|H) / P(E|not H) — how many times better the hypothesis predicts the evidence than its rival."
+        },
+        {
+          "h": "One number for the evidence",
+          "md": "The Bayes factor is the cleanest possible answer to *'what does this evidence actually say?'* — fully separated from your prior.\n\n- LR = 20 — strong evidence for H\n- LR = 1 — the evidence says nothing\n- LR = 0.05 — strong evidence against H\n\nRedo the diagnostic test instantly: prior odds 1:999, LR = 0.99/0.05 ≈ 20. Posterior odds = 20:999 ≈ 1:50 → about 2%. Same answer as the town-counting, three seconds of arithmetic."
+        },
+        {
+          "h": "Log-odds: evidence adds",
+          "md": "Take logs and multiplication becomes addition: each independent piece of evidence *adds* its log-likelihood-ratio to your running log-odds. Evidence becomes an additive currency — 'this signal is worth +3 decibans, that one −1.'\n\nThis is how spam filters score messages, and how Alan Turing's team at Bletchley weighed Enigma evidence (they coined the *ban*). When you hear 'weight of evidence,' this is the literal weighing."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Prior odds 1:4 that a strategy has real edge. A backtest result has likelihood ratio 8 in its favor. Posterior odds — and roughly posterior probability?",
+          "options": [
+            "8:4 = 2:1 → ~67%",
+            "1:32 → ~3%",
+            "9:4 → ~69%",
+            "8:1 → ~89%"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Right: (1×8):4 = 2:1, and 2/(2+1) ≈ 67%.",
+            "You multiplied the wrong side — LR of 8 favors the hypothesis.",
+            "You added; odds form multiplies.",
+            "That ignores the 1:4 prior."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A Bayes factor of exactly 1 means:",
+          "options": [
+            "The hypothesis is 50% likely",
+            "The evidence is equally probable under both hypotheses — it moves nothing",
+            "The evidence proves the hypothesis",
+            "The prior was wrong"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The posterior equals the *prior*, which can be anything — not necessarily 50%.",
+            "Correct. Multiply odds by 1: no change. Uninformative evidence.",
+            "Proof would be LR → ∞.",
+            "The BF says nothing about the prior; that's exactly its virtue."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Two independent signals have likelihood ratios 10 and 0.1. Net effect on your odds:",
+          "options": [
+            "Strong positive update",
+            "Strong negative update",
+            "None — they cancel exactly",
+            "Cannot combine likelihood ratios"
+          ],
+          "answer": 2,
+          "feedback": [
+            "The 0.1 exactly undoes the 10.",
+            "Symmetric reasoning — the 10 undoes the 0.1.",
+            "Right: 10 × 0.1 = 1. In log-odds, +1 and −1 sum to zero.",
+            "Independent LRs multiply — that's the core mechanic of this concept."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — The medical test paradox (likelihood ratios)",
+          "url": "https://www.youtube.com/watch?v=lG4VkPoG3ko",
+          "type": "video",
+          "note": "The back half of this video is the odds-form rewrite of Bayes — watch it now if you skipped it earlier."
+        }
+      ],
+      "anim": "bayes_logodds"
+    },
+    {
+      "id": "c08-beta",
+      "title": "Continuous beliefs: the Beta-Binomial",
+      "summary": "For an unknown rate, the belief is a whole distribution over [0,1]. Beta(a,b) updates on heads/tails by simply incrementing a or b.",
+      "anim": "beta",
+      "cards": [
+        {
+          "h": "From hypotheses to a curve",
+          "md": "So far our hypotheses were discrete: sick/healthy, edge/no-edge. But 'what fraction of the time does this coin land heads?' has a *continuum* of hypotheses — every value of θ between 0 and 1.\n\nA Bayesian's belief about θ is therefore a **whole curve**: a probability density over [0,1]. Tall where you think θ likely lives, flat where you're unsure. Updating reshapes the entire curve at once — every candidate θ gets multiplied by how well it predicted the data."
+        },
+        {
+          "h": "The Beta distribution",
+          "md": "The workhorse curve for rates is **Beta(a, b)**. Read its two parameters as *pseudo-counts*:\n\n- Beta(1, 1) — flat; total ignorance about θ\n- Beta(5, 5) — probably near 0.5\n- Beta(20, 4) — probably near 0.83\n\nMean ≈ a/(a+b). Bigger a+b = more (pseudo-)data = tighter curve. The prior literally says: 'I walk in as if I'd already seen a−1 heads and b−1 tails.'"
+        },
+        {
+          "h": "The update is addition",
+          "md": "Here's the payoff. If your prior is Beta(a, b) and you observe h heads and t tails:\n\n## posterior = Beta(a + h, b + t)\n\nThat's it. The full Bayes machinery — likelihood times prior, normalize the curve — collapses to *incrementing two counters*. This happy algebra is called **conjugacy** (the Beta is conjugate to the Binomial), and it's why Beta-Binomial models run in production everywhere: A/B tests, click-through rates, win rates."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Prior Beta(2, 2) on a coin's heads-rate. You flip 10 times: 7 heads, 3 tails. Posterior?",
+          "options": [
+            "Beta(7, 3)",
+            "Beta(9, 5)",
+            "Beta(14, 6)",
+            "Beta(2.7, 2.3)"
+          ],
+          "answer": 1,
+          "feedback": [
+            "You dropped the prior's pseudo-counts.",
+            "Right: (2+7, 2+3). Add heads to a, tails to b.",
+            "Counts add; they don't multiply.",
+            "Whole observations add as whole counts."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Two analysts model a click-through rate: one starts from Beta(1,1), the other from Beta(60,140). After both see the same 1,000,000 impressions, their posteriors are:",
+          "options": [
+            "Wildly different — priors are destiny",
+            "Nearly identical — a million observations swamp 200 pseudo-counts",
+            "Identical to their priors",
+            "Impossible to compare"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Destiny only when data is scarce.",
+            "Right. Posterior counts are ~prior + 1,000,000; the prior's contribution is a rounding error. Data swamps the prior.",
+            "A million observations reshape any finite prior.",
+            "Same model, same data — directly comparable."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Beta(21, 3) versus Beta(7, 1) have the same mean (0.875). What differs?",
+          "options": [
+            "Nothing — same mean, same belief",
+            "Beta(21, 3) is tighter: more pseudo-data, more confidence around that mean",
+            "Beta(7, 1) is tighter",
+            "Only the mean matters in Bayesian inference"
+          ],
+          "answer": 1,
+          "feedback": [
+            "A belief is the whole curve, not its mean.",
+            "Right — a+b = 24 vs 8. Same center, three times the effective evidence, visibly narrower curve.",
+            "Fewer pseudo-counts = wider, not tighter.",
+            "Two beliefs with equal means can imply very different bets; the spread is the risk."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — Binomial distributions / probabilities of probabilities",
+          "url": "https://www.3blue1brown.com/lessons/binomial-distributions",
+          "type": "reading",
+          "note": "Written lesson with animations — the ideal companion for this concept."
+        },
+        {
+          "label": "Seeing Theory — Bayesian inference (Beta demo)",
+          "url": "https://seeing-theory.brown.edu/bayesian-inference/index.html",
+          "type": "interactive",
+          "note": "Flip coins and watch the Beta posterior sharpen — same demo as this concept's animation, second opinion."
+        }
+      ]
+    },
+    {
+      "id": "c09-priors",
+      "title": "Choosing priors",
+      "summary": "Priors encode pre-data knowledge. Flat isn't neutral, informative priors are honest when defensible, and sensitivity analysis is the discipline that keeps them safe.",
+      "cards": [
+        {
+          "h": "The objection",
+          "md": "'Priors are subjective — you can get any answer you want.' This is the standard objection to Bayes, and it deserves a straight response:\n\n1. *Everyone* has priors; Bayesians just write theirs down where they can be criticized.\n2. With reasonable data, priors wash out (you proved this in the last checkpoint).\n3. When priors *don't* wash out — small data, rare events — that is precisely when pretending you don't have one causes disasters like the base-rate fallacy."
+        },
+        {
+          "h": "Flat is not neutral",
+          "md": "A tempting dodge: 'use a flat prior and stay objective.' But flat in one parameterization is curved in another — flat on θ is *not* flat on θ², or on log-odds of θ. Every prior takes a stance; flatness just hides which one.\n\nPractical guidance:\n- **Weakly informative** priors (broad but not absurd) are the modern default — they rule out the ridiculous without steering the answer.\n- **Informative** priors are correct when you genuinely have prior evidence — last quarter's rates, published effect sizes, physical limits. Discarding known information is not humility; it's waste."
+        },
+        {
+          "h": "Sensitivity analysis",
+          "md": "The professional discipline that makes priors safe: **rerun the analysis under several defensible priors.**\n\n- Conclusions agree → the data is doing the work; report with confidence.\n- Conclusions diverge → the data is too weak to decide, and *that is the finding*. Report the divergence; collect more data.\n\nA Bayesian result quoted without sensitivity checks is a single scenario, not an analysis."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A colleague: 'I used a flat prior, so my analysis is assumption-free.' The sharpest correction:",
+          "options": [
+            "Correct — flat priors are objective",
+            "Flat on one scale is informative on another; the assumption is hidden, not absent",
+            "Flat priors are forbidden",
+            "Priors never matter anyway"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Flat-on-θ is a specific stance that transforms into a non-flat stance on other scales.",
+            "Right. Every prior takes a position; flatness just obscures which one.",
+            "Flat priors are often fine — the claim of assumption-freedom is what's wrong.",
+            "They matter exactly when data is thin."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Estimating the failure rate of a new part, when three prior generations of the same part all failed at 1-3%. The best prior:",
+          "options": [
+            "Flat on [0,1] — new part, blank slate",
+            "Weakly concentrated near 1-3% but with real spread — use the history, stay open to surprise",
+            "A point mass at exactly 2%",
+            "Whatever makes the new part look best"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Ignoring three generations of directly relevant data is waste, not objectivity.",
+            "Right — informative but honest. History in, dogma out.",
+            "A point mass can never update; it's certainty, not belief.",
+            "That's advocacy. Bayes is accounting, not marketing."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Under three defensible priors your conclusion flips sign. The Bayesian response:",
+          "options": [
+            "Report the prior whose answer you prefer",
+            "Average the three answers and report that",
+            "Report that the data cannot yet decide, and gather more",
+            "Abandon Bayesian methods"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Prior-shopping is the one sin the framework cannot survive.",
+            "An average of divergent scenarios manufactures false confidence.",
+            "Right. Divergence under sensitivity analysis IS the result: insufficient evidence.",
+            "The divergence was a discovery, not a failure — a non-Bayesian analysis would simply have hidden it."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Think Bayes 2 — priors and modeling chapters",
+          "url": "https://allendowney.github.io/ThinkBayes2/",
+          "type": "reading",
+          "note": "Practical prior choice with code, minus the philosophy wars."
+        }
+      ],
+      "anim": "bayes_sensitivity"
+    },
+    {
+      "id": "c10-decisions",
+      "title": "From posterior to decision",
+      "summary": "The posterior is the input, not the output: predictions integrate over it, and decisions maximize expected utility under it. Capstone concept.",
+      "cards": [
+        {
+          "h": "Prediction: average over what you don't know",
+          "md": "What's the probability the *next* flip is heads? Not 'the best θ' — you don't know θ. The **posterior predictive** averages the prediction over every candidate θ, weighted by your posterior belief in it.\n\nFor Beta(a, b) it's beautifully simple: P(next is heads) = a/(a+b). With posterior Beta(9,5): 9/14 ≈ 0.64.\n\nThe honest prediction bakes in your *uncertainty about the rate*, not just the rate's best guess."
+        },
+        {
+          "h": "Decision: probability × consequences",
+          "md": "A posterior alone never tells you what to do — you also need what each outcome *costs*. The rule: **choose the action with the best expected utility under the posterior.**\n\nA 2% posterior of disease sounds dismissible — until the follow-up test costs $50 and the missed disease is fatal; then 2% commands action. A 60% posterior of trading edge sounds actionable — until the downside is ruin. Same posteriors, opposite decisions, because the payoffs differ. Probabilities and payoffs are separate inputs; Bayes owns the first, you must supply the second."
+        },
+        {
+          "h": "The whole method on one card",
+          "md": "You now hold the complete loop:\n\n1. **Prior** — write down what you believe and why.\n2. **Likelihood** — model how each hypothesis predicts data.\n3. **Update** — posterior ∝ likelihood × prior (odds form for speed; conjugate forms when lucky).\n4. **Check** — sensitivity analysis across defensible priors.\n5. **Predict & decide** — posterior predictive for forecasts; expected utility for actions.\n6. **Loop** — today's posterior is tomorrow's prior.\n\nThe mastery review will now interleave everything. That's not ceremony — spaced, mixed retrieval is where retention is actually built."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Posterior on a conversion rate: Beta(30, 70). The honest probability that the next visitor converts:",
+          "options": [
+            "0.30",
+            "0.43",
+            "0.70",
+            "Unknowable without the true rate"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Right: a/(a+b) = 30/100. The posterior predictive collapses to the posterior mean here.",
+            "Check: 30/(30+70).",
+            "That's b's share — the non-conversion side.",
+            "Averaging over the posterior is exactly how you predict *without* knowing the true rate."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Alarm A: posterior 0.9 of a trivial fault costing $10. Alarm B: posterior 0.02 of a failure costing $100,000. Which does a Bayesian decision-maker investigate first?",
+          "options": [
+            "A — higher probability wins",
+            "B — expected loss $2,000 vs $9",
+            "Neither — both below 95% certainty",
+            "Flip a coin"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Probability alone isn't a decision rule.",
+            "Right. 0.02 × 100,000 = 2,000 ≫ 0.9 × 10 = 9. Consequences weight the posterior.",
+            "Certainty thresholds are for mastery gates, not loss management.",
+            "The expected losses differ by 200×; this is not a coin-flip situation."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Which sequence is the Bayesian workflow in the right order?",
+          "options": [
+            "Decide → collect data → choose the prior that supports the decision",
+            "Prior → likelihood → posterior → sensitivity check → predict/decide",
+            "Likelihood → decision → prior",
+            "Posterior → prior → data"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That's the workflow of motivated reasoning, formalized.",
+            "Right — belief in, evidence weighed, belief out, stress-tested, then acted on.",
+            "The prior can't come last; it means 'before.'",
+            "The arrow of the method runs prior → posterior, never backward."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Think Bayes 2 — decision analysis chapters",
+          "url": "https://allendowney.github.io/ThinkBayes2/",
+          "type": "reading",
+          "note": "Posterior predictive and expected-utility decisions, in Python."
+        },
+        {
+          "label": "3Blue1Brown — Bayes playlist",
+          "url": "https://www.youtube.com/playlist?list=PLk4N6AFvLWe3xCHuOs0siWp0q2F43Cslh",
+          "type": "video",
+          "note": "Rewatch the full arc now that you own the vocabulary — it lands differently after mastery."
+        }
+      ],
+      "anim": "bayes_decision"
     }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A Bayesian says 'the probability this startup succeeds is 20%.' What does the 20% measure?",
-     "options": [
-      "The fraction of similar startups that succeed",
-      "Their degree of belief that this startup succeeds, given current information",
-      "The startup's objective success rate",
-      "Nothing — one-off events can't have probabilities"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That's the frequentist reading — reference-class frequency. A Bayesian can use that as an input, but the 20% itself is about belief in this case.",
-      "Right. It quantifies confidence about this specific case given what's known now.",
-      "There's no separate 'objective rate' living inside a one-off event — that's the point the belief reading solves.",
-      "Backwards — putting probabilities on one-off events is exactly what the belief interpretation permits."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "You believe P(market up tomorrow) = 0.6. Coherence requires your P(market not up) to be:",
-     "options": [
-      "Anything, beliefs are personal",
-      "0.6",
-      "0.4",
-      "Unknown until tomorrow"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Beliefs are personal but not lawless — they must sum correctly or you're Dutch-bookable.",
-      "Then P(up) + P(not up) = 1.2 — incoherent; you'd accept a guaranteed-loss set of bets.",
-      "Correct: complements must sum to 1. That's the minimum price of coherence.",
-      "Coherence is about your beliefs now, not the outcome later."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Which claim is a *Bayesian* probability statement that a strict frequentist would refuse to make?",
-     "options": [
-      "This coin lands heads 50% of flips in the long run",
-      "About 1% of these parts are defective",
-      "There's a 75% probability this specific hypothesis is true",
-      "The die shows a 6 on 1/6 of rolls"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Long-run frequency — fully frequentist.",
-      "A population rate — frequentist territory.",
-      "Yes. A hypothesis is either true or false; only the belief interpretation lets you put 75% on it.",
-      "Long-run frequency again."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Veritasium — The Bayesian Trap",
-     "url": "https://www.youtube.com/watch?v=R13BD8qKeTg",
-     "type": "video",
-     "note": "9 min. Probability-as-belief and why updating matters in real life."
-    },
-    {
-     "label": "Seeing Theory — Bayesian Inference (interactive)",
-     "url": "https://seeing-theory.brown.edu/bayesian-inference/index.html",
-     "type": "interactive",
-     "note": "Brown University. Drag-and-see visualizations of the core ideas."
-    }
-   ]
-  },
-  {
-   "id": "c02-conditional",
-   "title": "Joint and conditional probability",
-   "summary": "P(A|B) is belief in A after learning B. The product rule P(A and B) = P(A|B)P(B) ties joint, conditional, and marginal beliefs together.",
-   "cards": [
-    {
-     "h": "Learning changes the question",
-     "md": "P(A) is your belief in A knowing nothing special. **P(A | B)** — 'probability of A *given* B' — is your belief in A *after learning B is true*.\n\nExample: P(a random person is over 6 ft) might be 0.15. P(over 6 ft | plays pro basketball) is much higher. Same person-property, different information state.\n\nConditioning is not a minor notation. It is *the* operation of learning. All of Bayesian inference is: **condition your beliefs on what you observed.**"
-    },
-    {
-     "h": "The product rule",
-     "md": "The joint probability that two things are both true factors cleanly:\n\n**P(A and B) = P(A | B) × P(B)**\n\nRead it as a story: for both to hold, first B happens (P(B)), then A happens *in a world where B is true* (P(A|B)).\n\nIt factors the other way too: P(A and B) = P(B | A) × P(A).\n\nThose two factorizations describe the same joint quantity — hold that thought; setting them equal is where Bayes' theorem comes from."
-    },
-    {
-     "h": "The classic trap",
-     "md": "**P(A|B) is not P(B|A).** The probability a person is a pro basketball player *given* they're over 6 ft is tiny; the probability they're over 6 ft *given* they're pro is huge.\n\nConfusing the two is called the *inverse fallacy*, and it's not academic: prosecutors have argued 'P(evidence | innocent) is tiny, so P(innocent | evidence) is tiny.' Those are different numbers, and the gap between them is exactly what Bayes' theorem computes."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "P(cloudy) = 0.4 and P(rain | cloudy) = 0.5. P(cloudy and rain) = ?",
-     "options": [
-      "0.9",
-      "0.2",
-      "0.5",
-      "0.1"
-     ],
-     "answer": 1,
-     "feedback": [
-      "You added. The product rule multiplies: joint = conditional × marginal.",
-      "Right: 0.5 × 0.4 = 0.2.",
-      "That's just P(rain|cloudy); you still need to weight by how likely 'cloudy' is.",
-      "Check the arithmetic: 0.5 × 0.4."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Roughly 90% of spam emails contain a link. Can you conclude that ~90% of emails containing a link are spam?",
-     "options": [
-      "Yes — same statement",
-      "No — that reverses the conditional, and P(spam|link) depends on how common spam and links are overall",
-      "Yes, if the sample is large",
-      "No, because 90% is too high to be real"
-     ],
-     "answer": 1,
-     "feedback": [
-      "P(link|spam) and P(spam|link) are different quantities.",
-      "Exactly. Plenty of legitimate email contains links; the reversed conditional needs base rates.",
-      "Sample size doesn't fix a reversed conditional.",
-      "The number's size is irrelevant; the direction of the conditional is the issue."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Which expression equals P(A and B)?",
-     "options": [
-      "P(A) + P(B)",
-      "P(A|B) + P(B|A)",
-      "P(B|A) × P(A)",
-      "P(A) × P(B), always"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Addition is for 'or' (and only for exclusive events).",
-      "Conditionals don't add into a joint.",
-      "Yes — the product rule, factored through A.",
-      "Only when A and B are independent. The product rule holds always; this shortcut doesn't."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Seeing Theory — Compound Probability",
-     "url": "https://seeing-theory.brown.edu/compound-probability/index.html",
-     "type": "interactive",
-     "note": "Joint, conditional, and the product rule, interactively."
-    },
-    {
-     "label": "3Blue1Brown — The quick proof of Bayes' theorem",
-     "url": "https://www.youtube.com/watch?v=U_85TaXbeIo",
-     "type": "video",
-     "note": "3 min. Derives the theorem from the two factorizations of the joint — exactly this concept's punchline."
-    }
-   ]
-  },
-  {
-   "id": "c03-bayes-theorem",
-   "title": "Bayes' theorem",
-   "summary": "P(H|E) = P(E|H)P(H)/P(E). It is the product rule rearranged — the rule for reversing a conditional legally.",
-   "cards": [
-    {
-     "h": "One line of algebra",
-     "md": "From the last concept, the joint factors both ways:\n\nP(H and E) = P(H|E)·P(E) = P(E|H)·P(H)\n\nDivide both sides by P(E):\n\n## P(H|E) = P(E|H) · P(H) / P(E)\n\nThat's the entire theorem. Nothing mystical — it's the product rule rearranged. Its power is *direction*: it converts the conditional you can usually compute, P(evidence | hypothesis), into the one you actually want, P(hypothesis | evidence)."
-    },
-    {
-     "h": "Why direction matters",
-     "md": "Models naturally run forward: *if* the coin is fair, *then* P(3 heads) is easy. *If* the patient has the disease, *then* P(positive test) is in the test's spec sheet.\n\nBut you observe the evidence and want the hypothesis: P(fair | 3 heads), P(disease | positive). Bayes' theorem is the legal move from forward to backward — the inverse fallacy done right, with P(H) and P(E) supplying exactly the correction the fallacy omits."
-    },
-    {
-     "h": "The denominator",
-     "md": "P(E) — the total probability of the evidence — is computed by summing over all the ways E could happen:\n\nP(E) = P(E|H)·P(H) + P(E|not H)·P(not H)\n\nIt's the *normalizer*: it makes the posteriors across all hypotheses sum to 1. A useful instinct: evidence that is likely under many hypotheses (big P(E)) moves you little; evidence that is *only* likely under one hypothesis moves you a lot."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "P(H) = 0.5, P(E|H) = 0.8, P(E|not H) = 0.4. What is P(H|E)?",
-     "options": [
-      "0.8",
-      "2/3",
-      "0.4",
-      "0.5"
-     ],
-     "answer": 1,
-     "feedback": [
-      "0.8 is P(E|H) — the forward direction, not the answer.",
-      "Right: P(E) = 0.8(0.5) + 0.4(0.5) = 0.6, so P(H|E) = 0.4/0.6 = 2/3.",
-      "That's the numerator 0.8×0.5 without normalizing by P(E).",
-      "The evidence favored H 2:1 — the belief must move off 0.5."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "In P(H|E) = P(E|H)P(H)/P(E), what job does P(E) do?",
-     "options": [
-      "Measures how good the hypothesis is",
-      "Normalizes, so posteriors over all hypotheses sum to 1",
-      "It's a fudge factor chosen to get the answer you want",
-      "It equals P(E|H)"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Hypothesis quality lives in P(E|H) and P(H).",
-      "Correct — it's total probability of the evidence across all hypotheses.",
-      "It's fully determined by the model: sum P(E|Hᵢ)P(Hᵢ).",
-      "Only if H were certain. In general P(E) averages over all hypotheses."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Evidence E is almost equally likely whether H is true or false. What does observing E do to your belief in H?",
-     "options": [
-      "Confirms H strongly",
-      "Refutes H strongly",
-      "Moves it very little",
-      "Sets it to 0.5"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Strong confirmation needs P(E|H) >> P(E|not H).",
-      "Refutation needs the reverse asymmetry.",
-      "Right — uninformative evidence, ratio near 1, posterior ≈ prior.",
-      "The posterior stays near the *prior*, wherever that was — not at 0.5."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — Bayes theorem, the geometry of changing beliefs",
-     "url": "https://www.youtube.com/watch?v=HZGCoVF3YvM",
-     "type": "video",
-     "note": "15 min. The definitive visual treatment; the librarian/farmer example."
-    },
-    {
-     "label": "3Blue1Brown — written lesson version",
-     "url": "https://www.3blue1brown.com/lessons/bayes-theorem/",
-     "type": "reading",
-     "note": "Same material as the video, readable at your own pace."
-    }
-   ],
-   "anim": "square"
-  },
-  {
-   "id": "c04-vocabulary",
-   "title": "Prior, likelihood, posterior",
-   "summary": "Posterior ∝ likelihood × prior. The prior is belief before data, the likelihood scores hypotheses by how well they predict the data, the posterior is belief after.",
-   "cards": [
-    {
-     "h": "Naming the parts",
-     "md": "Bayes' theorem, with its parts named:\n\n**posterior = likelihood × prior / evidence**\n\n- **Prior** P(H): belief before this data arrived\n- **Likelihood** P(E|H): how well hypothesis H predicts the observed data — *a function of H*, with the data held fixed\n- **Posterior** P(H|E): belief after\n- **Evidence** P(E): the normalizer\n\nBecause the normalizer doesn't depend on H, the working form is:\n\n## posterior ∝ likelihood × prior"
-    },
-    {
-     "h": "The likelihood is not a probability over hypotheses",
-     "md": "Subtle but load-bearing: the likelihood asks, for each candidate hypothesis, *'how surprised would this hypothesis be by the data I actually saw?'*\n\nFix the data. Vary the hypothesis. The resulting scores don't need to sum to 1 — they're not a distribution over hypotheses, they're a *scorecard*. Hypotheses that predicted the data well score high; hypotheses that would have been shocked score low.\n\nThe posterior then blends that scorecard with the prior."
-    },
-    {
-     "h": "A division of labor",
-     "md": "Each part has one job:\n\n- The **prior** carries everything you knew *before* — base rates, past results, structure.\n- The **likelihood** carries everything the *new data* says.\n- The **posterior** is their product, renormalized.\n\nNeither part is optional. Data without priors ignores what you already knew (see the next concept for how badly that goes); priors without data is just stubbornness. The posterior is the negotiated settlement — and it's tomorrow's prior."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "You flip a coin 10 times and see 7 heads. In evaluating 'this coin is fair,' the number P(7 heads in 10 | fair) ≈ 0.117 is the:",
-     "options": [
-      "Prior",
-      "Likelihood",
-      "Posterior",
-      "Evidence"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The prior is your belief in fairness before flipping.",
-      "Right — data fixed, hypothesis assumed, it scores how well 'fair' predicts what you saw.",
-      "The posterior is P(fair | 7 heads) — it also needs the prior and normalizer.",
-      "The evidence averages over all hypotheses, not just 'fair.'"
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why can we write posterior ∝ likelihood × prior, dropping P(E)?",
-     "options": [
-      "P(E) is always 1",
-      "P(E) doesn't depend on which hypothesis you're scoring, so it rescales all posteriors equally",
-      "P(E) is unknowable",
-      "The proportionality is an approximation"
-     ],
-     "answer": 1,
-     "feedback": [
-      "P(E) is rarely 1.",
-      "Correct — it's a common denominator across hypotheses; relative belief is unaffected, and you can renormalize at the end.",
-      "It's computable — sum likelihood×prior over hypotheses. It's just not needed for comparing them.",
-      "It's exact, not approximate; normalization is deferred, not lost."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Likelihood values across all candidate hypotheses sum to 1.4. Is something wrong?",
-     "options": [
-      "Yes — probabilities must sum to 1",
-      "No — the likelihood is a function of the hypothesis, not a distribution over hypotheses",
-      "Yes — the data must be corrupted",
-      "No — but only because 1.4 is close to 1"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The likelihood isn't a probability distribution over H. Each value is a probability *of the data*, under a different H.",
-      "Exactly. It's a scorecard, not a distribution; no sum-to-1 constraint applies.",
-      "Nothing about the data is implicated.",
-      "The sum could be 0.03 or 12 — any value is fine."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Think Bayes 2 — Chapter 1-2 (free book)",
-     "url": "https://allendowney.github.io/ThinkBayes2/",
-     "type": "reading",
-     "note": "Allen Downey. Prior/likelihood/posterior with runnable Python — matches your stack."
-    }
-   ]
-  },
-  {
-   "id": "c05-base-rates",
-   "title": "The diagnostic test: base rates bite",
-   "summary": "With a rare condition, even an accurate test yields mostly false positives. The prior (base rate) dominates when evidence is moderate.",
-   "cards": [
-    {
-     "h": "The setup",
-     "md": "A disease affects **1 in 1,000** people. A test catches 99% of true cases (sensitivity) and wrongly flags 5% of healthy people (false-positive rate).\n\nYou test positive. What's the probability you have the disease?\n\nMost people — including most physicians in published studies (Casscells 1978, and replications since) — answer near 95%. Lock in your own answer before the next card."
-    },
-    {
-     "h": "Count a town",
-     "md": "Skip the formula; count 100,000 people.\n\n- Sick: 100. Of these, **99** test positive.\n- Healthy: 99,900. Of these, 5% — **4,995** — test positive.\n\nPositives total 99 + 4,995 = 5,094. True positives: 99.\n\n## P(disease | positive) = 99 / 5,094 ≈ 1.9%\n\nNot 95%. The false positives outnumber the true ones 50-to-1, because the healthy population is enormous. The 'accurate test' intuition ignored the prior."
-    },
-    {
-     "h": "The general lesson",
-     "md": "This is base-rate neglect, and it's the single most consequential Bayesian error in the wild — medicine, fraud detection, security alerts, trading signals.\n\nThe pattern: **when the prior is extreme, moderate evidence cannot overcome it.** A 20:1 likelihood ratio applied to a 1-in-1000 prior still leaves you overwhelmingly likely healthy.\n\nCorollary for any alert system: if the condition you're screening for is rare, most alerts are false — no matter how good the detector looks on paper. The fix is either a stronger detector or a second, independent test (next concept)."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Same test (99% sensitivity, 5% false positives), but the disease affects 1 in 10 people. Roughly what is P(disease | positive)?",
-     "options": [
-      "About 2%",
-      "About 30%",
-      "About 69%",
-      "About 99%"
-     ],
-     "answer": 2,
-     "feedback": [
-      "That was the 1-in-1000 answer; the prior is now 100× larger.",
-      "Recount: per 1,000 people — 100 sick → 99 positive; 900 healthy → 45 positive.",
-      "Right: 99/(99+45) ≈ 69%. Same test, different prior, wildly different posterior.",
-      "Even at a 10% base rate, false positives still drag it well below 99%."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Your fraud model flags transactions with a 1% false-positive rate and 95% detection. Fraud is 1 in 10,000 transactions. Of flagged transactions, roughly what fraction are actually fraud?",
-     "options": [
-      "~95%",
-      "~50%",
-      "~1%",
-      "~0.9%"
-     ],
-     "answer": 3,
-     "feedback": [
-      "That's the detector's spec, not the posterior.",
-      "The base rate is far too low for a coin-flip posterior.",
-      "Close — but compute it: per 1M txns, 95 true flags vs ~10,000 false flags.",
-      "Yes: 95/(95+9,999) ≈ 0.9%. Over 99% of flags are false. Rare condition + moderate evidence = alert fatigue."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "What single change most efficiently rescues the rare-disease test's posterior?",
-     "options": [
-      "Raise sensitivity from 99% to 99.9%",
-      "Cut the false-positive rate from 5% toward 0.1%",
-      "Test more people",
-      "Report results with more decimals"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Sensitivity barely matters here — the 99 true positives weren't the problem; the 4,995 false ones were.",
-      "Right. False positives dominate the denominator; cutting them 50× lifts the posterior from ~2% to ~50%.",
-      "More tests scale both counts equally.",
-      "Precision of reporting doesn't touch the math."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — The medical test paradox",
-     "url": "https://www.youtube.com/watch?v=lG4VkPoG3ko",
-     "type": "video",
-     "note": "21 min. This exact problem, plus the odds/likelihood-ratio reframing used in the next concepts."
-    }
-   ],
-   "anim": "grid"
-  },
-  {
-   "id": "c06-updating",
-   "title": "Sequential updating",
-   "summary": "Today's posterior is tomorrow's prior. Independent evidence can be absorbed piece by piece, in any order, and lands on the same posterior.",
-   "anim": "chain",
-   "cards": [
-    {
-     "h": "The loop",
-     "md": "Bayes' theorem isn't a one-shot formula — it's a **loop**:\n\n1. Hold a prior.\n2. Observe evidence.\n3. Compute the posterior.\n4. **That posterior is your new prior.** Go to 2.\n\nThis is why Bayesian inference fits streaming reality — markets, sensors, test results. You never start over; every belief you hold is the compressed summary of everything you've seen so far."
-    },
-    {
-     "h": "Order doesn't matter",
-     "md": "If two pieces of evidence are independent given the hypothesis, you can process E₁ then E₂, or E₂ then E₁, or both at once — the final posterior is identical. Multiplication commutes:\n\nposterior ∝ P(E₂|H) · P(E₁|H) · prior\n\nThis is a powerful sanity check: if your updating procedure gives different answers depending on the order you read the news, it isn't Bayesian — something is leaking."
-    },
-    {
-     "h": "Double-counting",
-     "md": "The loop has one failure mode worth tattooing somewhere: **evidence may be counted once.**\n\nIf two news stories both trace back to the same source, they are one piece of evidence wearing two hats. Updating on both is like flipping a coin once and recording it twice. Correlated signals — analysts quoting each other, indicators derived from the same price series — must be discounted or your posterior becomes confident far beyond what the world actually told you."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "After updating on this morning's data, your posterior for a hypothesis is 0.7. New independent data arrives this afternoon. What prior do you use?",
-     "options": [
-      "The original prior from last week",
-      "0.5, to stay neutral",
-      "0.7 — this morning's posterior",
-      "Whichever gives the higher posterior"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Re-using the old prior throws away this morning's evidence.",
-      "Resetting to neutral erases everything you learned.",
-      "Right — posterior in, prior out. The chain is the whole method.",
-      "Choosing to reach a conclusion isn't inference; it's motivated reasoning."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Three independent studies each favor a drug with likelihood ratio 2:1. Processed sequentially from a 1:1 prior, the final odds are:",
-     "options": [
-      "2:1",
-      "6:1",
-      "8:1",
-      "Depends on the order processed"
-     ],
-     "answer": 2,
-     "feedback": [
-      "That's one study's worth.",
-      "You added the ratios; independent evidence multiplies.",
-      "Yes: 2 × 2 × 2 = 8:1. Independent likelihood ratios multiply.",
-      "Multiplication commutes — order can't matter for independent evidence."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Five financial newsletters all turn bearish the same week, and all five cite the same bank's report. As evidence, this is closest to:",
-     "options": [
-      "Five independent updates — strong bear signal",
-      "Roughly one update — the newsletters are correlated through their source",
-      "Zero updates — newsletters are never evidence",
-      "A contrarian buy signal"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Counting them separately double- (quintuple-) counts one report.",
-      "Right. One underlying source ≈ one piece of evidence; the echoes add almost nothing.",
-      "The underlying report is real evidence — once.",
-      "Bayes says discount the echo, not invert it; contrarianism needs its own evidence."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Think Bayes 2 — Ch. 4, sequential estimation",
-     "url": "https://allendowney.github.io/ThinkBayes2/",
-     "type": "reading",
-     "note": "The update loop in runnable code."
-    }
-   ]
-  },
-  {
-   "id": "c07-odds",
-   "title": "Odds form and Bayes factors",
-   "summary": "posterior odds = prior odds × likelihood ratio. The Bayes factor cleanly separates what the evidence says from what you believed before.",
-   "cards": [
-    {
-     "h": "Probabilities → odds",
-     "md": "Odds are just probability in ratio clothing: p = 0.75 is odds of 3:1 (0.75/0.25). Odds of 1:4 is p = 0.2.\n\nWhy bother? Because in odds form, Bayes' theorem loses its denominator entirely:\n\n## posterior odds = prior odds × likelihood ratio\n\nwhere the **likelihood ratio** (or **Bayes factor**) is P(E|H) / P(E|not H) — how many times better the hypothesis predicts the evidence than its rival."
-    },
-    {
-     "h": "One number for the evidence",
-     "md": "The Bayes factor is the cleanest possible answer to *'what does this evidence actually say?'* — fully separated from your prior.\n\n- LR = 20 — strong evidence for H\n- LR = 1 — the evidence says nothing\n- LR = 0.05 — strong evidence against H\n\nRedo the diagnostic test instantly: prior odds 1:999, LR = 0.99/0.05 ≈ 20. Posterior odds = 20:999 ≈ 1:50 → about 2%. Same answer as the town-counting, three seconds of arithmetic."
-    },
-    {
-     "h": "Log-odds: evidence adds",
-     "md": "Take logs and multiplication becomes addition: each independent piece of evidence *adds* its log-likelihood-ratio to your running log-odds. Evidence becomes an additive currency — 'this signal is worth +3 decibans, that one −1.'\n\nThis is how spam filters score messages, and how Alan Turing's team at Bletchley weighed Enigma evidence (they coined the *ban*). When you hear 'weight of evidence,' this is the literal weighing."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Prior odds 1:4 that a strategy has real edge. A backtest result has likelihood ratio 8 in its favor. Posterior odds — and roughly posterior probability?",
-     "options": [
-      "8:4 = 2:1 → ~67%",
-      "1:32 → ~3%",
-      "9:4 → ~69%",
-      "8:1 → ~89%"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Right: (1×8):4 = 2:1, and 2/(2+1) ≈ 67%.",
-      "You multiplied the wrong side — LR of 8 favors the hypothesis.",
-      "You added; odds form multiplies.",
-      "That ignores the 1:4 prior."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A Bayes factor of exactly 1 means:",
-     "options": [
-      "The hypothesis is 50% likely",
-      "The evidence is equally probable under both hypotheses — it moves nothing",
-      "The evidence proves the hypothesis",
-      "The prior was wrong"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The posterior equals the *prior*, which can be anything — not necessarily 50%.",
-      "Correct. Multiply odds by 1: no change. Uninformative evidence.",
-      "Proof would be LR → ∞.",
-      "The BF says nothing about the prior; that's exactly its virtue."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Two independent signals have likelihood ratios 10 and 0.1. Net effect on your odds:",
-     "options": [
-      "Strong positive update",
-      "Strong negative update",
-      "None — they cancel exactly",
-      "Cannot combine likelihood ratios"
-     ],
-     "answer": 2,
-     "feedback": [
-      "The 0.1 exactly undoes the 10.",
-      "Symmetric reasoning — the 10 undoes the 0.1.",
-      "Right: 10 × 0.1 = 1. In log-odds, +1 and −1 sum to zero.",
-      "Independent LRs multiply — that's the core mechanic of this concept."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — The medical test paradox (likelihood ratios)",
-     "url": "https://www.youtube.com/watch?v=lG4VkPoG3ko",
-     "type": "video",
-     "note": "The back half of this video is the odds-form rewrite of Bayes — watch it now if you skipped it earlier."
-    }
-   ]
-  },
-  {
-   "id": "c08-beta",
-   "title": "Continuous beliefs: the Beta-Binomial",
-   "summary": "For an unknown rate, the belief is a whole distribution over [0,1]. Beta(a,b) updates on heads/tails by simply incrementing a or b.",
-   "anim": "beta",
-   "cards": [
-    {
-     "h": "From hypotheses to a curve",
-     "md": "So far our hypotheses were discrete: sick/healthy, edge/no-edge. But 'what fraction of the time does this coin land heads?' has a *continuum* of hypotheses — every value of θ between 0 and 1.\n\nA Bayesian's belief about θ is therefore a **whole curve**: a probability density over [0,1]. Tall where you think θ likely lives, flat where you're unsure. Updating reshapes the entire curve at once — every candidate θ gets multiplied by how well it predicted the data."
-    },
-    {
-     "h": "The Beta distribution",
-     "md": "The workhorse curve for rates is **Beta(a, b)**. Read its two parameters as *pseudo-counts*:\n\n- Beta(1, 1) — flat; total ignorance about θ\n- Beta(5, 5) — probably near 0.5\n- Beta(20, 4) — probably near 0.83\n\nMean ≈ a/(a+b). Bigger a+b = more (pseudo-)data = tighter curve. The prior literally says: 'I walk in as if I'd already seen a−1 heads and b−1 tails.'"
-    },
-    {
-     "h": "The update is addition",
-     "md": "Here's the payoff. If your prior is Beta(a, b) and you observe h heads and t tails:\n\n## posterior = Beta(a + h, b + t)\n\nThat's it. The full Bayes machinery — likelihood times prior, normalize the curve — collapses to *incrementing two counters*. This happy algebra is called **conjugacy** (the Beta is conjugate to the Binomial), and it's why Beta-Binomial models run in production everywhere: A/B tests, click-through rates, win rates."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Prior Beta(2, 2) on a coin's heads-rate. You flip 10 times: 7 heads, 3 tails. Posterior?",
-     "options": [
-      "Beta(7, 3)",
-      "Beta(9, 5)",
-      "Beta(14, 6)",
-      "Beta(2.7, 2.3)"
-     ],
-     "answer": 1,
-     "feedback": [
-      "You dropped the prior's pseudo-counts.",
-      "Right: (2+7, 2+3). Add heads to a, tails to b.",
-      "Counts add; they don't multiply.",
-      "Whole observations add as whole counts."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Two analysts model a click-through rate: one starts from Beta(1,1), the other from Beta(60,140). After both see the same 1,000,000 impressions, their posteriors are:",
-     "options": [
-      "Wildly different — priors are destiny",
-      "Nearly identical — a million observations swamp 200 pseudo-counts",
-      "Identical to their priors",
-      "Impossible to compare"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Destiny only when data is scarce.",
-      "Right. Posterior counts are ~prior + 1,000,000; the prior's contribution is a rounding error. Data swamps the prior.",
-      "A million observations reshape any finite prior.",
-      "Same model, same data — directly comparable."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Beta(21, 3) versus Beta(7, 1) have the same mean (0.875). What differs?",
-     "options": [
-      "Nothing — same mean, same belief",
-      "Beta(21, 3) is tighter: more pseudo-data, more confidence around that mean",
-      "Beta(7, 1) is tighter",
-      "Only the mean matters in Bayesian inference"
-     ],
-     "answer": 1,
-     "feedback": [
-      "A belief is the whole curve, not its mean.",
-      "Right — a+b = 24 vs 8. Same center, three times the effective evidence, visibly narrower curve.",
-      "Fewer pseudo-counts = wider, not tighter.",
-      "Two beliefs with equal means can imply very different bets; the spread is the risk."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — Binomial distributions / probabilities of probabilities",
-     "url": "https://www.3blue1brown.com/lessons/binomial-distributions",
-     "type": "reading",
-     "note": "Written lesson with animations — the ideal companion for this concept."
-    },
-    {
-     "label": "Seeing Theory — Bayesian inference (Beta demo)",
-     "url": "https://seeing-theory.brown.edu/bayesian-inference/index.html",
-     "type": "interactive",
-     "note": "Flip coins and watch the Beta posterior sharpen — same demo as this concept's animation, second opinion."
-    }
-   ]
-  },
-  {
-   "id": "c09-priors",
-   "title": "Choosing priors",
-   "summary": "Priors encode pre-data knowledge. Flat isn't neutral, informative priors are honest when defensible, and sensitivity analysis is the discipline that keeps them safe.",
-   "cards": [
-    {
-     "h": "The objection",
-     "md": "'Priors are subjective — you can get any answer you want.' This is the standard objection to Bayes, and it deserves a straight response:\n\n1. *Everyone* has priors; Bayesians just write theirs down where they can be criticized.\n2. With reasonable data, priors wash out (you proved this in the last checkpoint).\n3. When priors *don't* wash out — small data, rare events — that is precisely when pretending you don't have one causes disasters like the base-rate fallacy."
-    },
-    {
-     "h": "Flat is not neutral",
-     "md": "A tempting dodge: 'use a flat prior and stay objective.' But flat in one parameterization is curved in another — flat on θ is *not* flat on θ², or on log-odds of θ. Every prior takes a stance; flatness just hides which one.\n\nPractical guidance:\n- **Weakly informative** priors (broad but not absurd) are the modern default — they rule out the ridiculous without steering the answer.\n- **Informative** priors are correct when you genuinely have prior evidence — last quarter's rates, published effect sizes, physical limits. Discarding known information is not humility; it's waste."
-    },
-    {
-     "h": "Sensitivity analysis",
-     "md": "The professional discipline that makes priors safe: **rerun the analysis under several defensible priors.**\n\n- Conclusions agree → the data is doing the work; report with confidence.\n- Conclusions diverge → the data is too weak to decide, and *that is the finding*. Report the divergence; collect more data.\n\nA Bayesian result quoted without sensitivity checks is a single scenario, not an analysis."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A colleague: 'I used a flat prior, so my analysis is assumption-free.' The sharpest correction:",
-     "options": [
-      "Correct — flat priors are objective",
-      "Flat on one scale is informative on another; the assumption is hidden, not absent",
-      "Flat priors are forbidden",
-      "Priors never matter anyway"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Flat-on-θ is a specific stance that transforms into a non-flat stance on other scales.",
-      "Right. Every prior takes a position; flatness just obscures which one.",
-      "Flat priors are often fine — the claim of assumption-freedom is what's wrong.",
-      "They matter exactly when data is thin."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Estimating the failure rate of a new part, when three prior generations of the same part all failed at 1-3%. The best prior:",
-     "options": [
-      "Flat on [0,1] — new part, blank slate",
-      "Weakly concentrated near 1-3% but with real spread — use the history, stay open to surprise",
-      "A point mass at exactly 2%",
-      "Whatever makes the new part look best"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Ignoring three generations of directly relevant data is waste, not objectivity.",
-      "Right — informative but honest. History in, dogma out.",
-      "A point mass can never update; it's certainty, not belief.",
-      "That's advocacy. Bayes is accounting, not marketing."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Under three defensible priors your conclusion flips sign. The Bayesian response:",
-     "options": [
-      "Report the prior whose answer you prefer",
-      "Average the three answers and report that",
-      "Report that the data cannot yet decide, and gather more",
-      "Abandon Bayesian methods"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Prior-shopping is the one sin the framework cannot survive.",
-      "An average of divergent scenarios manufactures false confidence.",
-      "Right. Divergence under sensitivity analysis IS the result: insufficient evidence.",
-      "The divergence was a discovery, not a failure — a non-Bayesian analysis would simply have hidden it."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Think Bayes 2 — priors and modeling chapters",
-     "url": "https://allendowney.github.io/ThinkBayes2/",
-     "type": "reading",
-     "note": "Practical prior choice with code, minus the philosophy wars."
-    }
-   ]
-  },
-  {
-   "id": "c10-decisions",
-   "title": "From posterior to decision",
-   "summary": "The posterior is the input, not the output: predictions integrate over it, and decisions maximize expected utility under it. Capstone concept.",
-   "cards": [
-    {
-     "h": "Prediction: average over what you don't know",
-     "md": "What's the probability the *next* flip is heads? Not 'the best θ' — you don't know θ. The **posterior predictive** averages the prediction over every candidate θ, weighted by your posterior belief in it.\n\nFor Beta(a, b) it's beautifully simple: P(next is heads) = a/(a+b). With posterior Beta(9,5): 9/14 ≈ 0.64.\n\nThe honest prediction bakes in your *uncertainty about the rate*, not just the rate's best guess."
-    },
-    {
-     "h": "Decision: probability × consequences",
-     "md": "A posterior alone never tells you what to do — you also need what each outcome *costs*. The rule: **choose the action with the best expected utility under the posterior.**\n\nA 2% posterior of disease sounds dismissible — until the follow-up test costs $50 and the missed disease is fatal; then 2% commands action. A 60% posterior of trading edge sounds actionable — until the downside is ruin. Same posteriors, opposite decisions, because the payoffs differ. Probabilities and payoffs are separate inputs; Bayes owns the first, you must supply the second."
-    },
-    {
-     "h": "The whole method on one card",
-     "md": "You now hold the complete loop:\n\n1. **Prior** — write down what you believe and why.\n2. **Likelihood** — model how each hypothesis predicts data.\n3. **Update** — posterior ∝ likelihood × prior (odds form for speed; conjugate forms when lucky).\n4. **Check** — sensitivity analysis across defensible priors.\n5. **Predict & decide** — posterior predictive for forecasts; expected utility for actions.\n6. **Loop** — today's posterior is tomorrow's prior.\n\nThe mastery review will now interleave everything. That's not ceremony — spaced, mixed retrieval is where retention is actually built."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Posterior on a conversion rate: Beta(30, 70). The honest probability that the next visitor converts:",
-     "options": [
-      "0.30",
-      "0.43",
-      "0.70",
-      "Unknowable without the true rate"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Right: a/(a+b) = 30/100. The posterior predictive collapses to the posterior mean here.",
-      "Check: 30/(30+70).",
-      "That's b's share — the non-conversion side.",
-      "Averaging over the posterior is exactly how you predict *without* knowing the true rate."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Alarm A: posterior 0.9 of a trivial fault costing $10. Alarm B: posterior 0.02 of a failure costing $100,000. Which does a Bayesian decision-maker investigate first?",
-     "options": [
-      "A — higher probability wins",
-      "B — expected loss $2,000 vs $9",
-      "Neither — both below 95% certainty",
-      "Flip a coin"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Probability alone isn't a decision rule.",
-      "Right. 0.02 × 100,000 = 2,000 ≫ 0.9 × 10 = 9. Consequences weight the posterior.",
-      "Certainty thresholds are for mastery gates, not loss management.",
-      "The expected losses differ by 200×; this is not a coin-flip situation."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Which sequence is the Bayesian workflow in the right order?",
-     "options": [
-      "Decide → collect data → choose the prior that supports the decision",
-      "Prior → likelihood → posterior → sensitivity check → predict/decide",
-      "Likelihood → decision → prior",
-      "Posterior → prior → data"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That's the workflow of motivated reasoning, formalized.",
-      "Right — belief in, evidence weighed, belief out, stress-tested, then acted on.",
-      "The prior can't come last; it means 'before.'",
-      "The arrow of the method runs prior → posterior, never backward."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Think Bayes 2 — decision analysis chapters",
-     "url": "https://allendowney.github.io/ThinkBayes2/",
-     "type": "reading",
-     "note": "Posterior predictive and expected-utility decisions, in Python."
-    },
-    {
-     "label": "3Blue1Brown — Bayes playlist",
-     "url": "https://www.youtube.com/playlist?list=PLk4N6AFvLWe3xCHuOs0siWp0q2F43Cslh",
-     "type": "video",
-     "note": "Rewatch the full arc now that you own the vocabulary — it lands differently after mastery."
-    }
-   ]
-  }
- ]
+  ]
 }

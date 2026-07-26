@@ -1,666 +1,670 @@
 {
- "id": "calculus",
- "title": "Calculus",
- "tagline": "The mathematics of change and accumulation.",
- "description": "Limits to derivatives to integrals to the theorem that ties them together. Root of the mathematics chain: ODEs, Fourier, and PDEs all build on this.",
- "prereqs": [],
- "concepts": [
-  {
-   "id": "c01-limits",
-   "title": "The idea of a limit",
-   "summary": "A limit is the value a function approaches as the input approaches a point — regardless of what happens at the point itself.",
-   "cards": [
+  "id": "calculus",
+  "title": "Calculus",
+  "tagline": "The mathematics of change and accumulation.",
+  "description": "Limits to derivatives to integrals to the theorem that ties them together. Root of the mathematics chain: ODEs, Fourier, and PDEs all build on this.",
+  "prereqs": [],
+  "concepts": [
     {
-     "h": "Approaching, not arriving",
-     "md": "Calculus's founding move is to ask not *what a function equals at a point* but **what it approaches near one**.\n\nTake f(x) = (x² − 1)/(x − 1). At x = 1 it's 0/0 — undefined. But feed it 0.9, 0.99, 0.999 and you get 1.9, 1.99, 1.999. From above: 2.1, 2.01, 2.001. The function is *aiming* at 2.\n\n## lim x→1 (x² − 1)/(x − 1) = 2\n\nThe limit is the destination, and it exists even when the function never lands there."
+      "id": "c01-limits",
+      "title": "The idea of a limit",
+      "summary": "A limit is the value a function approaches as the input approaches a point — regardless of what happens at the point itself.",
+      "cards": [
+        {
+          "h": "Approaching, not arriving",
+          "md": "Calculus's founding move is to ask not *what a function equals at a point* but **what it approaches near one**.\n\nTake f(x) = (x² − 1)/(x − 1). At x = 1 it's 0/0 — undefined. But feed it 0.9, 0.99, 0.999 and you get 1.9, 1.99, 1.999. From above: 2.1, 2.01, 2.001. The function is *aiming* at 2.\n\n## lim x→1 (x² − 1)/(x − 1) = 2\n\nThe limit is the destination, and it exists even when the function never lands there."
+        },
+        {
+          "h": "Why this one idea unlocks everything",
+          "md": "Every core object in calculus is a limit in disguise:\n\n- **Derivative** — the limit of slopes over shrinking intervals\n- **Integral** — the limit of sums over shrinking slices\n- **Continuity** — the statement that the limit *equals* the value\n\nBefore limits, 'instantaneous speed' and 'area under a curve' were philosophical puzzles about infinitely small quantities. The limit replaces 'infinitely small' with 'as small as you like' — a moving target instead of a mystical object. That substitution is the whole trick, and it took mathematics two centuries after Newton to state it cleanly."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "f(x) = (x² − 4)/(x − 2) is undefined at x = 2. What is lim x→2 f(x)?",
+          "options": [
+            "Undefined — the function doesn't exist there",
+            "4",
+            "2",
+            "0"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The limit asks where the function is heading nearby, not what it equals at the point. Nearby it's heading somewhere definite.",
+            "Right. For x ≠ 2, f(x) = x + 2, which approaches 4. The hole at x = 2 doesn't change the destination.",
+            "That's the input value, not what the function approaches.",
+            "Plug in values near 2 (like 1.99): you get near 3.99, not 0."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The limit of f as x → a can exist even when f(a) is undefined because:",
+          "options": [
+            "Limits ignore the function entirely",
+            "The limit depends only on values of f *near* a, never at a",
+            "Undefined points are treated as zero",
+            "It can't — the limit requires f(a) to exist"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Limits use the function heavily — everywhere except the single point a.",
+            "Exactly. The limit is a statement about the approach, and the point itself is excluded from the evidence.",
+            "Calculus never silently substitutes zero; that would break everything downstream.",
+            "Backwards — handling exactly this case is why limits were invented."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "As x → 0 from the right, f(x) → 3; from the left, f(x) → 5. What is lim x→0 f(x)?",
+          "options": [
+            "4, the average",
+            "3, the right side wins",
+            "It does not exist — the two sides must agree",
+            "Both 3 and 5"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Limits don't compromise; averaging two destinations describes neither.",
+            "Neither side outranks the other.",
+            "Right. A limit is one destination; if the approaches disagree, there is no single value being approached.",
+            "A limit is by definition a single number."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — Essence of Calculus (series)",
+          "url": "https://www.3blue1brown.com/topics/calculus",
+          "type": "video",
+          "note": "The best visual treatment of these ideas in existence. Watch chapter by chapter as you climb this ladder."
+        },
+        {
+          "label": "Khan Academy — Limits and continuity",
+          "url": "https://www.khanacademy.org/math/calculus-1",
+          "type": "interactive",
+          "note": "Unlimited practice problems with worked solutions when you want more reps than the checkpoints give."
+        }
+      ],
+      "anim": "calc_limit"
     },
     {
-     "h": "Why this one idea unlocks everything",
-     "md": "Every core object in calculus is a limit in disguise:\n\n- **Derivative** — the limit of slopes over shrinking intervals\n- **Integral** — the limit of sums over shrinking slices\n- **Continuity** — the statement that the limit *equals* the value\n\nBefore limits, 'instantaneous speed' and 'area under a curve' were philosophical puzzles about infinitely small quantities. The limit replaces 'infinitely small' with 'as small as you like' — a moving target instead of a mystical object. That substitution is the whole trick, and it took mathematics two centuries after Newton to state it cleanly."
+      "id": "c02-derivative-def",
+      "title": "The derivative: instantaneous rate",
+      "summary": "The derivative is the limit of the average rate of change (rise over run) as the interval shrinks to zero — the slope of the tangent line.",
+      "cards": [
+        {
+          "h": "From average to instantaneous",
+          "md": "A car covers 60 miles in an hour: average speed 60 mph. But what's its speed *right now*, at 2:00:00 exactly? Over an interval of zero time it travels zero distance — 0/0 again.\n\nThe fix is the limit. Average speed over a shrinking window:\n\n## f′(x) = lim h→0 [f(x+h) − f(x)] / h\n\nCompute rise-over-run over an interval of width h, then let h shrink. The averages home in on one number: the **instantaneous rate of change** — the derivative."
+        },
+        {
+          "h": "The geometric picture",
+          "md": "Graphically, [f(x+h) − f(x)]/h is the slope of a **secant line** through two points on the curve. As h → 0, the second point slides into the first and the secant pivots into the **tangent line**.\n\nSo the derivative at a point = slope of the tangent there.\n\n- f′(x) > 0: function rising\n- f′(x) < 0: falling\n- f′(x) = 0: momentarily flat — the candidates for peaks and valleys\n\nWorked once from the definition: f(x) = x². [(x+h)² − x²]/h = (2xh + h²)/h = 2x + h → **2x** as h → 0. You will never need the definition again for x² — but you now know what the rules you're about to learn are shortcuts *for*."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "In the definition f′(x) = lim h→0 [f(x+h) − f(x)]/h, the quotient before the limit represents:",
+          "options": [
+            "The tangent slope exactly",
+            "The average rate of change over an interval of width h — a secant slope",
+            "The area under f between x and x+h",
+            "The value of f at x"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Not yet — only after the limit does the secant become the tangent.",
+            "Right. Rise over run between two actual points; the limit is what turns average into instantaneous.",
+            "Area is the integral's territory, not the derivative's.",
+            "It's a ratio of *changes* in f, not f itself."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "f(t) is a rocket's altitude in meters at t seconds, and f′(10) = 250. The correct reading:",
+          "options": [
+            "The rocket is 250 m high at t = 10",
+            "The rocket climbed 250 m during the first 10 s",
+            "At t = 10 the rocket is climbing at 250 m/s",
+            "The rocket accelerates at 250 m/s²"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Altitude is f(10); the derivative is the *rate* of altitude change.",
+            "Total climb is f(10) − f(0); the derivative is instantaneous, not cumulative.",
+            "Right — derivative of position is velocity, read at that instant.",
+            "Acceleration is the derivative of the derivative — one level up."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Using the definition on f(x) = x², the difference quotient simplifies to 2x + h. Why is the derivative 2x and not 2x + h?",
+          "options": [
+            "We set h = 0 because 0 is a legal input after simplifying",
+            "The h term is a rounding error we ignore",
+            "We take the limit as h → 0, and 2x + h approaches 2x",
+            "It's a convention with no justification"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Close — but the honest statement is the limit; before simplifying, h = 0 gave 0/0, so 'plugging in' only works because the limit exists.",
+            "Nothing in calculus is ignored; the limit handles h exactly.",
+            "Right. 2x + h is a moving target whose destination is 2x. The limit makes 'infinitely small' rigorous.",
+            "It's fully justified — the limit is the justification, and it's airtight."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — The paradox of the derivative",
+          "url": "https://www.3blue1brown.com/lessons/derivatives",
+          "type": "video",
+          "note": "Exactly this concept: why 'instantaneous rate of change' is almost a contradiction, and how the limit resolves it."
+        }
+      ],
+      "anim": "secant_to_tangent"
+    },
+    {
+      "id": "c03-rules",
+      "title": "Differentiation rules",
+      "summary": "Power, sum, product, and chain rules turn differentiation from limit computations into mechanical algebra.",
+      "cards": [
+        {
+          "h": "The toolkit",
+          "md": "Nobody computes limits daily. A handful of rules, each proved once from the definition, cover almost everything:\n\n- **Power**: (xⁿ)′ = n·xⁿ⁻¹  — so (x³)′ = 3x²\n- **Constant multiple & sum**: differentiate term by term\n- **Product**: (fg)′ = f′g + fg′  — *not* f′g′\n- **Quotient**: (f/g)′ = (f′g − fg′)/g²\n\nPlus the specials: (eˣ)′ = eˣ, (ln x)′ = 1/x, (sin x)′ = cos x, (cos x)′ = −sin x."
+        },
+        {
+          "h": "The chain rule",
+          "md": "The one rule that runs the modern world:\n\n## (f(g(x)))′ = f′(g(x)) · g′(x)\n\nFor nested functions, multiply the rates of each layer, evaluated where it operates. If y changes 3× as fast as u, and u changes 2× as fast as x, then y changes 6× as fast as x. Rates through a chain **multiply**.\n\nExample: d/dx sin(x²) = cos(x²) · 2x — outer derivative at the inner value, times the inner derivative.\n\nHold onto this rule: backpropagation, the algorithm that trains every neural network, is the chain rule applied a billion times. It reappears in the Neural Networks topic."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "d/dx (5x⁴ − 3x + 7) = ?",
+          "options": [
+            "20x³ − 3",
+            "5x³ − 3",
+            "20x³ − 3x + 7",
+            "20x⁴ − 3"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Right: power rule per term; the constant 7 dies (its rate of change is zero).",
+            "The constant multiple 5 survives: 5 · 4x³ = 20x³.",
+            "Constants differentiate to zero, and −3x differentiates to −3, not −3x.",
+            "The power drops by one: x⁴ → x³."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "d/dx (x² · sin x) = ?",
+          "options": [
+            "2x · cos x",
+            "2x sin x + x² cos x",
+            "x² cos x",
+            "2x + cos x"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That's the tempting f′g′ — the product rule is f′g + fg′.",
+            "Right: derivative of the first times the second, plus the first times derivative of the second.",
+            "You differentiated only sin x; the x² factor also changes.",
+            "You differentiated each factor and added — products don't work like sums."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "d/dx e^(3x²) = ?",
+          "options": [
+            "e^(3x²)",
+            "6x · e^(3x²)",
+            "e^(6x)",
+            "3x² · e^(3x²−1)"
+          ],
+          "answer": 1,
+          "feedback": [
+            "(eˣ)′ = eˣ only when the exponent is plain x; here there's an inner function whose rate matters.",
+            "Right: outer derivative e^(inner) times inner derivative 6x. Chain rule.",
+            "The exponent doesn't differentiate in place; the whole composition does.",
+            "That's the power rule misapplied to an exponential — different animal entirely."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — Visualizing the chain rule and product rule",
+          "url": "https://www.3blue1brown.com/lessons/chain-rule-and-product-rule",
+          "type": "video",
+          "note": "Why the rules are what they are — geometric proofs you'll actually remember."
+        },
+        {
+          "label": "Paul's Online Math Notes — Derivatives",
+          "url": "https://tutorial.math.lamar.edu/Classes/CalcI/DerivativeIntro.aspx",
+          "type": "reading",
+          "note": "The classic drill reference: every rule with a stack of worked examples."
+        }
+      ]
+    },
+    {
+      "id": "c04-applications",
+      "title": "Using derivatives: extrema and optimization",
+      "summary": "Peaks and valleys hide where f′ = 0. Optimization: model the quantity, differentiate, solve f′ = 0, verify which candidate wins.",
+      "cards": [
+        {
+          "h": "Where the interesting points hide",
+          "md": "At a smooth peak or valley the tangent is horizontal — so every interior maximum or minimum satisfies **f′(x) = 0**. Solve that equation and you have the complete list of candidates (critical points).\n\nCandidates, not winners: f(x) = x³ has f′(0) = 0 but no peak there — it just pauses. Classify with the second derivative: **f″ > 0** means curving upward (a valley), **f″ < 0** curving downward (a peak), f″ = 0 says ask more questions.\n\nOn a closed interval, also check the endpoints — the best point of a domain can sit on its boundary, where the zero-slope logic doesn't apply."
+        },
+        {
+          "h": "Optimization, the recipe",
+          "md": "The most-used skill in applied calculus:\n\n1. Write the quantity to optimize as a function of one variable (use the constraints to eliminate others).\n2. Differentiate; solve f′ = 0.\n3. Classify candidates (second derivative or endpoint check).\n\nExample: a farmer with 100 m of fence against a river (three sides needed) maximizes area A = x(100 − 2x). A′ = 100 − 4x = 0 → x = 25, A″ = −4 < 0 → maximum: 25 × 50 m.\n\nThis recipe is everywhere — minimum cost, maximum yield, best fit. Training a neural network is this exact recipe on a function with a billion variables; gradient descent (that topic's concept 4) is what step 2 becomes when 'solve f′ = 0' is too hard to do directly."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "f′(c) = 0 and f″(c) = −6. At x = c, f has:",
+          "options": [
+            "A local minimum",
+            "A local maximum",
+            "Nothing — need more info",
+            "A discontinuity"
+          ],
+          "answer": 1,
+          "feedback": [
+            "f″ < 0 curves downward — that's the shape of a peak, not a valley.",
+            "Right: flat tangent plus downward curvature = local max.",
+            "The second-derivative test is decisive whenever f″ ≠ 0.",
+            "Both derivatives existing at c is the opposite of a discontinuity."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why does f′(x) = 0 give *candidates* rather than guaranteed extrema?",
+          "options": [
+            "The equation might be solved wrong",
+            "A zero-slope point can be a pause in a climb (like x³ at 0), and endpoints can beat all interior points",
+            "f′ = 0 has nothing to do with extrema",
+            "Only f″ = 0 finds extrema"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The issue is mathematical, not clerical.",
+            "Right on both counts — flat isn't always a turn, and boundaries play by different rules.",
+            "It has everything to do with them; it's necessary for interior extrema, just not sufficient.",
+            "f″ = 0 is the *inconclusive* case of the classification test."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Minimize the material for a closed box. After using the volume constraint you get surface area S(x) with S′(x) = 4x − 108/x². The candidate dimension satisfies:",
+          "options": [
+            "4x = 108/x², i.e. x³ = 27, x = 3",
+            "x = 0",
+            "S(x) = 0",
+            "S″(x) = 0"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Right — set S′ = 0 and solve: 4x³ = 108.",
+            "x = 0 isn't even a box, and S′ isn't zero there — it's undefined.",
+            "Zero surface area isn't a candidate; we set the *derivative* to zero, not the function.",
+            "S″ = 0 is the classification tool's edge case, not the candidate equation."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Paul's Online Math Notes — Optimization",
+          "url": "https://tutorial.math.lamar.edu/Classes/CalcI/Optimization.aspx",
+          "type": "reading",
+          "note": "A dozen fully worked optimization problems — the pattern sinks in by the fourth."
+        }
+      ],
+      "anim": "calc_extrema"
+    },
+    {
+      "id": "c05-integral",
+      "title": "The integral: accumulation",
+      "summary": "The definite integral is the limit of Riemann sums — total accumulation of a quantity, geometrically the signed area under a curve.",
+      "cards": [
+        {
+          "h": "Adding up infinitely many slivers",
+          "md": "Reverse question: a car's *speed* is known at every instant — how far did it travel?\n\nOver a tiny interval, distance ≈ speed × time. So: chop [a, b] into n slivers of width Δx, approximate each sliver's contribution as f(x)·Δx, add them up, and let the slicing get infinitely fine:\n\n## ∫ₐᵇ f(x) dx = lim Σ f(xᵢ) Δx\n\nThe same limit trick as the derivative, pointed the other way: the derivative shrinks a *ratio*, the integral refines a *sum*."
+        },
+        {
+          "h": "Area, signed",
+          "md": "Geometrically ∫ₐᵇ f(x) dx is the area between the curve and the x-axis — **signed**: regions below the axis count negative. ∫₀^2π sin x dx = 0 because the hill and the valley cancel exactly.\n\nRead the units as a sanity check: f in m/s times dx in s gives meters — integrating a rate recovers the total. Speed → distance, power → energy, flow rate → volume, density → mass. Whenever a quantity is 'rate × time added up', it's an integral wearing work clothes."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A pump's flow rate is r(t) liters/min. What does ∫₀^30 r(t) dt represent?",
+          "options": [
+            "The average flow rate",
+            "Total liters pumped in the first 30 minutes",
+            "The flow rate at t = 30",
+            "The pump's maximum rate"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Average rate is the integral *divided by* 30 — the integral alone is the total.",
+            "Right: rate × time, accumulated. Liters/min × min = liters.",
+            "The rate at an instant is just r(30) — no integral needed.",
+            "Maxima come from derivatives (r′ = 0), not integrals."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "f(x) = x − 2 on [0, 4]: below the axis on [0,2], above on [2,4], both triangles of area 2. ∫₀⁴ f dx = ?",
+          "options": [
+            "4",
+            "0",
+            "−4",
+            "2"
+          ],
+          "answer": 1,
+          "feedback": [
+            "4 is the total *unsigned* area; the integral signs it.",
+            "Right: −2 + 2 = 0. Below-axis area counts negative.",
+            "That would need both triangles below the axis.",
+            "Check both pieces: they're equal and opposite."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "In a Riemann sum Σ f(xᵢ)Δx, what does refining the partition (Δx → 0) accomplish?",
+          "options": [
+            "Makes the sum smaller",
+            "Makes the rectangle approximation error vanish, so the sum converges to the exact accumulation",
+            "Changes the interval [a, b]",
+            "Nothing — the sum is already exact"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The number of terms grows as each shrinks — the sum converges, it doesn't dwindle.",
+            "Right. Thinner slices hug the curve better; the limit of the process is the integral's definition.",
+            "The interval is fixed; only the slicing gets finer.",
+            "For a curved f, rectangles always miss slightly — until the limit."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — Integration and the fundamental theorem",
+          "url": "https://www.3blue1brown.com/lessons/integration",
+          "type": "video",
+          "note": "The car-odometer framing of this exact concept, animated."
+        }
+      ],
+      "anim": "calc_riemann"
+    },
+    {
+      "id": "c06-ftc",
+      "title": "The Fundamental Theorem of Calculus",
+      "summary": "Differentiation and integration are inverse operations: ∫ₐᵇ f(x) dx = F(b) − F(a) where F′ = f.",
+      "cards": [
+        {
+          "h": "The bridge",
+          "md": "Two ideas built independently — slopes from shrinking ratios, areas from refining sums — turn out to be inverses:\n\n## ∫ₐᵇ f(x) dx = F(b) − F(a),  where F′ = f\n\nTo total up f, find *any* function F whose derivative is f (an **antiderivative**), and subtract its endpoint values. The infinite sum collapses into one subtraction.\n\n∫₁³ x² dx: an antiderivative of x² is x³/3, so the answer is 27/3 − 1/3 = 26/3. No rectangles were harmed."
+        },
+        {
+          "h": "Why it's true, in one breath",
+          "md": "Let A(x) = area under f from a to x. Nudge x by a sliver dx: the area grows by a strip ≈ f(x)·dx tall-times-wide. So dA/dx = f(x) — **the rate at which area accumulates IS the height of the curve.** Accumulation and rate are two views of one relationship; that's the theorem.\n\nPractical consequence: the hunt for integrals becomes the hunt for antiderivatives — reading the derivative rules right-to-left. Power rule reversed: ∫xⁿ dx = xⁿ⁺¹/(n+1) + C. The +C matters: derivatives erase constants, so antiderivatives recover them only up to an unknown one. Pinning down that C from side conditions is precisely what solving a differential equation is — the next topic in this chain."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "∫₀² 3x² dx = ?",
+          "options": [
+            "12",
+            "8",
+            "6",
+            "24"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Check the antiderivative: x³, evaluated 2³ − 0³.",
+            "Right: antiderivative x³; 8 − 0 = 8.",
+            "6 is 3·2 — that's not how the theorem works; find F with F′ = 3x².",
+            "You may have doubled — F(b) − F(a) = 8 − 0."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The FTC is 'fundamental' because it:",
+          "options": [
+            "Is the hardest theorem in calculus",
+            "Connects the two halves of calculus, letting antiderivatives replace infinite sums",
+            "Defines what a limit is",
+            "Only works for polynomials"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Its proof sketch fits on one card; its importance isn't difficulty.",
+            "Right — it welds derivatives and integrals into one subject and makes integrals computable.",
+            "Limits were defined first; the FTC is built on top of them.",
+            "It works for any continuous f — polynomials are just the easy practice ground."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A(x) = ∫₀ˣ f(t) dt is the accumulated area so far. What is A′(x)?",
+          "options": [
+            "f(x) — the curve's current height",
+            "f′(x)",
+            "0",
+            "F(b) − F(a)"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Right — this IS the theorem: area accumulates at a rate equal to the height being added.",
+            "One derivative too many; accumulation undoes exactly one level.",
+            "The area is growing wherever f > 0; its rate isn't zero.",
+            "That's a definite integral's value — a number, not a function of x."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Khan Academy — Fundamental theorem of calculus",
+          "url": "https://www.khanacademy.org/math/calculus-1",
+          "type": "interactive",
+          "note": "Practice evaluating definite integrals until the antiderivative reflex is automatic."
+        },
+        {
+          "label": "MIT OCW 18.01 — Single Variable Calculus",
+          "url": "https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/",
+          "type": "reading",
+          "note": "Full university course, free — lecture videos, notes, and exams for going beyond this ladder."
+        }
+      ],
+      "anim": "calc_ftc"
+    },
+    {
+      "id": "c07-techniques",
+      "title": "Finding antiderivatives",
+      "summary": "Substitution reverses the chain rule; integration by parts reverses the product rule. Recognize which rule the integrand came from.",
+      "cards": [
+        {
+          "h": "Substitution: the chain rule backwards",
+          "md": "Differentiation is mechanical; antidifferentiation is pattern recognition. The main pattern: an integrand that looks like a chain-rule *output* — some f(g(x)) times g′(x) hanging around.\n\n∫ 2x·cos(x²) dx: spot the inner function u = x², note du = 2x dx is present, rewrite as ∫ cos u du = sin u + C = **sin(x²) + C**.\n\nSubstitution is bookkeeping for 'this used to be a chain rule.' If the inner function's derivative isn't in the integrand (up to a constant), substitution won't fire — pick a different u or a different technique."
+        },
+        {
+          "h": "Integration by parts: the product rule backwards",
+          "md": "Rearranging the product rule and integrating gives:\n\n## ∫ u dv = uv − ∫ v du\n\nTrade one integral for another — a good trade when the new one is easier. ∫ x·eˣ dx: choose u = x (dies when differentiated), dv = eˣ dx. Result: x·eˣ − ∫ eˣ dx = **(x − 1)eˣ + C**.\n\nHonest scope note: unlike differentiation, integration is not fully mechanical — some innocent-looking integrands (e^(−x²), sin(x)/x) have no elementary antiderivative at all, and numerical methods take over. Knowing when to stop searching is itself a skill."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "∫ 3x² · e^(x³) dx = ?",
+          "options": [
+            "e^(x³) + C",
+            "3x² e^(x³) + C",
+            "x³ e^(x³) + C",
+            "e^(3x²) + C"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Right: u = x³, du = 3x² dx is sitting right there; ∫ eᵘ du = eᵘ + C.",
+            "That's the integrand handed back — differentiate your answer to check; it should reproduce the integrand.",
+            "Differentiating this gives extra terms via the product rule — not the integrand.",
+            "The exponent doesn't change; substitution preserves x³."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In ∫ x·cos x dx by parts, the productive choice is u = x, dv = cos x dx, because:",
+          "options": [
+            "x is written first",
+            "Differentiating u = x simplifies it to 1, making the leftover integral ∫ sin x dx easy",
+            "cos x can't be integrated",
+            "Any choice works equally well"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Order on the page is irrelevant; behavior under differentiation is what matters.",
+            "Right — pick u to *die* under differentiation. Result: x sin x + cos x + C.",
+            "cos x integrates trivially to sin x — that's exactly why it can be dv.",
+            "Try u = cos x: the leftover integral gets worse, not better. The choice is the technique."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The universal check for any antiderivative you compute:",
+          "options": [
+            "Plug in x = 0",
+            "Differentiate your answer — it must reproduce the integrand exactly",
+            "Confirm the +C is present",
+            "Graph both functions"
+          ],
+          "answer": 1,
+          "feedback": [
+            "One point can't verify a function identity.",
+            "Right — differentiation is mechanical and reliable, so it's the perfect verifier for its inverse. Free error detection; use it every time.",
+            "The +C is necessary but says nothing about whether the rest is right.",
+            "Graphs persuade; derivatives prove."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Paul's Online Math Notes — Integration techniques",
+          "url": "https://tutorial.math.lamar.edu/Classes/CalcII/IntTechIntro.aspx",
+          "type": "reading",
+          "note": "Substitution through partial fractions, with the decision process spelled out."
+        }
+      ]
+    },
+    {
+      "id": "c08-applied",
+      "title": "Integrals at work",
+      "summary": "Area between curves, average value, and total change from a rate — the three applied patterns that cover most real integral use.",
+      "cards": [
+        {
+          "h": "Three patterns",
+          "md": "**Area between curves**: ∫ₐᵇ (top − bottom) dx. Find where the curves cross to set the limits.\n\n**Average value** of f on [a,b]: (1/(b−a)) ∫ₐᵇ f dx — total accumulation divided by the width. The honest mean of a continuously varying quantity (average temperature over a day, average power draw).\n\n**Net change**: F(b) = F(a) + ∫ₐᵇ F′(t) dt — current state equals initial state plus accumulated rate. Position from velocity, account balance from cash flow, charge from current."
+        },
+        {
+          "h": "The mindset that transfers",
+          "md": "The applied skill isn't computing integrals — software does that — it's **recognizing accumulation structure**: 'this total is a rate summed over time,' 'this average must be integral-weighted,' 'this quantity is the area between two curves.'\n\nSet up the integral correctly and the rest is mechanical. Set it up wrong and no amount of computation saves you. That's why every checkpoint here has emphasized reading integrals, not just evaluating them.\n\nThis closes the core ladder. Calculus's sequels each pick one thread: **ODEs** (equations whose unknowns are functions and whose statements involve derivatives), **Fourier series** (rebuilding functions from waves — built on integrals), and **PDEs** (rates in several variables at once)."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Average value of f(x) = x² on [0, 3]:",
+          "options": [
+            "9",
+            "3",
+            "4.5",
+            "27"
+          ],
+          "answer": 1,
+          "feedback": [
+            "9 is the endpoint value f(3), not the average over the interval.",
+            "Right: (1/3)∫₀³ x² dx = (1/3)(9) = 3.",
+            "4.5 is the midpoint guess (f(1.5)=2.25 anyway) — averages of curves need the integral.",
+            "27 is x³ at 3 — the antiderivative's value, before dividing by the width... and before evaluating correctly: ∫ = 9."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A reservoir holds 500 units at t = 0. Net inflow rate is r(t), which is sometimes negative. Volume at t = 10:",
+          "options": [
+            "∫₀¹⁰ r(t) dt",
+            "500 + ∫₀¹⁰ r(t) dt",
+            "500 · ∫₀¹⁰ r(t) dt",
+            "500 + r(10)"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That's only the *change* — you dropped the starting stock.",
+            "Right: initial state plus accumulated net rate. Negative stretches of r subtract automatically.",
+            "Rates add to stocks; they don't multiply them.",
+            "r(10) is the instantaneous rate at the end — units don't even match volume."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "To find the area enclosed between y = x and y = x², you should:",
+          "options": [
+            "∫₀¹ (x² − x) dx",
+            "∫₀¹ (x − x²) dx, since x is the upper curve on [0,1] where they cross",
+            "∫₀¹ x·x² dx",
+            "Add the two areas under each curve"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That's bottom minus top — you'd get a negative area. Order matters.",
+            "Right: crossings at 0 and 1 set the limits; top − bottom = x − x²; area = 1/6.",
+            "Multiplying curves has no geometric meaning here.",
+            "Adding double-counts the region under the lower curve; you want the difference."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "3Blue1Brown — Essence of Calculus, closing chapters",
+          "url": "https://www.3blue1brown.com/topics/calculus",
+          "type": "video",
+          "note": "Rewatch the series end-to-end after mastery — it consolidates exactly this ladder."
+        },
+        {
+          "label": "MIT OCW 18.01 — problem sets",
+          "url": "https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/",
+          "type": "reading",
+          "note": "Exam-grade problems if you want to pressure-test mastery beyond the review queue."
+        }
+      ]
     }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "f(x) = (x² − 4)/(x − 2) is undefined at x = 2. What is lim x→2 f(x)?",
-     "options": [
-      "Undefined — the function doesn't exist there",
-      "4",
-      "2",
-      "0"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The limit asks where the function is heading nearby, not what it equals at the point. Nearby it's heading somewhere definite.",
-      "Right. For x ≠ 2, f(x) = x + 2, which approaches 4. The hole at x = 2 doesn't change the destination.",
-      "That's the input value, not what the function approaches.",
-      "Plug in values near 2 (like 1.99): you get near 3.99, not 0."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The limit of f as x → a can exist even when f(a) is undefined because:",
-     "options": [
-      "Limits ignore the function entirely",
-      "The limit depends only on values of f *near* a, never at a",
-      "Undefined points are treated as zero",
-      "It can't — the limit requires f(a) to exist"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Limits use the function heavily — everywhere except the single point a.",
-      "Exactly. The limit is a statement about the approach, and the point itself is excluded from the evidence.",
-      "Calculus never silently substitutes zero; that would break everything downstream.",
-      "Backwards — handling exactly this case is why limits were invented."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "As x → 0 from the right, f(x) → 3; from the left, f(x) → 5. What is lim x→0 f(x)?",
-     "options": [
-      "4, the average",
-      "3, the right side wins",
-      "It does not exist — the two sides must agree",
-      "Both 3 and 5"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Limits don't compromise; averaging two destinations describes neither.",
-      "Neither side outranks the other.",
-      "Right. A limit is one destination; if the approaches disagree, there is no single value being approached.",
-      "A limit is by definition a single number."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — Essence of Calculus (series)",
-     "url": "https://www.3blue1brown.com/topics/calculus",
-     "type": "video",
-     "note": "The best visual treatment of these ideas in existence. Watch chapter by chapter as you climb this ladder."
-    },
-    {
-     "label": "Khan Academy — Limits and continuity",
-     "url": "https://www.khanacademy.org/math/calculus-1",
-     "type": "interactive",
-     "note": "Unlimited practice problems with worked solutions when you want more reps than the checkpoints give."
-    }
-   ]
-  },
-  {
-   "id": "c02-derivative-def",
-   "title": "The derivative: instantaneous rate",
-   "summary": "The derivative is the limit of the average rate of change (rise over run) as the interval shrinks to zero — the slope of the tangent line.",
-   "cards": [
-    {
-     "h": "From average to instantaneous",
-     "md": "A car covers 60 miles in an hour: average speed 60 mph. But what's its speed *right now*, at 2:00:00 exactly? Over an interval of zero time it travels zero distance — 0/0 again.\n\nThe fix is the limit. Average speed over a shrinking window:\n\n## f′(x) = lim h→0 [f(x+h) − f(x)] / h\n\nCompute rise-over-run over an interval of width h, then let h shrink. The averages home in on one number: the **instantaneous rate of change** — the derivative."
-    },
-    {
-     "h": "The geometric picture",
-     "md": "Graphically, [f(x+h) − f(x)]/h is the slope of a **secant line** through two points on the curve. As h → 0, the second point slides into the first and the secant pivots into the **tangent line**.\n\nSo the derivative at a point = slope of the tangent there.\n\n- f′(x) > 0: function rising\n- f′(x) < 0: falling\n- f′(x) = 0: momentarily flat — the candidates for peaks and valleys\n\nWorked once from the definition: f(x) = x². [(x+h)² − x²]/h = (2xh + h²)/h = 2x + h → **2x** as h → 0. You will never need the definition again for x² — but you now know what the rules you're about to learn are shortcuts *for*."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "In the definition f′(x) = lim h→0 [f(x+h) − f(x)]/h, the quotient before the limit represents:",
-     "options": [
-      "The tangent slope exactly",
-      "The average rate of change over an interval of width h — a secant slope",
-      "The area under f between x and x+h",
-      "The value of f at x"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Not yet — only after the limit does the secant become the tangent.",
-      "Right. Rise over run between two actual points; the limit is what turns average into instantaneous.",
-      "Area is the integral's territory, not the derivative's.",
-      "It's a ratio of *changes* in f, not f itself."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "f(t) is a rocket's altitude in meters at t seconds, and f′(10) = 250. The correct reading:",
-     "options": [
-      "The rocket is 250 m high at t = 10",
-      "The rocket climbed 250 m during the first 10 s",
-      "At t = 10 the rocket is climbing at 250 m/s",
-      "The rocket accelerates at 250 m/s²"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Altitude is f(10); the derivative is the *rate* of altitude change.",
-      "Total climb is f(10) − f(0); the derivative is instantaneous, not cumulative.",
-      "Right — derivative of position is velocity, read at that instant.",
-      "Acceleration is the derivative of the derivative — one level up."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Using the definition on f(x) = x², the difference quotient simplifies to 2x + h. Why is the derivative 2x and not 2x + h?",
-     "options": [
-      "We set h = 0 because 0 is a legal input after simplifying",
-      "The h term is a rounding error we ignore",
-      "We take the limit as h → 0, and 2x + h approaches 2x",
-      "It's a convention with no justification"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Close — but the honest statement is the limit; before simplifying, h = 0 gave 0/0, so 'plugging in' only works because the limit exists.",
-      "Nothing in calculus is ignored; the limit handles h exactly.",
-      "Right. 2x + h is a moving target whose destination is 2x. The limit makes 'infinitely small' rigorous.",
-      "It's fully justified — the limit is the justification, and it's airtight."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — The paradox of the derivative",
-     "url": "https://www.3blue1brown.com/lessons/derivatives",
-     "type": "video",
-     "note": "Exactly this concept: why 'instantaneous rate of change' is almost a contradiction, and how the limit resolves it."
-    }
-   ],
-   "anim": "secant_to_tangent"
-  },
-  {
-   "id": "c03-rules",
-   "title": "Differentiation rules",
-   "summary": "Power, sum, product, and chain rules turn differentiation from limit computations into mechanical algebra.",
-   "cards": [
-    {
-     "h": "The toolkit",
-     "md": "Nobody computes limits daily. A handful of rules, each proved once from the definition, cover almost everything:\n\n- **Power**: (xⁿ)′ = n·xⁿ⁻¹  — so (x³)′ = 3x²\n- **Constant multiple & sum**: differentiate term by term\n- **Product**: (fg)′ = f′g + fg′  — *not* f′g′\n- **Quotient**: (f/g)′ = (f′g − fg′)/g²\n\nPlus the specials: (eˣ)′ = eˣ, (ln x)′ = 1/x, (sin x)′ = cos x, (cos x)′ = −sin x."
-    },
-    {
-     "h": "The chain rule",
-     "md": "The one rule that runs the modern world:\n\n## (f(g(x)))′ = f′(g(x)) · g′(x)\n\nFor nested functions, multiply the rates of each layer, evaluated where it operates. If y changes 3× as fast as u, and u changes 2× as fast as x, then y changes 6× as fast as x. Rates through a chain **multiply**.\n\nExample: d/dx sin(x²) = cos(x²) · 2x — outer derivative at the inner value, times the inner derivative.\n\nHold onto this rule: backpropagation, the algorithm that trains every neural network, is the chain rule applied a billion times. It reappears in the Neural Networks topic."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "d/dx (5x⁴ − 3x + 7) = ?",
-     "options": [
-      "20x³ − 3",
-      "5x³ − 3",
-      "20x³ − 3x + 7",
-      "20x⁴ − 3"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Right: power rule per term; the constant 7 dies (its rate of change is zero).",
-      "The constant multiple 5 survives: 5 · 4x³ = 20x³.",
-      "Constants differentiate to zero, and −3x differentiates to −3, not −3x.",
-      "The power drops by one: x⁴ → x³."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "d/dx (x² · sin x) = ?",
-     "options": [
-      "2x · cos x",
-      "2x sin x + x² cos x",
-      "x² cos x",
-      "2x + cos x"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That's the tempting f′g′ — the product rule is f′g + fg′.",
-      "Right: derivative of the first times the second, plus the first times derivative of the second.",
-      "You differentiated only sin x; the x² factor also changes.",
-      "You differentiated each factor and added — products don't work like sums."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "d/dx e^(3x²) = ?",
-     "options": [
-      "e^(3x²)",
-      "6x · e^(3x²)",
-      "e^(6x)",
-      "3x² · e^(3x²−1)"
-     ],
-     "answer": 1,
-     "feedback": [
-      "(eˣ)′ = eˣ only when the exponent is plain x; here there's an inner function whose rate matters.",
-      "Right: outer derivative e^(inner) times inner derivative 6x. Chain rule.",
-      "The exponent doesn't differentiate in place; the whole composition does.",
-      "That's the power rule misapplied to an exponential — different animal entirely."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — Visualizing the chain rule and product rule",
-     "url": "https://www.3blue1brown.com/lessons/chain-rule-and-product-rule",
-     "type": "video",
-     "note": "Why the rules are what they are — geometric proofs you'll actually remember."
-    },
-    {
-     "label": "Paul's Online Math Notes — Derivatives",
-     "url": "https://tutorial.math.lamar.edu/Classes/CalcI/DerivativeIntro.aspx",
-     "type": "reading",
-     "note": "The classic drill reference: every rule with a stack of worked examples."
-    }
-   ]
-  },
-  {
-   "id": "c04-applications",
-   "title": "Using derivatives: extrema and optimization",
-   "summary": "Peaks and valleys hide where f′ = 0. Optimization: model the quantity, differentiate, solve f′ = 0, verify which candidate wins.",
-   "cards": [
-    {
-     "h": "Where the interesting points hide",
-     "md": "At a smooth peak or valley the tangent is horizontal — so every interior maximum or minimum satisfies **f′(x) = 0**. Solve that equation and you have the complete list of candidates (critical points).\n\nCandidates, not winners: f(x) = x³ has f′(0) = 0 but no peak there — it just pauses. Classify with the second derivative: **f″ > 0** means curving upward (a valley), **f″ < 0** curving downward (a peak), f″ = 0 says ask more questions.\n\nOn a closed interval, also check the endpoints — the best point of a domain can sit on its boundary, where the zero-slope logic doesn't apply."
-    },
-    {
-     "h": "Optimization, the recipe",
-     "md": "The most-used skill in applied calculus:\n\n1. Write the quantity to optimize as a function of one variable (use the constraints to eliminate others).\n2. Differentiate; solve f′ = 0.\n3. Classify candidates (second derivative or endpoint check).\n\nExample: a farmer with 100 m of fence against a river (three sides needed) maximizes area A = x(100 − 2x). A′ = 100 − 4x = 0 → x = 25, A″ = −4 < 0 → maximum: 25 × 50 m.\n\nThis recipe is everywhere — minimum cost, maximum yield, best fit. Training a neural network is this exact recipe on a function with a billion variables; gradient descent (that topic's concept 4) is what step 2 becomes when 'solve f′ = 0' is too hard to do directly."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "f′(c) = 0 and f″(c) = −6. At x = c, f has:",
-     "options": [
-      "A local minimum",
-      "A local maximum",
-      "Nothing — need more info",
-      "A discontinuity"
-     ],
-     "answer": 1,
-     "feedback": [
-      "f″ < 0 curves downward — that's the shape of a peak, not a valley.",
-      "Right: flat tangent plus downward curvature = local max.",
-      "The second-derivative test is decisive whenever f″ ≠ 0.",
-      "Both derivatives existing at c is the opposite of a discontinuity."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why does f′(x) = 0 give *candidates* rather than guaranteed extrema?",
-     "options": [
-      "The equation might be solved wrong",
-      "A zero-slope point can be a pause in a climb (like x³ at 0), and endpoints can beat all interior points",
-      "f′ = 0 has nothing to do with extrema",
-      "Only f″ = 0 finds extrema"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The issue is mathematical, not clerical.",
-      "Right on both counts — flat isn't always a turn, and boundaries play by different rules.",
-      "It has everything to do with them; it's necessary for interior extrema, just not sufficient.",
-      "f″ = 0 is the *inconclusive* case of the classification test."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Minimize the material for a closed box. After using the volume constraint you get surface area S(x) with S′(x) = 4x − 108/x². The candidate dimension satisfies:",
-     "options": [
-      "4x = 108/x², i.e. x³ = 27, x = 3",
-      "x = 0",
-      "S(x) = 0",
-      "S″(x) = 0"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Right — set S′ = 0 and solve: 4x³ = 108.",
-      "x = 0 isn't even a box, and S′ isn't zero there — it's undefined.",
-      "Zero surface area isn't a candidate; we set the *derivative* to zero, not the function.",
-      "S″ = 0 is the classification tool's edge case, not the candidate equation."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Paul's Online Math Notes — Optimization",
-     "url": "https://tutorial.math.lamar.edu/Classes/CalcI/Optimization.aspx",
-     "type": "reading",
-     "note": "A dozen fully worked optimization problems — the pattern sinks in by the fourth."
-    }
-   ]
-  },
-  {
-   "id": "c05-integral",
-   "title": "The integral: accumulation",
-   "summary": "The definite integral is the limit of Riemann sums — total accumulation of a quantity, geometrically the signed area under a curve.",
-   "cards": [
-    {
-     "h": "Adding up infinitely many slivers",
-     "md": "Reverse question: a car's *speed* is known at every instant — how far did it travel?\n\nOver a tiny interval, distance ≈ speed × time. So: chop [a, b] into n slivers of width Δx, approximate each sliver's contribution as f(x)·Δx, add them up, and let the slicing get infinitely fine:\n\n## ∫ₐᵇ f(x) dx = lim Σ f(xᵢ) Δx\n\nThe same limit trick as the derivative, pointed the other way: the derivative shrinks a *ratio*, the integral refines a *sum*."
-    },
-    {
-     "h": "Area, signed",
-     "md": "Geometrically ∫ₐᵇ f(x) dx is the area between the curve and the x-axis — **signed**: regions below the axis count negative. ∫₀^2π sin x dx = 0 because the hill and the valley cancel exactly.\n\nRead the units as a sanity check: f in m/s times dx in s gives meters — integrating a rate recovers the total. Speed → distance, power → energy, flow rate → volume, density → mass. Whenever a quantity is 'rate × time added up', it's an integral wearing work clothes."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A pump's flow rate is r(t) liters/min. What does ∫₀^30 r(t) dt represent?",
-     "options": [
-      "The average flow rate",
-      "Total liters pumped in the first 30 minutes",
-      "The flow rate at t = 30",
-      "The pump's maximum rate"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Average rate is the integral *divided by* 30 — the integral alone is the total.",
-      "Right: rate × time, accumulated. Liters/min × min = liters.",
-      "The rate at an instant is just r(30) — no integral needed.",
-      "Maxima come from derivatives (r′ = 0), not integrals."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "f(x) = x − 2 on [0, 4]: below the axis on [0,2], above on [2,4], both triangles of area 2. ∫₀⁴ f dx = ?",
-     "options": [
-      "4",
-      "0",
-      "−4",
-      "2"
-     ],
-     "answer": 1,
-     "feedback": [
-      "4 is the total *unsigned* area; the integral signs it.",
-      "Right: −2 + 2 = 0. Below-axis area counts negative.",
-      "That would need both triangles below the axis.",
-      "Check both pieces: they're equal and opposite."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "In a Riemann sum Σ f(xᵢ)Δx, what does refining the partition (Δx → 0) accomplish?",
-     "options": [
-      "Makes the sum smaller",
-      "Makes the rectangle approximation error vanish, so the sum converges to the exact accumulation",
-      "Changes the interval [a, b]",
-      "Nothing — the sum is already exact"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The number of terms grows as each shrinks — the sum converges, it doesn't dwindle.",
-      "Right. Thinner slices hug the curve better; the limit of the process is the integral's definition.",
-      "The interval is fixed; only the slicing gets finer.",
-      "For a curved f, rectangles always miss slightly — until the limit."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — Integration and the fundamental theorem",
-     "url": "https://www.3blue1brown.com/lessons/integration",
-     "type": "video",
-     "note": "The car-odometer framing of this exact concept, animated."
-    }
-   ]
-  },
-  {
-   "id": "c06-ftc",
-   "title": "The Fundamental Theorem of Calculus",
-   "summary": "Differentiation and integration are inverse operations: ∫ₐᵇ f(x) dx = F(b) − F(a) where F′ = f.",
-   "cards": [
-    {
-     "h": "The bridge",
-     "md": "Two ideas built independently — slopes from shrinking ratios, areas from refining sums — turn out to be inverses:\n\n## ∫ₐᵇ f(x) dx = F(b) − F(a),  where F′ = f\n\nTo total up f, find *any* function F whose derivative is f (an **antiderivative**), and subtract its endpoint values. The infinite sum collapses into one subtraction.\n\n∫₁³ x² dx: an antiderivative of x² is x³/3, so the answer is 27/3 − 1/3 = 26/3. No rectangles were harmed."
-    },
-    {
-     "h": "Why it's true, in one breath",
-     "md": "Let A(x) = area under f from a to x. Nudge x by a sliver dx: the area grows by a strip ≈ f(x)·dx tall-times-wide. So dA/dx = f(x) — **the rate at which area accumulates IS the height of the curve.** Accumulation and rate are two views of one relationship; that's the theorem.\n\nPractical consequence: the hunt for integrals becomes the hunt for antiderivatives — reading the derivative rules right-to-left. Power rule reversed: ∫xⁿ dx = xⁿ⁺¹/(n+1) + C. The +C matters: derivatives erase constants, so antiderivatives recover them only up to an unknown one. Pinning down that C from side conditions is precisely what solving a differential equation is — the next topic in this chain."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "∫₀² 3x² dx = ?",
-     "options": [
-      "12",
-      "8",
-      "6",
-      "24"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Check the antiderivative: x³, evaluated 2³ − 0³.",
-      "Right: antiderivative x³; 8 − 0 = 8.",
-      "6 is 3·2 — that's not how the theorem works; find F with F′ = 3x².",
-      "You may have doubled — F(b) − F(a) = 8 − 0."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The FTC is 'fundamental' because it:",
-     "options": [
-      "Is the hardest theorem in calculus",
-      "Connects the two halves of calculus, letting antiderivatives replace infinite sums",
-      "Defines what a limit is",
-      "Only works for polynomials"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Its proof sketch fits on one card; its importance isn't difficulty.",
-      "Right — it welds derivatives and integrals into one subject and makes integrals computable.",
-      "Limits were defined first; the FTC is built on top of them.",
-      "It works for any continuous f — polynomials are just the easy practice ground."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "A(x) = ∫₀ˣ f(t) dt is the accumulated area so far. What is A′(x)?",
-     "options": [
-      "f(x) — the curve's current height",
-      "f′(x)",
-      "0",
-      "F(b) − F(a)"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Right — this IS the theorem: area accumulates at a rate equal to the height being added.",
-      "One derivative too many; accumulation undoes exactly one level.",
-      "The area is growing wherever f > 0; its rate isn't zero.",
-      "That's a definite integral's value — a number, not a function of x."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Khan Academy — Fundamental theorem of calculus",
-     "url": "https://www.khanacademy.org/math/calculus-1",
-     "type": "interactive",
-     "note": "Practice evaluating definite integrals until the antiderivative reflex is automatic."
-    },
-    {
-     "label": "MIT OCW 18.01 — Single Variable Calculus",
-     "url": "https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/",
-     "type": "reading",
-     "note": "Full university course, free — lecture videos, notes, and exams for going beyond this ladder."
-    }
-   ]
-  },
-  {
-   "id": "c07-techniques",
-   "title": "Finding antiderivatives",
-   "summary": "Substitution reverses the chain rule; integration by parts reverses the product rule. Recognize which rule the integrand came from.",
-   "cards": [
-    {
-     "h": "Substitution: the chain rule backwards",
-     "md": "Differentiation is mechanical; antidifferentiation is pattern recognition. The main pattern: an integrand that looks like a chain-rule *output* — some f(g(x)) times g′(x) hanging around.\n\n∫ 2x·cos(x²) dx: spot the inner function u = x², note du = 2x dx is present, rewrite as ∫ cos u du = sin u + C = **sin(x²) + C**.\n\nSubstitution is bookkeeping for 'this used to be a chain rule.' If the inner function's derivative isn't in the integrand (up to a constant), substitution won't fire — pick a different u or a different technique."
-    },
-    {
-     "h": "Integration by parts: the product rule backwards",
-     "md": "Rearranging the product rule and integrating gives:\n\n## ∫ u dv = uv − ∫ v du\n\nTrade one integral for another — a good trade when the new one is easier. ∫ x·eˣ dx: choose u = x (dies when differentiated), dv = eˣ dx. Result: x·eˣ − ∫ eˣ dx = **(x − 1)eˣ + C**.\n\nHonest scope note: unlike differentiation, integration is not fully mechanical — some innocent-looking integrands (e^(−x²), sin(x)/x) have no elementary antiderivative at all, and numerical methods take over. Knowing when to stop searching is itself a skill."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "∫ 3x² · e^(x³) dx = ?",
-     "options": [
-      "e^(x³) + C",
-      "3x² e^(x³) + C",
-      "x³ e^(x³) + C",
-      "e^(3x²) + C"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Right: u = x³, du = 3x² dx is sitting right there; ∫ eᵘ du = eᵘ + C.",
-      "That's the integrand handed back — differentiate your answer to check; it should reproduce the integrand.",
-      "Differentiating this gives extra terms via the product rule — not the integrand.",
-      "The exponent doesn't change; substitution preserves x³."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "In ∫ x·cos x dx by parts, the productive choice is u = x, dv = cos x dx, because:",
-     "options": [
-      "x is written first",
-      "Differentiating u = x simplifies it to 1, making the leftover integral ∫ sin x dx easy",
-      "cos x can't be integrated",
-      "Any choice works equally well"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Order on the page is irrelevant; behavior under differentiation is what matters.",
-      "Right — pick u to *die* under differentiation. Result: x sin x + cos x + C.",
-      "cos x integrates trivially to sin x — that's exactly why it can be dv.",
-      "Try u = cos x: the leftover integral gets worse, not better. The choice is the technique."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "The universal check for any antiderivative you compute:",
-     "options": [
-      "Plug in x = 0",
-      "Differentiate your answer — it must reproduce the integrand exactly",
-      "Confirm the +C is present",
-      "Graph both functions"
-     ],
-     "answer": 1,
-     "feedback": [
-      "One point can't verify a function identity.",
-      "Right — differentiation is mechanical and reliable, so it's the perfect verifier for its inverse. Free error detection; use it every time.",
-      "The +C is necessary but says nothing about whether the rest is right.",
-      "Graphs persuade; derivatives prove."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Paul's Online Math Notes — Integration techniques",
-     "url": "https://tutorial.math.lamar.edu/Classes/CalcII/IntTechIntro.aspx",
-     "type": "reading",
-     "note": "Substitution through partial fractions, with the decision process spelled out."
-    }
-   ]
-  },
-  {
-   "id": "c08-applied",
-   "title": "Integrals at work",
-   "summary": "Area between curves, average value, and total change from a rate — the three applied patterns that cover most real integral use.",
-   "cards": [
-    {
-     "h": "Three patterns",
-     "md": "**Area between curves**: ∫ₐᵇ (top − bottom) dx. Find where the curves cross to set the limits.\n\n**Average value** of f on [a,b]: (1/(b−a)) ∫ₐᵇ f dx — total accumulation divided by the width. The honest mean of a continuously varying quantity (average temperature over a day, average power draw).\n\n**Net change**: F(b) = F(a) + ∫ₐᵇ F′(t) dt — current state equals initial state plus accumulated rate. Position from velocity, account balance from cash flow, charge from current."
-    },
-    {
-     "h": "The mindset that transfers",
-     "md": "The applied skill isn't computing integrals — software does that — it's **recognizing accumulation structure**: 'this total is a rate summed over time,' 'this average must be integral-weighted,' 'this quantity is the area between two curves.'\n\nSet up the integral correctly and the rest is mechanical. Set it up wrong and no amount of computation saves you. That's why every checkpoint here has emphasized reading integrals, not just evaluating them.\n\nThis closes the core ladder. Calculus's sequels each pick one thread: **ODEs** (equations whose unknowns are functions and whose statements involve derivatives), **Fourier series** (rebuilding functions from waves — built on integrals), and **PDEs** (rates in several variables at once)."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Average value of f(x) = x² on [0, 3]:",
-     "options": [
-      "9",
-      "3",
-      "4.5",
-      "27"
-     ],
-     "answer": 1,
-     "feedback": [
-      "9 is the endpoint value f(3), not the average over the interval.",
-      "Right: (1/3)∫₀³ x² dx = (1/3)(9) = 3.",
-      "4.5 is the midpoint guess (f(1.5)=2.25 anyway) — averages of curves need the integral.",
-      "27 is x³ at 3 — the antiderivative's value, before dividing by the width... and before evaluating correctly: ∫ = 9."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A reservoir holds 500 units at t = 0. Net inflow rate is r(t), which is sometimes negative. Volume at t = 10:",
-     "options": [
-      "∫₀¹⁰ r(t) dt",
-      "500 + ∫₀¹⁰ r(t) dt",
-      "500 · ∫₀¹⁰ r(t) dt",
-      "500 + r(10)"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That's only the *change* — you dropped the starting stock.",
-      "Right: initial state plus accumulated net rate. Negative stretches of r subtract automatically.",
-      "Rates add to stocks; they don't multiply them.",
-      "r(10) is the instantaneous rate at the end — units don't even match volume."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "To find the area enclosed between y = x and y = x², you should:",
-     "options": [
-      "∫₀¹ (x² − x) dx",
-      "∫₀¹ (x − x²) dx, since x is the upper curve on [0,1] where they cross",
-      "∫₀¹ x·x² dx",
-      "Add the two areas under each curve"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That's bottom minus top — you'd get a negative area. Order matters.",
-      "Right: crossings at 0 and 1 set the limits; top − bottom = x − x²; area = 1/6.",
-      "Multiplying curves has no geometric meaning here.",
-      "Adding double-counts the region under the lower curve; you want the difference."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "3Blue1Brown — Essence of Calculus, closing chapters",
-     "url": "https://www.3blue1brown.com/topics/calculus",
-     "type": "video",
-     "note": "Rewatch the series end-to-end after mastery — it consolidates exactly this ladder."
-    },
-    {
-     "label": "MIT OCW 18.01 — problem sets",
-     "url": "https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/",
-     "type": "reading",
-     "note": "Exam-grade problems if you want to pressure-test mastery beyond the review queue."
-    }
-   ]
-  }
- ]
+  ]
 }

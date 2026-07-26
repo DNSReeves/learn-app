@@ -347,7 +347,8 @@
           "type": "article",
           "note": "Prompt-chaining, routing, orchestrator-workers — the decomposition patterns, named."
         }
-      ]
+      ],
+      "anim": "agent_budget_curve"
     },
     {
       "id": "memory",
@@ -541,7 +542,8 @@
           "type": "paper",
           "note": "Training-side honesty pressure — complementary to the harness-side guards this concept covers."
         }
-      ]
+      ],
+      "anim": "agent_grounding_guard"
     },
     {
       "id": "multi-agent",
@@ -630,7 +632,8 @@
           "type": "article",
           "note": "Production notes on orchestrator-worker research agents — briefs, parallelism, and what broke."
         }
-      ]
+      ],
+      "anim": "agent_verify_gauntlet"
     },
     {
       "id": "evaluation",
@@ -885,7 +888,8 @@
           "type": "article",
           "note": "Ends where this course does: start simple, add autonomy only as trust is earned."
         }
-      ]
+      ],
+      "anim": "agent_heartbeat"
     }
   ]
 }

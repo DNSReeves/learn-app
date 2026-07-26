@@ -264,7 +264,8 @@
           "type": "data",
           "note": "Compute, data, and cost trends with methodology — the follow-the-constraint habit, institutionalized."
         }
-      ]
+      ],
+      "anim": "agi_scaling_law"
     },
     {
       "id": "alignment",
@@ -353,7 +354,8 @@
           "type": "paper",
           "note": "What a deployed partial method actually looks like — worth reading against the critiques."
         }
-      ]
+      ],
+      "anim": "agi_spec_gaming"
     },
     {
       "id": "forecasting-agi",
@@ -436,7 +438,8 @@
           "type": "paper",
           "note": "The big survey itself: spread, framing effects, and wave-over-wave drift. Read the distributions, not the medians."
         }
-      ]
+      ],
+      "anim": "agi_forecast_spread"
     },
     {
       "id": "economic-transformation",
@@ -525,7 +528,8 @@
           "type": "paper",
           "note": "Why transformative technologies can DEPRESS measured productivity before lifting it — the lag, formalized."
         }
-      ]
+      ],
+      "anim": "agi_jcurve"
     },
     {
       "id": "societal-stakes",

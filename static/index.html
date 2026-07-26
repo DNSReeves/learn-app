@@ -1351,6 +1351,2551 @@ ANIMS.attention_heatmap=async(cv,ctx)=>{
 };
 
 route();
+
+/* ===== Learn animation expansion (52 anims, 2026-07-26, workflow-authored + verified) ===== */
+/* calculus / calc_limit */
+(function(){
+const calc_lf=(x)=>x+1;
+function calc_drawLimit(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=90,X1=830,Y0=330,Y1=45,xmax=2.2,ymax=3.4;
+  const sx=x=>X0+(x/xmax)*(X1-X0);
+  const sy=y=>Y0-(y/ymax)*(Y0-Y1);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=2;g+=0.5){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  for(let g=0;g<=3;g+=1){ctx.beginPath();ctx.moveTo(X0,sy(g));ctx.lineTo(X1,sy(g));ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.textAlign="center";ctx.fillText("x = 1",sx(1),Y0+18);
+  ctx.textAlign="right";ctx.fillText("2",X0-8,sy(2)+4);
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(sx(0),sy(calc_lf(0)));ctx.lineTo(sx(xmax),sy(calc_lf(xmax)));ctx.stroke();
+  ctx.strokeStyle="#5A6E8C";ctx.setLineDash([5,5]);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(X0,sy(2));ctx.lineTo(sx(1),sy(2));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(sx(1),Y0);ctx.lineTo(sx(1),sy(2));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle=F.txt;ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(sx(1),sy(2),6,0,7);ctx.stroke();
+  if(s.x!=null){
+    const x=s.x,y=calc_lf(x);
+    ctx.strokeStyle=F.post;ctx.setLineDash([3,4]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(sx(x),Y0);ctx.lineTo(sx(x),sy(y));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X0,sy(y));ctx.lineTo(sx(x),sy(y));ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(sx(x),sy(y),5,0,7);ctx.fill();
+    ctx.fillStyle=F.txt;ctx.textAlign="left";
+    ctx.fillText("x = "+x.toFixed(3)+"    f(x) = "+y.toFixed(3),X0+20,Y1-12);
+  }
+}
+ANIMS.calc_limit_static=(cv,ctx)=>calc_drawLimit(ctx,cv,{x:0.5});
+ANIMS.calc_limit=async(cv,ctx)=>{
+  calc_drawLimit(ctx,cv,{x:0.5});
+  await narrate("f(x) = (x²−1)/(x−1) equals x+1 everywhere except x=1, where it is 0/0 — a hole in the graph.");
+  await narrate("From the left, push x toward 1 and watch the output.");
+  await tween(1600,k=>calc_drawLimit(ctx,cv,{x:0.5+k*0.48}));
+  await narrate("From the right, x → 1 as well: 1.5, 1.1, 1.02 …");
+  await tween(1600,k=>calc_drawLimit(ctx,cv,{x:1.5-k*0.48}));
+  await narrate("Both sides home in on 2. The limit is 2 — the destination exists even though f never lands there.");
+  calc_drawLimit(ctx,cv,{x:1.02});
+};
+})();
+/* calculus / calc_riemann */
+(function(){
+const calc_rf=(x)=>0.25*x*x+0.5;
+function calc_drawRiemann(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=740,Y0=330,Y1=45,xmax=4.4,ymax=5.2,a=0,b=4;
+  const sx=x=>X0+(x/xmax)*(X1-X0);
+  const sy=y=>Y0-(y/ymax)*(Y0-Y1);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=4;g+=1){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  const n=s.n,dx=(b-a)/n;let sum=0;
+  ctx.lineWidth=1;
+  for(let i=0;i<n;i++){
+    const xl=a+i*dx,xm=xl+dx/2,h=calc_rf(xm);sum+=h*dx;
+    const px=sx(xl),pw=sx(xl+dx)-sx(xl),py=sy(h);
+    ctx.fillStyle="rgba(232,161,60,0.28)";ctx.fillRect(px,py,pw,Y0-py);
+    ctx.strokeStyle=F.post;ctx.strokeRect(px,py,pw,Y0-py);
+  }
+  ctx.strokeStyle=F.txt;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let x=a;x<=b+0.001;x+=0.02){const px=sx(x),py=sy(calc_rf(x));if(x===a)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.textAlign="center";
+  ctx.fillText("a",sx(a),Y0+18);ctx.fillText("b",sx(b),Y0+18);
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("n = "+n,772,130);
+  ctx.fillText("Σ f·Δx",772,158);
+  ctx.fillText("= "+sum.toFixed(3),772,180);
+  ctx.fillStyle=F.ok;ctx.fillText("∫ = 7.333",772,210);
+}
+ANIMS.calc_riemann_static=(cv,ctx)=>calc_drawRiemann(ctx,cv,{n:6});
+ANIMS.calc_riemann=async(cv,ctx)=>{
+  calc_drawRiemann(ctx,cv,{n:6});
+  await narrate("Speed is known at every instant — how far did the car go? Chop the interval into thin slivers.");
+  await narrate("Each sliver contributes about f(x)·Δx. Add them all: a Riemann sum approximating the area under f.");
+  await tween(1400,k=>calc_drawRiemann(ctx,cv,{n:Math.max(6,Math.round(6+k*10))}));
+  await narrate("Refine the partition — thinner slices hug the curve, and the gap to the true area shrinks.");
+  await tween(1800,k=>calc_drawRiemann(ctx,cv,{n:Math.round(16+k*56)}));
+  await narrate("As Δx → 0 the sum converges to the exact accumulation: ∫ f dx = 7.333, the signed area under the curve.");
+  calc_drawRiemann(ctx,cv,{n:80});
+};
+})();
+/* calculus / calc_ftc */
+(function(){
+const calc_ff=(x)=>0.6*x+0.4;
+const calc_FA=(x)=>0.3*x*x+0.4*x;
+function calc_drawFtc(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,Y0=330,Y1=70,xmax=3.2,ymax=4.3,a=0,b=3;
+  const sx=x=>X0+(x/xmax)*(X1-X0);
+  const sy=y=>Y0-(y/ymax)*(Y0-Y1);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=3;g+=1){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  const cx=s.x;
+  ctx.fillStyle="rgba(232,161,60,0.25)";
+  ctx.beginPath();ctx.moveTo(sx(0),sy(0));
+  for(let x=0;x<=cx+0.001;x+=0.02)ctx.lineTo(sx(x),sy(calc_ff(x)));
+  ctx.lineTo(sx(cx),sy(0));ctx.closePath();ctx.fill();
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let x=0;x<=b+0.001;x+=0.02){const px=sx(x),py=sy(calc_ff(x));if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.strokeStyle=F.ok;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let x=0;x<=cx+0.001;x+=0.02){const px=sx(x),py=sy(calc_FA(x));if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.strokeStyle=F.post;ctx.setLineDash([4,4]);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(sx(cx),Y0);ctx.lineTo(sx(cx),Y1);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=F.ax;ctx.beginPath();ctx.arc(sx(cx),sy(calc_ff(cx)),4,0,7);ctx.fill();
+  ctx.fillStyle=F.ok;ctx.beginPath();ctx.arc(sx(cx),sy(calc_FA(cx)),4,0,7);ctx.fill();
+  ctx.textAlign="left";
+  ctx.fillStyle=F.ax;ctx.fillText("f(x) — height",X0+15,Y1-30);
+  ctx.fillStyle=F.ok;ctx.fillText("A(x) — area so far",X0+15,Y1-10);
+  ctx.fillStyle=F.txt;ctx.textAlign="right";ctx.fillText("A = "+calc_FA(cx).toFixed(2),X1,Y1-20);
+}
+ANIMS.calc_ftc_static=(cv,ctx)=>calc_drawFtc(ctx,cv,{x:1.2});
+ANIMS.calc_ftc=async(cv,ctx)=>{
+  calc_drawFtc(ctx,cv,{x:0.05});
+  await narrate("A(x) is the area under f from 0 out to x — the amount accumulated so far.");
+  await narrate("Sweep x to the right: the shaded area piles up while the green curve tracks its running total.");
+  await tween(2400,k=>calc_drawFtc(ctx,cv,{x:0.05+k*2.95}));
+  await narrate("Where f is tall, area piles up fast and A steepens; where f is short, A barely climbs.");
+  await narrate("So dA/dx = f(x): area accumulates at a rate equal to the curve's height. That is the Fundamental Theorem.");
+  calc_drawFtc(ctx,cv,{x:3});
+};
+})();
+/* calculus / calc_extrema */
+(function(){
+const calc_ef=(x)=>(1/3)*x*x*x-3*x*x+8*x;
+const calc_edf=(x)=>x*x-6*x+8;
+function calc_drawExt(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=70,X1=820,Y0=330,Y1=45,xmax=6.3,ymax=12.8;
+  const sx=x=>X0+(x/xmax)*(X1-X0);
+  const sy=y=>Y0-(y/ymax)*(Y0-Y1);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=6;g+=1){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let x=0;x<=6.001;x+=0.02){const px=sx(x),py=sy(calc_ef(x));if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  if(s.marks){
+    [2,4].forEach(cx=>{ctx.setLineDash([4,4]);ctx.strokeStyle="#5A6E8C";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(sx(cx),Y0);ctx.lineTo(sx(cx),sy(calc_ef(cx)));ctx.stroke();ctx.setLineDash([]);});
+    ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(sx(2),sy(calc_ef(2)),6,0,7);ctx.fill();
+    ctx.fillStyle=F.ok;ctx.beginPath();ctx.arc(sx(4),sy(calc_ef(4)),6,0,7);ctx.fill();
+    ctx.textAlign="center";
+    ctx.fillStyle=F.post;ctx.fillText("max  f′=0, f″<0",sx(2),sy(calc_ef(2))-14);
+    ctx.fillStyle=F.ok;ctx.fillText("min  f′=0, f″>0",sx(4),sy(calc_ef(4))+24);
+  }
+  const x=s.x,y=calc_ef(x),m=calc_edf(x),dxs=0.85;
+  const x1=x-dxs,x2=x+dxs,y1=y-m*dxs,y2=y+m*dxs;
+  ctx.strokeStyle=Math.abs(m)<0.25?F.post:(m>0?F.ok:F.wrong);ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(sx(x1),sy(y1));ctx.lineTo(sx(x2),sy(y2));ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(sx(x),sy(y),5,0,7);ctx.fill();
+  ctx.textAlign="left";ctx.fillStyle=F.txt;ctx.fillText("f′(x) = "+m.toFixed(2),X0+15,Y1-8);
+}
+ANIMS.calc_extrema_static=(cv,ctx)=>calc_drawExt(ctx,cv,{x:0.6});
+ANIMS.calc_extrema=async(cv,ctx)=>{
+  calc_drawExt(ctx,cv,{x:0.6});
+  await narrate("Slide a tangent line along the curve — its slope at each point is f′(x).");
+  await narrate("Green where the curve rises (f′>0), red where it falls (f′<0).");
+  await tween(2600,k=>calc_drawExt(ctx,cv,{x:0.4+k*5.3}));
+  await narrate("At a peak or a valley the tangent goes flat: f′(x)=0. Those are the critical points.");
+  await tween(900,k=>calc_drawExt(ctx,cv,{x:4,marks:true}));
+  await narrate("f′=0 finds the candidates; f″ sorts them — f″<0 is a peak (x=2), f″>0 a valley (x=4).");
+  calc_drawExt(ctx,cv,{x:4,marks:true});
+};
+})();
+/* odes / ode_transient */
+(function(){
+const ode_lfCurves=[0.1,0.6,1.1,2.4,3.2,3.8];
+function ode_lfY(y0,t){return 1.5+(y0-1.5)*Math.exp(-2*t);}
+function ode_drawLF(ctx,cv,st){
+  clear(ctx,cv);
+  const L=70,R=860,T=40,B=330;
+  const X=t=>L+(t/3)*(R-L), Y=y=>B-(y/4)*(B-T);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=4;g++){ctx.beginPath();ctx.moveTo(X(0),Y(g));ctx.lineTo(X(3),Y(g));ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(3),Y(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(0),Y(4));ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillText("t",X(3)-6,Y(0)+20);ctx.fillText("y",X(0)-22,Y(4)+6);
+  if(st.steady>0){
+    ctx.save();ctx.globalAlpha=st.steady;
+    ctx.strokeStyle=F.ok;ctx.lineWidth=2;ctx.setLineDash([6,5]);
+    ctx.beginPath();ctx.moveTo(X(0),Y(1.5));ctx.lineTo(X(3),Y(1.5));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=F.ok;ctx.fillText("steady state  y = 3/2",X(1.15),Y(1.5)-9);
+    ctx.restore();
+  }
+  const tMax=3*st.tMax;
+  if(tMax>0){
+    ode_lfCurves.forEach(y0=>{
+      ctx.strokeStyle=F.post;ctx.globalAlpha=0.85;ctx.lineWidth=2;
+      ctx.beginPath();
+      for(let t=0;t<=tMax+1e-9;t+=0.02){const yy=ode_lfY(y0,t);t===0?ctx.moveTo(X(t),Y(yy)):ctx.lineTo(X(t),Y(yy));}
+      ctx.stroke();
+      ctx.globalAlpha=1;ctx.fillStyle=F.post;
+      ctx.beginPath();ctx.arc(X(tMax),Y(ode_lfY(y0,tMax)),3,0,7);ctx.fill();
+    });
+    ctx.globalAlpha=1;
+  }
+}
+ANIMS.ode_transient_static=(cv,ctx)=>ode_drawLF(ctx,cv,{steady:1,tMax:0});
+ANIMS.ode_transient=async(cv,ctx)=>{
+  ode_drawLF(ctx,cv,{steady:0,tMax:0});
+  await narrate("y′ + 2y = 3 — the workhorse of applied modeling: an RC circuit charging, a mixing tank, any 'inflow minus proportional leak'.");
+  await tween(900,k=>ode_drawLF(ctx,cv,{steady:k,tMax:0}));
+  await narrate("Set y′ = 0 and the balance point falls out: y = 3/2. That's where the system is heading, no matter where it started.");
+  await narrate("Release solutions from any initial value and watch every one slide toward that line.");
+  await tween(1800,k=>ode_drawLF(ctx,cv,{steady:1,tMax:k}));
+  await narrate("Solution = steady state + decaying transient. The memory of the start fades as Ce^(−2t) — forgotten exponentially, time constant 1/2.");
+};
+})();
+/* odes / ode_logistic */
+(function(){
+function ode_logP(t){const K=1,r=1,P0=0.04;return K/(1+((K-P0)/P0)*Math.exp(-r*t));}
+function ode_logExp(t){const P0=0.04,r=1;return P0*Math.exp(r*t);}
+function ode_drawLog(ctx,cv,st){
+  clear(ctx,cv);
+  const L=70,R=860,T=30,B=330,Pm=1.3;
+  const X=t=>L+(t/10)*(R-L), Y=P=>B-(P/Pm)*(B-T);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=1.2;g+=0.2){ctx.beginPath();ctx.moveTo(X(0),Y(g));ctx.lineTo(X(10),Y(g));ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(10),Y(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(0),Y(Pm));ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillText("t",X(10)-14,Y(0)+20);ctx.fillText("P",X(0)-20,Y(Pm)+10);
+  ctx.save();ctx.strokeStyle=F.ok;ctx.setLineDash([6,5]);ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(X(0),Y(1));ctx.lineTo(X(10),Y(1));ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=F.ok;ctx.fillText("carrying capacity K",X(6.5),Y(1)-8);ctx.restore();
+  const tMax=10*st.tMax;
+  if(tMax>0){
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=2;ctx.globalAlpha=0.9;
+    ctx.beginPath();let started=false;
+    for(let t=0;t<=tMax+1e-9;t+=0.03){const P=ode_logExp(t);if(P>Pm)break;started?ctx.lineTo(X(t),Y(P)):(ctx.moveTo(X(t),Y(P)),started=true);}
+    ctx.stroke();ctx.globalAlpha=1;
+    ctx.strokeStyle=F.post;ctx.lineWidth=2.5;
+    ctx.beginPath();
+    for(let t=0;t<=tMax+1e-9;t+=0.03){const P=ode_logP(t);t===0?ctx.moveTo(X(t),Y(P)):ctx.lineTo(X(t),Y(P));}
+    ctx.stroke();
+    ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(X(tMax),Y(ode_logP(tMax)),4,0,7);ctx.fill();
+  }
+  if(st.tMax>0.4){
+    ctx.fillStyle=F.wrong;ctx.fillText("pure exponential",X(0.4),Y(1.2));
+    ctx.fillStyle=F.post;ctx.fillText("logistic",X(7.3),Y(0.88));
+  }
+  if(st.inflect>0){
+    ctx.save();ctx.globalAlpha=st.inflect;
+    const ti=Math.log(24);
+    ctx.strokeStyle=F.txt;ctx.setLineDash([4,4]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(X(ti),Y(0));ctx.lineTo(X(ti),Y(0.5));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(X(ti),Y(0.5),4,0,7);ctx.fill();
+    ctx.fillText("P = K/2 — fastest growth",X(ti)+8,Y(0.5)-6);
+    ctx.restore();
+  }
+}
+ANIMS.ode_logistic_static=(cv,ctx)=>ode_drawLog(ctx,cv,{tMax:0,inflect:0});
+ANIMS.ode_logistic=async(cv,ctx)=>{
+  ode_drawLog(ctx,cv,{tMax:0,inflect:0});
+  await narrate("dP/dt = rP(1 − P/K). While P is small the bracket ≈ 1, so growth is almost pure exponential — the two curves are indistinguishable.");
+  await tween(1400,k=>ode_drawLog(ctx,cv,{tMax:0.34*k,inflect:0}));
+  await narrate("But every self-reproducing thing eventually binds. As P nears the carrying capacity K, the bracket → 0 and growth stalls into an S-curve.");
+  await tween(1600,k=>ode_drawLog(ctx,cv,{tMax:0.34+0.66*k,inflect:0}));
+  await narrate("Growth is fastest at P = K/2, the inflection — not at the start. rP(1−P/K) is a downward parabola in P, peaking halfway up.");
+  await tween(900,k=>ode_drawLog(ctx,cv,{tMax:1,inflect:k}));
+  await narrate("Fit an exponential to the early data and you get a gorgeous in-sample fit and a catastrophic forecast. Always ask the equation's question: what stops the growth?");
+};
+})();
+/* odes / ode_damping */
+(function(){
+function ode_dU(t){const a=0.4,w=2.5;return Math.exp(-a*t)*(Math.cos(w*t)+(a/w)*Math.sin(w*t));}
+function ode_dO(t){return 1.2*Math.exp(-0.5*t)-0.2*Math.exp(-3*t);}
+function ode_dC(t){return (1+t)*Math.exp(-t);}
+function ode_drawDamp(ctx,cv,st){
+  clear(ctx,cv);
+  const L=70,R=860,T=30,B=340;
+  const X=t=>L+(t/10)*(R-L), Y=y=>B-((y+1)/2.2)*(B-T);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  [-1,-0.5,0,0.5,1].forEach(g=>{ctx.beginPath();ctx.moveTo(X(0),Y(g));ctx.lineTo(X(10),Y(g));ctx.stroke();});
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(10),Y(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X(0),Y(-1));ctx.lineTo(X(0),Y(1.2));ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillText("t",X(10)-14,Y(0)-8);ctx.fillText("displacement",X(0)+6,Y(1.2)+2);
+  if(st.env>0){
+    ctx.save();ctx.globalAlpha=st.env;ctx.strokeStyle="#5A6E8C";ctx.setLineDash([5,5]);ctx.lineWidth=1.2;
+    const amp=Math.sqrt(1+Math.pow(0.4/2.5,2));
+    ctx.beginPath();for(let t=0;t<=10;t+=0.05){const e=amp*Math.exp(-0.4*t);t===0?ctx.moveTo(X(t),Y(e)):ctx.lineTo(X(t),Y(e));}ctx.stroke();
+    ctx.beginPath();for(let t=0;t<=10;t+=0.05){const e=-amp*Math.exp(-0.4*t);t===0?ctx.moveTo(X(t),Y(e)):ctx.lineTo(X(t),Y(e));}ctx.stroke();
+    ctx.setLineDash([]);ctx.fillStyle="#5A6E8C";ctx.fillText("e^(−αt) envelope",X(6.2),Y(amp*Math.exp(-0.4*6.2))-6);
+    ctx.restore();
+  }
+  if(st.u>0){
+    const tu=10*st.u;
+    ctx.strokeStyle=F.post;ctx.lineWidth=2.5;
+    ctx.beginPath();for(let t=0;t<=tu+1e-9;t+=0.02){const y=ode_dU(t);t===0?ctx.moveTo(X(t),Y(y)):ctx.lineTo(X(t),Y(y));}ctx.stroke();
+    ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(X(tu),Y(ode_dU(tu)),4,0,7);ctx.fill();
+  }
+  if(st.o>0){
+    const to=10*st.o;
+    ctx.strokeStyle=F.ok;ctx.lineWidth=2;
+    ctx.beginPath();for(let t=0;t<=to+1e-9;t+=0.02){const y=ode_dO(t);t===0?ctx.moveTo(X(t),Y(y)):ctx.lineTo(X(t),Y(y));}ctx.stroke();
+    ctx.strokeStyle=F.ax;ctx.lineWidth=2;ctx.setLineDash([2,3]);
+    ctx.beginPath();for(let t=0;t<=to+1e-9;t+=0.02){const y=ode_dC(t);t===0?ctx.moveTo(X(t),Y(y)):ctx.lineTo(X(t),Y(y));}ctx.stroke();ctx.setLineDash([]);
+  }
+  ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(X(0),Y(1),4,0,7);ctx.fill();
+  if(st.u>0.5){ctx.fillStyle=F.post;ctx.fillText("underdamped: complex roots −α ± iω",X(2.8),Y(0.92));}
+  if(st.o>0.5){ctx.fillStyle=F.ok;ctx.fillText("overdamped",X(2.4),Y(0.28));ctx.fillStyle=F.ax;ctx.fillText("critically damped",X(0.6),Y(0.6));}
+}
+ANIMS.ode_damping_static=(cv,ctx)=>ode_drawDamp(ctx,cv,{u:0,o:0,env:0});
+ANIMS.ode_damping=async(cv,ctx)=>{
+  ode_drawDamp(ctx,cv,{u:0,o:0,env:0});
+  await narrate("my″ + cy′ + ky = 0. One number — the discriminant c² − 4mk — decides the whole personality of the motion. Release the mass from rest at displacement 1.");
+  await narrate("c² − 4mk < 0: complex roots −α ± iω. The motion rings — oscillation trapped inside a decaying envelope.");
+  await tween(1700,k=>ode_drawDamp(ctx,cv,{u:k,o:0,env:k}));
+  await narrate("c² − 4mk > 0 is overdamped and = 0 is critically damped: both return to rest with no overshoot — the screen-door closer and the shock absorber.");
+  await tween(1500,k=>ode_drawDamp(ctx,cv,{u:1,o:k,env:1}));
+  await narrate("The translation skill: the real part is the decay rate, the imaginary part is the ring frequency. Roots −2 ± 3i mean a 3 rad/s ring dying on a half-second envelope.");
+};
+})();
+/* odes / ode_eulerdrift */
+(function(){
+function ode_eulerPts(){const h=0.25,N=30;let x=1,y=0;const pts=[[x,y]];for(let i=0;i<N;i++){const nx=x-h*y,ny=y+h*x;x=nx;y=ny;pts.push([x,y]);}return pts;}
+function ode_drawEuler(ctx,cv,st){
+  clear(ctx,cv);
+  const cx=430,cy=190,s=72;
+  const X=x=>cx+x*s, Y=y=>cy-y*s;
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(X(-2.6),Y(0));ctx.lineTo(X(2.6),Y(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X(0),Y(-1.9));ctx.lineTo(X(0),Y(1.9));ctx.stroke();
+  ctx.strokeStyle=F.ok;ctx.setLineDash([5,5]);ctx.lineWidth=2;
+  ctx.beginPath();for(let a=0;a<=st.circ*2*Math.PI+1e-9;a+=0.04){const px=X(Math.cos(a)),py=Y(Math.sin(a));a===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();ctx.setLineDash([]);
+  const pts=ode_eulerPts();
+  const n=Math.min(st.steps,pts.length-1);
+  if(n>0){
+    ctx.strokeStyle=F.post;ctx.lineWidth=2;
+    ctx.beginPath();for(let i=0;i<=n;i++){const p=pts[i];i===0?ctx.moveTo(X(p[0]),Y(p[1])):ctx.lineTo(X(p[0]),Y(p[1]));}ctx.stroke();
+    for(let i=0;i<=n;i++){const p=pts[i];ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(X(p[0]),Y(p[1]),2.5,0,7);ctx.fill();}
+    const hd=pts[n];ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(X(hd[0]),Y(hd[1]),4,0,7);ctx.fill();
+  }
+  ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(X(1),Y(0),3.5,0,7);ctx.fill();
+  if(st.tan){
+    ctx.strokeStyle=F.wrong;ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X(1),Y(0));ctx.lineTo(X(1),Y(0.85));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=F.wrong;ctx.font="14px 'IBM Plex Mono'";ctx.fillText("tangent step exits the circle",X(1)+8,Y(0.6));
+  }
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillStyle=F.ok;ctx.fillText("true orbit  x² + y² = 1  (conserved)",60,38);
+  ctx.fillStyle=F.post;ctx.fillText("Euler steps  (h = 0.25)",60,60);
+}
+ANIMS.ode_eulerdrift_static=(cv,ctx)=>ode_drawEuler(ctx,cv,{circ:1,steps:0});
+ANIMS.ode_eulerdrift=async(cv,ctx)=>{
+  ode_drawEuler(ctx,cv,{circ:0,steps:0});
+  await narrate("The system x′ = −y, y′ = x traces a perfect circle: x² + y² is conserved forever. This is the exact answer we're trying to reproduce.");
+  await tween(1000,k=>ode_drawEuler(ctx,cv,{circ:k,steps:0}));
+  await narrate("Euler takes the slope at the START of each step and follows that tangent. But a tangent to a circle lies outside it.");
+  await tween(800,k=>ode_drawEuler(ctx,cv,{circ:1,steps:Math.floor(k*4),tan:true}));
+  await narrate("So every single step gains a little radius — about 3% here — in the same direction. The orbit spirals steadily outward, gaining energy the true system conserves.");
+  await tween(1800,k=>ode_drawEuler(ctx,cv,{circ:1,steps:Math.floor(4+k*26)}));
+  await narrate("Biased errors compound; they never average away — that's the O(h) drift. RK4 interviews four slopes per step to stay on the circle instead of tangent to it.");
+};
+})();
+/* pdes / pde_transport */
+(function(){
+const pde_tr_L=64, pde_tr_R=840, pde_tr_base=300, pde_tr_c0=0.15, pde_tr_c1=0.82;
+function pde_tr_px(xn){return pde_tr_L+(pde_tr_R-pde_tr_L)*xn;}
+function pde_tr_h(shape,xn,c){
+  if(shape==='square') return (xn>c-0.05 && xn<c+0.05)?165:0;
+  const w=0.05, d=(xn-c)/w; return 175*Math.exp(-d*d);
+}
+function pde_tr_curve(ctx,shape,c,color,dashed){
+  const L=pde_tr_L,R=pde_tr_R,base=pde_tr_base;
+  ctx.strokeStyle=color; ctx.lineWidth=dashed?1.2:2.6;
+  if(dashed)ctx.setLineDash([5,5]); else ctx.setLineDash([]);
+  ctx.beginPath();
+  for(let px=L;px<=R;px+=2){const xn=(px-L)/(R-L); const y=base-pde_tr_h(shape,xn,c); if(px===L)ctx.moveTo(px,y); else ctx.lineTo(px,y);}
+  ctx.stroke(); ctx.setLineDash([]);
+}
+function pde_tr_draw(ctx,cv,s){
+  clear(ctx,cv); ctx.font="14px 'IBM Plex Mono'";
+  const L=pde_tr_L,R=pde_tr_R,base=pde_tr_base;
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(L,base); ctx.lineTo(R,base); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(L,base); ctx.lineTo(L,60); ctx.stroke();
+  ctx.fillStyle="#5A6E8C";
+  ctx.fillText("x",R-12,base+20); ctx.fillText("u(x,t)",L+8,72);
+  pde_tr_curve(ctx,s.shape,pde_tr_c0,"#5A6E8C",true);
+  pde_tr_curve(ctx,s.shape,s.c,F.post,false);
+  ctx.strokeStyle=F.ok; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(430,100); ctx.lineTo(505,100); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(505,100); ctx.lineTo(496,95); ctx.lineTo(496,105); ctx.closePath(); ctx.fillStyle=F.ok; ctx.fill();
+  ctx.fillStyle=F.ok; ctx.fillText("speed c",430,90);
+}
+ANIMS.pde_transport_static=(cv,ctx)=>pde_tr_draw(ctx,cv,{shape:'gauss',c:pde_tr_c0});
+ANIMS.pde_transport=async(cv,ctx)=>{
+  pde_tr_draw(ctx,cv,{shape:'gauss',c:pde_tr_c0});
+  await narrate("The transport equation ∂u/∂t + c·∂u/∂x = 0 is solved by u(x,t)=f(x−ct) — for ANY differentiable shape f.");
+  await tween(1600,k=>pde_tr_draw(ctx,cv,{shape:'gauss',c:pde_tr_c0+(pde_tr_c1-pde_tr_c0)*k}));
+  await narrate("Whatever the profile, it glides rigidly rightward at speed c — no spreading, no smoothing. (Chain rule: ∂u/∂t=−c·f′ and c·∂u/∂x=c·f′ cancel.)");
+  await tween(1500,k=>pde_tr_draw(ctx,cv,{shape:'square',c:pde_tr_c0+(pde_tr_c1-pde_tr_c0)*k}));
+  await narrate("A Gaussian, a square pulse, your signature — each slides unchanged. An ODE leaves a constant free; a PDE leaves a whole function free.");
+};
+})();
+/* pdes / pde_modedecay */
+(function(){
+const pde_md_L=70,pde_md_R=760,pde_md_y0=200,pde_md_A=64,pde_md_lam=0.55;
+function pde_md_mode(ctx,n,fac,color){
+  ctx.strokeStyle=color; ctx.lineWidth= n===1?2.8:2;
+  ctx.beginPath();
+  for(let px=pde_md_L;px<=pde_md_R;px+=2){const xn=(px-pde_md_L)/(pde_md_R-pde_md_L); const y=pde_md_y0 - pde_md_A*fac*Math.sin(n*Math.PI*xn); if(px===pde_md_L)ctx.moveTo(px,y);else ctx.lineTo(px,y);}
+  ctx.stroke();
+}
+function pde_md_draw(ctx,cv,s){
+  clear(ctx,cv); ctx.font="14px 'IBM Plex Mono'";
+  const L=pde_md_L,R=pde_md_R,y0=pde_md_y0;
+  ctx.strokeStyle="#22314a"; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(L,y0); ctx.lineTo(R,y0); ctx.stroke();
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(L,y0-90);ctx.lineTo(L,y0+90);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(R,y0-90);ctx.lineTo(R,y0+90);ctx.stroke();
+  ctx.fillStyle="#5A6E8C"; ctx.fillText("x=0",L-6,y0+108); ctx.fillText("x=L",R-18,y0+108);
+  const k=s.k;
+  const f1=Math.exp(-pde_md_lam*1*k), f2=Math.exp(-pde_md_lam*4*k), f3=Math.exp(-pde_md_lam*9*k);
+  pde_md_mode(ctx,3,f3,"#5A6E8C");
+  pde_md_mode(ctx,2,f2,F.ax);
+  pde_md_mode(ctx,1,f1,F.post);
+  ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillStyle=F.post; ctx.fillText("n=1  rate ∝ 1   ×"+f1.toFixed(2),610,58);
+  ctx.fillStyle=F.ax;   ctx.fillText("n=2  rate ∝ 4   ×"+f2.toFixed(2),610,80);
+  ctx.fillStyle="#5A6E8C"; ctx.fillText("n=3  rate ∝ 9   ×"+f3.toFixed(2),610,102);
+}
+ANIMS.pde_modedecay_static=(cv,ctx)=>pde_md_draw(ctx,cv,{k:0});
+ANIMS.pde_modedecay=async(cv,ctx)=>{
+  pde_md_draw(ctx,cv,{k:0});
+  await narrate("Separation of variables writes the hot rod as a sum of sine modes sin(nπx/L), each with its own clock Tₙ(t)=e^(−α(nπ/L)²t).");
+  await tween(2200,k=>pde_md_draw(ctx,cv,{k}));
+  await narrate("The decay rate carries n² — mode 3 fades 9× faster than the fundamental, mode 10 a hundred times faster.");
+  await narrate("Fine detail dies young; only the smooth n=1 mode lingers. That n² law is exactly why heat forgets its initial shape.");
+};
+})();
+/* pdes / pde_forget */
+(function(){
+const pde_fg_L=90,pde_fg_R=840,pde_fg_y0=195,pde_fg_amp=95,pde_fg_T=6,pde_fg_lam=0.5,pde_fg_w=2.2;
+function pde_fg_px(t){return pde_fg_L+(pde_fg_R-pde_fg_L)*(t/pde_fg_T);}
+function pde_fg_draw(ctx,cv,s){
+  clear(ctx,cv); ctx.font="14px 'IBM Plex Mono'";
+  const y0=pde_fg_y0;
+  ctx.strokeStyle="#22314a"; ctx.lineWidth=1;
+  [1,0,-1].forEach(v=>{const y=y0-pde_fg_amp*v; ctx.beginPath();ctx.moveTo(pde_fg_L,y);ctx.lineTo(pde_fg_R,y);ctx.stroke();});
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pde_fg_L,y0-pde_fg_amp-12);ctx.lineTo(pde_fg_L,y0+pde_fg_amp+12);ctx.stroke();
+  ctx.fillStyle="#5A6E8C"; ctx.fillText("+1",pde_fg_L-30,y0-pde_fg_amp+5); ctx.fillText("0",pde_fg_L-18,y0+5); ctx.fillText("−1",pde_fg_L-30,y0+pde_fg_amp+5);
+  ctx.fillText("time t →",pde_fg_R-70,y0+pde_fg_amp+30);
+  const tmax=pde_fg_T*s.k;
+  ctx.strokeStyle=F.ok; ctx.lineWidth=2.4; ctx.beginPath(); let st=true;
+  for(let t=0;t<=tmax+1e-9;t+=0.03){const y=y0-pde_fg_amp*Math.cos(pde_fg_w*t); const x=pde_fg_px(t); if(st){ctx.moveTo(x,y);st=false;}else ctx.lineTo(x,y);}
+  ctx.stroke();
+  ctx.strokeStyle=F.post; ctx.lineWidth=2.4; ctx.beginPath(); st=true;
+  for(let t=0;t<=tmax+1e-9;t+=0.03){const y=y0-pde_fg_amp*Math.exp(-pde_fg_lam*t); const x=pde_fg_px(t); if(st){ctx.moveTo(x,y);st=false;}else ctx.lineTo(x,y);}
+  ctx.stroke();
+  if(tmax>0){
+    const xe=pde_fg_px(tmax);
+    const yh=y0-pde_fg_amp*Math.exp(-pde_fg_lam*tmax);
+    const yw=y0-pde_fg_amp*Math.cos(pde_fg_w*tmax);
+    ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(xe,yh,4,0,7);ctx.fill();
+    ctx.fillStyle=F.ok;ctx.beginPath();ctx.arc(xe,yw,4,0,7);ctx.fill();
+  }
+  ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillStyle=F.post; ctx.fillText("heat:  e^(−λt)  → 0   (forgets)",pde_fg_L+10,y0-pde_fg_amp-18);
+  ctx.fillStyle=F.ok;   ctx.fillText("wave:  cos(ωt)  |·|=1  (remembers)",pde_fg_L+380,y0-pde_fg_amp-18);
+}
+ANIMS.pde_forget_static=(cv,ctx)=>pde_fg_draw(ctx,cv,{k:0});
+ANIMS.pde_forget=async(cv,ctx)=>{
+  pde_fg_draw(ctx,cv,{k:0});
+  await narrate("Take one Fourier mode and watch its amplitude evolve. Heat multiplies it by e^(−λt); the wave multiplies it by cos(ωt).");
+  await tween(2400,k=>pde_fg_draw(ctx,cv,{k}));
+  await narrate("Heat's amplitude bleeds to zero — irreversibly. Running it backward means multiplying by e^(+λt), blowing up noise: ill-posed.");
+  await narrate("The wave's multiplier stays magnitude 1 — energy conserved, and t→−t is still a solution. Heat forgets; the wave remembers.");
+};
+})();
+/* pdes / pde_stability */
+(function(){
+const pde_st_N=41, pde_st_MAX=16, pde_st_base=285, pde_st_scale=78;
+function pde_st_init(){const u=new Array(pde_st_N).fill(0); u[(pde_st_N-1)/2]=1; return u;}
+function pde_st_march(r,steps){let u=pde_st_init(); for(let s=0;s<steps;s++){const v=u.slice(); for(let i=1;i<pde_st_N-1;i++){v[i]=u[i]+r*(u[i+1]-2*u[i]+u[i-1]);} v[0]=0;v[pde_st_N-1]=0; u=v;} return u;}
+function pde_st_panel(ctx,x0,x1,u,color,title,rlabel){
+  const base=pde_st_base;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x0-8,52,x1-x0+16,250); ctx.clip();
+  ctx.strokeStyle="#22314a"; ctx.lineWidth=1; ctx.beginPath();ctx.moveTo(x0,base);ctx.lineTo(x1,base);ctx.stroke();
+  ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.beginPath();
+  for(let i=0;i<pde_st_N;i++){const x=x0+(x1-x0)*i/(pde_st_N-1); const y=base-u[i]*pde_st_scale; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.stroke();
+  ctx.fillStyle=color;
+  for(let i=0;i<pde_st_N;i++){const x=x0+(x1-x0)*i/(pde_st_N-1); const y=base-u[i]*pde_st_scale; ctx.beginPath();ctx.arc(x,y,1.8,0,7);ctx.fill();}
+  ctx.restore();
+  ctx.font="14px 'IBM Plex Mono'"; ctx.fillStyle=color; ctx.fillText(title,x0,42);
+  ctx.fillStyle="#5A6E8C"; ctx.font="13px 'IBM Plex Mono'"; ctx.fillText(rlabel,x0,315);
+}
+function pde_st_draw(ctx,cv,s){
+  clear(ctx,cv); ctx.font="14px 'IBM Plex Mono'";
+  const steps=Math.round(s.k*pde_st_MAX);
+  pde_st_panel(ctx,70,430,pde_st_march(0.40,steps),F.ok,"r = 0.40  ≤ ½   stable","relaxes to a smooth bump");
+  pde_st_panel(ctx,500,860,pde_st_march(0.70,steps),F.wrong,"r = 0.70  > ½   UNSTABLE","erupts into growing sawtooth");
+  ctx.fillStyle="#5A6E8C"; ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("step "+steps+" / "+pde_st_MAX,420,338);
+}
+ANIMS.pde_stability_static=(cv,ctx)=>pde_st_draw(ctx,cv,{k:0});
+ANIMS.pde_stability=async(cv,ctx)=>{
+  pde_st_draw(ctx,cv,{k:0});
+  await narrate("The explicit heat scheme marches a grid: uᵢ,ⱼ₊₁ = uᵢ,ⱼ + r(uᵢ₊₁ − 2uᵢ + uᵢ₋₁), with r = αΔt/Δx². Both panels start from the same spike.");
+  await tween(2400,k=>pde_st_draw(ctx,cv,{k}));
+  await narrate("Left (r=0.40 ≤ ½): every point relaxes toward its neighbor average — the spike smooths. Right (r=0.70 > ½): each update overshoots, harder each tick.");
+  await narrate("Above r=½ the grid erupts into growing sawtooth — not inaccuracy, exponential garbage. Halve Δx and you must quarter Δt.");
+};
+})();
+/* newtonian-physics / phys_orbit */
+(function(){
+// c06-circular : Newton's cannonball — an orbit is falling and missing
+const phys_orb_cx=450, phys_orb_cy=190, phys_orb_Re=120, phys_orb_r0=168, phys_orb_g=0.05;
+function phys_orbTraj(v0,maxSteps){
+  const g=phys_orb_g, Re=phys_orb_Re, cx=phys_orb_cx, cy=phys_orb_cy;
+  let x=cx, y=cy-phys_orb_r0, vx=v0, vy=0, pts=[[x,y]], hit=false;
+  for(let i=0;i<maxSteps;i++){
+    const dx=x-cx, dy=y-cy, r=Math.hypot(dx,dy);
+    if(i>3 && r<Re-1){ hit=true; break; }
+    const a=g*Re*Re/(r*r);
+    vx+=-a*dx/r; vy+=-a*dy/r; x+=vx; y+=vy;
+    pts.push([x,y]);
+  }
+  return {pts,hit};
+}
+function phys_orbScene(ctx,cv,st){
+  clear(ctx,cv);
+  const cx=phys_orb_cx, cy=phys_orb_cy, Re=phys_orb_Re, r0=phys_orb_r0;
+  const vc=Math.sqrt(phys_orb_g*Re*Re/r0);
+  const specs=[{v:vc*0.60,c:'#5A6E8C',max:320},{v:vc*0.82,c:F.prior,max:520},{v:vc*1.0,c:F.post,max:540}];
+  // Earth
+  const grd=ctx.createRadialGradient(cx-40,cy-50,15,cx,cy,Re+40);
+  grd.addColorStop(0,'#2b4a63'); grd.addColorStop(1,'#12202f');
+  ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(cx,cy,Re,0,2*Math.PI); ctx.fill();
+  ctx.strokeStyle='#3A4C68'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign='center';
+  ctx.fillText('Earth', cx, cy+4);
+  const rev=st.reveal||[0,0,0];
+  for(let s=0;s<specs.length;s++){
+    const f=rev[s]; if(f<=0) continue;
+    const {pts,hit}=phys_orbTraj(specs[s].v, specs[s].max);
+    const n=Math.max(2, Math.floor(pts.length*f));
+    ctx.strokeStyle=specs[s].c; ctx.lineWidth=s===2?2.4:1.6;
+    ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+    for(let i=1;i<n;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+    ctx.stroke();
+    const tip=pts[Math.min(n-1,pts.length-1)];
+    ctx.fillStyle=specs[s].c; ctx.beginPath(); ctx.arc(tip[0],tip[1],s===2?4.5:3.5,0,2*Math.PI); ctx.fill();
+    if(hit && f>=1){ ctx.strokeStyle=specs[s].c; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(tip[0]-5,tip[1]-5); ctx.lineTo(tip[0]+5,tip[1]+5);
+      ctx.moveTo(tip[0]+5,tip[1]-5); ctx.lineTo(tip[0]-5,tip[1]+5); ctx.stroke(); }
+  }
+  // cannon marker at launch
+  const px=cx, py=cy-r0;
+  ctx.fillStyle=F.txt; ctx.beginPath(); ctx.arc(px,py,4,0,2*Math.PI); ctx.fill();
+  ctx.font="12px 'IBM Plex Mono'"; ctx.textAlign='left'; ctx.fillStyle='#5A6E8C';
+  ctx.fillText('cannon', px+8, py-6);
+  ctx.font="13px 'IBM Plex Mono'";
+  if((rev[0]||0)>=1){ ctx.fillStyle='#5A6E8C'; ctx.fillText('slow → falls back to ground', 30, 40); }
+  if((rev[1]||0)>=1){ ctx.fillStyle=F.prior; ctx.fillText('faster → lands farther away', 30, 60); }
+  if((rev[2]||0)>=1){ ctx.fillStyle=F.post; ctx.fillText('~7.9 km/s → never lands: ORBIT', 30, 80); }
+  if(st.insight){ ctx.fillStyle=F.txt; ctx.font="14px 'IBM Plex Mono'";
+    ctx.fillText('g at ISS still ~90% — you float because you FALL together', 30, 108); }
+}
+ANIMS.phys_orbit_static=(cv,ctx)=>phys_orbScene(ctx,cv,{reveal:[0,0,0.3]});
+ANIMS.phys_orbit=async(cv,ctx)=>{
+  phys_orbScene(ctx,cv,{reveal:[0,0,0]});
+  await narrate("Newton's cannonball: fire it horizontally from a mountaintop. Fire it slowly and it falls back to the ground in a parabola.");
+  await tween(1400,k=>phys_orbScene(ctx,cv,{reveal:[k,0,0]}));
+  await narrate("Fire it faster and it lands farther away — the Earth's surface is curving away beneath it as it falls.");
+  await tween(1500,k=>phys_orbScene(ctx,cv,{reveal:[1,k,0]}));
+  await narrate("At about 7.9 km/s the surface curves away exactly as fast as the ball falls toward it. It falls forever and never lands — that is an orbit.");
+  await tween(2600,k=>phys_orbScene(ctx,cv,{reveal:[1,1,k]}));
+  await narrate("So 'weightlessness' is not the absence of gravity — g up there is still ~90% of its surface value. Station and astronaut simply fall together: free fall, sustained forever.");
+  phys_orbScene(ctx,cv,{reveal:[1,1,1],insight:true});
+};
+})();
+/* newtonian-physics / phys_impulse */
+(function(){
+// c05-momentum : impulse = area under F-t. Same delta-p, airbag shrinks the peak
+const phys_imp_L=95, phys_imp_R=850, phys_imp_B=330, phys_imp_T=60;
+function phys_impX(t){ return phys_imp_L + t*(phys_imp_R-phys_imp_L); }
+function phys_impY(Fv,Fmax){ return phys_imp_B - (Fv/Fmax)*(phys_imp_B-phys_imp_T); }
+function phys_impPulse(t,t0,T,Fp){ if(t<t0||t>t0+T) return 0; return Fp*Math.sin(Math.PI*(t-t0)/T); }
+function phys_impScene(ctx,cv,st){
+  clear(ctx,cv);
+  const AREA=0.13, t0=0.08, Tn=0.14, Tw=0.70;
+  const Fn=AREA*Math.PI/(2*Tn), Fw=AREA*Math.PI/(2*Tw), Fmax=Fn*1.12;
+  ctx.strokeStyle='#3A4C68'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(phys_imp_L,phys_imp_T-8); ctx.lineTo(phys_imp_L,phys_imp_B); ctx.lineTo(phys_imp_R,phys_imp_B); ctx.stroke();
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign='left';
+  ctx.fillText('force', phys_imp_L-30, phys_imp_T-14);
+  ctx.textAlign='right'; ctx.fillText('time →', phys_imp_R, phys_imp_B+22);
+  function drawPulse(T,Fp,col,fill,rev){
+    const steps=90;
+    ctx.beginPath(); ctx.moveTo(phys_impX(t0), phys_imp_B);
+    for(let i=0;i<=steps;i++){ const t=t0+(T*rev)*(i/steps); ctx.lineTo(phys_impX(t), phys_impY(phys_impPulse(t,t0,T,Fp),Fmax)); }
+    ctx.lineTo(phys_impX(t0+T*rev), phys_imp_B); ctx.closePath();
+    ctx.fillStyle=fill; ctx.fill();
+    ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
+    for(let i=0;i<=steps;i++){ const t=t0+(T*rev)*(i/steps); const y=phys_impY(phys_impPulse(t,t0,T,Fp),Fmax); if(i===0) ctx.moveTo(phys_impX(t),y); else ctx.lineTo(phys_impX(t),y); }
+    ctx.stroke();
+  }
+  const nRev=st.nRev||0, wRev=st.wRev||0;
+  if(nRev>0) drawPulse(Tn,Fn,F.wrong,'rgba(212,106,98,0.22)',nRev);
+  if(wRev>0) drawPulse(Tw,Fw,F.ok,'rgba(95,191,149,0.20)',wRev);
+  if(st.peakN){ const xp=phys_impX(t0+Tn/2), yp=phys_impY(Fn,Fmax);
+    ctx.strokeStyle=F.wrong; ctx.setLineDash([4,4]); ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(xp,yp); ctx.lineTo(xp,phys_imp_B); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=F.wrong; ctx.textAlign='left'; ctx.font="13px 'IBM Plex Mono'"; ctx.fillText('towering peak force', xp+8, yp+6); }
+  if(st.peakW){ const xp=phys_impX(t0+Tw/2), yp=phys_impY(Fw,Fmax);
+    ctx.strokeStyle=F.ok; ctx.setLineDash([4,4]); ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(xp,yp); ctx.lineTo(xp,phys_imp_B); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=F.ok; ctx.textAlign='center'; ctx.font="13px 'IBM Plex Mono'"; ctx.fillText('~1/5 the peak', xp, yp-8); }
+  if(st.eq){ ctx.fillStyle=F.txt; ctx.font="14px 'IBM Plex Mono'"; ctx.textAlign='center';
+    ctx.fillText('same shaded area  →  same Δp  =  ∫F dt', (phys_imp_L+phys_imp_R)/2, phys_imp_T-20); }
+  ctx.textAlign='left'; ctx.font="12px 'IBM Plex Mono'";
+  if(nRev>=1){ ctx.fillStyle=F.wrong; ctx.fillText('no cushion: tiny Δt', phys_impX(t0+Tn)+8, phys_imp_B-16); }
+  if(wRev>=1){ ctx.fillStyle=F.ok; ctx.fillText('airbag: ~5× the Δt', phys_impX(t0+Tw)-6, phys_imp_B-16); }
+}
+ANIMS.phys_impulse_static=(cv,ctx)=>phys_impScene(ctx,cv,{nRev:1,wRev:1,eq:true});
+ANIMS.phys_impulse=async(cv,ctx)=>{
+  phys_impScene(ctx,cv,{});
+  await narrate("A crash must remove all your momentum, so Δp is fixed. The impulse that does it is the area under the force-vs-time curve: ∫F dt = Δp.");
+  await tween(1400,k=>phys_impScene(ctx,cv,{nRev:k}));
+  await narrate("Hit something rigid and you stop in a few milliseconds. A tiny Δt forced across the same fixed area means a towering peak force — that peak is what injures you.");
+  await tween(700,k=>phys_impScene(ctx,cv,{nRev:1,peakN:true}));
+  await narrate("The airbag stretches the stopping time about fivefold, spreading the identical area over a much wider Δt.");
+  await tween(1700,k=>phys_impScene(ctx,cv,{nRev:1,peakN:true,wRev:k}));
+  await narrate("Same Δp, roughly one-fifth the peak force. Crumple zones, helmets, bending your knees on landing — all the very same theorem.");
+  phys_impScene(ctx,cv,{nRev:1,wRev:1,peakN:true,peakW:true,eq:true});
+};
+})();
+/* newtonian-physics / phys_slides */
+(function(){
+// c04-energy : same height h -> same sqrt(2gh), whatever the path
+const phys_bd_yTop=80, phys_bd_yBot=300, phys_bd_vmax=9.9;
+function phys_bdPt(kind,s){
+  const y=phys_bd_yTop+(phys_bd_yBot-phys_bd_yTop)*s;
+  if(kind==='steep'){ return [200+110*s, y]; }
+  return [470+250*s+70*Math.sin(s*Math.PI*2), y];
+}
+function phys_bdTrack(ctx,kind,col){
+  ctx.strokeStyle=col; ctx.lineWidth=2.4; ctx.beginPath();
+  for(let i=0;i<=60;i++){ const p=phys_bdPt(kind,i/60); if(i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]); }
+  ctx.stroke();
+}
+function phys_bdScene(ctx,cv,st){
+  clear(ctx,cv);
+  // height reference lines
+  ctx.strokeStyle='#22314a'; ctx.setLineDash([5,5]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(120,phys_bd_yTop); ctx.lineTo(800,phys_bd_yTop); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(120,phys_bd_yBot); ctx.lineTo(800,phys_bd_yBot); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#5A6E8C'; ctx.font="12px 'IBM Plex Mono'"; ctx.textAlign='left';
+  ctx.fillText('start height h  (v = 0)', 124, phys_bd_yTop-8);
+  ctx.fillText('bottom', 124, phys_bd_yBot+18);
+  // height bracket
+  ctx.strokeStyle='#3A4C68'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(140,phys_bd_yTop); ctx.lineTo(140,phys_bd_yBot); ctx.stroke();
+  ctx.fillStyle=F.txt; ctx.save(); ctx.translate(128,(phys_bd_yTop+phys_bd_yBot)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('h = 5 m', 0, 0); ctx.restore();
+  phys_bdTrack(ctx,'steep',F.prior);
+  phys_bdTrack(ctx,'wind',F.post);
+  ctx.textAlign='center'; ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillStyle=F.prior; ctx.fillText('steep', 255, phys_bd_yBot+34);
+  ctx.fillStyle=F.post; ctx.fillText('long & winding', 600, phys_bd_yBot+34);
+  const sS=st.sS||0, sW=st.sW||0;
+  function bead(kind,s,col){
+    const p=phys_bdPt(kind,s);
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(p[0],p[1],7,0,2*Math.PI); ctx.fill();
+    const v=phys_bd_vmax*Math.sqrt(s);
+    ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign='left';
+    ctx.fillText(v.toFixed(1)+' m/s', p[0]+12, p[1]+4);
+  }
+  bead('steep',sS,F.prior);
+  bead('wind',sW,F.post);
+  if(st.arrived){ ctx.fillStyle=F.ok; ctx.font="15px 'IBM Plex Mono'"; ctx.textAlign='center';
+    ctx.fillText('both arrive at √(2gh) = 9.9 m/s', 460, 40); }
+  if(st.insight){ ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign='center';
+    ctx.fillText('shape sets the TIME; only the height sets the SPEED', 460, 62); }
+}
+ANIMS.phys_slides_static=(cv,ctx)=>phys_bdScene(ctx,cv,{sS:0,sW:0});
+ANIMS.phys_slides=async(cv,ctx)=>{
+  phys_bdScene(ctx,cv,{sS:0,sW:0});
+  await narrate("Two frictionless slides drop through the same height h — one steep and short, one long and winding. A bead starts from rest on each.");
+  await tween(700,k=>phys_bdScene(ctx,cv,{sS:0,sW:0}));
+  await narrate("Release them. Different paths, different arrival times — the steep one gets to the bottom first.");
+  await tween(2400,k=>{ const sS=Math.min(1,k/0.6), sW=k; phys_bdScene(ctx,cv,{sS,sW}); });
+  await narrate("But energy carries no clock. mgh = ½mv² on any frictionless path, so both arrive at exactly √(2gh) = 9.9 m/s — the shape drops out entirely.");
+  phys_bdScene(ctx,cv,{sS:1,sW:1,arrived:true});
+  await narrate("Forces tell you why and when; energy tells you how fast and how far. Here, only the height h decides the speed.");
+  phys_bdScene(ctx,cv,{sS:1,sW:1,arrived:true,insight:true});
+};
+})();
+/* newtonian-physics / phys_frames */
+(function(){
+// c01-frames : one drop, two frames -- straight line vs parabola, same a=g
+const phys_tr_D=150, phys_tr_hY=120, phys_tr_fY=300;
+function phys_trPanel(ctx,ox,frame,st){
+  // ground reference grid (shows absolute space)
+  ctx.strokeStyle='#22314a'; ctx.lineWidth=1;
+  for(let gx=ox+20; gx<=ox+380; gx+=40){ ctx.beginPath(); ctx.moveTo(gx,90); ctx.lineTo(gx,phys_tr_fY+18); ctx.stroke(); }
+  ctx.strokeStyle='#3A4C68'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(ox+10,phys_tr_fY+18); ctx.lineTo(ox+390,phys_tr_fY+18); ctx.stroke();
+  const k=st.k||0;
+  const off = frame==='ground' ? phys_tr_D*k : 0;
+  const hx = (frame==='ground' ? ox+55 : ox+185) + off;
+  const by = phys_tr_hY + (phys_tr_fY-phys_tr_hY)*k*k;
+  // person: hand at top, feet at bottom, body between
+  ctx.strokeStyle='#5A6E8C'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(hx,phys_tr_hY); ctx.lineTo(hx,phys_tr_fY); ctx.stroke();
+  ctx.fillStyle='#5A6E8C';
+  ctx.beginPath(); ctx.arc(hx,phys_tr_hY,4,0,2*Math.PI); ctx.fill();     // hand
+  ctx.fillRect(hx-14,phys_tr_fY-2,28,4);                                 // feet
+  // ball trace
+  if(k>0){ ctx.strokeStyle=frame==='ground'?F.post:F.prior; ctx.lineWidth=2; ctx.beginPath();
+    for(let i=0;i<=40;i++){ const s=k*i/40; const ox2=(frame==='ground'?ox+55:ox+185)+(frame==='ground'?phys_tr_D*s:0); const y=phys_tr_hY+(phys_tr_fY-phys_tr_hY)*s*s; if(i===0) ctx.moveTo(ox2,y); else ctx.lineTo(ox2,y); }
+    ctx.stroke(); }
+  // ball
+  ctx.fillStyle=F.txt; ctx.beginPath(); ctx.arc(hx,by,6,0,2*Math.PI); ctx.fill();
+  // titles
+  ctx.textAlign='center'; ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillStyle=frame==='ground'?F.post:F.prior;
+  ctx.fillText(frame==='ground'?'Ground frame':'Train frame', ox+200, 50);
+  if(st.labels){ ctx.fillStyle=F.txt; ctx.font="12px 'IBM Plex Mono'";
+    ctx.fillText(frame==='ground'?'→ parabola':'straight down', ox+200, 70); }
+}
+function phys_trScene(ctx,cv,st){
+  clear(ctx,cv);
+  ctx.strokeStyle='#3A4C68'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+  ctx.beginPath(); ctx.moveTo(450,40); ctx.lineTo(450,350); ctx.stroke(); ctx.setLineDash([]);
+  phys_trPanel(ctx,40,'ground',st);
+  phys_trPanel(ctx,470,'train',st);
+  if(st.insight){ ctx.fillStyle=F.ok; ctx.font="14px 'IBM Plex Mono'"; ctx.textAlign='center';
+    ctx.fillText('trajectories differ — but both frames measure a = g,  F = mg', 450, 372); }
+}
+ANIMS.phys_frames_static=(cv,ctx)=>phys_trScene(ctx,cv,{k:0});
+ANIMS.phys_frames=async(cv,ctx)=>{
+  phys_trScene(ctx,cv,{k:0});
+  await narrate("Drop a ball inside a train cruising at a constant 200 km/h. Watch the same drop from two frames at once.");
+  await tween(600,k=>phys_trScene(ctx,cv,{k:0}));
+  await narrate("In the train's own frame the ball falls straight down and lands at your feet — nothing carried it sideways.");
+  await tween(1800,k=>phys_trScene(ctx,cv,{k}));
+  await narrate("But in the ground frame it kept the train's forward velocity the whole way down, so it traces a parabola — yet still lands at the feet, which moved too.");
+  phys_trScene(ctx,cv,{k:1,labels:true});
+  await narrate("Both descriptions are correct. Trajectories are frame-dependent; acceleration and force are not — both frames compute a = g downward and F = mg.");
+  phys_trScene(ctx,cv,{k:1,labels:true,insight:true});
+};
+})();
+/* fourier-series / fs_ortho */
+(function(){
+// ---- Fourier: orthogonality extraction (fs_or_) ----
+const fs_or_x0=70, fs_or_x1=830, fs_or_W=760, fs_or_yc=200, fs_or_vs=78;
+const fs_or_ox=(x)=>fs_or_x0+(x+Math.PI)/(2*Math.PI)*fs_or_W;
+const fs_or_run=(pfn,X)=>{let s=0,a=-Math.PI,N=500,h=(X-a)/N;if(h<=0)return 0;for(let i=0;i<N;i++){const x=a+(i+0.5)*h;s+=pfn(x)*h;}return s;};
+function fs_or_draw(ctx,cv,st){
+  clear(ctx,cv);
+  const pair=st.pair||'match';
+  const k=st.k==null?1:st.k;
+  const pfn=pair==='match'?(x)=>Math.cos(3*x)*Math.cos(3*x):(x)=>Math.cos(3*x)*Math.cos(5*x);
+  const xcut=-Math.PI+k*2*Math.PI;
+  const yc=fs_or_yc, vs=fs_or_vs;
+  const cutpx=fs_or_ox(xcut);
+  // shaded running area (signed)
+  for(let px=fs_or_x0;px<=cutpx;px++){
+    const x=(px-fs_or_x0)/fs_or_W*2*Math.PI-Math.PI;
+    const v=pfn(x);
+    ctx.strokeStyle=v>=0?'rgba(95,191,149,0.40)':'rgba(212,106,98,0.40)';
+    ctx.beginPath();ctx.moveTo(px,yc);ctx.lineTo(px,yc-v*vs);ctx.stroke();
+  }
+  // faint factor curves
+  ctx.lineWidth=1;
+  const facs=pair==='match'?[3]:[3,5];
+  facs.forEach((a)=>{
+    ctx.strokeStyle='rgba(90,110,140,0.55)';ctx.beginPath();
+    for(let px=fs_or_x0;px<=fs_or_x1;px++){const x=(px-fs_or_x0)/fs_or_W*2*Math.PI-Math.PI;const y=yc-Math.cos(a*x)*vs;px===fs_or_x0?ctx.moveTo(px,y):ctx.lineTo(px,y);}
+    ctx.stroke();
+  });
+  // axis + ticks
+  ctx.strokeStyle='#3A4C68';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(fs_or_x0,yc);ctx.lineTo(fs_or_x1,yc);ctx.stroke();
+  ctx.fillStyle='#5A6E8C';ctx.font="13px 'IBM Plex Mono'";ctx.textAlign='center';
+  [[-Math.PI,'−π'],[0,'0'],[Math.PI,'π']].forEach(([xv,lab])=>{const px=fs_or_ox(xv);ctx.strokeStyle='#3A4C68';ctx.beginPath();ctx.moveTo(px,yc-4);ctx.lineTo(px,yc+4);ctx.stroke();ctx.fillText(lab,px,yc+22);});
+  // product curve bold
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.2;ctx.beginPath();
+  for(let px=fs_or_x0;px<=fs_or_x1;px++){const x=(px-fs_or_x0)/fs_or_W*2*Math.PI-Math.PI;const y=yc-pfn(x)*vs;px===fs_or_x0?ctx.moveTo(px,y):ctx.lineTo(px,y);}
+  ctx.stroke();
+  // sweep line
+  ctx.strokeStyle='rgba(215,223,234,0.7)';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(cutpx,44);ctx.lineTo(cutpx,yc+34);ctx.stroke();ctx.setLineDash([]);
+  // labels
+  ctx.textAlign='left';ctx.font="14px 'IBM Plex Mono'";ctx.fillStyle=F.post;
+  ctx.fillText('product:  '+(pair==='match'?'cos(3x) · cos(3x) = cos²(3x)':'cos(3x) · cos(5x)'),fs_or_x0,28);
+  const val=fs_or_run(pfn,xcut);
+  const tgt=pair==='match'?'→ π ≈ 3.14':'→ 0';
+  ctx.fillStyle=F.txt;ctx.textAlign='right';
+  ctx.fillText('∫ running = '+val.toFixed(2)+'   '+tgt,fs_or_x1,28);
+  ctx.textAlign='left';ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillStyle='rgba(95,191,149,0.9)';ctx.fillText('■ area +',fs_or_x0,360);
+  ctx.fillStyle='rgba(212,106,98,0.9)';ctx.fillText('■ area −',fs_or_x0+72,360);
+}
+ANIMS.fs_ortho_static=(cv,ctx)=>fs_or_draw(ctx,cv,{pair:'match',k:0});
+ANIMS.fs_ortho=async(cv,ctx)=>{
+  fs_or_draw(ctx,cv,{pair:'match',k:0});
+  await narrate("The extraction move: multiply the whole series by ONE basis function, then integrate over a period.");
+  await narrate("Match — cos(3x) times itself. cos²(3x) rides above the axis; it rectifies, and the running integral climbs to +π.");
+  await tween(1500,k=>fs_or_draw(ctx,cv,{pair:'match',k}));
+  await narrate("Mismatch — cos(3x) times cos(5x). Equal green and red area beat against each other; the integral returns to exactly 0.");
+  await tween(1500,k=>fs_or_draw(ctx,cv,{pair:'mismatch',k}));
+  await narrate("Every term dies except the one that matches. One integral extracts one coefficient — an infinite system solved one at a time.");
+};
+})();
+/* fourier-series / fs_gibbs */
+(function(){
+// ---- Fourier: Gibbs phenomenon (fs_gb_) ----
+const fs_gb_x0=70, fs_gb_x1=830, fs_gb_W=760, fs_gb_yc=190, fs_gb_vs=104;
+const fs_gb_lerp=(a,b,t)=>a+(b-a)*t;
+const fs_gb_sum=(x,N)=>{let s=0;for(let k=1;k<=N;k+=2)s+=Math.sin(k*x)/k;return s*4/Math.PI;};
+const fs_gb_ox=(x)=>fs_gb_x0+(x+Math.PI)/(2*Math.PI)*fs_gb_W;
+function fs_gb_draw(ctx,cv,st){
+  clear(ctx,cv);
+  const N1=st.N1||5,N2=st.N2||5,bl=st.blend==null?0:st.blend,rev=st.reveal==null?1:st.reveal;
+  const yc=fs_gb_yc,vs=fs_gb_vs;
+  // guide lines: +-1 and +-1.1789
+  ctx.setLineDash([5,4]);ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(90,110,140,0.55)';
+  [1,-1].forEach(v=>{ctx.beginPath();ctx.moveTo(fs_gb_x0,yc-v*vs);ctx.lineTo(fs_gb_x1,yc-v*vs);ctx.stroke();});
+  ctx.strokeStyle='rgba(232,161,60,0.7)';
+  [1.1789,-1.1789].forEach(v=>{ctx.beginPath();ctx.moveTo(fs_gb_x0,yc-v*vs);ctx.lineTo(fs_gb_x1,yc-v*vs);ctx.stroke();});
+  ctx.setLineDash([]);
+  // axis
+  ctx.strokeStyle='#3A4C68';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(fs_gb_x0,yc);ctx.lineTo(fs_gb_x1,yc);ctx.stroke();
+  // square wave reference
+  ctx.strokeStyle='rgba(124,141,165,0.85)';ctx.lineWidth=1.5;ctx.setLineDash([2,3]);ctx.beginPath();
+  ctx.moveTo(fs_gb_ox(-Math.PI),yc+vs);ctx.lineTo(fs_gb_ox(0),yc+vs);
+  ctx.moveTo(fs_gb_ox(0),yc-vs);ctx.lineTo(fs_gb_ox(Math.PI),yc-vs);
+  ctx.stroke();ctx.setLineDash([]);
+  // partial sum (blended N)
+  const Nshow=Math.round(fs_gb_lerp(N1,N2,bl));
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.2;ctx.beginPath();
+  const xend=-Math.PI+rev*2*Math.PI;let first=true;
+  for(let px=fs_gb_x0;px<=fs_gb_ox(xend);px++){
+    const x=(px-fs_gb_x0)/fs_gb_W*2*Math.PI-Math.PI;
+    const v=fs_gb_lerp(fs_gb_sum(x,N1),fs_gb_sum(x,N2),bl);
+    const y=yc-v*vs;
+    first?(ctx.moveTo(px,y),first=false):ctx.lineTo(px,y);
+  }
+  ctx.stroke();
+  // labels
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign='left';
+  ctx.fillText('square wave = (4/π)[ sin x + sin3x/3 + sin5x/5 + … ]',fs_gb_x0,30);
+  ctx.textAlign='right';ctx.fillStyle=F.post;ctx.fillText('N = '+Nshow+' terms',fs_gb_x1,30);
+  ctx.textAlign='left';ctx.fillStyle='rgba(232,161,60,0.95)';ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText('≈1.18  (9% overshoot — never shrinks)',fs_gb_ox(0.12),yc-1.1789*vs-8);
+}
+ANIMS.fs_gibbs_static=(cv,ctx)=>fs_gb_draw(ctx,cv,{N1:5,N2:5,blend:0});
+ANIMS.fs_gibbs=async(cv,ctx)=>{
+  fs_gb_draw(ctx,cv,{N1:5,N2:5,blend:0,reveal:0});
+  await narrate("Truncate the square-wave series at N terms. Near each jump the partial sum overshoots the true ±1 level.");
+  await tween(1100,k=>fs_gb_draw(ctx,cv,{N1:5,N2:5,blend:0,reveal:k}));
+  await narrate("Add more terms — 5 → 41. The overshoot spike NARROWS, but its height clings to ≈1.18: about 9% past the jump.");
+  await tween(1600,k=>fs_gb_draw(ctx,cv,{N1:5,N2:41,blend:k,reveal:1}));
+  await narrate("41 → 201: razor-thin, exact same height. Converges pointwise everywhere, never uniformly — this is the ringing at every sharp edge.");
+  await tween(1600,k=>fs_gb_draw(ctx,cv,{N1:41,N2:201,blend:k,reveal:1}));
+};
+})();
+/* fourier-series / fs_phasor */
+(function(){
+// ---- Fourier: counter-rotating phasors (fs_ph_) ----
+const fs_ph_cx=205, fs_ph_cy=195, fs_ph_R=60;
+const fs_ph_wx0=360, fs_ph_wW=500;
+const fs_ph_wx=(phi)=>fs_ph_wx0+phi/(2*Math.PI)*fs_ph_wW;
+function fs_ph_draw(ctx,cv,st){
+  clear(ctx,cv);
+  const mode=st.mode||'one';
+  const th=(st.k==null?0:st.k)*2*Math.PI;
+  const cx=fs_ph_cx,cy=fs_ph_cy,R=fs_ph_R;
+  // unit circle + complex axes
+  ctx.strokeStyle='#22314a';ctx.lineWidth=1;ctx.beginPath();ctx.arc(cx,cy,R,0,2*Math.PI);ctx.stroke();
+  ctx.strokeStyle='#3A4C68';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(cx-R-25,cy);ctx.lineTo(cx+2*R+28,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-R-22);ctx.lineTo(cx,cy+R+22);ctx.stroke();
+  ctx.fillStyle='#5A6E8C';ctx.font="12px 'IBM Plex Mono'";ctx.textAlign='center';
+  ctx.fillText('Re',cx+2*R+20,cy-6);ctx.fillText('Im',cx+13,cy-R-12);
+  const drawVec=(x1,y1,x2,y2,col,w)=>{ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.fillStyle=col;ctx.beginPath();ctx.arc(x2,y2,3.5,0,2*Math.PI);ctx.fill();};
+  // phasor A = e^{i theta}
+  const ax=cx+R*Math.cos(th), ay=cy-R*Math.sin(th);
+  drawVec(cx,cy,ax,ay,F.prior,2);
+  ctx.fillStyle=F.prior;ctx.textAlign='left';ctx.font="12px 'IBM Plex Mono'";ctx.fillText('e^{iθ}',ax+6,ay-4);
+  if(mode==='both'){
+    const bx=cx+R*Math.cos(-th), by=cy-R*Math.sin(-th);
+    drawVec(cx,cy,bx,by,'#9AA6B8',2);
+    ctx.fillStyle='#9AA6B8';ctx.fillText('e^{−iθ}',bx+6,by+14);
+    // imaginary parts cancel
+    ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(212,106,98,0.65)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx,cy);ctx.stroke();ctx.setLineDash([]);
+    // sum on real axis = 2 cos theta
+    const sumx=cx+2*R*Math.cos(th);
+    drawVec(cx,cy,sumx,cy,F.post,3);
+    ctx.fillStyle=F.post;ctx.fillText('2cosθ',sumx+6,cy+18);
+  } else {
+    ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(232,161,60,0.6)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax,cy);ctx.stroke();ctx.setLineDash([]);
+    drawVec(cx,cy,ax,cy,F.post,3);
+  }
+  // right waveform panel
+  const wyc=cy, sc=mode==='both'?45:88;
+  ctx.strokeStyle='#3A4C68';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(fs_ph_wx0,wyc);ctx.lineTo(fs_ph_wx0+fs_ph_wW+12,wyc);ctx.stroke();
+  ctx.fillStyle='#5A6E8C';ctx.font="12px 'IBM Plex Mono'";ctx.textAlign='center';ctx.fillText('θ →',fs_ph_wx0+fs_ph_wW+4,wyc-6);
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.2;ctx.beginPath();let f2=true;
+  for(let phi=0;phi<=th+0.0001;phi+=0.03){
+    const v=mode==='both'?2*Math.cos(phi):Math.cos(phi);
+    const x=fs_ph_wx(phi), y=wyc-v*sc;
+    f2?(ctx.moveTo(x,y),f2=false):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  const vNow=mode==='both'?2*Math.cos(th):Math.cos(th);
+  ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(fs_ph_wx(th),wyc-vNow*sc,4,0,2*Math.PI);ctx.fill();
+  // title
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign='left';
+  ctx.fillText(mode==='both'?'cosθ = ½e^{iθ} + ½e^{−iθ}  (two counter-rotating phasors)':'e^{iθ} : unit phasor spinning counter-clockwise',fs_ph_wx0-4,34);
+}
+ANIMS.fs_phasor_static=(cv,ctx)=>fs_ph_draw(ctx,cv,{mode:'one',k:0.12});
+ANIMS.fs_phasor=async(cv,ctx)=>{
+  fs_ph_draw(ctx,cv,{mode:'one',k:0});
+  await narrate("e^{iθ} is a unit phasor spinning counter-clockwise. Its shadow on the real axis traces cosθ.");
+  await tween(1800,k=>fs_ph_draw(ctx,cv,{mode:'one',k}));
+  await narrate("Now add its mirror e^{−iθ}, spinning clockwise. At every instant the two imaginary parts (red) are equal and opposite.");
+  await tween(1800,k=>fs_ph_draw(ctx,cv,{mode:'both',k}));
+  await narrate("They sum on the real axis: e^{iθ}+e^{−iθ} = 2cosθ. Negative frequency is no backward motion — just the mirror half that keeps a real signal real.");
+};
+})();
+/* fourier-series / fs_transform */
+(function(){
+// ---- Fourier: series -> transform limit (fs_tr_) ----
+const fs_tr_x0=70, fs_tr_x1=830, fs_tr_W=760, fs_tr_yb=330, fs_tr_H=225, fs_tr_wmax=15;
+const fs_tr_env=(w)=>Math.exp(-(w/4.5)*(w/4.5));
+const fs_tr_ox=(w)=>fs_tr_x0+(w+fs_tr_wmax)/(2*fs_tr_wmax)*fs_tr_W;
+function fs_tr_draw(ctx,cv,st){
+  clear(ctx,cv);
+  const T=st.T||1.7, fill=st.fill==null?0:st.fill;
+  const dw=2*Math.PI/T, yb=fs_tr_yb, H=fs_tr_H;
+  // baseline axis
+  ctx.strokeStyle='#3A4C68';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(fs_tr_x0,yb);ctx.lineTo(fs_tr_x1,yb);ctx.stroke();
+  ctx.fillStyle='#5A6E8C';ctx.font="13px 'IBM Plex Mono'";ctx.textAlign='center';
+  [[-fs_tr_wmax,'−ω'],[0,'0'],[fs_tr_wmax,'+ω']].forEach(([wv,lab])=>{ctx.fillText(lab,fs_tr_ox(wv),yb+20);});
+  ctx.fillText('frequency  ω',(fs_tr_x0+fs_tr_x1)/2,yb+38);
+  // filled continuum
+  if(fill>0){
+    ctx.fillStyle='rgba(232,161,60,'+(0.30*fill)+')';
+    ctx.beginPath();ctx.moveTo(fs_tr_ox(-fs_tr_wmax),yb);
+    for(let w=-fs_tr_wmax;w<=fs_tr_wmax;w+=0.1){ctx.lineTo(fs_tr_ox(w),yb-fs_tr_env(w)*H);}
+    ctx.lineTo(fs_tr_ox(fs_tr_wmax),yb);ctx.closePath();ctx.fill();
+  }
+  // envelope curve (dashed)
+  ctx.strokeStyle='rgba(124,141,165,0.8)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.beginPath();
+  for(let w=-fs_tr_wmax;w<=fs_tr_wmax;w+=0.1){const x=fs_tr_ox(w),y=yb-fs_tr_env(w)*H;w===-fs_tr_wmax?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+  ctx.stroke();ctx.setLineDash([]);
+  // discrete stems
+  ctx.strokeStyle=F.post;ctx.fillStyle=F.post;ctx.lineWidth=2;
+  ctx.globalAlpha=1-0.78*fill;let count=0;
+  const nmax=Math.ceil(fs_tr_wmax/dw);
+  for(let n=-nmax;n<=nmax;n++){
+    const w=n*dw;if(Math.abs(w)>fs_tr_wmax)continue;count++;
+    const x=fs_tr_ox(w),y=yb-fs_tr_env(w)*H;
+    ctx.beginPath();ctx.moveTo(x,yb);ctx.lineTo(x,y);ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,2.6,0,2*Math.PI);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  // labels
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign='left';
+  ctx.fillText('spectrum of a pulse repeated every T',fs_tr_x0,30);
+  ctx.textAlign='right';ctx.fillStyle=F.post;
+  ctx.fillText('T = '+T.toFixed(1)+'   Δω = 2π/T = '+dw.toFixed(2)+'   lines: '+count,fs_tr_x1,30);
+}
+ANIMS.fs_transform_static=(cv,ctx)=>fs_tr_draw(ctx,cv,{T:1.7,fill:0});
+ANIMS.fs_transform=async(cv,ctx)=>{
+  fs_tr_draw(ctx,cv,{T:1.7,fill:0});
+  await narrate("Treat a one-off pulse as periodic with period T. Its spectrum is a comb of discrete lines, spaced Δω = 2π/T.");
+  await narrate("Let T grow. The spacing 2π/T shrinks, so the harmonic lines crowd closer and closer together.");
+  await tween(1800,k=>fs_tr_draw(ctx,cv,{T:1.7+k*(9-1.7),fill:0}));
+  await narrate("Push T → ∞: the spacing collapses to zero and the lines merge into one continuous curve.");
+  await tween(1800,k=>fs_tr_draw(ctx,cv,{T:9+k*(30-9),fill:k}));
+  await narrate("That continuum is the Fourier transform F(ω) — the same extraction integral, now asked at every real frequency. Series → transform.");
+};
+})();
+/* neural-networks / nn_neuron */
+(function(){
+const nnN_lerp=(a,b,t)=>a+(b-a)*t;
+function nnN_dot(ctx,x,y,r,c){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();}
+function nnN_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";ctx.textBaseline="middle";
+  const charge=s.charge||0, acc=s.acc, relu=s.relu||0, out=s.out;
+  const in1={x:140,y:110,v:"1",lab:"“free money”",w:"+3.0",c:F.ok};
+  const in2={x:140,y:250,v:"1",lab:"sender in contacts",w:"−4.0",c:F.wrong};
+  const sum={x:420,y:180,r:38};
+  const box={x:585,y:145,w:120,h:70};
+  const outN={x:820,y:180,r:22};
+  ctx.lineWidth=2;ctx.strokeStyle="#3A4C68";
+  [in1,in2].forEach(n=>{ctx.beginPath();ctx.moveTo(n.x+28,n.y);ctx.lineTo(sum.x-sum.r,sum.y);ctx.stroke();});
+  ctx.beginPath();ctx.moveTo(sum.x,315);ctx.lineTo(sum.x,sum.y+sum.r);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(sum.x+sum.r,sum.y);ctx.lineTo(box.x,box.y+box.h/2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(box.x+box.w,box.y+box.h/2);ctx.lineTo(outN.x-outN.r,outN.y);ctx.stroke();
+  ctx.textAlign="center";
+  [in1,in2].forEach(n=>{ctx.fillStyle=n.c;ctx.fillText(n.w,(n.x+28+sum.x-sum.r)/2,(n.y+sum.y)/2-10);});
+  ctx.fillStyle="#5A6E8C";ctx.fillText("bias −1.0",sum.x,332);
+  [in1,in2].forEach(n=>{
+    if(charge>0&&charge<1){
+      const px=nnN_lerp(n.x+28,sum.x-sum.r,charge),py=nnN_lerp(n.y,sum.y,charge);
+      nnN_dot(ctx,px,py,6,n.c);
+    }
+  });
+  [in1,in2].forEach(n=>{
+    nnN_dot(ctx,n.x,n.y,26,"#1b2740");
+    ctx.strokeStyle=n.c;ctx.lineWidth=2;ctx.beginPath();ctx.arc(n.x,n.y,26,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle=F.txt;ctx.font="16px 'IBM Plex Mono'";ctx.fillText(n.v,n.x,n.y);
+    ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.fillText(n.lab,n.x,n.y+42);
+    ctx.font="14px 'IBM Plex Mono'";
+  });
+  nnN_dot(ctx,sum.x,sum.y,sum.r,"#1b2740");
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2;ctx.beginPath();ctx.arc(sum.x,sum.y,sum.r,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="20px 'IBM Plex Mono'";
+  ctx.fillText(acc===undefined?"Σ":(acc>0?"+":"")+acc.toFixed(1),sum.x,sum.y);
+  ctx.font="12px 'IBM Plex Mono'";ctx.fillStyle="#5A6E8C";ctx.fillText("weighted sum",sum.x,sum.y+sum.r+16);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.strokeStyle=F.ax;ctx.lineWidth=1.5;ctx.strokeRect(box.x,box.y,box.w,box.h);
+  const bx0=box.x+14,bx1=box.x+box.w-14,by0=box.y+box.h-16,mid=box.x+box.w*0.5;
+  ctx.strokeStyle=F.post;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx0,by0);ctx.lineTo(mid,by0);ctx.lineTo(bx1,box.y+14);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.fillText("ReLU  max(0,x)",box.x+box.w/2,box.y-9);
+  if(relu>0){nnN_dot(ctx,nnN_lerp(mid,bx0,0.55),by0,5,F.wrong);}
+  ctx.font="14px 'IBM Plex Mono'";
+  nnN_dot(ctx,outN.x,outN.y,outN.r,"#1b2740");
+  ctx.strokeStyle=(out===0)?F.wrong:F.ax;ctx.lineWidth=2;ctx.beginPath();ctx.arc(outN.x,outN.y,outN.r,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="18px 'IBM Plex Mono'";ctx.fillText(out===undefined?"?":out.toFixed(0),outN.x,outN.y);
+  ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.fillText("output",outN.x,outN.y+38);
+  ctx.textAlign="left";ctx.textBaseline="alphabetic";
+}
+ANIMS.nn_neuron_static=(cv,ctx)=>nnN_draw(ctx,cv,{charge:0});
+ANIMS.nn_neuron=async(cv,ctx)=>{
+  nnN_draw(ctx,cv,{charge:0});
+  await narrate("A neuron is one small formula: weight each input, add a bias, then squash the sum through a nonlinearity.");
+  await tween(800,k=>nnN_draw(ctx,cv,{charge:0}));
+  await narrate("Two signals arrive. “free money” pushes +3.0 toward spam; a known contact pushes −4.0 against it.");
+  await tween(1400,k=>nnN_draw(ctx,cv,{charge:k}));
+  await narrate("Sum them with the −1.0 bias: 3 − 4 − 1 = −2.0. The evidence against wins.");
+  await tween(800,k=>nnN_draw(ctx,cv,{charge:1,acc:-2.0}));
+  await narrate("ReLU squashes it — max(0, −2.0) = 0, so the neuron stays silent. The weights hold the knowledge; the nonlinear squash is what makes stacking layers worthwhile.");
+  await tween(1000,k=>nnN_draw(ctx,cv,{charge:1,acc:-2.0,relu:k,out:0}));
+};
+})();
+/* neural-networks / nn_loss_xent */
+(function(){
+const nnL_xe=(p)=>-Math.log(Math.max(p,1e-3));
+const nnL_lerp=(a,b,t)=>a+(b-a)*t;
+function nnL_dot(ctx,x,y,r,c){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();}
+function nnL_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const L=95,R=820,T=55,B=315,Lmax=4;
+  const px=(p)=>L+(R-L)*p;
+  const py=(loss)=>B-(Math.min(loss,Lmax)/Lmax)*(B-T);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=B-(i/4)*(B-T);ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(R,y);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,B);ctx.lineTo(R,B);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.textAlign="center";
+  ctx.fillText("probability the model gave the TRUE class  →",(L+R)/2,B+32);
+  ctx.textAlign="right";ctx.fillText("4+",L-8,T+4);ctx.fillText("0",L-8,B);
+  ctx.textAlign="center";ctx.fillText("0",L,B+16);ctx.fillText("1.0",R,B+16);
+  ctx.save();ctx.translate(L-52,(T+B)/2);ctx.rotate(-Math.PI/2);ctx.fillStyle="#5A6E8C";ctx.fillText("cross-entropy loss  −log(p)",0,0);ctx.restore();
+  const rev=s.k===undefined?1:s.k;
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.5;ctx.beginPath();
+  let started=false;
+  for(let p=1.0;p>=0.02;p-=0.004){
+    if(p<1-rev*0.985)break;
+    const x=px(p),y=py(nnL_xe(p));
+    if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  if(s.p!==undefined){
+    const mp=s.p,ml=nnL_xe(mp),x=px(mp),y=py(ml);
+    ctx.strokeStyle="#3A4C68";ctx.setLineDash([4,4]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,B);ctx.lineTo(x,y);ctx.lineTo(L,y);ctx.stroke();ctx.setLineDash([]);
+    const col=ml>1.2?F.wrong:F.ok;
+    nnL_dot(ctx,x,y,6,col);
+    ctx.fillStyle=col;ctx.textAlign=mp>0.5?"right":"left";
+    const tx=mp>0.5?x-14:x+14;
+    ctx.fillText("p="+mp.toFixed(2)+"   loss="+ml.toFixed(2),tx,y-6);
+    ctx.textAlign="center";ctx.fillStyle=col;ctx.font="12px 'IBM Plex Mono'";
+    ctx.fillText(ml>1.2?"confident & WRONG":"confident & right",x,B-6);
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+  ctx.textAlign="left";
+}
+ANIMS.nn_loss_xent_static=(cv,ctx)=>nnL_draw(ctx,cv,{k:1,p:0.9});
+ANIMS.nn_loss_xent=async(cv,ctx)=>{
+  nnL_draw(ctx,cv,{k:0});
+  await narrate("Cross-entropy scores one prediction by the −log of the probability the model assigned to the true class.");
+  await tween(1200,k=>nnL_draw(ctx,cv,{k}));
+  await narrate("Confident and right — near probability 1 on the truth — costs almost nothing.");
+  await tween(800,k=>nnL_draw(ctx,cv,{k:1,p:0.95}));
+  await narrate("But be 95% sure of the WRONG class — the truth got just 0.05 — and the penalty explodes toward infinity.");
+  await tween(1600,k=>nnL_draw(ctx,cv,{k:1,p:nnL_lerp(0.95,0.05,k)}));
+  await narrate("That steep wall is the point: cross-entropy punishes confident mistakes brutally. It trains calibration, not just correctness.");
+  await tween(600,k=>nnL_draw(ctx,cv,{k:1,p:0.05}));
+};
+})();
+/* neural-networks / nn_generalization */
+(function(){
+const nnG_train=(t)=>0.95*Math.exp(-4.5*t)+0.04;
+const nnG_val=(t)=>0.90*Math.exp(-5*t)+0.10+0.55*t*t;
+function nnG_argmin(){let bt=0,bv=1e9;for(let t=0;t<=1;t+=0.002){const v=nnG_val(t);if(v<bv){bv=v;bt=t;}}return bt;}
+function nnG_dot(ctx,x,y,r,c){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();}
+function nnG_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const L=90,R=830,T=50,B=315;
+  const px=(t)=>L+(R-L)*t;
+  const py=(v)=>B-(Math.min(v,1.05)/1.05)*(B-T);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){const y=T+(i/5)*(B-T);ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(R,y);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,B);ctx.lineTo(R,B);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.textAlign="center";ctx.fillText("training epochs  →",(L+R)/2,B+30);
+  ctx.save();ctx.translate(L-46,(T+B)/2);ctx.rotate(-Math.PI/2);ctx.fillText("loss",0,0);ctx.restore();
+  const kt=s.kt===undefined?0:s.kt, kv=s.kv===undefined?0:s.kv;
+  const curve=(fn,frac,col)=>{
+    if(frac<=0)return;
+    ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();
+    let st=false;
+    for(let t=0;t<=frac+1e-6;t+=0.004){const x=px(t),y=py(fn(t));if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}
+    ctx.stroke();
+  };
+  curve(nnG_train,kt,F.ok);
+  curve(nnG_val,kv,F.post);
+  if(kt>0){const x=px(kt),y=py(nnG_train(kt));nnG_dot(ctx,x,y,4,F.ok);ctx.fillStyle=F.ok;ctx.textAlign="left";ctx.fillText("training loss",Math.min(x+8,R-110),y+4);}
+  if(kv>0){const x=px(kv),y=py(nnG_val(kv));nnG_dot(ctx,x,y,4,F.post);ctx.fillStyle=F.post;ctx.textAlign="left";ctx.fillText("validation loss",Math.min(x+8,R-120),y-6);}
+  if(s.showMin){
+    const tm=nnG_argmin(),x=px(tm);
+    ctx.strokeStyle=F.txt;ctx.setLineDash([5,5]);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,B);ctx.stroke();ctx.setLineDash([]);
+    nnG_dot(ctx,x,py(nnG_val(tm)),6,F.txt);
+    ctx.fillStyle=F.txt;ctx.textAlign="center";ctx.fillText("early stop",x,T-6);
+    ctx.fillStyle=F.wrong;ctx.textAlign="left";ctx.font="12px 'IBM Plex Mono'";
+    ctx.fillText("← learning        memorizing →",x-96,B-8);
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+  ctx.textAlign="left";
+}
+ANIMS.nn_generalization_static=(cv,ctx)=>nnG_draw(ctx,cv,{kt:0,kv:0});
+ANIMS.nn_generalization=async(cv,ctx)=>{
+  nnG_draw(ctx,cv,{kt:0,kv:0});
+  await narrate("Split the data: train on one part, and track the loss on a held-out validation set the network never learns from.");
+  await tween(700,k=>nnG_draw(ctx,cv,{kt:0,kv:0}));
+  await narrate("Training loss falls — and with enough capacity it keeps falling, toward memorizing every example.");
+  await tween(1500,k=>nnG_draw(ctx,cv,{kt:k,kv:0}));
+  await narrate("Validation loss falls too… then turns back upward. That turn is the moment learning becomes memorizing.");
+  await tween(1600,k=>nnG_draw(ctx,cv,{kt:1,kv:k}));
+  await narrate("Stop at the validation minimum — early stopping. Everything past it fits noise in the training set, not signal you can use.");
+  await tween(800,k=>nnG_draw(ctx,cv,{kt:1,kv:1,showMin:true}));
+};
+})();
+/* neural-networks / nn_attention */
+(function(){
+const nnA_toks=["The","keys","to","the","cabinet","were","on","the","table"];
+const nnA_score=[0.12,1.0,0.15,0.10,0.45,0,0,0,0];
+function nnA_dot(ctx,x,y,r,c){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();}
+function nnA_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="15px 'IBM Plex Mono'";
+  const n=nnA_toks.length, y=230, slot=(900-40)/n, bw=76, bh=38;
+  const cx=(i)=>20+slot*i+slot/2;
+  const focus=5;
+  const links=s.links||0, resolved=s.resolved;
+  for(let i=0;i<focus;i++){
+    const sc=nnA_score[i]; if(sc<=0)continue;
+    const x0=cx(focus),x1=cx(i),ytop=y-bh/2;
+    const midx=(x0+x1)/2, lift=60+Math.abs(focus-i)*24;
+    let a, col;
+    if(resolved){ if(i===1){a=1;col=F.post;} else {a=0.10;col=F.ax;} }
+    else { a=sc*links; col=F.ax; }
+    ctx.globalAlpha=Math.max(0,Math.min(1,a));
+    ctx.strokeStyle=col;ctx.lineWidth=(resolved&&i===1)?3:1.5;
+    ctx.beginPath();ctx.moveTo(x0,ytop);ctx.quadraticCurveTo(midx,ytop-lift,x1,ytop);ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+  for(let i=0;i<n;i++){
+    const x=cx(i);
+    let border=F.ax, fill="#1b2740";
+    if(i===focus){border=F.post;}
+    if(resolved&&i===1){border=F.post;fill="#3a2c14";}
+    ctx.fillStyle=fill;ctx.strokeStyle=border;ctx.lineWidth=(i===focus||(resolved&&i===1))?2.5:1.5;
+    ctx.beginPath();ctx.roundRect(x-bw/2,y-bh/2,bw,bh,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle=F.txt;ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(nnA_toks[i],x,y);
+  }
+  ctx.textBaseline="alphabetic";
+  ctx.textAlign="center";ctx.font="14px 'IBM Plex Mono'";
+  if(resolved){ctx.fillStyle=F.post;ctx.fillText("“keys” is plural  →  “were” agrees, across the whole sentence",450,320);}
+  else if(links>0){ctx.fillStyle="#5A6E8C";ctx.fillText("“were” scores its relevance against every earlier word",450,320);}
+  else{ctx.fillStyle="#5A6E8C";ctx.fillText("“were” or “was”?  the deciding word is far to the left",450,320);}
+  ctx.fillStyle=F.post;ctx.font="12px 'IBM Plex Mono'";ctx.fillText("focus",cx(focus),y+bh/2+16);
+  ctx.textAlign="left";
+}
+ANIMS.nn_attention_static=(cv,ctx)=>nnA_draw(ctx,cv,{links:0});
+ANIMS.nn_attention=async(cv,ctx)=>{
+  nnA_draw(ctx,cv,{links:0});
+  await narrate("Agreement question: “were” or “was”? The word that decides it sits far to the left.");
+  await tween(700,k=>nnA_draw(ctx,cv,{links:0}));
+  await narrate("Attention lets the focus word score its relevance against every earlier position at once — no fixed-size memory to squeeze through.");
+  await tween(1400,k=>nnA_draw(ctx,cv,{links:k}));
+  await narrate("The strongest score lands on “keys”. Plural — so “were” is right, and the long-range link was direct and learned.");
+  await tween(1000,k=>nnA_draw(ctx,cv,{links:1,resolved:true}));
+  await narrate("No relay race, no fading memory — just a direct lookup to what matters. Stack these layers with feed-forward ones and you have a Transformer.");
+  await tween(500,k=>nnA_draw(ctx,cv,{links:1,resolved:true}));
+};
+})();
+/* llms / llm_temp */
+(function(){
+const _llmSoftmax=(logits,T)=>{const z=logits.map(l=>l/Math.max(T,1e-3));const m=Math.max(...z);const e=z.map(v=>Math.exp(v-m));const s=e.reduce((a,b)=>a+b,0);return e.map(v=>v/s);};
+const _llmTokLabels=[" Paris"," the"," a"," home"," known"," one"," Lyon"," Nice"];
+const _llmLogits=[3.4,2.1,1.6,1.2,0.9,0.6,0.3,0.0];
+function _llmDrawTemp(ctx,cv,st){
+  clear(ctx,cv);
+  const T=st.T;
+  const probs=_llmSoftmax(_llmLogits,T);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillStyle=F.txt; ctx.textAlign="left";
+  ctx.fillText('P(next token | "The capital of France is")',90,38);
+  const x0=90,x1=830,yb=300,H=205;
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x0,yb);ctx.lineTo(x1,yb);ctx.stroke();
+  const n=probs.length; const gap=8; const bw=(x1-x0-gap*(n-1))/n;
+  const argmax=probs.indexOf(Math.max(...probs));
+  for(let i=0;i<n;i++){
+    const bx=x0+i*(bw+gap);
+    const bh=probs[i]*H;
+    ctx.fillStyle = i===argmax? F.post : F.prior;
+    ctx.globalAlpha = i===argmax?1:0.5;
+    ctx.fillRect(bx, yb-bh, bw, bh);
+    ctx.globalAlpha=1;
+    ctx.fillStyle=F.txt; ctx.textAlign="center"; ctx.font="12px 'IBM Plex Mono'";
+    ctx.fillText((probs[i]*100).toFixed(0)+"%", bx+bw/2, yb-bh-6);
+    ctx.fillStyle="#5A6E8C";
+    ctx.fillText(_llmTokLabels[i], bx+bw/2, yb+16);
+  }
+  ctx.textAlign="left"; ctx.font="16px 'IBM Plex Mono'"; ctx.fillStyle=F.post;
+  ctx.fillText("T = "+T.toFixed(2), 90, 352);
+  ctx.fillStyle="#5A6E8C"; ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText(st.note||"", 205, 352);
+}
+ANIMS.llm_temp_static=(cv,ctx)=>_llmDrawTemp(ctx,cv,{T:1.0,note:"the trained distribution, as-is"});
+ANIMS.llm_temp=async(cv,ctx)=>{
+  _llmDrawTemp(ctx,cv,{T:1.0,note:"the trained distribution, as-is"});
+  await narrate("Every step, the model emits one logit per vocabulary token, and softmax turns them into a probability distribution over what comes next.");
+  await tween(900,k=>_llmDrawTemp(ctx,cv,{T:1.0,note:"the trained distribution, as-is"}));
+  await narrate("Temperature is arithmetic, not mood: divide every logit by T before the softmax. Drive T toward 0 and the distribution sharpens onto the argmax — greedy decoding, always the top token.");
+  await tween(1400,k=>_llmDrawTemp(ctx,cv,{T:1.0-0.72*k,note:"T→0 sharpens toward the top token"}));
+  await narrate("Raise T above 1 and it flattens, pushing probability mass onto lower-ranked tokens — more adventurous draws.");
+  await tween(1600,k=>_llmDrawTemp(ctx,cv,{T:0.28+1.52*k,note:"T>1 flattens onto the tail"}));
+  await narrate("Same forward pass, same logits — temperature never touches the model. You only choose how boldly to draw. And each bold draw becomes context for the next token, so small T changes compound into very different outputs.");
+  await tween(900,k=>_llmDrawTemp(ctx,cv,{T:1.8,note:"one computation, many ways to sample it"}));
+};
+})();
+/* llms / llm_scaling */
+(function(){
+function _llmDrawScale(ctx,cv,st){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const L=115,R=820,Tp=64,B=298;
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let i=1;i<=4;i++){const gx=L+(R-L)*i/5;ctx.beginPath();ctx.moveTo(gx,Tp);ctx.lineTo(gx,B);ctx.stroke();}
+  for(let i=1;i<=3;i++){const gy=Tp+(B-Tp)*i/4;ctx.beginPath();ctx.moveTo(L,gy);ctx.lineTo(R,gy);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(L,Tp);ctx.lineTo(L,B);ctx.lineTo(R,B);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.textAlign="center";ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("compute  (log scale) →",(L+R)/2,B+26);
+  ctx.save();ctx.translate(L-32,(Tp+B)/2);ctx.rotate(-Math.PI/2);ctx.textAlign="center";
+  ctx.fillText("loss  (log)",0,0);ctx.restore();
+  const px=p=>L+(R-L)*p;
+  const py=p=>Tp+(B-Tp)*(0.10+0.82*p);
+  const solidEnd=0.62;
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(px(0),py(0));ctx.lineTo(px(Math.min(st.p,solidEnd)),py(Math.min(st.p,solidEnd)));ctx.stroke();
+  if(st.extrap){
+    ctx.setLineDash([7,6]);ctx.strokeStyle=F.post;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(px(solidEnd),py(solidEnd));ctx.lineTo(px(1),py(1));ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=F.post;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillText("extrapolated",px(0.72),py(0.78)-10);
+  }
+  const p=st.p;
+  ctx.fillStyle= p>solidEnd? F.post:F.ok;
+  ctx.beginPath();ctx.arc(px(p),py(p),6,0,7);ctx.fill();
+  ctx.textAlign="left";ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillText("Pretraining loss vs compute",L,42);
+  if(st.note){ctx.fillStyle="#5A6E8C";ctx.font="13px 'IBM Plex Mono'";ctx.fillText(st.note,L,B+52);}
+}
+ANIMS.llm_scaling_static=(cv,ctx)=>_llmDrawScale(ctx,cv,{p:0.62,extrap:false,note:"loss falls as a smooth power law"});
+ANIMS.llm_scaling=async(cv,ctx)=>{
+  _llmDrawScale(ctx,cv,{p:0,extrap:false,note:""});
+  await narrate("Plot pretraining loss against training compute on log-log axes.");
+  await tween(1500,k=>_llmDrawScale(ctx,cv,{p:0.62*k,extrap:false,note:"training a bigger run, more compute →"}));
+  await narrate("The result that reorganized the field: it comes out startlingly straight — a smooth power law. Each 10× of compute buys a fixed drop in loss, and the same holds for parameters and data.");
+  await tween(900,k=>_llmDrawScale(ctx,cv,{p:0.62,extrap:false,note:"a straight line on log-log axes"}));
+  await narrate("Straight enough that labs extrapolate it — predicting what a run will achieve before spending millions in compute.");
+  await tween(1500,k=>_llmDrawScale(ctx,cv,{p:0.62+0.38*k,extrap:true,note:"predict the run before you pay for it"}));
+  await narrate("Chinchilla fixed the exchange rate: compute-optimal training wants ~20 tokens per parameter. But the law predicts loss, not abilities — specific capabilities can still look like they appear abruptly.");
+  await tween(700,k=>_llmDrawScale(ctx,cv,{p:1.0,extrap:true,note:"~20 tokens per parameter — predicts loss, not skills"}));
+};
+})();
+/* llms / llm_embed */
+(function(){
+function _llmVec(a,b){return [b[0]-a[0],b[1]-a[1]];}
+function _llmArrow(ctx,a,b,color){
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+  const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);const s=10;
+  ctx.beginPath();ctx.moveTo(b[0],b[1]);
+  ctx.lineTo(b[0]-s*Math.cos(ang-0.4),b[1]-s*Math.sin(ang-0.4));
+  ctx.lineTo(b[0]-s*Math.cos(ang+0.4),b[1]-s*Math.sin(ang+0.4));
+  ctx.closePath();ctx.fill();
+}
+const _llmPts={man:[250,300],woman:[330,172],king:[560,300],queen:[640,172]};
+function _llmDot(ctx,p,label,color){
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(p[0],p[1],6,0,7);ctx.fill();
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText(label,p[0]+11,p[1]+5);
+}
+function _llmDrawEmbed(ctx,cv,st){
+  clear(ctx,cv);
+  ctx.fillStyle="#5A6E8C";ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText("embedding space  (2 of the model's thousands of dimensions)",70,40);
+  const P=_llmPts;
+  _llmDot(ctx,P.man,"man",F.ax);
+  _llmDot(ctx,P.woman,"woman",F.ax);
+  _llmDot(ctx,P.king,"king",F.post);
+  _llmDot(ctx,P.queen,"queen",st.showQueen?F.post:"#3A4C68");
+  if(st.a>0){
+    const b=[P.man[0]+(P.woman[0]-P.man[0])*st.a,P.man[1]+(P.woman[1]-P.man[1])*st.a];
+    _llmArrow(ctx,P.man,b,F.ok);
+    if(st.a>=1){ctx.fillStyle=F.ok;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+      ctx.fillText("the man→woman offset",120,220);}
+  }
+  if(st.b>0){
+    const v=_llmVec(P.man,P.woman);
+    const end=[P.king[0]+v[0]*st.b,P.king[1]+v[1]*st.b];
+    _llmArrow(ctx,P.king,end,F.post);
+  }
+  if(st.note){ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";ctx.fillText(st.note,70,360);}
+}
+ANIMS.llm_embed_static=(cv,ctx)=>_llmDrawEmbed(ctx,cv,{a:0,b:0,showQueen:false,note:"token IDs → vectors whose geometry carries meaning"});
+ANIMS.llm_embed=async(cv,ctx)=>{
+  _llmDrawEmbed(ctx,cv,{a:0,b:0,showQueen:false,note:""});
+  await narrate("A token ID carries no meaning. It selects a row of the embedding matrix — an ordinary weight vector, trained by gradient descent like everything else.");
+  await tween(900,k=>_llmDrawEmbed(ctx,cv,{a:0,b:0,showQueen:false,note:"tokens used in similar contexts drift close together"}));
+  await narrate("Training bends those rows into a geometry where directions correspond to meaning. Take the offset from man to woman — that vector is a direction in the space.");
+  await tween(1300,k=>_llmDrawEmbed(ctx,cv,{a:k,b:0,showQueen:false,note:"a direction, not a hand-designed feature"}));
+  await narrate("Now copy that exact same offset and add it to king. The tip lands on queen.");
+  await tween(1400,k=>_llmDrawEmbed(ctx,cv,{a:1,b:k,showQueen:k>=1,note:"king + (woman − man) ≈ queen"}));
+  await narrate("Nobody engineered this. 'Understanding' begins as a lookup table that training bent into shape — and everything downstream is arithmetic on these vectors.");
+  await tween(700,k=>_llmDrawEmbed(ctx,cv,{a:1,b:1,showQueen:true,note:"the embedding matrix is the model's whole interface to language"}));
+};
+})();
+/* llms / llm_goodhart */
+(function(){
+const _llmTcap=t=>0.35+0.55*(1-Math.exp(-2.7*t));
+const _llmBench=t=> t<=0.5? _llmTcap(t): _llmTcap(t)+0.95*Math.pow(t-0.5,1.15);
+function _llmScoreY(s){const Tp=66,B=306;return B-(B-Tp)*Math.min(s,1.05)/1.05;}
+function _llmDrawGood(ctx,cv,st){
+  clear(ctx,cv);
+  const L=115,R=820,B=306,Tp=66;
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(L,Tp);ctx.lineTo(L,B);ctx.lineTo(R,B);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="center";
+  ctx.fillText("time / successive model releases →",(L+R)/2,B+26);
+  ctx.save();ctx.translate(L-30,(Tp+B)/2);ctx.rotate(-Math.PI/2);ctx.textAlign="center";ctx.fillText("score",0,0);ctx.restore();
+  const X=t=>L+(R-L)*t;
+  const rT=st.rT??0, rB=st.rB??0;
+  if(st.gap){
+    ctx.fillStyle="rgba(212,106,98,0.16)";
+    ctx.beginPath();
+    const rr=Math.min(rB,1);
+    ctx.moveTo(X(0.5),_llmScoreY(_llmBench(0.5)));
+    for(let t=0.5;t<=rr;t+=0.01){ctx.lineTo(X(t),_llmScoreY(_llmBench(t)));}
+    for(let t=rr;t>=0.5;t-=0.01){ctx.lineTo(X(t),_llmScoreY(_llmTcap(t)));}
+    ctx.closePath();ctx.fill();
+  }
+  if(st.marker){
+    ctx.setLineDash([5,5]);ctx.strokeStyle=F.wrong;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X(0.5),Tp);ctx.lineTo(X(0.5),B);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=F.wrong;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";
+    ctx.fillText("becomes a target",X(0.5),Tp-8);
+  }
+  ctx.strokeStyle=F.ok;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let t=0;t<=rT;t+=0.005){const x=X(t),y=_llmScoreY(_llmTcap(t));t===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+  ctx.stroke();
+  if(rB>0){
+    ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();
+    for(let t=0;t<=rB;t+=0.005){const x=X(t),y=_llmScoreY(_llmBench(t));t===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();
+  }
+  ctx.textAlign="left";ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillStyle=F.ok;ctx.fillText("— true capability",L+12,Tp+4);
+  if(rB>0){ctx.fillStyle=F.post;ctx.fillText("— benchmark score",L+12,Tp+24);}
+  if(st.note){ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";ctx.fillText(st.note,L+12,B+52);}
+}
+ANIMS.llm_goodhart_static=(cv,ctx)=>_llmDrawGood(ctx,cv,{rT:1,rB:1,marker:true,gap:true,note:"contamination + Goodharting: score rises after real gains slow"});
+ANIMS.llm_goodhart=async(cv,ctx)=>{
+  _llmDrawGood(ctx,cv,{rT:0,rB:0,note:""});
+  await narrate("A benchmark exists to measure real capability. Plot that capability across successive releases: it climbs, then the easy gains saturate.");
+  await tween(1400,k=>_llmDrawGood(ctx,cv,{rT:k,rB:0,note:"real capability rises, then flattens"}));
+  await narrate("At first the public benchmark score tracks it honestly — the lines sit on top of each other.");
+  await tween(1300,k=>_llmDrawGood(ctx,cv,{rT:1,rB:0.5*k,marker:false,note:"an honest proxy — for now"}));
+  await narrate("But once the number drives releases and valuations, it becomes a target. Test items leak into the training crawl; data mixtures get tuned toward it.");
+  await tween(1500,k=>_llmDrawGood(ctx,cv,{rT:1,rB:0.5+0.5*k,marker:true,gap:true,note:"the score keeps climbing after real capability has flattened"}));
+  await narrate("So read '95 on MMLU' like a backtest with unknown look-ahead: the gap may be recall of the answer key, not capability. Trust benchmarks published after the cutoff — and your own evals on your own traffic.");
+  await tween(700,k=>_llmDrawGood(ctx,cv,{rT:1,rB:1,marker:true,gap:true,note:"the only benchmark that matters is your task distribution"}));
+};
+})();
+/* ai-agents / agent_grounding_guard */
+(function(){
+// ===== agent_grounding_guard (concept: grounding) =====
+const _agg_pool=["0.19%","$1.77B","0.42%"];
+const _agg_tokens=[
+  {t:"AUM ",n:false},
+  {t:"$437B",n:true,ok:false},
+  {t:", expense ",n:false},
+  {t:"0.19%",n:true,ok:true}
+];
+function agg_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.textAlign="left";ctx.textBaseline="alphabetic";
+  ctx.font="14px 'IBM Plex Mono'";
+  // left: grounding pool
+  ctx.fillStyle=F.txt;ctx.fillText("grounding pool",40,46);
+  ctx.fillStyle="#5A6E8C";ctx.fillText("every number from this turn's tool results",40,66);
+  let py=92;
+  for(let i=0;i<_agg_pool.length;i++){
+    const on=s.pool>=(i+1)/_agg_pool.length;
+    ctx.fillStyle=on?"#1c2c44":"#141d2e";
+    ctx.strokeStyle=on?F.ok:"#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(40,py,120,32,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle=on?F.txt:"#5A6E8C";ctx.font="15px 'IBM Plex Mono'";
+    ctx.fillText(_agg_pool[i],56,py+21);ctx.font="14px 'IBM Plex Mono'";
+    py+=44;
+  }
+  // right: model reply scanned
+  ctx.fillStyle=F.txt;ctx.fillText("model reply — scan each number",470,46);
+  const bx=470,by=118;ctx.font="17px 'IBM Plex Mono'";
+  let x=bx;const pos=[];
+  for(const tok of _agg_tokens){const w=ctx.measureText(tok.t).width;pos.push({tok,x,w});x+=w;}
+  const totalW=x-bx;const cursorX=bx+s.scan*totalW;
+  for(const p of pos){
+    let color=F.txt;let passed=false;
+    if(p.tok.n){passed=cursorX>=p.x+p.w*0.5;color=passed?(p.tok.ok?F.ok:F.wrong):F.post;}
+    ctx.fillStyle=color;ctx.fillText(p.tok.t,p.x,by);
+    if(p.tok.n&&passed){
+      ctx.strokeStyle=color;ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(p.x,by+6);ctx.lineTo(p.x+p.w,by+6);ctx.stroke();
+      ctx.fillStyle=color;ctx.font="13px 'IBM Plex Mono'";
+      ctx.fillText(p.tok.ok?"in pool":"no source",p.x,by+26);
+      ctx.font="17px 'IBM Plex Mono'";
+    }
+  }
+  if(s.scan>0&&s.scan<1){
+    ctx.strokeStyle=F.post;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(cursorX,by-24);ctx.lineTo(cursorX,by+34);ctx.stroke();
+  }
+  if(s.blocked){
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=3;ctx.strokeRect(470,190,290,60);
+    ctx.fillStyle=F.wrong;ctx.font="20px 'IBM Plex Mono'";ctx.fillText("REPLY BLOCKED",492,224);
+    ctx.font="12px 'IBM Plex Mono'";ctx.fillStyle="#5A6E8C";
+    ctx.fillText("retry: ground the number or drop it",492,242);
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+}
+ANIMS.agent_grounding_guard_static=(cv,ctx)=>agg_draw(ctx,cv,{pool:1,scan:0,blocked:false});
+ANIMS.agent_grounding_guard=async(cv,ctx)=>{
+  agg_draw(ctx,cv,{pool:0,scan:0,blocked:false});
+  await narrate("The guard builds a grounding pool: every number that appeared in this turn's tool results (plus numbers the user supplied).");
+  await tween(1100,k=>agg_draw(ctx,cv,{pool:k,scan:0,blocked:false}));
+  await narrate("Then it scans the reply and checks each numeric claim against the pool.");
+  await tween(1500,k=>agg_draw(ctx,cv,{pool:1,scan:k,blocked:false}));
+  await narrate("$437B has no source in the pool — for a fund reporting $1.77B, that number is fabricated. The reply is blocked.");
+  agg_draw(ctx,cv,{pool:1,scan:1,blocked:true});
+  await narrate("Grounding is mechanical, not aspirational: a claim with no source stops the send, mechanically, before it becomes an action.");
+};
+})();
+/* ai-agents / agent_heartbeat */
+(function(){
+// ===== agent_heartbeat (concept: failure-modes) =====
+const _hb_pulses=[130,220,310,400];
+const _hb_death=400;const _hb_thresh=140;
+function hb_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.textAlign="left";ctx.textBaseline="alphabetic";ctx.font="14px 'IBM Plex Mono'";
+  const baseY=250,x0=60,x1=840;
+  ctx.fillStyle=F.txt;ctx.fillText("agent heartbeat — one ping every ~10 min",x0,40);
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x0,baseY);ctx.lineTo(x1,baseY);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.fillText("time →",x1-58,baseY+24);
+  const nowX=x0+s.k*(x1-x0);
+  for(const px of _hb_pulses){if(px<=nowX){
+    ctx.strokeStyle=F.ok;ctx.lineWidth=2;ctx.beginPath();
+    ctx.moveTo(px-9,baseY);ctx.lineTo(px-4,baseY);ctx.lineTo(px,baseY-46);ctx.lineTo(px+4,baseY);ctx.lineTo(px+9,baseY);ctx.stroke();
+  }}
+  let last=x0;for(const px of _hb_pulses){if(px<=nowX)last=px;}
+  const gap=nowX-last;const fill=Math.min(1,gap/_hb_thresh);
+  const wy=92,wx=x0,ww=360,wh=22;
+  ctx.fillStyle="#5A6E8C";ctx.fillText("off-box watchdog timer (resets on each ping)",wx,wy-10);
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;ctx.strokeRect(wx,wy,ww,wh);
+  ctx.fillStyle=fill>=1?F.wrong:(fill>0.6?F.post:F.ok);
+  ctx.fillRect(wx+1.5,wy+1.5,(ww-3)*fill,wh-3);
+  if(nowX>_hb_death+12){
+    ctx.strokeStyle=F.wrong;ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(_hb_death+14,baseY-58);ctx.lineTo(_hb_death+14,baseY);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=F.wrong;ctx.fillText("process dies — pings stop",_hb_death+20,baseY-42);
+  }
+  ctx.strokeStyle=F.txt;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(nowX,baseY-58);ctx.lineTo(nowX,baseY+8);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.fillText("now",nowX-12,baseY-64);
+  if(fill>=1){
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=3;ctx.strokeRect(560,150,280,64);
+    ctx.fillStyle=F.wrong;ctx.font="18px 'IBM Plex Mono'";ctx.fillText("ALARM (off-box)",582,180);
+    ctx.font="12px 'IBM Plex Mono'";ctx.fillStyle="#5A6E8C";ctx.fillText("the missing heartbeat IS the alarm",582,200);
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+}
+ANIMS.agent_heartbeat_static=(cv,ctx)=>hb_draw(ctx,cv,{k:0.3});
+ANIMS.agent_heartbeat=async(cv,ctx)=>{
+  hb_draw(ctx,cv,{k:0});
+  await narrate("The agent pushes a heartbeat every ~10 minutes to a watcher on another machine — whose timer resets on each ping.");
+  await tween(1500,k=>hb_draw(ctx,cv,{k:0.45*k}));
+  await narrate("While pings keep arriving, the timer never fills. Here, silence genuinely means health.");
+  await tween(500,k=>hb_draw(ctx,cv,{k:0.45+0.05*k}));
+  await narrate("Then the process dies. No ping arrives, the watchdog timer runs out — and a dead system can't send its own error.");
+  await tween(1800,k=>hb_draw(ctx,cv,{k:0.5+0.5*k}));
+  await narrate("Silence is only allowed to mean health if something off-box would provably scream otherwise.");
+};
+})();
+/* ai-agents / agent_budget_curve */
+(function(){
+// ===== agent_budget_curve (concept: planning) =====
+function _abq(b){const ramp=1-Math.exp(-5*b);const pen=0.28*Math.max(0,b-0.55)/0.45;return Math.max(0,Math.min(1,ramp-pen));}
+function abc_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.textAlign="left";ctx.textBaseline="alphabetic";ctx.font="14px 'IBM Plex Mono'";
+  const x0=90,x1=820,y0=320,yt=60;
+  const X=b=>x0+b*(x1-x0);const Y=q=>y0+q*(yt-y0);
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0,yt);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.fillText("task quality",x0-4,yt-24);
+  ctx.fillStyle="#5A6E8C";ctx.fillText("step budget →",x1-130,y0+26);
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();let started=false;
+  for(let b=0;b<=s.k+1e-6;b+=0.008){const px=X(b),py=Y(_abq(b));if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+  const peak=0.55;
+  if(s.k>=peak){
+    ctx.fillStyle=F.ok;ctx.beginPath();ctx.arc(X(peak),Y(_abq(peak)),6,0,7);ctx.fill();
+    ctx.fillStyle=F.ok;ctx.fillText("sweet spot",X(peak)-32,Y(_abq(peak))-14);
+  }
+  const mb=Math.min(s.k,1);
+  ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(X(mb),Y(_abq(mb)),5,0,7);ctx.fill();
+  if(s.k>0.15){ctx.fillStyle=F.wrong;ctx.fillText("too tight:",X(0.02),Y(_abq(0.14))+40);ctx.fillText("skips checks",X(0.02),Y(_abq(0.14))+58);}
+  if(s.k>=1){ctx.fillStyle=F.wrong;ctx.fillText("unlimited: procrastinates,",X(0.6),Y(_abq(1))+30);ctx.fillText("stale context",X(0.6),Y(_abq(1))+48);}
+}
+ANIMS.agent_budget_curve_static=(cv,ctx)=>abc_draw(ctx,cv,{k:1});
+ANIMS.agent_budget_curve=async(cv,ctx)=>{
+  abc_draw(ctx,cv,{k:0});
+  await narrate("Plot task quality against the step budget the agent is given.");
+  await tween(1300,k=>abc_draw(ctx,cv,{k:0.55*k}));
+  await narrate("Too tight, and the agent skips verification it should have done — quality suffers.");
+  await tween(1500,k=>abc_draw(ctx,cv,{k:0.55+0.45*k}));
+  await narrate("Past the sweet spot, extra budget buys procrastination: re-checking done work, stale context — quality flattens, even dips.");
+  await narrate("Budgets aren't just cost control: scarcity forces the plan to surface. Finding that peak per task-type is real tuning work.");
+};
+})();
+/* ai-agents / agent_verify_gauntlet */
+(function(){
+// ===== agent_verify_gauntlet (concept: multi-agent) =====
+const _mvg_gates=[360,500,640];
+function mvg_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.textAlign="left";ctx.textBaseline="alphabetic";ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillStyle=F.txt;ctx.fillText("finder → skeptic gauntlet ('assume it's false, prove it')",60,36);
+  for(const gx of _mvg_gates){
+    ctx.strokeStyle="#3A4C68";ctx.setLineDash([3,4]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(gx,92);ctx.lineTo(gx,320);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.fillText("skeptic",gx-22,86);ctx.font="14px 'IBM Plex Mono'";
+  }
+  const startX=100,endX=760;
+  const lanes=[{y:160,label:"plausible-but-wrong finding",dies:true,dieGate:1},{y:270,label:"real finding",dies:false}];
+  for(const ln of lanes){
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(startX,ln.y);ctx.lineTo(endX,ln.y);ctx.stroke();
+    ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.fillText(ln.label,startX,ln.y-16);ctx.font="14px 'IBM Plex Mono'";
+    const stopX=ln.dies?_mvg_gates[ln.dieGate]:endX;
+    const tx=startX+s.k*(stopX-startX);
+    const dead=ln.dies&&s.k>=1;const won=!ln.dies&&s.k>=1;
+    ctx.fillStyle=dead?F.wrong:(ln.dies?F.post:F.ok);
+    ctx.beginPath();ctx.arc(tx,ln.y,9,0,7);ctx.fill();
+    if(dead){
+      ctx.strokeStyle=F.txt;ctx.lineWidth=2;ctx.beginPath();
+      ctx.moveTo(tx-5,ln.y-5);ctx.lineTo(tx+5,ln.y+5);ctx.moveTo(tx+5,ln.y-5);ctx.lineTo(tx-5,ln.y+5);ctx.stroke();
+      ctx.fillStyle=F.wrong;ctx.fillText("refuted — discarded",tx+18,ln.y+4);
+    }
+    if(won){ctx.fillStyle=F.ok;ctx.fillText("✓ survived all → accepted",tx+16,ln.y+4);}
+  }
+}
+ANIMS.agent_verify_gauntlet_static=(cv,ctx)=>mvg_draw(ctx,cv,{k:0.4});
+ANIMS.agent_verify_gauntlet=async(cv,ctx)=>{
+  mvg_draw(ctx,cv,{k:0});
+  await narrate("A finder sweeps for bugs and emits candidate findings — some real, some plausible-but-wrong.");
+  await tween(900,k=>mvg_draw(ctx,cv,{k:0.35*k}));
+  await narrate("Each candidate runs a gauntlet of INDEPENDENT skeptics, prompted to REFUTE it — not to double-check, which would just confirm the finder's framing.");
+  await tween(1600,k=>mvg_draw(ctx,cv,{k:0.35+0.65*k}));
+  await narrate("The wrong one is refuted and discarded; the real one survives every skeptic and is accepted.");
+  await narrate("Independence at generation, adversarial pressure at acceptance — ~3× the cost, cheap against one bad finding shipped.");
+};
+})();
+/* agi-and-beyond / agi_scaling_law */
+(function(){
+// ===== agi_scaling_law : scaling-debates =====
+const agi_loss=(x)=>0.9-0.66*Math.pow(Math.max(x,0),0.6);
+function agi_sc_px(cv){return {L:96,R:cv.width-44,T:44,B:cv.height-58};}
+function agi_drawScaling(ctx,cv,s){
+  clear(ctx,cv);
+  const p=agi_sc_px(cv), obs=0.62;
+  const X=x=>p.L+x*(p.R-p.L);
+  const Y=l=>p.B-(l-0.2)/0.75*(p.B-p.T);
+  ctx.strokeStyle="#22314a"; ctx.lineWidth=1;
+  ctx.font="12px 'IBM Plex Mono'"; ctx.fillStyle="#5A6E8C"; ctx.textAlign="center";
+  for(let i=0;i<=6;i++){const gx=X(i/6);ctx.beginPath();ctx.moveTo(gx,p.T);ctx.lineTo(gx,p.B);ctx.stroke();
+    ctx.fillText("10^"+(18+2*i),gx,p.B+16);}
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(p.L,p.T-8);ctx.lineTo(p.L,p.B);ctx.lineTo(p.R,p.B);ctx.stroke();
+  ctx.fillStyle="#5A6E8C"; ctx.textAlign="center";
+  ctx.fillText("training compute (FLOP)",(p.L+p.R)/2,p.B+36);
+  ctx.save();ctx.translate(p.L-60,(p.T+p.B)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("loss (nats)  ↓ better",0,0);ctx.restore();
+  ctx.strokeStyle="#3A4C68"; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(X(obs),p.T);ctx.lineTo(X(obs),p.B);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle="#5A6E8C";ctx.textAlign="center";ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("observed",X(obs/2),p.T+6);
+  ctx.fillText("extrapolation",X((obs+1)/2),p.T+6);
+  const sol=s.sol||0;
+  ctx.strokeStyle=F.prior; ctx.lineWidth=2.4; ctx.beginPath();
+  for(let i=0;i<=100;i++){const x=obs*sol*i/100;const px=X(x),py=Y(agi_loss(x));
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  if(s.fan>0){
+    const f=s.fan, lEnd=agi_loss(obs), endX=obs+(1-obs)*f;
+    ctx.fillStyle="rgba(232,161,60,0.07)";
+    ctx.beginPath();ctx.moveTo(X(obs),Y(lEnd));
+    for(let i=0;i<=60;i++){const x=obs+(endX-obs)*i/60;ctx.lineTo(X(x),Y(agi_loss(x)));}
+    for(let i=60;i>=0;i--){const x=obs+(endX-obs)*i/60;const l=lEnd-0.02*(x-obs);ctx.lineTo(X(x),Y(l));}
+    ctx.closePath();ctx.fill();
+    ctx.setLineDash([6,5]);
+    ctx.strokeStyle=F.post; ctx.lineWidth=2; ctx.beginPath();
+    for(let i=0;i<=60;i++){const x=obs+(endX-obs)*i/60;const px=X(x),py=Y(agi_loss(x));i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+    ctx.stroke();
+    ctx.strokeStyle=F.wrong; ctx.beginPath();
+    for(let i=0;i<=60;i++){const x=obs+(endX-obs)*i/60;const l=lEnd-0.02*(x-obs);const px=X(x),py=Y(l);i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+    ctx.stroke();
+    ctx.setLineDash([]);
+    if(f>0.85){ctx.fillStyle=F.txt;ctx.font="16px 'IBM Plex Mono'";ctx.textAlign="left";
+      ctx.fillText("?  what do the nats buy",X(endX)+8,Y(lEnd-0.06));}
+  }
+}
+ANIMS.agi_scaling_law_static=(cv,ctx)=>agi_drawScaling(ctx,cv,{sol:1,fan:1});
+ANIMS.agi_scaling_law=async(cv,ctx)=>{
+  agi_drawScaling(ctx,cv,{sol:0,fan:0});
+  await narrate("Scaling laws are an empirical regularity: grow compute, data and parameters together, and next-token loss falls.");
+  await tween(1400,k=>agi_drawScaling(ctx,cv,{sol:k,fan:0}));
+  await narrate("Over MANY orders of magnitude the decline is smooth and predictable (Kaplan 2020; Chinchilla 2022). Optimists and skeptics both accept this line.");
+  await tween(1200,k=>agi_drawScaling(ctx,cv,{sol:1,fan:k}));
+  await narrate("The contested move is past the observed data: does falling loss keep buying the capabilities you care about, or bend? Loss is in nats — the fight is what those nats buy.");
+  await narrate("The solid line is shared ground. The cone — the extrapolation beyond observed compute — is the entire scaling debate.");
+};
+})();
+/* agi-and-beyond / agi_spec_gaming */
+(function(){
+// ===== agi_spec_gaming : alignment =====
+const agi_proxy=(x)=>Math.pow(Math.max(x,0),0.5);
+const agi_true=(x)=>0.2+0.72*Math.exp(-Math.pow((x-0.32)/0.26,2));
+function agi_al_px(cv){return {L:96,R:cv.width-168,T:44,B:cv.height-56};}
+function agi_drawAlign(ctx,cv,s){
+  clear(ctx,cv);
+  const p=agi_al_px(cv);
+  const X=x=>p.L+x*(p.R-p.L);
+  const Y=v=>p.B-v*(p.B-p.T);
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(p.L,p.T-8);ctx.lineTo(p.L,p.B);ctx.lineTo(p.R,p.B);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";
+  ctx.fillText("optimization / training pressure →",(p.L+p.R)/2,p.B+30);
+  ctx.save();ctx.translate(p.L-58,(p.T+p.B)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("score",0,0);ctx.restore();
+  const kp=s.k||0, kt=s.kt!==undefined?s.kt:kp;
+  if(s.showGap){
+    ctx.fillStyle="rgba(212,106,98,0.12)";ctx.beginPath();
+    for(let i=0;i<=80;i++){const x=kp*i/80;ctx.lineTo(X(x),Y(agi_proxy(x)));}
+    for(let i=80;i>=0;i--){const x=kp*i/80;ctx.lineTo(X(x),Y(agi_true(x)));}
+    ctx.closePath();ctx.fill();
+  }
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.6;ctx.beginPath();
+  for(let i=0;i<=80;i++){const x=kp*i/80;const px=X(x),py=Y(agi_proxy(x));i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.strokeStyle=F.ok;ctx.lineWidth=2.6;ctx.beginPath();
+  for(let i=0;i<=80;i++){const x=kt*i/80;const px=X(x),py=Y(agi_true(x));i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillStyle=F.post;ctx.fillText("proxy objective",p.R+10,Y(agi_proxy(Math.max(kp,0.03)))-2);
+  ctx.fillStyle="#5A6E8C";ctx.fillText("(what you wrote)",p.R+10,Y(agi_proxy(Math.max(kp,0.03)))+14);
+  ctx.fillStyle=F.ok;ctx.fillText("true goal",p.R+10,Y(agi_true(kt))+2);
+  ctx.fillStyle="#5A6E8C";ctx.fillText("(what you meant)",p.R+10,Y(agi_true(kt))+18);
+}
+ANIMS.agi_spec_gaming_static=(cv,ctx)=>agi_drawAlign(ctx,cv,{k:1,showGap:true});
+ANIMS.agi_spec_gaming=async(cv,ctx)=>{
+  agi_drawAlign(ctx,cv,{k:0,showGap:false});
+  await narrate("The alignment problem in one line: the objective you can write down is not the outcome you want. Watch a system optimize against it.");
+  await tween(1300,k=>agi_drawAlign(ctx,cv,{k:0.34*k,showGap:false}));
+  await narrate("The proxy — the reward you actually specified — climbs. Early on the true goal rises right alongside it. So far, so good.");
+  await tween(1500,k=>agi_drawAlign(ctx,cv,{k:0.34+0.66*k,showGap:true}));
+  await narrate("But optimization pressure finds the GAP: the true goal peaks, then falls as the system games the proxy. Reward achieved, purpose defeated — Goodhart's law under pressure.");
+  await narrate("This is in production today. Train for approval and you get sycophancy: agreeing with confident users genuinely raises the score. The objective wasn't failed — it was the problem.");
+};
+})();
+/* agi-and-beyond / agi_jcurve */
+(function(){
+// ===== agi_jcurve : economic-transformation =====
+const agi_j=(x)=>2.2*Math.pow(x,3)-1.2*x;
+function agi_jc_px(cv){return {L:96,R:cv.width-44,T:40,B:cv.height-60};}
+function agi_drawJ(ctx,cv,s){
+  clear(ctx,cv);
+  const p=agi_jc_px(cv);
+  const X=x=>p.L+x*(p.R-p.L);
+  const Y=v=>{const lo=-0.45,hi=1.08;return p.B-(v-lo)/(hi-lo)*(p.B-p.T);};
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(p.L,p.T-6);ctx.lineTo(p.L,p.B);ctx.lineTo(p.R,p.B);ctx.stroke();
+  ctx.strokeStyle="#3A4C68";ctx.setLineDash([5,5]);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p.L,Y(0));ctx.lineTo(p.R,Y(0));ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText("prior trend (baseline)",p.R-186,Y(0)-6);
+  ctx.textAlign="center";
+  ctx.fillText("years since the technology is adopted →",(p.L+p.R)/2,p.B+34);
+  ctx.save();ctx.translate(p.L-58,(p.T+p.B)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("measured productivity",0,0);ctx.restore();
+  const kp=s.k||0;
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.8;ctx.beginPath();
+  for(let i=0;i<=100;i++){const x=kp*i/100;const px=X(x),py=Y(agi_j(x));i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  if(kp>0){const dx=X(kp),dy=Y(agi_j(kp));ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(dx,dy,4.5,0,7);ctx.fill();}
+  if(s.showDip){
+    const tx=0.426,px=X(tx),py=Y(agi_j(tx));
+    ctx.strokeStyle=F.wrong;ctx.setLineDash([3,3]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,Y(0));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=F.wrong;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";
+    ctx.fillText("dip: reorganization",px,py+18);
+    ctx.fillText("(intangible investment, uncounted)",px,py+34);
+  }
+  if(s.showGain){
+    ctx.fillStyle=F.ok;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="right";
+    ctx.fillText("gains arrive — late",X(0.99),Y(agi_j(0.99))-10);
+  }
+}
+ANIMS.agi_jcurve_static=(cv,ctx)=>agi_drawJ(ctx,cv,{k:1,showDip:true,showGain:true});
+ANIMS.agi_jcurve=async(cv,ctx)=>{
+  agi_drawJ(ctx,cv,{k:0});
+  await narrate("Every general-purpose technology — steam, electricity, computing — pays off slower and lumpier than expected. Track measured productivity after adoption.");
+  await tween(1300,k=>agi_drawJ(ctx,cv,{k:0.43*k}));
+  await narrate("First it DIPS below the prior trend. Firms pour effort into reorganizing — work the statistics don't count yet. Solow, 1987: 'the computer age everywhere but in the productivity statistics.'");
+  await tween(1500,k=>agi_drawJ(ctx,cv,{k:0.43+0.57*k,showDip:true,showGain:true}));
+  await narrate("Then the J: gains arrive a decade-plus late, concentrated in firms that rebuilt around the tech. This is the productivity J-curve (Brynjolfsson, Rock & Syverson).");
+  await narrate("The AI reading: today's vast datacenter capex measures EXPECTATION, not realized gains. A trough is what a real, lagging GPT looks like — and also what an overbuild looks like. Unit economics and diffusion tell them apart.");
+};
+})();
+/* agi-and-beyond / agi_forecast_spread */
+(function(){
+// ===== agi_forecast_spread : forecasting-agi =====
+const agi_bell=(x,mu,sig)=>Math.exp(-Math.pow((x-mu)/sig,2));
+function agi_fc_px(cv){return {L:70,R:cv.width-44,T:48,B:cv.height-58};}
+function agi_drawForecast(ctx,cv,s){
+  clear(ctx,cv);
+  const p=agi_fc_px(cv);
+  const X=x=>p.L+x*(p.R-p.L);
+  const mu=s.mu, sig=0.16, col=s.col||F.post;
+  const g=s.g===undefined?1:s.g, baseY=p.B, topY=p.T+18, amp=(baseY-topY)*g;
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(p.L,p.T-6);ctx.lineTo(p.L,p.B);ctx.lineTo(p.R,p.B);ctx.stroke();
+  const ticks=[[0.06,"5y"],[0.28,"15y"],[0.52,"30y"],[0.78,"60y"],[0.96,"never"]];
+  ctx.fillStyle="#5A6E8C";ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";
+  for(const t of ticks){ctx.fillText(t[1],X(t[0]),p.B+18);}
+  ctx.fillText("when do machines reach human-level? → (expert answers)",(p.L+p.R)/2,p.B+36);
+  ctx.fillStyle=(col===F.prior)?"rgba(124,141,165,0.14)":"rgba(232,161,60,0.14)";
+  ctx.beginPath();ctx.moveTo(X(0),baseY);
+  for(let i=0;i<=120;i++){const x=i/120;ctx.lineTo(X(x),baseY-amp*agi_bell(x,mu,sig));}
+  ctx.lineTo(X(1),baseY);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<=120;i++){const x=i/120;const px=X(x),py=baseY-amp*agi_bell(x,mu,sig);i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  const peakY=baseY-amp;
+  ctx.strokeStyle=col;ctx.setLineDash([5,4]);ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X(mu),baseY);ctx.lineTo(X(mu),peakY-14);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";
+  ctx.fillText("median",X(mu),peakY-18);
+  if(s.cap){ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";ctx.fillText(s.cap,p.L+6,p.T+4);}
+}
+ANIMS.agi_forecast_spread_static=(cv,ctx)=>agi_drawForecast(ctx,cv,{mu:0.5,g:1,cap:"'all occupations' framing"});
+ANIMS.agi_forecast_spread=async(cv,ctx)=>{
+  agi_drawForecast(ctx,cv,{mu:0.5,g:0,cap:"'all occupations' framing"});
+  await narrate("The biggest expert surveys (Grace et al., thousands of AI researchers) don't hand you a number — they hand you a distribution. Answers run from a few years out to 'never'.");
+  await tween(1100,k=>agi_drawForecast(ctx,cv,{mu:0.5,g:k,cap:"'all occupations' framing"}));
+  await narrate("Now change ONLY the wording — ask 'all tasks' instead of 'all occupations'. Same people, same evidence. The whole distribution slides earlier by DECADES.");
+  await tween(1400,k=>agi_drawForecast(ctx,cv,{mu:0.5-0.24*k,g:1,cap:"'all tasks' framing"}));
+  await narrate("If phrasing moves the median as much as evidence does, the point estimate is soft. And between survey waves the mass drifts earlier after capability jumps — that drift is real signal.");
+  await tween(1200,k=>agi_drawForecast(ctx,cv,{mu:0.26-0.06*k,g:1,cap:"next wave, post-jump"}));
+  await narrate("Read the spread and the drift, not the median. Informed people disagreeing by orders of magnitude IS the finding.");
+};
+})();
+/* roman-engineering / roman_concrete_heal */
+(function(){
+// ---- Roman concrete: heals vs. spalls over two millennia ----
+const roman_conc_L=72, roman_conc_R=44, roman_conc_T=46, roman_conc_B=52;
+const roman_conc_TX=(cv,t)=>roman_conc_L+(t/20)*(cv.width-roman_conc_L-roman_conc_R);
+const roman_conc_VY=(cv,v)=>cv.height-roman_conc_B-(v)*(cv.height-roman_conc_T-roman_conc_B);
+const roman_conc_modern=(t)=> t<0.8?1.0 : (t<1.7? 1.0-0.94*((t-0.8)/0.9) : 0.06);
+const roman_conc_roman=(t)=> Math.min(1.02, 0.80+0.22*(1-Math.exp(-t/2.2)));
+const roman_conc_plot=(ctx,cv,fn,tmax,color,w)=>{
+  ctx.strokeStyle=color; ctx.lineWidth=w; ctx.beginPath();
+  for(let i=0;i<=240;i++){ const t=tmax*i/240, X=roman_conc_TX(cv,t), Y=roman_conc_VY(cv,fn(t));
+    i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);} ctx.stroke();
+};
+function roman_drawConc(ctx,cv,st){
+  clear(ctx,cv); const phase=st.phase||0, k=st.k==null?1:st.k;
+  ctx.font="14px 'IBM Plex Mono'"; ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  ctx.strokeStyle="#22314a"; ctx.lineWidth=1;
+  for(let c=5;c<=20;c+=5){ const X=roman_conc_TX(cv,c);
+    ctx.beginPath(); ctx.moveTo(X,roman_conc_VY(cv,0)); ctx.lineTo(X,roman_conc_VY(cv,1.08)); ctx.stroke();
+    ctx.fillStyle="#5A6E8C"; ctx.fillText(c+"", X, roman_conc_VY(cv,0)+20); }
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5; ctx.beginPath();
+  ctx.moveTo(roman_conc_L,roman_conc_VY(cv,1.08)); ctx.lineTo(roman_conc_L,roman_conc_VY(cv,0));
+  ctx.lineTo(roman_conc_TX(cv,20),roman_conc_VY(cv,0)); ctx.stroke();
+  ctx.fillStyle="#5A6E8C";
+  ctx.fillText("time  →  centuries of seawater", (roman_conc_L+roman_conc_TX(cv,20))/2, cv.height-14);
+  ctx.save(); ctx.translate(20,cv.height/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText("structural integrity", 0,0); ctx.restore();
+  ctx.strokeStyle="#3A4C68"; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(roman_conc_TX(cv,1),roman_conc_VY(cv,0)); ctx.lineTo(roman_conc_TX(cv,1),roman_conc_VY(cv,1.05)); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle="#5A6E8C"; ctx.fillText("~1 century", roman_conc_TX(cv,1), roman_conc_VY(cv,1.05)-6);
+  if(phase>=1){ const tm=phase===1?20*k:20; roman_conc_plot(ctx,cv,roman_conc_modern,tm,"#D46A62",2.6);
+    ctx.fillStyle="#D46A62"; ctx.textAlign="left";
+    ctx.fillText("modern — steel rebar", roman_conc_TX(cv,1.6), roman_conc_VY(cv,0.86)); }
+  if(phase>=2){ const tr=phase===2?20*k:20; roman_conc_plot(ctx,cv,roman_conc_roman,tr,"#5FBF95",2.6);
+    ctx.fillStyle="#5FBF95"; ctx.textAlign="right";
+    ctx.fillText("Roman — opus caementicium", roman_conc_TX(cv,19.6), roman_conc_VY(cv,1.06)); }
+  if(phase>=3){ ctx.globalAlpha=Math.min(1,k*1.2); ctx.fillStyle="#E8A13C"; ctx.textAlign="center";
+    ctx.fillText("no steel to rust — geometry carries the load", cv.width/2, roman_conc_VY(cv,0.44));
+    ctx.globalAlpha=1; }
+}
+ANIMS.roman_concrete_heal_static=(cv,ctx)=>roman_drawConc(ctx,cv,{phase:3,k:1});
+ANIMS.roman_concrete_heal=async(cv,ctx)=>{
+  roman_drawConc(ctx,cv,{phase:0,k:0});
+  await narrate("Compression strength isn't the question — longevity is. Watch two thousand years of seawater.");
+  await tween(1400,k=>roman_drawConc(ctx,cv,{phase:1,k}));
+  await narrate("Modern concrete starts stronger, but its steel rebar rusts, swells, and bursts the cover — spalling within a century.");
+  await tween(1500,k=>roman_drawConc(ctx,cv,{phase:2,k}));
+  await narrate("Roman marine concrete has no steel. Seawater grows interlocking minerals inside its cracks — it heals and strengthens with age.");
+  await tween(1100,k=>roman_drawConc(ctx,cv,{phase:3,k}));
+  await narrate("The trade was geometry for steel: never ask stone to resist tension, and the structure lasts millennia.");
+};
+})();
+/* roman-engineering / roman_siphon */
+(function(){
+// ---- Inverted siphon: water seeks its own level ----
+const roman_sip_path=[{x:150,y:112},{x:360,y:300},{x:600,y:300},{x:760,y:132}];
+const roman_sip_seglen=(a,b)=>Math.hypot(b.x-a.x,b.y-a.y);
+const roman_sip_walk=(frac)=>{
+  const segs=[]; let tot=0;
+  for(let i=0;i<roman_sip_path.length-1;i++){const L=roman_sip_seglen(roman_sip_path[i],roman_sip_path[i+1]);segs.push(L);tot+=L;}
+  let target=tot*frac, pts=[{x:roman_sip_path[0].x,y:roman_sip_path[0].y}];
+  for(let i=0;i<segs.length;i++){ if(target<=segs[i]){ const a=roman_sip_path[i],b=roman_sip_path[i+1],r=segs[i]?target/segs[i]:0;
+      pts.push({x:a.x+(b.x-a.x)*r,y:a.y+(b.y-a.y)*r}); return pts; }
+    target-=segs[i]; pts.push({x:roman_sip_path[i+1].x,y:roman_sip_path[i+1].y}); }
+  const last=roman_sip_path[roman_sip_path.length-1]; pts.push({x:last.x,y:last.y}); return pts;
+};
+function roman_drawSiphon(ctx,cv,st){
+  clear(ctx,cv); const phase=st.phase||0, k=st.k==null?1:st.k;
+  ctx.font="14px 'IBM Plex Mono'"; ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+  ctx.fillStyle="#1a2740"; ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(0,cv.height); ctx.lineTo(0,150); ctx.lineTo(150,150);
+  ctx.lineTo(360,322); ctx.lineTo(600,322); ctx.lineTo(760,170);
+  ctx.lineTo(cv.width,170); ctx.lineTo(cv.width,cv.height); ctx.closePath(); ctx.fill();
+  ctx.fillStyle="#243550"; ctx.fillRect(78,90,72,60); ctx.strokeStyle="#3A4C68"; ctx.strokeRect(78,90,72,60);
+  ctx.fillStyle="#5B9BD5"; ctx.fillRect(80,112,68,36);
+  ctx.fillStyle="#243550"; ctx.fillRect(752,110,74,60); ctx.strokeStyle="#3A4C68"; ctx.strokeRect(752,110,74,60);
+  ctx.strokeStyle="#5A6E8C"; ctx.setLineDash([5,4]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(80,112); ctx.lineTo(cv.width-20,112); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle="#5A6E8C"; ctx.textAlign="right"; ctx.fillText("source level", cv.width-24,106);
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=9; ctx.lineJoin="round"; ctx.beginPath();
+  ctx.moveTo(roman_sip_path[0].x,roman_sip_path[0].y);
+  for(let i=1;i<roman_sip_path.length;i++) ctx.lineTo(roman_sip_path[i].x,roman_sip_path[i].y);
+  ctx.stroke();
+  if(phase>=2){ const frac=phase===2?k:1; const pts=roman_sip_walk(frac);
+    ctx.strokeStyle="#5B9BD5"; ctx.lineWidth=6; ctx.lineJoin="round"; ctx.beginPath();
+    ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y); ctx.stroke();
+    const h=pts[pts.length-1]; ctx.fillStyle="#8ec3f0"; ctx.beginPath(); ctx.arc(h.x,h.y,5,0,7); ctx.fill();
+  }
+  if(phase>=3){ const f=Math.min(1,k); const top=132; const fillTop=170-(170-top)*f;
+    ctx.fillStyle="#5B9BD5"; ctx.fillRect(754,fillTop,70,170-fillTop);
+    ctx.strokeStyle="#E8A13C"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(700,112); ctx.lineTo(700,132); ctx.stroke();
+    ctx.fillStyle="#E8A13C"; ctx.textAlign="right"; ctx.fillText("outlet", 694,110); ctx.fillText("just below", 694,124); }
+  ctx.fillStyle="#D7DFEA"; ctx.textAlign="center";
+  ctx.fillText("header tank", 114,84);
+  ctx.fillText("receiving tank", 789,104);
+  if(phase>=2){ ctx.fillStyle="#E8A13C"; ctx.fillText("under pressure", 480,338); }
+}
+ANIMS.roman_siphon_static=(cv,ctx)=>roman_drawSiphon(ctx,cv,{phase:3,k:1});
+ANIMS.roman_siphon=async(cv,ctx)=>{
+  roman_drawSiphon(ctx,cv,{phase:1,k:0});
+  await narrate("A valley too deep even for arcades. The Romans sealed the channel into banks of lead pipe and let physics carry the water.");
+  await tween(1600,k=>roman_drawSiphon(ctx,cv,{phase:2,k}));
+  await narrate("Water plunges down one slope under its own weight and crosses the valley floor under pressure — Lyon's siphons held over 100 m of head.");
+  await tween(1200,k=>roman_drawSiphon(ctx,cv,{phase:3,k}));
+  await narrate("It climbs the far side to a tank just below the source. Water seeks its own level; gravity pays the whole bill — no pump anywhere.");
+};
+})();
+/* roman-engineering / roman_scour */
+(function(){
+// ---- Bridge pier scour: constriction speeds the current, current digs the bed ----
+const roman_sc_surf=92, roman_sc_bed0=298, roman_sc_pierL=418, roman_sc_pierR=466;
+function roman_drawScour(ctx,cv,st){
+  clear(ctx,cv); const phase=st.phase||0, k=st.k==null?1:st.k;
+  ctx.font="14px 'IBM Plex Mono'"; ctx.textBaseline="alphabetic"; ctx.textAlign="left";
+  const scour=(phase>=3? 62*k : 0);
+  const bedY=(x)=>roman_sc_bed0+scour*Math.exp(-Math.pow((x-472)/60,2));
+  ctx.fillStyle="#17324f"; ctx.beginPath();
+  ctx.moveTo(0,roman_sc_surf); ctx.lineTo(cv.width,roman_sc_surf);
+  for(let x=cv.width;x>=0;x-=6){ ctx.lineTo(x,bedY(x)); }
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle="#2a2113"; ctx.beginPath(); ctx.moveTo(0,cv.height);
+  for(let x=0;x<=cv.width;x+=6){ ctx.lineTo(x,bedY(x)); }
+  ctx.lineTo(cv.width,cv.height); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle="#6b5636"; ctx.lineWidth=2.5; ctx.beginPath();
+  for(let x=0;x<=cv.width;x+=6){ x?ctx.lineTo(x,bedY(x)):ctx.moveTo(x,bedY(x)); } ctx.stroke();
+  ctx.fillStyle="#5A6E8C";
+  ctx.fillRect(roman_sc_pierL,roman_sc_surf-34,roman_sc_pierR-roman_sc_pierL,(roman_sc_bed0-8)-(roman_sc_surf-34));
+  ctx.beginPath(); ctx.moveTo(roman_sc_pierL,roman_sc_surf-34); ctx.lineTo(roman_sc_pierL-16,(roman_sc_surf-34+roman_sc_bed0)/2); ctx.lineTo(roman_sc_pierL,roman_sc_bed0-8); ctx.closePath(); ctx.fill();
+  const rows=[140,190,240]; ctx.strokeStyle="#5B9BD5"; ctx.fillStyle="#5B9BD5";
+  const xs=[70,180,300,520,640,760];
+  for(const y of rows){ for(const x0 of xs){
+    let len=26; const near=Math.exp(-Math.pow((x0-472)/150,2));
+    if(phase>=2) len=26+(46*near)*(phase===2?k:1);
+    const x1=x0+len; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x1-6,y-4); ctx.lineTo(x1-6,y+4); ctx.closePath(); ctx.fill();
+  }}
+  ctx.fillStyle="#D7DFEA"; ctx.textAlign="center";
+  ctx.fillText("flow →", 44, 76);
+  ctx.fillText("pier", (roman_sc_pierL+roman_sc_pierR)/2, roman_sc_surf-42);
+  if(phase>=2){ ctx.fillStyle="#E8A13C"; ctx.fillText("channel constricted — current speeds up", cv.width/2, 74); }
+  if(phase>=3){ ctx.fillStyle="#D46A62"; ctx.textAlign="center"; ctx.fillText("scour", 500, roman_sc_bed0+44);
+    ctx.font="13px 'IBM Plex Mono'"; ctx.fillText("foundation undermined", 500, roman_sc_bed0+62); ctx.font="14px 'IBM Plex Mono'"; }
+}
+ANIMS.roman_scour_static=(cv,ctx)=>roman_drawScour(ctx,cv,{phase:3,k:1});
+ANIMS.roman_scour=async(cv,ctx)=>{
+  roman_drawScour(ctx,cv,{phase:1,k:0});
+  await narrate("Each pier was built thick enough to stand as its own abutment — so losing one span wouldn't unzip the whole bridge.");
+  await tween(1300,k=>roman_drawScour(ctx,cv,{phase:2,k}));
+  await narrate("But a fat pier constricts the channel. The same river through a narrower gap has to flow faster past the pier.");
+  await tween(1500,k=>roman_drawScour(ctx,cv,{phase:3,k}));
+  await narrate("Fast water scours the bed out from under the footing. Scour — not crushed arches — felled most ancient bridges, and still leads bridge failures today.");
+};
+})();
+/* roman-engineering / roman_cascade */
+(function(){
+// ---- The water city: one flow, many jobs ----
+const roman_cas_stages=[
+  {x:80,y:74,label:"aqueduct"},
+  {x:224,y:116,label:"tank"},
+  {x:388,y:160,label:"fountains & baths"},
+  {x:560,y:206,label:"latrines & washing"},
+  {x:706,y:250,label:"sewers"},
+  {x:842,y:300,label:"Tiber"}
+];
+const roman_cas_at=(prog)=>{
+  const n=roman_cas_stages.length-1; const p=Math.max(0,Math.min(1,prog))*n;
+  const i=Math.min(n-1,Math.floor(p)); const r=p-i;
+  const a=roman_cas_stages[i], b=roman_cas_stages[i+1];
+  return {x:a.x+(b.x-a.x)*r, y:a.y+(b.y-a.y)*r, idx:p};
+};
+function roman_drawCascade(ctx,cv,st){
+  clear(ctx,cv); const prog=st.prog==null?0:st.prog;
+  ctx.font="14px 'IBM Plex Mono'"; ctx.textBaseline="alphabetic"; ctx.textAlign="center";
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=7; ctx.lineJoin="round"; ctx.beginPath();
+  ctx.moveTo(roman_cas_stages[0].x,roman_cas_stages[0].y);
+  for(let i=1;i<roman_cas_stages.length;i++) ctx.lineTo(roman_cas_stages[i].x,roman_cas_stages[i].y);
+  ctx.stroke();
+  const here=roman_cas_at(prog);
+  ctx.strokeStyle="#5B9BD5"; ctx.lineWidth=5; ctx.beginPath();
+  ctx.moveTo(roman_cas_stages[0].x,roman_cas_stages[0].y);
+  for(let i=1;i<roman_cas_stages.length;i++){ if(i<=here.idx){ ctx.lineTo(roman_cas_stages[i].x,roman_cas_stages[i].y);} else { ctx.lineTo(here.x,here.y); break; } }
+  ctx.stroke();
+  for(let i=0;i<roman_cas_stages.length;i++){ const s=roman_cas_stages[i];
+    const passed = here.idx>=i-0.001;
+    ctx.fillStyle= passed? "#5FBF95":"#243550"; ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(s.x,s.y,8,0,7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle= passed? "#D7DFEA":"#5A6E8C";
+    const above = i%2===0; ctx.fillText(s.label, s.x, s.y+(above?-16:24));
+  }
+  ctx.fillStyle="#E8A13C"; ctx.beginPath(); ctx.arc(here.x,here.y,7,0,7); ctx.fill();
+  ctx.strokeStyle="#E8A13C"; ctx.globalAlpha=0.4; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(here.x,here.y,12,0,7); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.fillStyle="#5A6E8C"; ctx.textAlign="left"; ctx.fillText("one gradient  ·  no storage  ·  no shut-off", 24, cv.height-16);
+}
+ANIMS.roman_cascade_static=(cv,ctx)=>roman_drawCascade(ctx,cv,{prog:1});
+ANIMS.roman_cascade=async(cv,ctx)=>{
+  roman_drawCascade(ctx,cv,{prog:0});
+  await narrate("Roman urban water was one continuous cascade, descending by gravity — no storage, no shut-off. It worked because it never stopped flowing.");
+  await tween(1500,k=>roman_drawCascade(ctx,cv,{prog:k*0.4}));
+  await narrate("Aqueduct to distribution tank to fountains and baths — running water within a short walk of nearly everyone.");
+  await tween(1700,k=>roman_drawCascade(ctx,cv,{prog:0.4+k*0.6}));
+  await narrate("Then the same water works its second shift: latrines, street-washing, and its overflow flushed the Cloaca Maxima out to the Tiber. Waste water was working water.");
+};
+})();
+/* investing-with-etfs / etf_arb */
+(function(){
+// ===== c01 creation/redemption arbitrage keeps the price honest =====
+const _etfArbETF=(t)=>{
+  if(t<0.40) return 100;
+  if(t<0.55) return 100+(t-0.40)/0.15;      // greed lifts it to 101
+  if(t<0.70) return 101;                      // a $1 gap sits open
+  if(t<0.85) return 101-(t-0.70)/0.15;        // arbitrage supply pushes it back
+  return 100;
+};
+const _etfArbX=(t,L,W)=>L+t*W;
+const _etfArbY=(p,T,H)=>T+(102-p)/4*H;
+function _etfArbDraw(ctx,cv,st){
+  clear(ctx,cv); ctx.font="14px 'IBM Plex Mono'";
+  const L=72,R=44,T=48,B=54,W=cv.width-L-R,H=cv.height-T-B;
+  for(let p=98;p<=102;p++){
+    const y=_etfArbY(p,T,H);
+    ctx.strokeStyle="#22314a"; ctx.lineWidth=1; ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(L+W,y);ctx.stroke();
+    ctx.fillStyle="#5A6E8C"; ctx.textAlign="right"; ctx.fillText("$"+p,L-8,y+4);
+  }
+  ctx.textAlign="left";
+  ctx.strokeStyle="#3A4C68"; ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,T+H);ctx.lineTo(L+W,T+H);ctx.stroke();
+  ctx.fillStyle="#5A6E8C"; ctx.fillText("time →", L+W-56, T+H+34);
+  const rt=st.reveal, yB=_etfArbY(100,T,H);
+  // shade the gap between ETF and basket over the revealed span
+  ctx.fillStyle="rgba(212,106,98,0.16)"; ctx.beginPath(); let started=false;
+  for(let t=0;t<=rt+1e-6;t+=0.004){ const x=_etfArbX(t,L,W),y=_etfArbY(_etfArbETF(t),T,H); if(!started){ctx.moveTo(x,yB);started=true;} ctx.lineTo(x,y); }
+  for(let t=rt;t>=0;t-=0.004){ ctx.lineTo(_etfArbX(t,L,W),yB); }
+  ctx.closePath(); ctx.fill();
+  // basket value (constant $100)
+  ctx.strokeStyle=F.prior; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+  ctx.beginPath();ctx.moveTo(L,yB);ctx.lineTo(L+W,yB);ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=F.prior; ctx.fillText("basket value  $100", L+8, yB+18);
+  // ETF market price
+  ctx.strokeStyle=F.post; ctx.lineWidth=2.5; ctx.beginPath();
+  for(let t=0;t<=rt+1e-6;t+=0.004){ const x=_etfArbX(t,L,W),y=_etfArbY(_etfArbETF(t),T,H); if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y); }
+  ctx.stroke();
+  const pe=_etfArbETF(rt), xe=_etfArbX(rt,L,W), ye=_etfArbY(pe,T,H);
+  ctx.fillStyle=F.post; ctx.beginPath();ctx.arc(xe,ye,4.5,0,7);ctx.fill();
+  ctx.fillText("ETF  $"+pe.toFixed(2), Math.min(xe+10,L+W-92), ye-8);
+  if(st.showAP){
+    ctx.fillStyle=F.ok; ctx.textAlign="center";
+    ctx.fillText("AP: swap $100 of stock → new shares → sell at $101", L+W/2, T-16);
+    ctx.textAlign="left";
+    const xg=_etfArbX(0.72,L,W), yTop=_etfArbY(101,T,H)+4, yBot=_etfArbY(100,T,H)-4;
+    ctx.strokeStyle=F.ok; ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(xg,yTop);ctx.lineTo(xg,yBot);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(xg-4,yBot-5);ctx.lineTo(xg,yBot);ctx.lineTo(xg+4,yBot-5);ctx.stroke();
+  }
+}
+ANIMS.etf_arb_static=(cv,ctx)=>_etfArbDraw(ctx,cv,{reveal:1,showAP:false});
+ANIMS.etf_arb=async(cv,ctx)=>{
+  _etfArbDraw(ctx,cv,{reveal:0,showAP:false});
+  await narrate("An ETF share trades on the exchange all day; the basket it holds has its own value. Start them level at $100.");
+  await tween(1100,k=>_etfArbDraw(ctx,cv,{reveal:0.40*k,showAP:false}));
+  await narrate("Buyers push the ETF to $101 while the basket is still worth $100 — a gap opens (shaded red).");
+  await tween(1300,k=>_etfArbDraw(ctx,cv,{reveal:0.40+0.30*k,showAP:false}));
+  await narrate("That gap is free money: an authorized participant hands over $100 of stock for new shares in-kind and sells them at $101 — and the new supply pushes the price back down.");
+  await tween(1300,k=>_etfArbDraw(ctx,cv,{reveal:0.70+0.15*k,showAP:true}));
+  await narrate("There is always a line for free money, so the gap closes in seconds. The ETF stays pinned to its basket — usually within pennies.");
+  await tween(900,k=>_etfArbDraw(ctx,cv,{reveal:0.85+0.15*k,showAP:true}));
+};
+})();
+/* investing-with-etfs / etf_levdecay */
+(function(){
+// ===== c03 leveraged-ETF daily-reset volatility decay =====
+const _etfLevIdx=[100,110,99];
+const _etfLevLev=[100,120,96];
+const _etfLevY=(p,T,H)=>T+(124-p)/34*H;
+const _etfLevXs=(L,W)=>[L,L+W/2,L+W];
+function _etfLevPath(ctx,pts,xs,T,H,prog,color,width){
+  ctx.strokeStyle=color; ctx.lineWidth=width; ctx.beginPath();
+  const cur=prog*(pts.length-1);
+  for(let i=0;i<pts.length;i++){
+    if(i>cur){ const seg=cur-(i-1);
+      if(seg>0){ const x=xs[i-1]+(xs[i]-xs[i-1])*seg, y=_etfLevY(pts[i-1]+(pts[i]-pts[i-1])*seg,T,H); ctx.lineTo(x,y); }
+      break; }
+    const x=xs[i], y=_etfLevY(pts[i],T,H); if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+function _etfLevDraw(ctx,cv,st){
+  clear(ctx,cv); ctx.font="14px 'IBM Plex Mono'";
+  const L=90,R=160,T=44,B=54,W=cv.width-L-R,H=cv.height-T-B, xs=_etfLevXs(L,W);
+  for(let p=90;p<=120;p+=10){ const y=_etfLevY(p,T,H);
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(L+W,y);ctx.stroke();
+    ctx.fillStyle="#5A6E8C";ctx.textAlign="right";ctx.fillText(p,L-8,y+4); }
+  ctx.textAlign="center";ctx.fillStyle="#5A6E8C";
+  ["Day 0","Day 1","Day 2"].forEach((d,i)=>ctx.fillText(d,xs[i],T+H+30));
+  ctx.textAlign="left";
+  ctx.strokeStyle="#3A4C68";ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,T+H);ctx.lineTo(L+W,T+H);ctx.stroke();
+  if(st.idx>0) _etfLevPath(ctx,_etfLevIdx,xs,T,H,st.idx,F.prior,2.5);
+  if(st.lev>0) _etfLevPath(ctx,_etfLevLev,xs,T,H,st.lev,F.post,2.5);
+  if(st.idx>=1){ ctx.fillStyle=F.prior; ctx.textAlign="center"; ctx.fillText("+10%",xs[1],_etfLevY(110,T,H)-10); ctx.textAlign="left";
+    const y=_etfLevY(99,T,H); ctx.beginPath();ctx.arc(xs[2],y,4,0,7);ctx.fill(); ctx.fillText("index  99  (−1%)",xs[2]+10,y+4); }
+  if(st.lev>=1){ ctx.fillStyle=F.post; ctx.textAlign="center"; ctx.fillText("+20%",xs[1],_etfLevY(120,T,H)-10); ctx.textAlign="left";
+    const y=_etfLevY(96,T,H); ctx.beginPath();ctx.arc(xs[2],y,4,0,7);ctx.fill(); ctx.fillText("2× fund  96  (−4%)",xs[2]+10,y+4); }
+  if(st.annotate>0){ ctx.globalAlpha=0.3+0.7*st.annotate;
+    const y0=_etfLevY(120,T,H);
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(xs[1],y0);ctx.lineTo(xs[2],y0);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=F.wrong;ctx.textAlign="center";
+    ctx.fillText("−20% of 120 = −24",(xs[1]+xs[2])/2,y0-8);
+    ctx.textAlign="left";ctx.globalAlpha=1; }
+}
+ANIMS.etf_levdecay_static=(cv,ctx)=>_etfLevDraw(ctx,cv,{idx:1,lev:1,annotate:1});
+ANIMS.etf_levdecay=async(cv,ctx)=>{
+  _etfLevDraw(ctx,cv,{idx:0,lev:0,annotate:0});
+  await narrate("The index rises 10% to 110, then falls 10% back to 99 — down just 1% over the two days.");
+  await tween(1300,k=>_etfLevDraw(ctx,cv,{idx:k,lev:0,annotate:0}));
+  await narrate("A 2× fund delivers twice each single day: +20% to 120, then −20% to 96 — down 4%, not 2%.");
+  await tween(1300,k=>_etfLevDraw(ctx,cv,{idx:1,lev:k,annotate:0}));
+  await narrate("Twice the daily move gave four times the loss. The culprit: the −20% day bites 120 — a bigger base than the +20% grew from 100.");
+  await tween(1100,k=>_etfLevDraw(ctx,cv,{idx:1,lev:1,annotate:k}));
+  await narrate("That is volatility decay: every down-up wiggle grinds a leveraged fund lower. A choppy sideways month can lose real money while the index goes nowhere — a trader's tool, not buy-and-hold.");
+};
+})();
+/* investing-with-etfs / etf_bestdays */
+(function(){
+// ===== c07 selling in a crash misses the clustered best days =====
+const _etfBDInv=[100,96,90,82,72,66,63,71,78,83,88,92,94];
+const _etfBDY=(p,T,H)=>T+(105-p)/50*H;
+const _etfBDX=(i,L,W)=>L+i/12*W;
+function _etfBDDraw(ctx,cv,st){
+  clear(ctx,cv); ctx.font="14px 'IBM Plex Mono'";
+  const L=70,R=150,T=44,B=54,W=cv.width-L-R,H=cv.height-T-B;
+  for(let p=60;p<=100;p+=10){ const y=_etfBDY(p,T,H);
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(L+W,y);ctx.stroke();
+    ctx.fillStyle="#5A6E8C";ctx.textAlign="right";ctx.fillText(p,L-8,y+4); }
+  ctx.textAlign="left";
+  ctx.strokeStyle="#3A4C68";ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,T+H);ctx.lineTo(L+W,T+H);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.fillText("time →",L+W-56,T+H+30);
+  ctx.fillStyle="rgba(124,141,165,0.10)"; ctx.fillRect(_etfBDX(4,L,W),T,_etfBDX(8,L,W)-_etfBDX(4,L,W),H);
+  ctx.fillStyle="#5A6E8C";ctx.textAlign="center";ctx.fillText("panic",(_etfBDX(4,L,W)+_etfBDX(8,L,W))/2,T+16);ctx.textAlign="left";
+  const n=st.reveal;
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();
+  const full=Math.min(Math.floor(n),12);
+  for(let i=0;i<=full;i++){ const x=_etfBDX(i,L,W),y=_etfBDY(_etfBDInv[i],T,H); if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y); }
+  if(full<12 && n>full){ const f=n-full, x=_etfBDX(full,L,W)+(_etfBDX(full+1,L,W)-_etfBDX(full,L,W))*f, y=_etfBDY(_etfBDInv[full]+(_etfBDInv[full+1]-_etfBDInv[full])*f,T,H); ctx.lineTo(x,y); }
+  ctx.stroke();
+  if(st.best){ ctx.strokeStyle=F.ok;ctx.lineWidth=4;ctx.beginPath();
+    for(let i=6;i<=8;i++){const x=_etfBDX(i,L,W),y=_etfBDY(_etfBDInv[i],T,H); if(i===6)ctx.moveTo(x,y);else ctx.lineTo(x,y);} ctx.stroke();
+    for(let i=7;i<=8;i++){ctx.fillStyle=F.ok;ctx.beginPath();ctx.arc(_etfBDX(i,L,W),_etfBDY(_etfBDInv[i],T,H),4,0,7);ctx.fill();}
+    ctx.fillStyle=F.ok;ctx.textAlign="center";ctx.fillText("best days",_etfBDX(7,L,W),_etfBDY(_etfBDInv[8],T,H)-12);ctx.textAlign="left"; }
+  if(st.sell>0){ const sy=_etfBDY(63,T,H);
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=2;ctx.setLineDash([6,5]);
+    ctx.beginPath();ctx.moveTo(_etfBDX(6,L,W),sy);ctx.lineTo(_etfBDX(6+6*st.sell,L,W),sy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=F.wrong;ctx.beginPath();ctx.arc(_etfBDX(6,L,W),sy,4,0,7);ctx.fill();
+    ctx.fillText("sold — in cash",_etfBDX(6,L,W)+10,sy+18); }
+  if(st.reveal>=12){ ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(_etfBDX(12,L,W),_etfBDY(94,T,H),4.5,0,7);ctx.fill();
+    ctx.fillText("stayed in  94",_etfBDX(12,L,W)+10,_etfBDY(94,T,H)+4); }
+  if(st.sell>=1){ ctx.fillStyle=F.wrong;ctx.fillText("sold out  63",_etfBDX(12,L,W)+10,_etfBDY(63,T,H)+4); }
+}
+ANIMS.etf_bestdays_static=(cv,ctx)=>_etfBDDraw(ctx,cv,{reveal:12,best:true,sell:1});
+ANIMS.etf_bestdays=async(cv,ctx)=>{
+  _etfBDDraw(ctx,cv,{reveal:0,best:false,sell:0});
+  await narrate("A market falls into a panic — down to 63 — then rebounds violently back toward 94.");
+  await tween(1600,k=>_etfBDDraw(ctx,cv,{reveal:12*k,best:false,sell:0}));
+  await narrate("Notice where the biggest up days sit: clustered right at the bottom. Rebounds are born inside the panic, not after it.");
+  await tween(700,k=>_etfBDDraw(ctx,cv,{reveal:12,best:true,sell:0}));
+  await narrate("Now the seller: exits at the bottom to 'wait for calm', locks the loss, and sits in cash — specifically through the rebound days.");
+  await tween(1300,k=>_etfBDDraw(ctx,cv,{reveal:12,best:true,sell:k}));
+  await narrate("By the time it feels calm the snapback already happened. Ends at 63 versus 94. The ones who caught the best days weren't nimble — they were simply still there.");
+};
+})();
+/* investing-with-etfs / etf_divers */
+(function(){
+// ===== c04 real vs cosmetic diversification = correlation, not fund count =====
+const _etfDvStock=[100,108,96,104,88,96,104];
+const _etfDvCos  =[100,107,95,105,86,97,103];
+const _etfDvBond =[100,99,103,100,108,103,101];
+const _etfDvComb=(a,b)=>a.map((v,i)=>(v+b[i])/2);
+const _etfDvY=(p,T,H)=>T+(112-p)/30*H;
+const _etfDvX=(i,L,W)=>L+i/6*W;
+function _etfDvLine(ctx,arr,L,W,T,H,color,width,dash){
+  ctx.strokeStyle=color;ctx.lineWidth=width; if(dash)ctx.setLineDash(dash);else ctx.setLineDash([]);
+  ctx.beginPath(); arr.forEach((v,i)=>{const x=_etfDvX(i,L,W),y=_etfDvY(v,T,H); if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});
+  ctx.stroke(); ctx.setLineDash([]);
+}
+function _etfDvDraw(ctx,cv,st){
+  clear(ctx,cv); ctx.font="14px 'IBM Plex Mono'";
+  const L=70,R=150,T=48,B=54,W=cv.width-L-R,H=cv.height-T-B;
+  for(let p=85;p<=110;p+=5){ const y=_etfDvY(p,T,H);
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(L+W,y);ctx.stroke();
+    ctx.fillStyle="#5A6E8C";ctx.textAlign="right";ctx.fillText(p,L-8,y+4); }
+  ctx.textAlign="left";
+  ctx.strokeStyle="#3A4C68";ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,T+H);ctx.lineTo(L+W,T+H);ctx.stroke();
+  ctx.fillStyle="#5A6E8C";ctx.textAlign="center";ctx.fillText("bad-news day",_etfDvX(4,L,W),T-14);ctx.textAlign="left";
+  const useBond=(st.mode==='real'||st.mode==='insight');
+  const comb=_etfDvComb(_etfDvStock, useBond?_etfDvBond:_etfDvCos);
+  const k=(st.k==null?1:st.k);
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,L+W*k+3,cv.height); ctx.clip();
+  _etfDvLine(ctx,_etfDvStock,L,W,T,H, useBond?"#5A6E8C":F.post, 2, null);
+  if(st.mode==='stock'){ ctx.fillStyle=F.post; ctx.fillText("stock fund",_etfDvX(6,L,W)+8,_etfDvY(104,T,H)+4); }
+  if(st.mode==='cosmetic'){
+    _etfDvLine(ctx,_etfDvCos,L,W,T,H,F.post,2,[5,4]);
+    _etfDvLine(ctx,comb,L,W,T,H,F.txt,3,null);
+    ctx.fillStyle=F.post;ctx.fillText("a 2nd US large-cap fund",_etfDvX(0,L,W)+6,_etfDvY(100,T,H)-10);
+    ctx.fillStyle=F.txt;ctx.textAlign="center";ctx.fillText("combined still crashes to 87",_etfDvX(4,L,W),_etfDvY(87,T,H)+22);ctx.textAlign="left"; }
+  if(useBond){
+    _etfDvLine(ctx,_etfDvBond,L,W,T,H,F.ok,2,[5,4]);
+    _etfDvLine(ctx,comb,L,W,T,H,F.txt,3,null);
+    ctx.fillStyle=F.ok;ctx.fillText("bonds zag up",_etfDvX(4,L,W)+8,_etfDvY(108,T,H)-6);
+    ctx.fillStyle=F.txt;ctx.textAlign="center";ctx.fillText("50/50 dips only to "+comb[4].toFixed(0),_etfDvX(4,L,W),_etfDvY(comb[4],T,H)-12);ctx.textAlign="left"; }
+  ctx.restore();
+}
+ANIMS.etf_divers_static=(cv,ctx)=>_etfDvDraw(ctx,cv,{mode:'real',k:1});
+ANIMS.etf_divers=async(cv,ctx)=>{
+  _etfDvDraw(ctx,cv,{mode:'stock',k:0});
+  await narrate("Here is a US stock fund: quiet, then a bad-news day drops it to 88.");
+  await tween(1100,k=>_etfDvDraw(ctx,cv,{mode:'stock',k}));
+  await narrate("Add a second US large-cap fund — different ticker, same giant companies. It moves in lockstep, so the 50/50 combined still crashes to 87. Cosmetic: more line items, one bet.");
+  await tween(1200,k=>_etfDvDraw(ctx,cv,{mode:'cosmetic',k}));
+  await narrate("Now swap in an uncorrelated bond fund. On the same bad-news day it zags UP, so the 50/50 portfolio dips only to 98 instead of 88.");
+  await tween(1200,k=>_etfDvDraw(ctx,cv,{mode:'real',k}));
+  await narrate("That is real diversification — holdings that respond differently to the same news. The test is never how many funds you own, but how many independent bets.");
+  await tween(600,k=>_etfDvDraw(ctx,cv,{mode:'insight',k}));
+};
+})();
+/* quant-finance / qf_voldrag */
+(function(){
+// ---- c01-returns: volatility drag ----
+const qf_vd_L=90, qf_vd_R=820, qf_vd_T=70, qf_vd_B=320;
+const qf_vd_WMAX=1.65;
+const qf_vd_yFor=(w)=> qf_vd_B - (w/qf_vd_WMAX)*(qf_vd_B-qf_vd_T);
+const qf_vd_X=[150,470,770];
+const qf_vd_W=[1.0,1.5,0.75];
+function qf_vd_draw(ctx,cv,st){
+  const p=st.p||0, gap=st.gap||0;
+  clear(ctx,cv);
+  ctx.font="15px 'IBM Plex Mono'"; ctx.fillStyle=F.txt;
+  ctx.fillText("Volatility drag:  +50% then −50%  ≠  break-even", qf_vd_L-30, 34);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(qf_vd_L,qf_vd_T-10); ctx.lineTo(qf_vd_L,qf_vd_B); ctx.lineTo(qf_vd_R,qf_vd_B); ctx.stroke();
+  const y1=qf_vd_yFor(1.0);
+  ctx.strokeStyle="#22314a"; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(qf_vd_L,y1); ctx.lineTo(qf_vd_R,y1); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle="#5A6E8C"; ctx.fillText("start = 1.00", qf_vd_R-110, y1-8);
+  ctx.fillText("year 0", qf_vd_X[0]-20, qf_vd_B+20);
+  ctx.fillText("year 1", qf_vd_X[1]-20, qf_vd_B+20);
+  ctx.fillText("year 2", qf_vd_X[2]-20, qf_vd_B+20);
+  const pts=[[qf_vd_X[0],qf_vd_yFor(qf_vd_W[0])],[qf_vd_X[1],qf_vd_yFor(qf_vd_W[1])],[qf_vd_X[2],qf_vd_yFor(qf_vd_W[2])]];
+  ctx.lineWidth=2.5;
+  const f0=Math.max(0,Math.min(1,p));
+  if(f0>0){ ctx.strokeStyle=F.ok; ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]); ctx.lineTo(pts[0][0]+(pts[1][0]-pts[0][0])*f0, pts[0][1]+(pts[1][1]-pts[0][1])*f0); ctx.stroke(); }
+  const f1=Math.max(0,Math.min(1,p-1));
+  if(f1>0){ ctx.strokeStyle=F.wrong; ctx.beginPath(); ctx.moveTo(pts[1][0],pts[1][1]); ctx.lineTo(pts[1][0]+(pts[2][0]-pts[1][0])*f1, pts[1][1]+(pts[2][1]-pts[1][1])*f1); ctx.stroke(); }
+  const dot=(x,y,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();};
+  dot(pts[0][0],pts[0][1],F.ax);
+  if(p>=1){ dot(pts[1][0],pts[1][1],F.ok); ctx.fillStyle=F.ok; ctx.fillText("×1.5 = 1.50  (+50%)", pts[1][0]-40, pts[1][1]-14); }
+  if(p>=2){ dot(pts[2][0],pts[2][1],F.wrong); ctx.fillStyle=F.wrong; ctx.fillText("×0.5 = 0.75  (−25%)", pts[2][0]-150, pts[2][1]-14); }
+  if(gap>0 && p>=2){
+    const gy0=qf_vd_yFor(1.0), gy1=qf_vd_yFor(0.75);
+    ctx.globalAlpha=gap;
+    ctx.fillStyle="rgba(212,106,98,0.18)"; ctx.fillRect(qf_vd_X[2]+14, gy0, 26, gy1-gy0);
+    ctx.strokeStyle=F.wrong; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(qf_vd_X[2]+14,gy0); ctx.lineTo(qf_vd_X[2]+40,gy0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(qf_vd_X[2]+14,gy1); ctx.lineTo(qf_vd_X[2]+40,gy1); ctx.stroke();
+    ctx.fillStyle=F.post; ctx.font="15px 'IBM Plex Mono'"; ctx.fillText("g ≈ μ − σ²/2", 560, 70);
+    ctx.font="13px 'IBM Plex Mono'"; ctx.fillStyle="#5A6E8C"; ctx.fillText("mean 0% · variance is the tax", 520, 92);
+    ctx.globalAlpha=1;
+  }
+}
+ANIMS.qf_voldrag_static=(cv,ctx)=>qf_vd_draw(ctx,cv,{p:2,gap:1});
+ANIMS.qf_voldrag=async(cv,ctx)=>{
+  qf_vd_draw(ctx,cv,{p:0,gap:0});
+  await narrate("Up 50%, then down 50%. The two returns average to zero — so wealth is unchanged, right?");
+  await tween(1100,k=>qf_vd_draw(ctx,cv,{p:k,gap:0}));
+  await narrate("Multiply, don't average: 1.5 × 0.5 = 0.75. You're down 25%.");
+  await tween(1100,k=>qf_vd_draw(ctx,cv,{p:1+k,gap:0}));
+  await narrate("That gap is volatility drag: geometric growth ≈ μ − σ²/2. Variance is a direct tax on compounded wealth.");
+  await tween(1000,k=>qf_vd_draw(ctx,cv,{p:2,gap:k}));
+};
+})();
+/* quant-finance / qf_kelly */
+(function(){
+// ---- c06-position-sizing: Kelly growth parabola ----
+const qf_k_L=95, qf_k_R=830, qf_k_T=60, qf_k_B=300;
+const qf_k_UMAX=2.4;
+const qf_k_g=(u)=> 2*u - u*u;
+const qf_k_GMIN=-1.0, qf_k_GMAX=1.15;
+const qf_k_xFor=(u)=> qf_k_L + (u/qf_k_UMAX)*(qf_k_R-qf_k_L);
+const qf_k_yFor=(g)=> qf_k_B - ((g-qf_k_GMIN)/(qf_k_GMAX-qf_k_GMIN))*(qf_k_B-qf_k_T);
+function qf_k_draw(ctx,cv,st){
+  const uEnd=st.uEnd||0, neg=st.neg||0, marks=st.marks||0;
+  clear(ctx,cv);
+  ctx.font="15px 'IBM Plex Mono'"; ctx.fillStyle=F.txt;
+  ctx.fillText("Kelly growth curve:  g(f) = fμ − f²σ²/2", qf_k_L-35, 32);
+  ctx.font="14px 'IBM Plex Mono'";
+  const y0=qf_k_yFor(0);
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(qf_k_L,qf_k_T); ctx.lineTo(qf_k_L,qf_k_B); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(qf_k_L,y0); ctx.lineTo(qf_k_R,y0); ctx.stroke();
+  ctx.fillStyle="#5A6E8C";
+  ctx.fillText("growth g", qf_k_L-72, qf_k_T+40);
+  ctx.fillText("g = 0", qf_k_R-52, y0-6);
+  ctx.fillText("bet fraction f  (multiples of Kelly f*)", qf_k_R-320, qf_k_B+26);
+  if(neg>0){
+    ctx.globalAlpha=neg; ctx.fillStyle="rgba(212,106,98,0.14)";
+    const xs=qf_k_xFor(2.0); ctx.fillRect(xs, y0, qf_k_R-xs, qf_k_B-y0);
+    ctx.globalAlpha=1; ctx.fillStyle=F.wrong;
+    ctx.fillText("beyond 2f*: toward ruin", qf_k_xFor(2.0)+6, qf_k_B-10);
+  }
+  const uMax=Math.max(0,Math.min(qf_k_UMAX,uEnd));
+  ctx.lineWidth=2.5; ctx.strokeStyle=F.post; ctx.beginPath();
+  let started=false;
+  for(let u=0;u<=uMax+1e-6;u+=0.02){ const x=qf_k_xFor(u), y=qf_k_yFor(qf_k_g(u)); if(!started){ctx.moveTo(x,y);started=true;} else ctx.lineTo(x,y); }
+  ctx.stroke();
+  const dot=(u,c,lab,dy)=>{ const x=qf_k_xFor(u), y=qf_k_yFor(qf_k_g(u)); ctx.strokeStyle="#22314a"; ctx.lineWidth=1; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y0); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,5,0,7); ctx.fill(); ctx.fillText(lab, x-18, y+(dy||-14)); };
+  if(uEnd>=0.99){ dot(1.0,F.ok,"f*  peak",-14); }
+  if(uEnd>=1.99){ dot(2.0,F.wrong,"2f*  g=0",-14); }
+  if(marks>0){ ctx.globalAlpha=marks; dot(0.5,F.txt,"½f* → 75%",-14); dot(1.5,F.txt,"1.5f* → 75%",-14); ctx.globalAlpha=1; ctx.fillStyle="#5A6E8C"; ctx.fillText("underbet: cheap  ·  overbet: fatal", qf_k_L+10, qf_k_T+16); }
+}
+ANIMS.qf_kelly_static=(cv,ctx)=>qf_k_draw(ctx,cv,{uEnd:2.4,neg:1,marks:1});
+ANIMS.qf_kelly=async(cv,ctx)=>{
+  qf_k_draw(ctx,cv,{uEnd:0});
+  await narrate("Kelly plots long-run growth g against bet fraction f: an inverted parabola g(f)=fμ − f²σ²/2, peaking at the Kelly fraction f* = μ/σ².");
+  await tween(1100,k=>qf_k_draw(ctx,cv,{uEnd:k*1.0}));
+  await narrate("Bet double Kelly and growth falls to exactly zero — all the risk, none of the reward. Past 2f* it goes negative: you compound toward ruin on positive-edge bets.");
+  await tween(1200,k=>qf_k_draw(ctx,cv,{uEnd:1+k*1.4, neg:k}));
+  await narrate("The asymmetry: ½ Kelly keeps 75% of growth — but so does 1.5× Kelly, at triple the pain. Underbetting is cheap; overbetting is fatal.");
+  await tween(1000,k=>qf_k_draw(ctx,cv,{uEnd:2.4, neg:1, marks:k}));
+};
+})();
+/* quant-finance / qf_maxtrials */
+(function(){
+// ---- c05-backtesting: max over trials ----
+const qf_mt_L=95, qf_mt_R=830, qf_mt_T=60, qf_mt_B=300;
+const qf_mt_NMAX=300;
+const qf_mt_SMIN=-1.2, qf_mt_SMAX=1.65;
+const qf_mt_xFor=(n)=> qf_mt_L + (Math.log(n)/Math.log(qf_mt_NMAX))*(qf_mt_R-qf_mt_L);
+const qf_mt_yFor=(s)=> qf_mt_B - ((s-qf_mt_SMIN)/(qf_mt_SMAX-qf_mt_SMIN))*(qf_mt_B-qf_mt_T);
+const qf_mt_emax=(n)=> 0.30*Math.sqrt(2*Math.log(Math.max(1.001,n)));
+const qf_mt_dots=(()=>{
+  let seed=20260726; const rnd=()=>{ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; };
+  const box=()=>{ const u=Math.max(1e-6,rnd()), v=rnd(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+  const arr=[];
+  for(let i=0;i<130;i++){ const n=Math.exp(rnd()*Math.log(qf_mt_NMAX)); const s=box()*0.40; arr.push([n, Math.max(qf_mt_SMIN+0.05,Math.min(qf_mt_SMAX-0.05,s))]); }
+  arr.sort((a,b)=>a[0]-b[0]);
+  return arr;
+})();
+function qf_mt_draw(ctx,cv,st){
+  const ds=st.dotsShown||0, cu=st.curve||0, thr=st.thr||0;
+  clear(ctx,cv);
+  ctx.font="15px 'IBM Plex Mono'"; ctx.fillStyle=F.txt;
+  ctx.fillText("The reported backtest is the max over trials", qf_mt_L-35, 32);
+  ctx.font="14px 'IBM Plex Mono'";
+  const yZero=qf_mt_yFor(0);
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(qf_mt_L,qf_mt_T); ctx.lineTo(qf_mt_L,qf_mt_B); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(qf_mt_L,yZero); ctx.lineTo(qf_mt_R,yZero); ctx.stroke();
+  ctx.fillStyle="#5A6E8C";
+  ctx.fillText("Sharpe = 0  (true edge: none)", qf_mt_L+8, yZero-8);
+  ctx.fillText("trials N →", qf_mt_R-100, qf_mt_B+24);
+  [1,10,100,300].forEach(n=>{ const x=qf_mt_xFor(n); ctx.fillStyle="#5A6E8C"; ctx.fillText("N="+n, x-14, qf_mt_B+24); ctx.strokeStyle="#22314a"; ctx.beginPath(); ctx.moveTo(x,qf_mt_B); ctx.lineTo(x,qf_mt_B+4); ctx.stroke(); });
+  if(thr>0){ const y1=qf_mt_yFor(1.0); ctx.globalAlpha=thr; ctx.strokeStyle=F.ok; ctx.setLineDash([6,4]); ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(qf_mt_L,y1); ctx.lineTo(qf_mt_R,y1); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle=F.ok; ctx.fillText("Sharpe 1.0 — 'looks like a real edge'", qf_mt_L+8, y1-8); ctx.globalAlpha=1; }
+  const cnt=Math.floor(qf_mt_dots.length*ds);
+  for(let i=0;i<cnt;i++){ const d=qf_mt_dots[i]; ctx.fillStyle="rgba(124,141,165,0.55)"; ctx.beginPath(); ctx.arc(qf_mt_xFor(d[0]), qf_mt_yFor(d[1]), 2.6, 0, 7); ctx.fill(); }
+  if(cu>0){
+    const Nf=Math.exp(cu*Math.log(qf_mt_NMAX));
+    ctx.strokeStyle=F.post; ctx.lineWidth=2.5; ctx.beginPath(); let started=false;
+    for(let n=1;n<=Nf+1e-6;n*=1.06){ const x=qf_mt_xFor(n), y=qf_mt_yFor(qf_mt_emax(n)); if(!started){ctx.moveTo(x,y);started=true;} else ctx.lineTo(x,y); }
+    ctx.stroke();
+    const x=qf_mt_xFor(Nf), y=qf_mt_yFor(qf_mt_emax(Nf));
+    ctx.fillStyle=F.post; ctx.beginPath(); ctx.arc(x,y,5,0,7); ctx.fill();
+    ctx.fillText("best of N ≈ √(2 ln N)", Math.min(qf_mt_R-170,x-40), y-12);
+  }
+}
+ANIMS.qf_maxtrials_static=(cv,ctx)=>qf_mt_draw(ctx,cv,{dotsShown:1,curve:1,thr:1});
+ANIMS.qf_maxtrials=async(cv,ctx)=>{
+  qf_mt_draw(ctx,cv,{dotsShown:0,curve:0,thr:0});
+  await narrate("Every backtest you see is the winner of a tournament you didn't run. Here are worthless strategies — true edge zero — scattered around Sharpe 0.");
+  await tween(1100,k=>qf_mt_draw(ctx,cv,{dotsShown:k,curve:0,thr:0}));
+  await narrate("Take the best of N. The expected maximum grows like √(2 ln N) — the more you search, the luckier the champion looks.");
+  await tween(1300,k=>qf_mt_draw(ctx,cv,{dotsShown:1,curve:k,thr:0}));
+  await narrate("A few hundred trials and the winner clears Sharpe 1 — a 'real edge' manufactured from noise. Report the trial count, or be fooled.");
+  await tween(1000,k=>qf_mt_draw(ctx,cv,{dotsShown:1,curve:1,thr:k}));
+};
+})();
+/* quant-finance / qf_decay */
+(function(){
+// ---- c04-factors: out-of-sample decay ----
+const qf_dc_L=110, qf_dc_R=820, qf_dc_T=70, qf_dc_B=300;
+const qf_dc_yFor=(pct)=> qf_dc_B - (pct/110)*(qf_dc_B-qf_dc_T);
+const qf_dc_cx=[230,470,710];
+const qf_dc_vals=[100,74,42];
+const qf_dc_labs=["in-sample","post-sample","post-publication"];
+function qf_dc_bar(ctx,x,val,col){ const w=120, y=qf_dc_yFor(val), y0=qf_dc_yFor(0); ctx.fillStyle=col; ctx.fillRect(x-w/2, y, w, y0-y); }
+function qf_dc_draw(ctx,cv,st){
+  const g=st.g||[0,0,0];
+  clear(ctx,cv);
+  ctx.font="15px 'IBM Plex Mono'"; ctx.fillStyle=F.txt;
+  ctx.fillText("Published factors decay out-of-sample  (McLean & Pontiff, 97 anomalies)", qf_dc_L-45, 34);
+  ctx.font="14px 'IBM Plex Mono'";
+  const y0=qf_dc_yFor(0), y100=qf_dc_yFor(100);
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(qf_dc_L,qf_dc_T-4); ctx.lineTo(qf_dc_L,y0); ctx.lineTo(qf_dc_R,y0); ctx.stroke();
+  ctx.strokeStyle="#22314a"; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(qf_dc_L,y100); ctx.lineTo(qf_dc_R,y100); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle="#5A6E8C"; ctx.fillText("100% = reported edge", qf_dc_R-195, y100-8);
+  const cols=[F.ax, F.post, F.wrong];
+  for(let i=0;i<3;i++){
+    if(g[i]>0){
+      const val=qf_dc_vals[i]*g[i];
+      qf_dc_bar(ctx, qf_dc_cx[i], val, cols[i]);
+      ctx.fillStyle=F.txt; ctx.fillText(Math.round(val)+"%", qf_dc_cx[i]-16, qf_dc_yFor(val)-8);
+      ctx.fillStyle="#5A6E8C"; ctx.fillText(qf_dc_labs[i], qf_dc_cx[i]-52, y0+20);
+    }
+  }
+  if(g[1]>0.99){ ctx.fillStyle=F.post; ctx.fillText("−26%  (data-mining: never real)", qf_dc_cx[1]-52, qf_dc_yFor(74)-28); }
+  if(g[2]>0.99){ ctx.fillStyle=F.wrong; ctx.fillText("−58%  (+ arbitraged away)", qf_dc_cx[2]-40, qf_dc_yFor(42)-28); ctx.fillStyle=F.ok; ctx.fillText("≈ half the published edge, gone", qf_dc_L+20, qf_dc_T+2); }
+}
+ANIMS.qf_decay_static=(cv,ctx)=>qf_dc_draw(ctx,cv,{g:[1,1,1]});
+ANIMS.qf_decay=async(cv,ctx)=>{
+  qf_dc_draw(ctx,cv,{g:[0,0,0]});
+  await narrate("A published factor's in-sample premium — call it 100% of the reported edge.");
+  await tween(900,k=>qf_dc_draw(ctx,cv,{g:[k,0,0]}));
+  await narrate("Track it after the sample ends: returns fall ~26%. That drop is pure data-mining — the part that was never real.");
+  await tween(1000,k=>qf_dc_draw(ctx,cv,{g:[1,k,0]}));
+  await narrate("After publication, ~58% is gone: data-mining plus informed capital arbitraging away what was real. Half the edge, vanished — your prior for any paper.");
+  await tween(1000,k=>qf_dc_draw(ctx,cv,{g:[1,1,k]}));
+};
+})();
+/* bayesian-inference / bayes_vocab */
+(function(){
+const bayes_voc_dens=(th,a,b)=>Math.pow(th,a-1)*Math.pow(1-th,b-1);
+function bayes_voc_norm(a,b){const N=140,xs=[],hs=[],raw=[];let mx=0;for(let i=0;i<=N;i++){const th=i/N,d=bayes_voc_dens(th,a,b);raw.push(d);if(d>mx)mx=d;}for(let i=0;i<=N;i++){xs.push(80+(i/N)*780);hs.push(mx>0?raw[i]/mx:0);}return{xs,hs};}
+function bayes_voc_curve(ctx,nb,scale,color,alpha){ctx.save();ctx.globalAlpha=alpha*0.15;ctx.beginPath();ctx.moveTo(nb.xs[0],320);for(let i=0;i<nb.xs.length;i++)ctx.lineTo(nb.xs[i],320-nb.hs[i]*248*scale);ctx.lineTo(nb.xs[nb.xs.length-1],320);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.globalAlpha=alpha;ctx.beginPath();for(let i=0;i<nb.xs.length;i++){const y=320-nb.hs[i]*248*scale;i?ctx.lineTo(nb.xs[i],y):ctx.moveTo(nb.xs[i],y);}ctx.strokeStyle=color;ctx.lineWidth=2.2;ctx.stroke();ctx.restore();}
+function bayes_voc_axes(ctx,cv){clear(ctx,cv);ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(80,320);ctx.lineTo(860,320);ctx.stroke();ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="center";[0,0.5,1].forEach(t=>{const x=80+t*780;ctx.strokeStyle="#3A4C68";ctx.beginPath();ctx.moveTo(x,320);ctx.lineTo(x,326);ctx.stroke();ctx.fillStyle="#7C8DA5";ctx.fillText(t.toFixed(1),x,342);});ctx.fillStyle="#5A6E8C";ctx.fillText("θ  —  the coin's true heads-rate",470,364);}
+function bayes_voc_label(ctx,x,y,txt,color,alpha){ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText(txt,x,y);ctx.restore();}
+function bayes_voc_draw(ctx,cv,s){bayes_voc_axes(ctx,cv);const pri=bayes_voc_norm(2,2),lik=bayes_voc_norm(8,4),post=bayes_voc_norm(9,5);if(s.pri>0){bayes_voc_curve(ctx,pri,1,"#5A6E8C",s.pri);bayes_voc_label(ctx,470,60,"prior  Beta(2,2)","#8CA0BC",s.pri);}if(s.lik>0){bayes_voc_curve(ctx,lik,1,F.ok,s.lik);bayes_voc_label(ctx,655,58,"likelihood  (7H,3T)",F.ok,s.lik);}if(s.pos>0){bayes_voc_curve(ctx,post,s.pos,F.post,1);bayes_voc_label(ctx,600,110,"posterior  Beta(9,5)",F.post,s.pos);}if(s.formula>0){ctx.save();ctx.globalAlpha=s.formula;ctx.fillStyle=F.txt;ctx.font="16px 'IBM Plex Mono'";ctx.textAlign="left";ctx.fillText("posterior  ∝  likelihood × prior",300,28);ctx.restore();}}
+ANIMS.bayes_vocab_static=(cv,ctx)=>bayes_voc_draw(ctx,cv,{pri:0.5,lik:0.5,pos:1,formula:1});
+ANIMS.bayes_vocab=async(cv,ctx)=>{bayes_voc_draw(ctx,cv,{pri:0,lik:0,pos:0,formula:0});
+ await narrate("Belief about a coin's heads-rate θ starts as a prior — broad, centered at 0.5.");
+ await tween(1100,k=>bayes_voc_draw(ctx,cv,{pri:k,lik:0,pos:0,formula:0}));
+ await narrate("The data — 7 heads in 10 flips — sets the likelihood: how well each θ predicts what we saw. It leans toward 0.7.");
+ await tween(1100,k=>bayes_voc_draw(ctx,cv,{pri:1,lik:k,pos:0,formula:0}));
+ await narrate("Multiply the two point-by-point and renormalize. The posterior, Beta(9,5), settles between them — mode ≈ 0.67.");
+ await tween(1300,k=>bayes_voc_draw(ctx,cv,{pri:0.5,lik:0.5,pos:k,formula:k}));
+ await narrate("posterior ∝ likelihood × prior — the negotiated settlement between what you knew and what you saw. And it becomes tomorrow's prior.");
+};
+})();
+/* bayesian-inference / bayes_logodds */
+(function(){
+const bayes_lo_x=db=>470+db*29.2;
+const bayes_lo_prob=db=>{const o=Math.pow(10,db/10);return o/(1+o);};
+function bayes_lo_axes(ctx,cv){clear(ctx,cv);const y=225;ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(bayes_lo_x(-12),y);ctx.lineTo(bayes_lo_x(12),y);ctx.stroke();ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="center";const ticks=[[-12,""],[-9,"1:8"],[-6,"1:4"],[-3,"1:2"],[0,"1:1"],[3,"2:1"],[6,"4:1"],[9,"8:1"],[12,""]];ticks.forEach(t=>{const db=t[0],lab=t[1],x=bayes_lo_x(db);ctx.strokeStyle="#3A4C68";ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+7);ctx.stroke();ctx.fillStyle="#7C8DA5";ctx.fillText(db+"",x,y+24);if(lab){ctx.fillStyle="#5A6E8C";ctx.fillText(lab,x,y-14);}});ctx.fillStyle="#5A6E8C";ctx.fillText("decibans  (10·log₁₀ of the odds)",470,y+46);ctx.fillText("posterior odds",470,y-36);}
+function bayes_lo_draw(ctx,cv,s){bayes_lo_axes(ctx,cv);const y=225;const x0=bayes_lo_x(0),x1=bayes_lo_x(s.db);ctx.fillStyle="rgba(232,161,60,0.18)";ctx.fillRect(Math.min(x0,x1),y-40,Math.abs(x1-x0),40);for(let i=1;i<=s.steps;i++){const db=i*3.0103,x=bayes_lo_x(db);ctx.strokeStyle="#3A4C68";ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x,y-52);ctx.lineTo(x,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=F.ok;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText("+3 dB",bayes_lo_x(db-1.5),y-58);}const mx=bayes_lo_x(s.db);ctx.strokeStyle=F.post;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mx,y-40);ctx.lineTo(mx,y);ctx.stroke();ctx.fillStyle=F.post;ctx.beginPath();ctx.moveTo(mx,y-40);ctx.lineTo(mx-8,y-56);ctx.lineTo(mx+8,y-56);ctx.closePath();ctx.fill();const p=bayes_lo_prob(s.db);ctx.fillStyle=F.txt;ctx.font="18px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText(s.db.toFixed(1)+" dB   →   P = "+(p*100).toFixed(0)+"%",470,120);if(s.title){ctx.fillStyle="#5A6E8C";ctx.font="13px 'IBM Plex Mono'";ctx.fillText(s.title,470,150);}}
+ANIMS.bayes_logodds_static=(cv,ctx)=>bayes_lo_draw(ctx,cv,{db:9.0309,steps:3,title:"three studies · 2×2×2 = 8:1 ≈ 89%"});
+ANIMS.bayes_logodds=async(cv,ctx)=>{bayes_lo_draw(ctx,cv,{db:0,steps:0,title:"even odds — no evidence yet"});
+ await narrate("Put belief on a log-odds axis, measured in decibans. We start at even odds, 1:1 — zero evidence.");
+ await tween(600,k=>bayes_lo_draw(ctx,cv,{db:0,steps:0,title:"even odds — no evidence yet"}));
+ await narrate("Study 1 favors the drug 2:1. As a weight of evidence that's +3 decibans — and evidence ADDS in log-odds, rather than multiplying probabilities.");
+ await tween(1100,k=>bayes_lo_draw(ctx,cv,{db:3.0103*k,steps:1,title:"one independent study, LR 2:1"}));
+ await narrate("Two more independent studies, +3 dB each. They simply accumulate.");
+ await tween(1400,k=>bayes_lo_draw(ctx,cv,{db:3.0103*(1+2*k),steps:3,title:"three studies · 2×2×2 = 8:1"}));
+ await narrate("9 dB total = 8:1 odds ≈ 89%. Turing's team called these bans; weight of evidence is additive currency — and a +3 dB signal is cancelled exactly by a −3 dB one.");
+};
+})();
+/* bayesian-inference / bayes_sensitivity */
+(function(){
+const bayes_sen_dens=(th,a,b)=>Math.pow(th,a-1)*Math.pow(1-th,b-1);
+function bayes_sen_norm(a,b){const N=160,xs=[],hs=[],raw=[];let mx=0;for(let i=0;i<=N;i++){const th=Math.min(Math.max(i/N,1e-4),1-1e-4),d=bayes_sen_dens(th,a,b);raw.push(d);if(d>mx)mx=d;}for(let i=0;i<=N;i++){xs.push(80+(i/N)*780);hs.push(mx>0?raw[i]/mx:0);}return{xs,hs};}
+function bayes_sen_curve(ctx,nb,color){ctx.save();ctx.globalAlpha=0.92;ctx.beginPath();for(let i=0;i<nb.xs.length;i++){const y=320-nb.hs[i]*250;i?ctx.lineTo(nb.xs[i],y):ctx.moveTo(nb.xs[i],y);}ctx.strokeStyle=color;ctx.lineWidth=2.2;ctx.stroke();ctx.restore();}
+function bayes_sen_axes(ctx,cv){clear(ctx,cv);ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(80,320);ctx.lineTo(860,320);ctx.stroke();ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="center";[0,0.5,1].forEach(t=>{const x=80+t*780;ctx.fillStyle="#7C8DA5";ctx.fillText(t.toFixed(1),x,342);});ctx.fillStyle="#5A6E8C";ctx.fillText("θ  —  unknown rate",470,364);}
+function bayes_sen_draw(ctx,cv,s){bayes_sen_axes(ctx,cv);const n=s.n,h=0.38*n,t=0.62*n;const priors=[[8,2,"#8CA0BC","skeptical"],[1,1,F.ok,"flat"],[2,8,F.post,"optimistic"]];priors.forEach(p=>bayes_sen_curve(ctx,bayes_sen_norm(p[0]+h,p[1]+t),p[2]));const tx=80+0.38*780;ctx.strokeStyle="#D46A62";ctx.setLineDash([4,4]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(tx,320);ctx.lineTo(tx,58);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#D46A62";ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText("data ≈ 0.38",tx,50);ctx.textAlign="left";ctx.font="13px 'IBM Plex Mono'";priors.forEach((p,i)=>{ctx.fillStyle=p[2];ctx.fillRect(100,72+i*20,14,4);ctx.fillStyle=F.txt;ctx.fillText(p[3]+" prior",120,78+i*20);});ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";ctx.textAlign="right";ctx.fillText("n = "+Math.round(n)+" flips",840,40);}
+ANIMS.bayes_sensitivity_static=(cv,ctx)=>bayes_sen_draw(ctx,cv,{n:120});
+ANIMS.bayes_sensitivity=async(cv,ctx)=>{bayes_sen_draw(ctx,cv,{n:0});
+ await narrate("The standard objection: 'priors are subjective — pick one and get any answer.' So start with three honest, wildly different priors.");
+ await tween(600,k=>bayes_sen_draw(ctx,cv,{n:0}));
+ await narrate("Now feed all three the same data — a rate landing near 0.38. Watch what the evidence does to them.");
+ await tween(1600,k=>bayes_sen_draw(ctx,cv,{n:120*k}));
+ await narrate("They converge. With enough data, defensible priors agree — the data did the work and the prior washed out.");
+ await tween(400,k=>bayes_sen_draw(ctx,cv,{n:120}));
+ await narrate("That is sensitivity analysis: rerun under several priors. Agree → report with confidence. Diverge → the data is too weak to decide, and THAT divergence is the finding.");
+};
+})();
+/* bayesian-inference / bayes_decision */
+(function(){
+function bayes_dec_bar(ctx,x,w,h,color){ctx.save();ctx.fillStyle=color;ctx.fillRect(x,320-h,w,h);ctx.restore();}
+function bayes_dec_draw(ctx,cv,s){clear(ctx,cv);ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(120,320);ctx.lineTo(820,320);ctx.stroke();const k=s.k,aProb=0.9,bProb=0.02,aLoss=9/2000,bLoss=1.0,maxH=248;const aH=(aProb*(1-k)+aLoss*k)*maxH,bH=(bProb*(1-k)+bLoss*k)*maxH;const ax=300,bx=560,w=110;bayes_dec_bar(ctx,ax,w,aH,"#7C8DA5");bayes_dec_bar(ctx,bx,w,bH,F.post);ctx.textAlign="center";ctx.font="14px 'IBM Plex Mono'";ctx.fillStyle=F.txt;ctx.fillText("Alarm A",ax+w/2,344);ctx.fillText("Alarm B",bx+w/2,344);ctx.font="13px 'IBM Plex Mono'";const aTop=320-aH,bTop=320-bH;if(k<0.5){ctx.fillStyle="#8CA0BC";ctx.fillText("P = 0.90",ax+w/2,aTop-8);ctx.fillStyle=F.post;ctx.fillText("P = 0.02",bx+w/2,bTop-8);}else{ctx.fillStyle="#8CA0BC";ctx.fillText("$9",ax+w/2,aTop-8);ctx.fillStyle=F.post;ctx.fillText("$2,000",bx+w/2,bTop-8);}ctx.font="16px 'IBM Plex Mono'";ctx.fillStyle=F.txt;ctx.fillText(k<0.5?"ranked by  posterior probability":"ranked by  expected loss = P × cost",470,36);if(s.showCost&&k<0.5){ctx.font="13px 'IBM Plex Mono'";ctx.fillStyle="#5A6E8C";ctx.fillText("trivial fault · costs $10",ax+w/2,72);ctx.fillText("failure · costs $100,000",bx+w/2,72);}}
+ANIMS.bayes_decision_static=(cv,ctx)=>bayes_dec_draw(ctx,cv,{k:1,showCost:true});
+ANIMS.bayes_decision=async(cv,ctx)=>{bayes_dec_draw(ctx,cv,{k:0,showCost:false});
+ await narrate("Two alarms. By posterior probability alone, A screams (90%) and B looks negligible (2%).");
+ await tween(600,k=>bayes_dec_draw(ctx,cv,{k:0,showCost:false}));
+ await narrate("But a posterior is never a decision. You also need what each outcome costs: A's fault is $10, B's failure is $100,000.");
+ await tween(600,k=>bayes_dec_draw(ctx,cv,{k:0,showCost:true}));
+ await narrate("Expected loss = probability × cost. A: 0.9×$10 = $9. B: 0.02×$100k = $2,000. The ranking flips.");
+ await tween(1400,k=>bayes_dec_draw(ctx,cv,{k:k,showCost:true}));
+ await narrate("Investigate B — 200× the expected loss. Bayes owns the probability; you must supply the payoff. Expected utility is where they meet.");
+};
+})();
 </script>
 </body>
 </html>

@@ -1,892 +1,896 @@
 {
- "id": "newtonian-physics",
- "title": "Newtonian Physics",
- "tagline": "The machine you learned in 1972 still runs. Time to blow the dust off.",
- "description": "A refresher ladder for an engineer who once owned this material: definitions compressed to reminders, depth spent on the classic half-remembered confusions — weight vs normal force, why centripetal isn't a force, momentum vs energy, the small-angle lie, and where the whole edifice finally breaks.",
- "prereqs": [
-  "calculus"
- ],
- "concepts": [
-  {
-   "id": "c01-frames",
-   "title": "Motion and reference frames",
-   "summary": "Kinematics is just calculus on position. The deep content is the frame: Newton's laws hold in inertial frames, all inertial frames are equivalent, and accelerated frames manufacture phantom forces.",
-   "cards": [
+  "id": "newtonian-physics",
+  "title": "Newtonian Physics",
+  "tagline": "The machine you learned in 1972 still runs. Time to blow the dust off.",
+  "description": "A refresher ladder for an engineer who once owned this material: definitions compressed to reminders, depth spent on the classic half-remembered confusions — weight vs normal force, why centripetal isn't a force, momentum vs energy, the small-angle lie, and where the whole edifice finally breaks.",
+  "prereqs": [
+    "calculus"
+  ],
+  "concepts": [
     {
-     "h": "The kinematics you already own",
-     "md": "Reminder, not lesson: position **x**(t), velocity **v** = d**x**/dt, acceleration **a** = d**v**/dt. Everything else is integration.\n\nThe constant-acceleration formulas you once memorized — v = v₀ + at, x = x₀ + v₀t + ½at² — are not separate facts. They're what you get by integrating a = const twice. If you remember the calculus, you can always rebuild the toolbox; the toolbox was never the physics.\n\nOne habit worth re-installing: velocity and acceleration are **vectors**, and they are independent of each other at any instant. A ball at the top of its arc has zero vertical velocity and full acceleration g. 'Moving' and 'accelerating' are different questions — half the classic traps live in that gap."
+      "id": "c01-frames",
+      "title": "Motion and reference frames",
+      "summary": "Kinematics is just calculus on position. The deep content is the frame: Newton's laws hold in inertial frames, all inertial frames are equivalent, and accelerated frames manufacture phantom forces.",
+      "cards": [
+        {
+          "h": "The kinematics you already own",
+          "md": "Reminder, not lesson: position **x**(t), velocity **v** = d**x**/dt, acceleration **a** = d**v**/dt. Everything else is integration.\n\nThe constant-acceleration formulas you once memorized — v = v₀ + at, x = x₀ + v₀t + ½at² — are not separate facts. They're what you get by integrating a = const twice. If you remember the calculus, you can always rebuild the toolbox; the toolbox was never the physics.\n\nOne habit worth re-installing: velocity and acceleration are **vectors**, and they are independent of each other at any instant. A ball at the top of its arc has zero vertical velocity and full acceleration g. 'Moving' and 'accelerating' are different questions — half the classic traps live in that gap."
+        },
+        {
+          "h": "Inertial frames: where the laws are true",
+          "md": "Newton's first law is secretly a *definition*: an **inertial frame** is one where a force-free body coasts at constant velocity. In that frame — and only in that kind of frame — F = ma holds as written.\n\nAny frame moving at constant velocity relative to an inertial frame is also inertial, and **no mechanical experiment can tell them apart** (Galilean relativity). Drop a ball in a smoothly cruising train: it lands at your feet. In the train frame it fell straight down; in the ground frame it traced a parabola. Both descriptions are correct; both frames measure the same *acceleration* and the same F = ma.\n\nVelocities transform between frames by simple addition (v′ = v − u). Hold that thought — it's the 'obvious' rule that fails in concept 8."
+        },
+        {
+          "h": "Accelerated frames: forces from nowhere",
+          "md": "Slam the brakes and your coffee 'leaps forward.' No force pushed it. The coffee did nothing — it kept its velocity, as the first law says it must — while the car (and your frame of reference) accelerated backward underneath it.\n\nIf you insist on doing physics inside an accelerating frame, you must add **fictitious forces** (−ma_frame per unit of analysis) to make F = ma balance. They're legitimate bookkeeping, but you can always spot them by two tells:\n\n- They are **exactly proportional to mass** — every object 'feels' them identically, because they're really the frame's motion, not an interaction.\n- They have **no third-law partner** — nothing in the universe feels the reaction, because nothing is exerting them.\n\nCentrifugal and Coriolis forces are this species. File that for concept 6."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A subway car brakes hard and a standing passenger lurches toward the front. In the ground (inertial) frame, what force pushed the passenger forward?",
+          "options": [
+            "The force of inertia, acting forward",
+            "None — the passenger kept moving at constant velocity while the car decelerated under them",
+            "A reaction force to the braking force",
+            "The centrifugal force of the deceleration"
+          ],
+          "answer": 1,
+          "feedback": [
+            "'Force of inertia' is the classic phantom. Inertia is the absence of a needed force, not a force itself.",
+            "Right. In the inertial frame nothing pushed forward; friction from the floor was the only horizontal force, dragging the passenger backward — just not fast enough to match the car.",
+            "The brake force acts between wheels and rails — its reaction acts on the rails, not on the passenger.",
+            "Centrifugal force belongs to rotating frames, and even there it's fictitious bookkeeping, not an agent."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "You drop a ball inside a train cruising at a constant 200 km/h. Relative to the train it falls straight down; relative to the ground it traces a parabola. Which description is the physically correct one?",
+          "options": [
+            "The ground frame's — the ground is really at rest",
+            "The train frame's — that's where the experiment happened",
+            "Both — the frames are equivalent, and they agree on the acceleration and the forces",
+            "Neither, until you account for the train's engine force on the ball"
+          ],
+          "answer": 2,
+          "feedback": [
+            "There is no 'really at rest.' The ground is just another inertial frame — Galilean relativity's whole point.",
+            "Locality doesn't privilege a frame; the ground observer's parabola is equally valid.",
+            "Right. Trajectories are frame-dependent; accelerations and forces are not. Both frames compute a = g downward and F = mg.",
+            "The engine exerts no force on a ball in free fall — nothing touches it but gravity."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "What is the reliable fingerprint of a fictitious force (as opposed to a real interaction)?",
+          "options": [
+            "It's proportional to the object's mass and has no third-law reaction partner",
+            "It only acts on light objects",
+            "It's always directed opposite to the velocity",
+            "It can't do work on anything"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Right. Exact mass-proportionality (it's really the frame accelerating) plus no reaction anywhere — nothing is exerting it.",
+            "Backwards tendency — fictitious forces scale *up* with mass, affecting everything in exact proportion.",
+            "Direction depends on the frame's acceleration, not the object's velocity (Coriolis isn't even parallel to either).",
+            "In the rotating frame, centrifugal force happily does work in the bookkeeping. That's not the tell."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Feynman Lectures I, Ch. 8 — Motion",
+          "url": "https://www.feynmanlectures.caltech.edu/I_08.html",
+          "type": "reading",
+          "note": "Velocity and acceleration rebuilt from the calculus up — the ideal rust remover."
+        },
+        {
+          "label": "Wikipedia — Inertial frame of reference",
+          "url": "https://en.wikipedia.org/wiki/Inertial_frame_of_reference",
+          "type": "reading",
+          "note": "The frame-as-definition view, with the Galilean transformation spelled out."
+        }
+      ],
+      "anim": "phys_frames"
     },
     {
-     "h": "Inertial frames: where the laws are true",
-     "md": "Newton's first law is secretly a *definition*: an **inertial frame** is one where a force-free body coasts at constant velocity. In that frame — and only in that kind of frame — F = ma holds as written.\n\nAny frame moving at constant velocity relative to an inertial frame is also inertial, and **no mechanical experiment can tell them apart** (Galilean relativity). Drop a ball in a smoothly cruising train: it lands at your feet. In the train frame it fell straight down; in the ground frame it traced a parabola. Both descriptions are correct; both frames measure the same *acceleration* and the same F = ma.\n\nVelocities transform between frames by simple addition (v′ = v − u). Hold that thought — it's the 'obvious' rule that fails in concept 8."
+      "id": "c02-laws",
+      "title": "The three laws",
+      "summary": "The first law defines the arena, the second is really F = dp/dt, and third-law pairs act on different bodies — which is why they never cancel.",
+      "cards": [
+        {
+          "h": "The first law is not a special case",
+          "md": "The lazy reading: 'N1 is just N2 with F = 0.' It isn't, and the distinction matters.\n\nThe first law's real job is to **certify the frame**. It asserts that inertial frames exist — frames where force-free motion is straight-line coasting — and thereby tells you where the second law may be applied. Inside a braking subway car, N2 appears to fail (things accelerate with no force); N1 is the law that says *this frame is broken, not the physics*.\n\nFirst law: here's where physics works. Second law: here's how it works there. A definition of the arena, then the rule of play."
+        },
+        {
+          "h": "F = dp/dt, not F = ma",
+          "md": "Newton never wrote F = ma. His second law: force equals the rate of change of **momentum**, p = mv.\n\n## F = dp/dt\n\nWhen m is constant, dp/dt = m(dv/dt) = ma and the familiar form drops out as a corollary. But the momentum form is the fundamental one, for two reasons you'll meet again:\n\n- **Variable mass.** A rocket expels mass; 'ma' is ambiguous (which m?), while dp/dt handled thrust correctly two centuries before rockets flew.\n- **Relativity.** F = ma dies at high speed; F = dp/dt survives intact once p = γmv. The momentum form is the one nature actually honors (concept 8).\n\nBonus: integrate it over time and you get impulse–momentum, ∫F dt = Δp — the working tool of concept 5."
+        },
+        {
+          "h": "Third-law pairs: different bodies, always",
+          "md": "'Equal and opposite' is the part everyone remembers. The load-bearing clause is the one everyone forgets: the two forces of a third-law pair **act on different bodies**. Same magnitude, opposite direction, same type of interaction, *never on the same object* — so they can never cancel each other in any one body's free-body diagram.\n\nThe canonical trap: a book rests on a table. Gravity down on book, normal force up on book — equal, opposite... and **not** a third-law pair. They're two different interactions that happen to balance because a = 0. The true partners:\n\n- Earth pulls book down ↔ **book pulls Earth up** (gravity pair)\n- Table pushes book up ↔ **book pushes table down** (contact pair)\n\nTest yourself with: 'if the pair canceled, nothing could ever accelerate.' The horse *can* pull the cart even though the cart pulls back equally — those two forces act on different bodies, and the horse moves because the ground's friction on the horse beats the cart's drag on the horse."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The old horse-and-cart paradox: the cart pulls back on the horse exactly as hard as the horse pulls forward on the cart, so how can the pair accelerate?",
+          "options": [
+            "The horse actually pulls slightly harder than the cart pulls back",
+            "The two forces act on different bodies; the horse accelerates because ground friction on the horse exceeds the cart's pull on the horse",
+            "The third law only applies in static situations",
+            "The horse's force is active while the cart's is merely reactive, so it wins"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Never — the third law is exact at every instant, accelerating or not.",
+            "Right. Sum forces per body: the horse's FBD contains ground friction forward and cart-pull backward; the cart's contains horse-pull forward and rolling resistance. Nothing cancels across bodies.",
+            "The third law holds always — statics, dynamics, collisions, orbits.",
+            "'Active vs reactive' is a verbal illusion; the two forces are perfectly symmetric in magnitude and simultaneity."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A book rests on a table. What is the third-law partner of the Earth's gravitational pull on the book?",
+          "options": [
+            "The normal force from the table on the book",
+            "The book's weight",
+            "The book's gravitational pull on the Earth",
+            "The table's push on the floor"
+          ],
+          "answer": 2,
+          "feedback": [
+            "The classic wrong answer. Normal force acts on the same body (the book) and is a different interaction (contact, not gravity). It balances gravity only because a = 0.",
+            "The weight IS the Earth's pull on the book — a force can't be its own partner.",
+            "Right. Same interaction (gravity), same magnitude, opposite direction, other body. The book pulls the Earth up with force mg.",
+            "That's two links down the contact chain — a partner must be the same interaction reversed."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why do physicists insist F = dp/dt is the 'real' second law rather than F = ma?",
+          "options": [
+            "It's mathematically equivalent in all cases, just more elegant",
+            "It handles variable-mass systems correctly and survives into relativity, where F = ma fails",
+            "Because acceleration can't be measured directly",
+            "It's not — F = ma is the fundamental form and dp/dt is the approximation"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Not equivalent: for a rocket shedding mass, or at relativistic speed, the two forms disagree — and dp/dt is the one that's right.",
+            "Correct. Rockets (which m?) and relativity (p = γmv) both break ma while dp/dt sails through. Momentum is the deeper currency.",
+            "Acceleration is perfectly measurable; that's not the issue at all.",
+            "Exactly backwards — ma is the constant-mass, low-speed corollary of dp/dt."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "What job does the first law do that the second law cannot?",
+          "options": [
+            "It covers the F = 0 case, which N2 can't evaluate",
+            "It defines force qualitatively before N2 quantifies it",
+            "It identifies the inertial frames — the arenas in which N2 is valid at all",
+            "None; it's historically first but logically redundant"
+          ],
+          "answer": 2,
+          "feedback": [
+            "N2 handles F = 0 fine (a = 0). If that were N1's only content it truly would be redundant.",
+            "Closer to Newton's own presentation, but the modern load-bearing role is about frames, not vocabulary.",
+            "Right. N1 is the frame test: where force-free bodies coast, N2 applies. In a braking bus, N1 fails first — flagging the frame as non-inertial.",
+            "It looks redundant only until you try to state N2 in an accelerating frame and watch it fail."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Feynman Lectures I, Ch. 9 — Newton's Laws of Dynamics",
+          "url": "https://www.feynmanlectures.caltech.edu/I_09.html",
+          "type": "reading",
+          "note": "The laws stated as Newton meant them — dp/dt front and center — then used to compute an orbit numerically."
+        },
+        {
+          "label": "Wikipedia — Newton's laws of motion",
+          "url": "https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion",
+          "type": "reading",
+          "note": "Careful modern statements, including the variable-mass caveats and the frame-definition reading of the first law."
+        },
+        {
+          "label": "Khan Academy — Forces and Newton's laws",
+          "url": "https://www.khanacademy.org/science/physics/forces-newtons-laws",
+          "type": "video",
+          "note": "Worked problems if you want reps; skim at 2× — you knew this once."
+        }
+      ]
     },
     {
-     "h": "Accelerated frames: forces from nowhere",
-     "md": "Slam the brakes and your coffee 'leaps forward.' No force pushed it. The coffee did nothing — it kept its velocity, as the first law says it must — while the car (and your frame of reference) accelerated backward underneath it.\n\nIf you insist on doing physics inside an accelerating frame, you must add **fictitious forces** (−ma_frame per unit of analysis) to make F = ma balance. They're legitimate bookkeeping, but you can always spot them by two tells:\n\n- They are **exactly proportional to mass** — every object 'feels' them identically, because they're really the frame's motion, not an interaction.\n- They have **no third-law partner** — nothing in the universe feels the reaction, because nothing is exerting them.\n\nCentrifugal and Coriolis forces are this species. File that for concept 6."
+      "id": "c03-fbd",
+      "title": "Forces and free-body diagrams",
+      "summary": "One body, only the forces acting ON it. Weight, mass, and normal force are three different things, and static friction is an inequality that adjusts — it doesn't sit at μN.",
+      "cards": [
+        {
+          "h": "The discipline",
+          "md": "A free-body diagram has exactly two rules, and every FBD error is a violation of one of them:\n\n1. **One body.** Isolate it. Everything else in the universe appears only through the forces it exerts on this body.\n2. **Only forces ON the body**, each traceable to an identifiable other object — Earth (gravity), a surface (normal + friction), a rope (tension), air (drag). If you can't name the object exerting it, it's not a force.\n\nTwo arrows that never belong: an '**ma** arrow' (that's the *result*, the right-hand side, not a force) and a '**centripetal force**' arrow (a job title some real force holds — concept 6). And forces the body exerts on *other* things stay off the page: they act elsewhere."
+        },
+        {
+          "h": "Weight vs mass vs normal force",
+          "md": "Three quantities, chronically conflated:\n\n- **Mass** m — intrinsic, kilograms, the same on the Moon. Measures resistance to acceleration (and gravitational charge — that coincidence is concept 7's punchline).\n- **Weight** W = mg — the gravitational *force* on the body. Newtons, not kilograms. Changes with g; never changes with motion.\n- **Normal force** N — whatever the surface must supply. It is a constraint force with **no formula of its own**: it takes the value the geometry demands, computed from N2.\n\nA bathroom scale reads **N**, not W. Stand on one in an elevator: accelerating up, N = m(g + a) — you read heavy; accelerating down, N = m(g − a) — light; cable cut, N = 0 — 'weightless,' while your weight mg is untouched. Apparent weight is normal force wearing weight's clothes."
+        },
+        {
+          "h": "Friction, as it actually behaves",
+          "md": "The half-remembered version is 'f = μN.' The truth has an inequality in it:\n\n- **Static:** f_s ≤ μ_s N. It's a constraint force like N — it supplies *whatever the situation requires*, up to the ceiling μ_s N. A block sitting calmly on a gentle incline feels f_s = mg sin θ, not μ_s N. The formula-with-equals applies only at the verge of slipping.\n- **Kinetic:** f_k ≈ μ_k N, roughly constant, opposing *relative sliding* — with μ_k < μ_s, which is why it lurches when it finally lets go.\n\nAnd the direction surprise worth re-learning: friction is not 'the force that opposes motion' — it opposes relative *slipping*, and it can point **forward**. When a car accelerates, static friction from road on tires is the only external forward force on the car. No slipping at the contact patch: static friction, doing the driving."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "You stand on a bathroom scale in an elevator accelerating downward at 2 m/s². Compared with the reading at rest, the scale now shows:",
+          "options": [
+            "The same — your weight hasn't changed",
+            "Less — the scale reads the normal force, which is m(g − a)",
+            "More — you press harder while descending",
+            "Zero — descending elevators are free fall"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Your weight mg indeed hasn't changed — but the scale never read weight. It reads normal force, which has.",
+            "Right. N2 vertically: N − mg = −ma, so N = m(g − a). The scale reads N. Apparent weight is normal force in disguise.",
+            "That intuition belongs to *upward* acceleration (or the moment a descent begins decelerating).",
+            "Zero requires a = g — a cut cable, not a working elevator at 2 m/s²."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A 10 kg block rests motionless on a 20° incline. μ_s = 0.8. The static friction force on it is:",
+          "options": [
+            "μ_s N = 0.8 · mg cos 20° ≈ 74 N",
+            "mg sin 20° ≈ 34 N — exactly what equilibrium requires",
+            "Zero, since nothing is moving",
+            "mg ≈ 98 N"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The most durable friction misconception: μ_s N is the *ceiling*, not the value. Static friction is an inequality; here it sits well below its maximum.",
+            "Right. The block is in equilibrium, so friction supplies precisely the mg sin θ needed — and only that. It would hit 74 N only at the verge of slipping (about 39°).",
+            "No *sliding* doesn't mean no friction — without it, the block would accelerate down the incline at g sin θ.",
+            "That's the full weight; only the along-incline component needs balancing by friction."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A car accelerates forward on dry pavement without spinning its tires. The external force that actually accelerates the car is:",
+          "options": [
+            "The engine's force on the drivetrain",
+            "Kinetic friction from the road, opposing tire motion",
+            "Static friction from the road on the tires, pointing forward",
+            "The reaction to the exhaust pushed backward"
+          ],
+          "answer": 2,
+          "feedback": [
+            "The engine's forces are internal — a system can't accelerate itself with internal forces (N3 guarantees they sum to zero). Something external must push.",
+            "Kinetic would mean the contact patch is sliding — a burnout. Normal driving keeps the patch momentarily at rest on the road: static.",
+            "Right. The tire pushes the road backward; the road pushes the tire forward — static friction, since the patch doesn't slip. Friction is the engine's ambassador to the outside world.",
+            "Cars aren't rockets; exhaust momentum is negligible. (For a rocket, though, this is exactly the mechanism.)"
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "Which arrow does NOT belong on the free-body diagram of a ball whirling on a string (horizontal circle)?",
+          "options": [
+            "Tension from the string",
+            "Gravity from the Earth",
+            "A centripetal force arrow pointing at the center",
+            "All three belong"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Tension is real — a rope touching the body always earns an arrow.",
+            "Gravity acts on everything with mass; it's always on the diagram.",
+            "Right. 'Centripetal' is a job description, and here tension already holds the job. Drawing it separately double-counts the force — the classic FBD error, unpacked fully in concept 6.",
+            "One of them is a job title, not a force. Look again."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "MIT OCW 8.01SC — Classical Mechanics",
+          "url": "https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/",
+          "type": "video",
+          "note": "The full MIT course, free. Week 2's Newton's-laws problem sessions are FBD boot camp for the returning engineer."
+        },
+        {
+          "label": "Wikipedia — Normal force",
+          "url": "https://en.wikipedia.org/wiki/Normal_force",
+          "type": "reading",
+          "note": "Short and precise on the constraint-force character — why N has no formula and the elevator changes it."
+        },
+        {
+          "label": "Feynman Lectures I, Ch. 12 — Characteristics of Force",
+          "url": "https://www.feynmanlectures.caltech.edu/I_12.html",
+          "type": "reading",
+          "note": "What friction, tension, and 'force' itself really are, one level below the freshman story."
+        }
+      ]
+    },
+    {
+      "id": "c04-energy",
+      "title": "Energy and work",
+      "summary": "Work is ∫F·dx — a signed scalar that can be zero while you sweat. Kinetic energy bookkeeping always works; potential energy exists only for conservative forces; friction reroutes energy to heat.",
+      "cards": [
+        {
+          "h": "Work is not effort",
+          "md": "**W = ∫ F · dx** — force dotted with displacement, summed along the path. Three consequences your muscles will argue with:\n\n- Hold a 50 kg barbell motionless for a minute: **zero work** on the barbell. No displacement, no work — your burning arms are paying a biological cost, not a mechanical one.\n- Carry a tray horizontally at constant velocity: the vertical force from your hand does **zero work** — force ⊥ displacement, and the dot product knows it.\n- Lower a weight slowly: your upward force does **negative work** (force opposite displacement). Negative work is how energy leaves a body.\n\nAnd the theorem that makes work worth defining — always true, no exceptions, because it's N2 integrated over distance:\n\n## W_net = ΔKE = Δ(½mv²)"
+        },
+        {
+          "h": "Potential energy is earned, not assumed",
+          "md": "A force gets a potential energy **only if it's conservative** — work independent of path, so 'energy stored by position' is well-defined. Gravity and ideal springs qualify: mgh and ½kx² are the receipts. Friction does not: its work depends on path length (drag a crate the long way and lose more), so there is no 'friction potential energy' to cash back. The work is rerouted to thermal energy, permanently, as far as mechanics is concerned.\n\nSo the bookkeeping has tiers:\n\n- **W_net = ΔKE** — always true, any forces.\n- **KE + PE = const** — true when only conservative forces do work.\n- **KE + PE + heat = const** — always true again (this is why 'energy conservation' never actually fails; friction just moves the money to an account mechanics can't withdraw from).\n\nTwo footnotes that restore old precision: only **ΔU** ever matters — the zero of potential energy is yours to place; and U belongs to the *system* (Earth + ball), not to the ball alone."
+        },
+        {
+          "h": "Why energy methods win",
+          "md": "The power move you half-remember: energy methods **skip the trajectory**. A bead slides down a frictionless wire of any lunatic shape from height h: speed at the bottom is √(2gh), full stop. Computing that with F = ma means wrestling the normal force at every point of the curve; energy conservation doesn't even ask for the shape.\n\nThe trade: energy is a **scalar** and carries no clock. It tells you *how fast at that point*, never *when it arrives* or *which way it's pointing*. When direction or timing matters, you need F = ma or momentum (next concept).\n\nRule of thumb worth re-installing: forces for *why and when*, energy for *how fast and how far*, momentum for *collisions and recoils*."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A waiter carries a loaded tray across a level room at constant velocity. The work done by his hand on the tray is:",
+          "options": [
+            "Positive — he's clearly exerting himself",
+            "Zero — his force on the tray is vertical, the displacement horizontal",
+            "Negative — friction opposes him",
+            "Equal to the tray's weight times the distance walked"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Exertion is metabolism, not mechanics. The dot product doesn't care how tired he gets.",
+            "Right. F ⊥ dx at every step, so F·dx = 0 throughout. Consistency check: the tray's KE is unchanged, and W_net = ΔKE demands zero net work.",
+            "Negative work would drain the tray's kinetic energy — but its speed is constant.",
+            "mg·d would apply if he lifted it a distance d *vertically*. Direction is the entire point of the dot product."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A crate slides down a rough (frictional) ramp at constant speed. Which statement is the correct energy account?",
+          "options": [
+            "Mechanical energy is conserved because speed is constant",
+            "Potential energy converts to kinetic energy",
+            "Potential energy is converted entirely to thermal energy via friction; mechanical energy falls, total energy doesn't",
+            "Energy conservation fails when friction acts"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Constant speed means constant KE — but PE is steadily draining. Mechanical energy (KE+PE) is falling; something's collecting the difference.",
+            "KE isn't growing (constant speed). The PE has to be going somewhere else.",
+            "Right. With ΔKE = 0, every joule of lost mgh becomes heat at the sliding interface. Friction never destroys energy — it moves it to an account mechanics can't withdraw from.",
+            "Total energy conservation never fails. What fails is *mechanical* energy conservation — the KE+PE subtotal."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why is there no such thing as 'friction potential energy'?",
+          "options": [
+            "Friction forces are too small to store meaningful energy",
+            "Friction's work depends on the path taken, so no position-based energy function can represent it",
+            "Friction only acts on moving objects",
+            "There is — it's the thermal energy in the surfaces"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Magnitude is irrelevant — a tiny conservative force still earns a potential; a huge friction force never does.",
+            "Right. Potential energy is a function of position alone; that only works when work between two points is path-independent. Drag a crate the long way around and friction takes more — no single U(x) can encode that.",
+            "Static friction acts on stationary objects constantly. And the issue is path-dependence, not motion.",
+            "Thermal energy is where the work *goes*, but it isn't recoverable by retracing the path — which is exactly what disqualifies it as potential energy."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "Two frictionless slides drop through the same height h — one straight and steep, one long and winding. A child starts from rest on each. Compare arrival speeds at the bottom:",
+          "options": [
+            "Steep slide is faster — shorter path",
+            "Winding slide is faster — more time to accelerate",
+            "Same speed: √(2gh) — gravity is conservative, so only the height drop matters",
+            "Cannot be determined without the slide shapes"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Shorter path means earlier *arrival*, not faster arrival speed. Energy carries no clock — time and speed are different questions.",
+            "More time at lower acceleration; the energy books balance to the same speed regardless.",
+            "Right. mgh = ½mv² on any frictionless path. The shape drops out entirely — the whole superpower of conservative forces.",
+            "The shapes matter for the arrival *time*, the normal forces, the thrill — everything except the final speed."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Feynman Lectures I, Ch. 4 — Conservation of Energy",
+          "url": "https://www.feynmanlectures.caltech.edu/I_04.html",
+          "type": "reading",
+          "note": "The famous Dennis-the-Menace blocks analogy: energy as an abstract conserved count, not a substance. Worth rereading once a decade."
+        },
+        {
+          "label": "Feynman Lectures I, Ch. 13 — Work and Potential Energy",
+          "url": "https://www.feynmanlectures.caltech.edu/I_13.html",
+          "type": "reading",
+          "note": "Work, conservative forces, and why the theorem W = ΔKE is just N2 integrated."
+        },
+        {
+          "label": "Khan Academy — Work and energy",
+          "url": "https://www.khanacademy.org/science/physics/work-and-energy",
+          "type": "video",
+          "note": "Problem reps for the rebuilt machinery; cherry-pick the ramp and spring problems."
+        }
+      ],
+      "anim": "phys_slides"
+    },
+    {
+      "id": "c05-momentum",
+      "title": "Momentum and collisions",
+      "summary": "Impulse ∫F dt = Δp; internal forces cancel in pairs, so total momentum survives any collision — including ones that destroy kinetic energy. Knowing which conservation law applies when is the skill.",
+      "cards": [
+        {
+          "h": "Impulse, and why momentum rules collisions",
+          "md": "Integrate F = dp/dt over time: **∫F dt = Δp** (impulse–momentum). This is N2's other integral — over time, where work was the integral over distance.\n\nNow take a *system* of colliding bodies. Every internal force comes in a third-law pair, so the internal impulses cancel **exactly**, however violent, brief, or messy the collision. Only external forces can change the total p — and during a millisecond impact, gravity's impulse is negligible next to the enormous contact forces. Hence the rule you can lean on with full weight:\n\n## In any collision, total momentum is conserved.\n\nElastic, inelastic, explosive, bodies shattering — doesn't matter. Momentum conservation is the third law in integrated form, and it holds even when you know nothing about the forces involved. (Everyday impulse corollary: airbags and crumple zones stretch Δt to shrink F for the same unavoidable Δp.)"
+        },
+        {
+          "h": "Momentum vs energy: which law when",
+          "md": "The confusion worth an hour of anyone's refresher time:\n\n- **Momentum**: conserved in *every* collision. A vector — conserved per component, direction included.\n- **Kinetic energy**: conserved only in *elastic* collisions (hardened steel, billiards approximately, atomic collisions). In a **perfectly inelastic** collision (bodies stick), the maximum possible KE is lost to deformation and heat — yet momentum is untouched.\n- **Explosions** are collisions run backward: momentum conserved (zero before, zero total after), KE *increases* — cashed out of chemical energy.\n\nThe diagnostic: momentum is the ledger no interaction can cheat; kinetic energy is a currency that freely changes denomination (heat, deformation, sound). When bodies stick, crumple, or thud, KE left the mechanical books — but p never did."
+        },
+        {
+          "h": "The ballistic pendulum: one problem, both laws",
+          "md": "The classic that tests whether you really have the boundary: a bullet embeds in a hanging block, which swings up to height h. Find the bullet's speed.\n\nThe tempting one-liner — ½mv² = (m+M)gh — is **wrong**, and knowing why is the mastery: the embedding is perfectly inelastic, and most of the bullet's KE (typically ~99%) becomes heat and splintered wood. Energy accounting across the impact is fiction.\n\nThe correct split, law by law:\n\n1. **Impact** (inelastic, milliseconds): momentum. mv = (m+M)V.\n2. **Swing** (smooth, no sliding, no collision): energy. ½(m+M)V² = (m+M)gh.\n\nChain them: v = (1 + M/m)√(2gh). Every collision problem decomposes this way — momentum across the crunch, energy across the glide. Draw the boundary where the crunch ends."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Two railcars collide and couple together. For the coupling collision itself, which is conserved?",
+          "options": [
+            "Both momentum and kinetic energy",
+            "Momentum only — coupling is perfectly inelastic, so KE is necessarily lost",
+            "Kinetic energy only",
+            "Neither — coupling forces are too complicated to say"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Both survive only in elastic collisions. Sticking together is the *defining opposite* of elastic.",
+            "Right. Internal impulses cancel by N3 (momentum safe); sticking maximizes KE loss to deformation and heat for the given momentum.",
+            "KE is precisely the casualty here; momentum is precisely the survivor. You have them swapped.",
+            "Complexity is the beauty of it: momentum conservation holds *regardless* of the force details — that's why it's the collision tool."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In the ballistic pendulum (bullet embeds in block, block swings to height h), why is ½mv² = (m+M)gh the wrong first equation?",
+          "options": [
+            "It omits the bullet's rotational energy",
+            "The embedding is inelastic — most of the bullet's KE becomes heat, so energy accounting across the impact is invalid",
+            "Momentum isn't conserved during the swing",
+            "It's actually correct — the algebra just gets harder"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Spin is a rounding error here; the missing physics is 20 dB bigger than that.",
+            "Right. Use momentum across the crunch (mv = (m+M)V), then energy across the swing. Applied naively, the one-liner overestimates h by a factor of roughly (m+M)/m — enormous for a bullet.",
+            "During the swing momentum *isn't* conserved (gravity and string tension act) — but that phase is exactly where *energy* methods are valid. You've got the map inverted.",
+            "It's wrong in the first line, not hard in the third: it silently assumes zero energy loss in a maximally lossy collision."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "You stand on frictionless ice holding a heavy ball, everything at rest, and throw the ball forward. Just afterward, the total momentum of you+ball is:",
+          "options": [
+            "Forward — the throw created momentum",
+            "Backward — recoil dominates because you're heavier",
+            "Zero, as before: the ball's forward momentum exactly cancels your backward recoil",
+            "Indeterminate without the throwing force profile"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Internal forces can't create system momentum — your push on the ball and its push on you cancel to the newton, at every instant.",
+            "Mass changes the *speeds* (you recoil slowly, ball flies fast), never the momentum balance — m_you·v_you = m_ball·v_ball exactly.",
+            "Right. The system started at p = 0 with no external horizontal force, so p = 0 forever. This is also precisely how rockets work — exhaust is the thrown ball, continuously.",
+            "That's the beauty: the force profile is irrelevant. Any internal push, however wild, leaves total p at zero."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "An airbag saves you in a crash. In impulse–momentum terms, what does it actually change?",
+          "options": [
+            "It reduces your momentum change Δp",
+            "It extends the stopping time Δt, reducing the peak force for the same Δp",
+            "It absorbs your momentum into the bag",
+            "It converts your momentum into energy"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Δp is fixed by the crash: your mv must reach zero regardless. No cushion negotiates that.",
+            "Right. ∫F dt = Δp is a contract: same area under the curve, but stretched over 10× the time means ~1/10 the peak force. Crumple zones, helmets, and bending your knees on landing are all the same theorem.",
+            "Momentum isn't a fluid the bag soaks up — it flows to the car and Earth through forces. The bag just meters the flow rate.",
+            "Momentum and energy aren't interconvertible — different quantities, different units, different conservation laws."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Feynman Lectures I, Ch. 10 — Conservation of Momentum",
+          "url": "https://www.feynmanlectures.caltech.edu/I_10.html",
+          "type": "reading",
+          "note": "Momentum conservation derived straight from the third law, then aimed at collisions."
+        },
+        {
+          "label": "Khan Academy — Linear momentum and collisions",
+          "url": "https://www.khanacademy.org/science/physics/linear-momentum",
+          "type": "video",
+          "note": "Elastic vs inelastic worked examples, including the ballistic pendulum."
+        },
+        {
+          "label": "Wikipedia — Elastic collision",
+          "url": "https://en.wikipedia.org/wiki/Elastic_collision",
+          "type": "reading",
+          "note": "The 1-D two-body formulas and the limiting cases (equal masses swap velocities; wall reverses you)."
+        }
+      ],
+      "anim": "phys_impulse"
+    },
+    {
+      "id": "c06-circular",
+      "title": "Circular motion and gravitation",
+      "summary": "Circular motion at constant speed is still acceleration — v²/r toward the center — and 'centripetal' names the job some real force performs. Orbits are the same idea: perpetual free fall.",
+      "cards": [
+        {
+          "h": "Centripetal is a job description",
+          "md": "Uniform circular motion is *accelerated* motion: speed constant, velocity turning, and the turning is an acceleration of magnitude\n\n## a = v²/r, pointed at the center.\n\nHere is the confusion to kill permanently: **there is no force called centripetal**. 'Centripetal' is the *requirement* — N2 says something real must supply mv²/r toward the center, and the supplier is always an ordinary force already on your free-body diagram:\n\n- Ball on a string → tension\n- Car on a flat curve → static friction\n- Car on a banked curve → a component of the normal force\n- Moon around Earth → gravity\n\nWriting 'centripetal force' as an extra FBD arrow double-counts. The right procedure: draw the real forces, sum the components toward the center, set the sum equal to mv²/r. If the real forces can't total mv²/r — friction maxes out, string snaps — the body simply stops turning that tightly and slides wide."
+        },
+        {
+          "h": "Centrifugal, and the released ball",
+          "md": "The outward 'force' you feel in a turning car is your **inertia** viewed from a rotating frame: your body tries to continue straight while the car curves in under you. In the ground frame there is no outward force on you at all — only an inward one (the door, the seat) making you turn. In the car's rotating frame you may legally add a fictitious centrifugal force to balance the books; both tells from concept 1 apply (mass-proportional, no reaction partner).\n\nThe litmus test: whirl a ball on a string and release. If an outward force existed, the ball would fly radially outward. It doesn't — it departs on the **tangent**, exactly along the velocity it already had, then falls like any projectile. Nothing was ever pulling it out; something had been pulling it *in*, and stopped."
+        },
+        {
+          "h": "An orbit is falling and missing",
+          "md": "Newton's cannonball: fire horizontally from a mountain, faster and faster. The ball falls the whole time; at ~7.9 km/s the Earth's surface curves away exactly as fast as the ball falls toward it. It falls forever and never lands. **That is an orbit** — free fall with enough sideways speed. Gravity supplies the centripetal requirement: GMm/r² = mv²/r, and Kepler's laws tumble out of the inverse square.\n\nThis kills the most durable misconception in the subject: astronauts are *not* weightless because they escaped gravity. At ISS altitude, g is still about **90%** of its surface value. They float because station and astronaut are **falling together** — the same N = 0 as the cut-cable elevator of concept 3, sustained forever. 'Weightlessness' is free fall, not the absence of weight."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A ball whirls on a string in a horizontal circle. The string suddenly breaks. Viewed from above, the ball initially travels:",
+          "options": [
+            "Radially outward, flung by centrifugal force",
+            "Along the tangent — straight, in the direction of its velocity at release",
+            "In a spiral that gradually unwinds",
+            "It continues on the circle briefly before departing"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The outward force never existed — it was the rotating frame's bookkeeping. Nothing real points outward at the moment of release.",
+            "Right. With the inward pull gone, N1 takes over: constant velocity, which at that instant is tangent to the circle.",
+            "Spirals require a continuing tangential force; after release the ball is force-free (horizontally).",
+            "Circular motion requires continuous inward force. The instant it vanishes, curvature vanishes with it — no grace period."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A car rounds an unbanked highway curve at constant speed. The force playing the centripetal role is:",
+          "options": [
+            "The centripetal force, a distinct inward force that arises in turns",
+            "The engine's forward force, redirected by the steering",
+            "Static friction from the road on the tires, pointing toward the curve's center",
+            "The normal force from the road"
+          ],
+          "answer": 2,
+          "feedback": [
+            "No such distinct force exists — 'centripetal' is the job title, and on a flat curve friction holds the job.",
+            "Engine force is internal and points along the car's motion; something external and *sideways* must curve the path.",
+            "Right. The turned tires would slide outward without friction gripping inward — mv²/r of it. Exceed μ_s N (ice, speed) and the car obeys N1: straight ahead, off the curve.",
+            "On a *flat* road the normal force is vertical — no horizontal component to bend the path. Banking the curve is exactly the trick that gives N an inward component."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Astronauts float aboard the ISS (~400 km up) because:",
+          "options": [
+            "Gravity is essentially zero at that altitude",
+            "Their centrifugal force balances gravity, leaving zero net force",
+            "They and the station are in continuous free fall together — the orbit IS the falling",
+            "The station's speed generates lift that cancels their weight"
+          ],
+          "answer": 2,
+          "feedback": [
+            "g at 400 km is ~8.7 m/s² — about 90% of surface gravity. If gravity were zero the station wouldn't orbit at all; it would leave in a straight line.",
+            "In the inertial frame there's no centrifugal force and the net force is decidedly nonzero — gravity, providing exactly the v²/r acceleration of the orbit.",
+            "Right. Everything falls together, so nothing presses on anything: N = 0, the cut-cable elevator sustained forever. Weight is nearly full; *apparent* weight is zero.",
+            "Lift needs air. The mechanism is pure gravity plus sideways speed — falling and perpetually missing."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "For a satellite in circular orbit, the equation GMm/r² = mv²/r expresses:",
+          "options": [
+            "A balance of two forces, leaving the satellite in equilibrium",
+            "Gravity as the sole force, exactly supplying the centripetal requirement for that r and v",
+            "The condition where gravity cancels the satellite's inertia",
+            "An approximation valid only near the Earth's surface"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Equilibrium means a = 0 and straight-line motion. An orbiting satellite accelerates continuously — that's what orbiting is. One side of this equation is a force; the other is ma.",
+            "Right. It's N2, not a balance: F_gravity = ma_centripetal. One real force, doing exactly the turning job. Solve it for v and Kepler's third law is twenty seconds away.",
+            "Inertia isn't a force to cancel — it's the straight-line tendency that gravity continuously bends.",
+            "It holds at any r — that's the inverse-square law's whole content, from LEO to the Moon (Newton's original check)."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Feynman Lectures I, Ch. 7 — The Theory of Gravitation",
+          "url": "https://www.feynmanlectures.caltech.edu/I_07.html",
+          "type": "reading",
+          "note": "The Moon as a falling body, Kepler from inverse-square, and the universality of gravitation — the best short telling in print."
+        },
+        {
+          "label": "Khan Academy — Centripetal force and gravitation",
+          "url": "https://www.khanacademy.org/science/physics/centripetal-force-and-gravitation",
+          "type": "video",
+          "note": "Flat and banked curves, orbits, and the 'no extra arrow' discipline in worked form."
+        },
+        {
+          "label": "Wikipedia — Centrifugal force",
+          "url": "https://en.wikipedia.org/wiki/Centrifugal_force",
+          "type": "reading",
+          "note": "The rotating-frame bookkeeping done properly — when the fictitious force is legitimate and when it's a blunder."
+        }
+      ],
+      "anim": "phys_orbit"
+    },
+    {
+      "id": "c07-oscillation",
+      "title": "Oscillation",
+      "summary": "A linear restoring force F = −kx yields sinusoidal motion whose period ignores amplitude. The pendulum only joins the club through the small-angle approximation — the textbook's quietest lie.",
+      "cards": [
+        {
+          "h": "SHM in one line of ODE",
+          "md": "Simple harmonic motion is what happens when the restoring force is **linear** in displacement:\n\nF = −kx  →  m x″ = −kx  →  x(t) = A cos(ωt + φ), with **ω = √(k/m)**.\n\nYou solved this equation for a living once; the physics worth re-savoring is what the solution *says*:\n\n- Period **T = 2π√(m/k)** — no A anywhere. Double the amplitude: same period (**isochronism**). The spring pulls harder exactly in proportion to the longer path, and the two effects cancel — a privilege of *linearity*, not of oscillation in general.\n- Velocity is maximal at the center where a = 0; acceleration is maximal at the turning points where v = 0. Position, velocity, acceleration: each 90° ahead of the last.\n- Energy sloshes: ½kA² total, all kinetic at center, all potential at the extremes, trading twice per cycle.\n\nWhy this one equation is everywhere: near almost any stable equilibrium, U(x) is approximately parabolic (Taylor: the first surviving term is quadratic), so **every small oscillation is approximately SHM** — molecules, buildings, circuits, markets' toy models. SHM is the universal small-wiggle."
+        },
+        {
+          "h": "The pendulum's small-angle lie",
+          "md": "The pendulum is *not* a simple harmonic oscillator. Its restoring torque goes as **sin θ**, not θ — the true equation is θ″ = −(g/L) sin θ, and it has no elementary solution.\n\nThe textbook move: for small θ, sin θ ≈ θ, the equation linearizes, and out comes the formula you remember:\n\n## T = 2π√(L/g) — *small angles only.*\n\nThe fine print, quantified: the true period *grows* with amplitude — by ~0.05% at 5°, ~1.7% at 30°, ~18% at 90°. Grandfather clocks keep the swing tiny for exactly this reason.\n\nAnd the deeper gem you may have forgotten you knew: **mass cancels**. The m in F = ma (inertia) and the m in mg (gravitational pull) divide out — heavy and light bobs swing identically, just as all masses free-fall identically. That equality of inertial and gravitational mass is, in Newton, a shrug-worthy coincidence. Einstein will make it the cornerstone (next concept)."
+        },
+        {
+          "h": "Damping and resonance",
+          "md": "Two add-ons complete the practical picture:\n\n- **Damping** (−bv): amplitude decays exponentially; the frequency droops slightly. Push damping far enough and oscillation dies entirely (critical damping — what shock absorbers and instrument needles are tuned to: fastest settling, no overshoot).\n- **Driving**: push the system periodically and it answers at *your* frequency — but the response amplitude explodes as the drive frequency approaches ω₀ = √(k/m). That's **resonance**: each push arrives timed to add energy, like a well-timed playground swing. Lightly damped systems build enormous amplitude from small periodic inputs — opera glass and wineglass, bridge and marching soldiers, quartz watch and its 32,768 Hz tuning fork.\n\nResonance is the design constraint *and* the design tool: you tune radios with it and stiffen bridges against it. Q — how many radians of oscillation before energy decays substantially — is the one number engineers pass around."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "You double the amplitude of a mass-on-spring oscillator. Its period:",
+          "options": [
+            "Doubles — twice the distance to cover",
+            "Halves — the spring pulls harder",
+            "Is unchanged — larger force and longer path cancel exactly, because F is linear in x",
+            "Increases by √2"
+          ],
+          "answer": 2,
+          "feedback": [
+            "The path doubles, but so does the average force, hence the average speed. For F ∝ x the cancellation is exact.",
+            "It does pull harder — and the mass travels proportionally farther and faster. Neither effect wins.",
+            "Right. Isochronism: T = 2π√(m/k), amplitude-blind. This is a special privilege of *linear* restoring forces — the pendulum at large angles loses it.",
+            "√2 scalings belong to changing m or k, not A. T = 2π√(m/k) has no amplitude in it."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A pendulum clock is set swinging at 60° amplitude instead of its designed 3°. Compared with T = 2π√(L/g), its actual period is:",
+          "options": [
+            "The same — pendulum period is independent of amplitude",
+            "Longer — sin θ < θ means weaker restoring torque than SHM assumes at large angles",
+            "Shorter — bigger swings mean higher speeds",
+            "Longer or shorter depending on the bob's mass"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That independence was the small-angle approximation talking — it's a property of the *linearized* pendulum, not the real one.",
+            "Right. At large θ the true restoring torque (∝ sin θ) lags the linear one (∝ θ), so the return trip takes longer — several percent longer at 60°. The clock runs slow.",
+            "Speeds are higher, but the distances grow faster than the restoring force can service. The nonlinearity loses the exact cancellation that linear springs enjoy.",
+            "Mass cancels from the pendulum equation entirely — inertial m and gravitational m divide out. Amplitude is the culprit."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why does a pendulum's period not depend on the mass of the bob?",
+          "options": [
+            "It does, weakly — heavier bobs swing slightly slower",
+            "The inertial mass (resisting acceleration) and gravitational mass (feeling the pull) cancel — the same equivalence that makes all objects free-fall alike",
+            "Air resistance compensates for the extra weight",
+            "Because the string's tension adjusts to the mass"
+          ],
+          "answer": 1,
+          "feedback": [
+            "In vacuum, not even weakly — m appears on both sides of the equation of motion and cancels identically.",
+            "Right. mL θ″ = −mg sin θ: the m's divide out, exactly as in free fall. Newton measured this equivalence with pendulums to ~1 part in 1000; Einstein promoted the 'coincidence' to the founding principle of general relativity.",
+            "The cancellation is exact in vacuum, where air plays no role at all.",
+            "Tension does scale with mass, but that's a symptom of the same cancellation, not its cause — the along-arc dynamics never see m."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "In SHM, where is the acceleration largest in magnitude?",
+          "options": [
+            "At the center, where the speed is greatest",
+            "At the turning points, where the displacement — and hence restoring force — is greatest",
+            "It's constant throughout the cycle",
+            "Halfway between center and extreme"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The center is where acceleration is exactly *zero* — maximum speed and zero force coincide. Speed and acceleration peak in different places; that gap trips everyone.",
+            "Right. a = −(k/m)x: extreme displacement, extreme force, extreme acceleration — at the very instant v = 0. The oscillator is a machine for keeping v and a out of phase.",
+            "Constant acceleration is projectile motion's signature. SHM's acceleration swings sinusoidally between ±ω²A.",
+            "a tracks displacement linearly — it peaks at the extremes, with nothing special at the midpoint."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Feynman Lectures I, Ch. 21 — The Harmonic Oscillator",
+          "url": "https://www.feynmanlectures.caltech.edu/I_21.html",
+          "type": "reading",
+          "note": "Why the same equation runs springs, circuits, and light — SHM as physics' universal small-wiggle."
+        },
+        {
+          "label": "3Blue1Brown — Differential equations, a tourist's guide",
+          "url": "https://www.3blue1brown.com/lessons/differential-equations",
+          "type": "video",
+          "note": "The pendulum done honestly — phase space, the sin θ nonlinearity, and exactly where the small-angle approximation lives."
+        },
+        {
+          "label": "Wikipedia — Pendulum (mechanics)",
+          "url": "https://en.wikipedia.org/wiki/Pendulum_(mechanics)",
+          "type": "reading",
+          "note": "The full nonlinear treatment with the amplitude-correction series — the small-angle lie itemized to any precision you like."
+        }
+      ],
+      "anim": "spring_phase"
+    },
+    {
+      "id": "c08-limits",
+      "title": "Where Newton breaks",
+      "summary": "Too fast, too small, too much gravity: three regimes where Newtonian mechanics fails — and precisely how it fails, what survives (F = dp/dt, conservation laws), and why it remains the right tool inside its domain.",
+      "cards": [
+        {
+          "h": "Too fast: relativity",
+          "md": "The Galilean rule from concept 1 — velocities add, v′ = v − u — is the piece that breaks first. Measure the speed of light from a moving platform and you get **the same c**, contradicting the addition rule that seemed too obvious to state. Einstein (1905) kept the physics-is-frame-independent principle and let simultaneity, time, and length bend instead.\n\nWhat happens to mechanics:\n\n- **F = ma fails.** No force can push a body past c; as v → c, the same force buys less and less acceleration.\n- **F = dp/dt survives**, with momentum corrected to p = γmv, γ = 1/√(1 − v²/c²). Newton's own formulation, again, was the durable one.\n- Every Newtonian formula is recovered as the **v ≪ c limit**: γ ≈ 1 + ½v²/c², and the corrections at everyday speeds are parts per trillion.\n\nNewton isn't wrong so much as *embedded* — the low-speed face of a deeper theory."
+        },
+        {
+          "h": "Too small: quantum mechanics",
+          "md": "Newton's deepest assumption is so quiet you never noticed it: that a particle *has* a definite position and momentum at every instant — a trajectory. Below the atomic scale, that assumption fails. Electrons interfere like waves; position and momentum can't both be sharp (Δx·Δp ≳ ℏ); identical setups yield different outcomes, lawfully random.\n\nThere is no orbit in a hydrogen atom — there is a standing wave of probability. The determinism of F = ma is replaced by deterministic evolution of a *probability amplitude* (Schrödinger's equation).\n\nYet the correspondence holds here too: when actions are huge compared with ℏ ≈ 10⁻³⁴ J·s — any object you can see — quantum expectation values obey Newton's equations (Ehrenfest's theorem). A baseball is a quantum object whose wave spreading is unmeasurably tiny. Newton is the **large-action limit**, just as he was the low-speed limit."
+        },
+        {
+          "h": "Too much gravity — and the first crack",
+          "md": "The crack appeared *within* Newtonian astronomy's greatest triumph. Planetary perturbation theory predicted Neptune from Uranus's wobbles (1846) — Newton at his imperial best. The same method applied to Mercury left a stubborn residue: its perihelion precesses **43 arcseconds per century** more than every Newtonian influence could explain. Astronomers hypothesized a hidden planet ('Vulcan'). It doesn't exist.\n\nGeneral relativity (1915) resolved it to the arcsecond, with no free parameters: gravity is not a force but the **curvature of spacetime**, and Mercury, deepest in the Sun's curvature, feels the strongest correction. The equivalence of inertial and gravitational mass — the pendulum 'coincidence' of concept 7 — is the load-bearing principle: gravity can be locally erased by free fall (your ISS astronauts, again), which only geometry explains cleanly.\n\nThe honest summary: Newtonian mechanics is a **superbly accurate limiting case** — valid when v ≪ c, action ≫ ℏ, gravity weak. Inside that domain (bridges, engines, spacecraft trajectories) it remains the correct engineering physics, and NASA flies missions on it. Your GPS receiver, meanwhile, quietly corrects for both special and general relativity (−7 μs and +45 μs per day) — the breakdown is in your pocket."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "At relativistic speeds F = ma fails, yet F = dp/dt survives. What makes the momentum form the durable one?",
+          "options": [
+            "It's easier to measure momentum than acceleration",
+            "With p = γmv, the momentum form remains exactly correct — mass's growing 'reluctance' near c is absorbed into p, while ma hard-codes the low-speed relation",
+            "Momentum is a vector while acceleration is not",
+            "It doesn't survive; both forms fail equally at high speed"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Measurability isn't the criterion — correctness of the law's form under the new kinematics is.",
+            "Right. The law 'force changes momentum' is deeper than 'force produces acceleration'; only the expression *for* momentum needed repair. Newton's original phrasing outlived his kinematics.",
+            "Both are vectors. The difference is that dp/dt correctly encodes the γ factor's velocity dependence; ma cannot.",
+            "Experiments in every accelerator on Earth run on F = dp/dt with relativistic p — it survives spectacularly."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Mercury's perihelion precesses 43″/century more than Newtonian perturbation theory predicts. Historically, what did this anomaly turn out to mean?",
+          "options": [
+            "Observational error — resolved with better telescopes",
+            "A hidden inner planet (Vulcan) perturbing Mercury",
+            "Newtonian gravity itself is incomplete; general relativity predicted the 43″ exactly, with no adjustable parameters",
+            "Mercury's unusual density distorts its orbit"
+          ],
+          "answer": 2,
+          "feedback": [
+            "The residue survived every improvement in instruments and analysis for six decades — it was in the physics, not the glass.",
+            "The community's actual first guess — the same move that had triumphantly found Neptune. But Vulcan was never there; the missing planet was missing physics.",
+            "Right. The first observed crack in Newtonian mechanics, hiding inside its best-tested domain, and GR's first confirmation. A theory's residuals are where its successor is born.",
+            "The planet's internal structure is irrelevant at these scales — the effect is the Sun's spacetime curvature, strongest for the innermost orbit."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Given relativity and quantum mechanics, what is the accurate status of Newtonian mechanics today?",
+          "options": [
+            "Falsified — retained only for historical and teaching purposes",
+            "A limiting case, essentially exact for v ≪ c, action ≫ ℏ, and weak gravity — which is why real engineering and spaceflight still run on it",
+            "Correct for solids; the newer theories cover only light and atoms",
+            "An unresolved rivalry among three competing frameworks"
+          ],
+          "answer": 1,
+          "feedback": [
+            "'Falsified' misreads how physics grows: the successors *reproduce* Newton inside his domain — that reproduction (the correspondence principle) was a design requirement for accepting them.",
+            "Right. Newton bounds his own validity now: parts-per-trillion accurate for a car, and good enough to navigate probes across the solar system. Knowing a theory's domain is knowing the theory.",
+            "The split isn't by material — a fast-enough solid is relativistic, a cold-enough solid is quantum. It's by regime: speed, action, field strength.",
+            "No rivalry: nested domains with agreed boundaries and exact correspondence in the overlaps."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "GPS satellite clocks are corrected for relativity (net ≈ +38 μs/day). Uncorrected, roughly what would happen to positioning?",
+          "options": [
+            "Nothing measurable — the effect is parts per trillion",
+            "Errors accumulating at kilometers per day — light covers ~11 km in 38 μs",
+            "A one-time fixed offset, easily calibrated away",
+            "GPS uses only geometry, so clock rates don't matter"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Parts-per-trillion is everyday-speed intuition, but GPS runs on nanosecond timing at orbital speed in weaker gravity — both corrections (special: −7, general: +45 μs/day) are enormous at that precision.",
+            "Right. Position is timing: c × 38 μs ≈ 11 km of drift per day. Relativity isn't philosophy here — it's a line item in the error budget of the map on your phone.",
+            "It's a *rate* mismatch, not an offset — the error compounds daily. You can't calibrate away a clock that runs fast.",
+            "GPS geometry IS timing — position comes from time-of-flight differences. The clocks are the whole instrument."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Feynman Lectures I, Ch. 15 — The Special Theory of Relativity",
+          "url": "https://www.feynmanlectures.caltech.edu/I_15.html",
+          "type": "reading",
+          "note": "Picks up exactly where Galilean invariance breaks, and repairs mechanics from the inside."
+        },
+        {
+          "label": "Feynman Lectures I, Ch. 37 — Quantum Behavior",
+          "url": "https://www.feynmanlectures.caltech.edu/I_37.html",
+          "type": "reading",
+          "note": "The double-slit chapter — 'the only mystery.' The cleanest possible account of where trajectories end."
+        },
+        {
+          "label": "Wikipedia — Tests of general relativity",
+          "url": "https://en.wikipedia.org/wiki/Tests_of_general_relativity",
+          "type": "reading",
+          "note": "Mercury's 43″, light deflection, gravitational time dilation, GPS — the receipts for the third break."
+        }
+      ]
     }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A subway car brakes hard and a standing passenger lurches toward the front. In the ground (inertial) frame, what force pushed the passenger forward?",
-     "options": [
-      "The force of inertia, acting forward",
-      "None — the passenger kept moving at constant velocity while the car decelerated under them",
-      "A reaction force to the braking force",
-      "The centrifugal force of the deceleration"
-     ],
-     "answer": 1,
-     "feedback": [
-      "'Force of inertia' is the classic phantom. Inertia is the absence of a needed force, not a force itself.",
-      "Right. In the inertial frame nothing pushed forward; friction from the floor was the only horizontal force, dragging the passenger backward — just not fast enough to match the car.",
-      "The brake force acts between wheels and rails — its reaction acts on the rails, not on the passenger.",
-      "Centrifugal force belongs to rotating frames, and even there it's fictitious bookkeeping, not an agent."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "You drop a ball inside a train cruising at a constant 200 km/h. Relative to the train it falls straight down; relative to the ground it traces a parabola. Which description is the physically correct one?",
-     "options": [
-      "The ground frame's — the ground is really at rest",
-      "The train frame's — that's where the experiment happened",
-      "Both — the frames are equivalent, and they agree on the acceleration and the forces",
-      "Neither, until you account for the train's engine force on the ball"
-     ],
-     "answer": 2,
-     "feedback": [
-      "There is no 'really at rest.' The ground is just another inertial frame — Galilean relativity's whole point.",
-      "Locality doesn't privilege a frame; the ground observer's parabola is equally valid.",
-      "Right. Trajectories are frame-dependent; accelerations and forces are not. Both frames compute a = g downward and F = mg.",
-      "The engine exerts no force on a ball in free fall — nothing touches it but gravity."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "What is the reliable fingerprint of a fictitious force (as opposed to a real interaction)?",
-     "options": [
-      "It's proportional to the object's mass and has no third-law reaction partner",
-      "It only acts on light objects",
-      "It's always directed opposite to the velocity",
-      "It can't do work on anything"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Right. Exact mass-proportionality (it's really the frame accelerating) plus no reaction anywhere — nothing is exerting it.",
-      "Backwards tendency — fictitious forces scale *up* with mass, affecting everything in exact proportion.",
-      "Direction depends on the frame's acceleration, not the object's velocity (Coriolis isn't even parallel to either).",
-      "In the rotating frame, centrifugal force happily does work in the bookkeeping. That's not the tell."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Feynman Lectures I, Ch. 8 — Motion",
-     "url": "https://www.feynmanlectures.caltech.edu/I_08.html",
-     "type": "reading",
-     "note": "Velocity and acceleration rebuilt from the calculus up — the ideal rust remover."
-    },
-    {
-     "label": "Wikipedia — Inertial frame of reference",
-     "url": "https://en.wikipedia.org/wiki/Inertial_frame_of_reference",
-     "type": "reading",
-     "note": "The frame-as-definition view, with the Galilean transformation spelled out."
-    }
-   ]
-  },
-  {
-   "id": "c02-laws",
-   "title": "The three laws",
-   "summary": "The first law defines the arena, the second is really F = dp/dt, and third-law pairs act on different bodies — which is why they never cancel.",
-   "cards": [
-    {
-     "h": "The first law is not a special case",
-     "md": "The lazy reading: 'N1 is just N2 with F = 0.' It isn't, and the distinction matters.\n\nThe first law's real job is to **certify the frame**. It asserts that inertial frames exist — frames where force-free motion is straight-line coasting — and thereby tells you where the second law may be applied. Inside a braking subway car, N2 appears to fail (things accelerate with no force); N1 is the law that says *this frame is broken, not the physics*.\n\nFirst law: here's where physics works. Second law: here's how it works there. A definition of the arena, then the rule of play."
-    },
-    {
-     "h": "F = dp/dt, not F = ma",
-     "md": "Newton never wrote F = ma. His second law: force equals the rate of change of **momentum**, p = mv.\n\n## F = dp/dt\n\nWhen m is constant, dp/dt = m(dv/dt) = ma and the familiar form drops out as a corollary. But the momentum form is the fundamental one, for two reasons you'll meet again:\n\n- **Variable mass.** A rocket expels mass; 'ma' is ambiguous (which m?), while dp/dt handled thrust correctly two centuries before rockets flew.\n- **Relativity.** F = ma dies at high speed; F = dp/dt survives intact once p = γmv. The momentum form is the one nature actually honors (concept 8).\n\nBonus: integrate it over time and you get impulse–momentum, ∫F dt = Δp — the working tool of concept 5."
-    },
-    {
-     "h": "Third-law pairs: different bodies, always",
-     "md": "'Equal and opposite' is the part everyone remembers. The load-bearing clause is the one everyone forgets: the two forces of a third-law pair **act on different bodies**. Same magnitude, opposite direction, same type of interaction, *never on the same object* — so they can never cancel each other in any one body's free-body diagram.\n\nThe canonical trap: a book rests on a table. Gravity down on book, normal force up on book — equal, opposite... and **not** a third-law pair. They're two different interactions that happen to balance because a = 0. The true partners:\n\n- Earth pulls book down ↔ **book pulls Earth up** (gravity pair)\n- Table pushes book up ↔ **book pushes table down** (contact pair)\n\nTest yourself with: 'if the pair canceled, nothing could ever accelerate.' The horse *can* pull the cart even though the cart pulls back equally — those two forces act on different bodies, and the horse moves because the ground's friction on the horse beats the cart's drag on the horse."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "The old horse-and-cart paradox: the cart pulls back on the horse exactly as hard as the horse pulls forward on the cart, so how can the pair accelerate?",
-     "options": [
-      "The horse actually pulls slightly harder than the cart pulls back",
-      "The two forces act on different bodies; the horse accelerates because ground friction on the horse exceeds the cart's pull on the horse",
-      "The third law only applies in static situations",
-      "The horse's force is active while the cart's is merely reactive, so it wins"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Never — the third law is exact at every instant, accelerating or not.",
-      "Right. Sum forces per body: the horse's FBD contains ground friction forward and cart-pull backward; the cart's contains horse-pull forward and rolling resistance. Nothing cancels across bodies.",
-      "The third law holds always — statics, dynamics, collisions, orbits.",
-      "'Active vs reactive' is a verbal illusion; the two forces are perfectly symmetric in magnitude and simultaneity."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A book rests on a table. What is the third-law partner of the Earth's gravitational pull on the book?",
-     "options": [
-      "The normal force from the table on the book",
-      "The book's weight",
-      "The book's gravitational pull on the Earth",
-      "The table's push on the floor"
-     ],
-     "answer": 2,
-     "feedback": [
-      "The classic wrong answer. Normal force acts on the same body (the book) and is a different interaction (contact, not gravity). It balances gravity only because a = 0.",
-      "The weight IS the Earth's pull on the book — a force can't be its own partner.",
-      "Right. Same interaction (gravity), same magnitude, opposite direction, other body. The book pulls the Earth up with force mg.",
-      "That's two links down the contact chain — a partner must be the same interaction reversed."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why do physicists insist F = dp/dt is the 'real' second law rather than F = ma?",
-     "options": [
-      "It's mathematically equivalent in all cases, just more elegant",
-      "It handles variable-mass systems correctly and survives into relativity, where F = ma fails",
-      "Because acceleration can't be measured directly",
-      "It's not — F = ma is the fundamental form and dp/dt is the approximation"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Not equivalent: for a rocket shedding mass, or at relativistic speed, the two forms disagree — and dp/dt is the one that's right.",
-      "Correct. Rockets (which m?) and relativity (p = γmv) both break ma while dp/dt sails through. Momentum is the deeper currency.",
-      "Acceleration is perfectly measurable; that's not the issue at all.",
-      "Exactly backwards — ma is the constant-mass, low-speed corollary of dp/dt."
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "What job does the first law do that the second law cannot?",
-     "options": [
-      "It covers the F = 0 case, which N2 can't evaluate",
-      "It defines force qualitatively before N2 quantifies it",
-      "It identifies the inertial frames — the arenas in which N2 is valid at all",
-      "None; it's historically first but logically redundant"
-     ],
-     "answer": 2,
-     "feedback": [
-      "N2 handles F = 0 fine (a = 0). If that were N1's only content it truly would be redundant.",
-      "Closer to Newton's own presentation, but the modern load-bearing role is about frames, not vocabulary.",
-      "Right. N1 is the frame test: where force-free bodies coast, N2 applies. In a braking bus, N1 fails first — flagging the frame as non-inertial.",
-      "It looks redundant only until you try to state N2 in an accelerating frame and watch it fail."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Feynman Lectures I, Ch. 9 — Newton's Laws of Dynamics",
-     "url": "https://www.feynmanlectures.caltech.edu/I_09.html",
-     "type": "reading",
-     "note": "The laws stated as Newton meant them — dp/dt front and center — then used to compute an orbit numerically."
-    },
-    {
-     "label": "Wikipedia — Newton's laws of motion",
-     "url": "https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion",
-     "type": "reading",
-     "note": "Careful modern statements, including the variable-mass caveats and the frame-definition reading of the first law."
-    },
-    {
-     "label": "Khan Academy — Forces and Newton's laws",
-     "url": "https://www.khanacademy.org/science/physics/forces-newtons-laws",
-     "type": "video",
-     "note": "Worked problems if you want reps; skim at 2× — you knew this once."
-    }
-   ]
-  },
-  {
-   "id": "c03-fbd",
-   "title": "Forces and free-body diagrams",
-   "summary": "One body, only the forces acting ON it. Weight, mass, and normal force are three different things, and static friction is an inequality that adjusts — it doesn't sit at μN.",
-   "cards": [
-    {
-     "h": "The discipline",
-     "md": "A free-body diagram has exactly two rules, and every FBD error is a violation of one of them:\n\n1. **One body.** Isolate it. Everything else in the universe appears only through the forces it exerts on this body.\n2. **Only forces ON the body**, each traceable to an identifiable other object — Earth (gravity), a surface (normal + friction), a rope (tension), air (drag). If you can't name the object exerting it, it's not a force.\n\nTwo arrows that never belong: an '**ma** arrow' (that's the *result*, the right-hand side, not a force) and a '**centripetal force**' arrow (a job title some real force holds — concept 6). And forces the body exerts on *other* things stay off the page: they act elsewhere."
-    },
-    {
-     "h": "Weight vs mass vs normal force",
-     "md": "Three quantities, chronically conflated:\n\n- **Mass** m — intrinsic, kilograms, the same on the Moon. Measures resistance to acceleration (and gravitational charge — that coincidence is concept 7's punchline).\n- **Weight** W = mg — the gravitational *force* on the body. Newtons, not kilograms. Changes with g; never changes with motion.\n- **Normal force** N — whatever the surface must supply. It is a constraint force with **no formula of its own**: it takes the value the geometry demands, computed from N2.\n\nA bathroom scale reads **N**, not W. Stand on one in an elevator: accelerating up, N = m(g + a) — you read heavy; accelerating down, N = m(g − a) — light; cable cut, N = 0 — 'weightless,' while your weight mg is untouched. Apparent weight is normal force wearing weight's clothes."
-    },
-    {
-     "h": "Friction, as it actually behaves",
-     "md": "The half-remembered version is 'f = μN.' The truth has an inequality in it:\n\n- **Static:** f_s ≤ μ_s N. It's a constraint force like N — it supplies *whatever the situation requires*, up to the ceiling μ_s N. A block sitting calmly on a gentle incline feels f_s = mg sin θ, not μ_s N. The formula-with-equals applies only at the verge of slipping.\n- **Kinetic:** f_k ≈ μ_k N, roughly constant, opposing *relative sliding* — with μ_k < μ_s, which is why it lurches when it finally lets go.\n\nAnd the direction surprise worth re-learning: friction is not 'the force that opposes motion' — it opposes relative *slipping*, and it can point **forward**. When a car accelerates, static friction from road on tires is the only external forward force on the car. No slipping at the contact patch: static friction, doing the driving."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "You stand on a bathroom scale in an elevator accelerating downward at 2 m/s². Compared with the reading at rest, the scale now shows:",
-     "options": [
-      "The same — your weight hasn't changed",
-      "Less — the scale reads the normal force, which is m(g − a)",
-      "More — you press harder while descending",
-      "Zero — descending elevators are free fall"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Your weight mg indeed hasn't changed — but the scale never read weight. It reads normal force, which has.",
-      "Right. N2 vertically: N − mg = −ma, so N = m(g − a). The scale reads N. Apparent weight is normal force in disguise.",
-      "That intuition belongs to *upward* acceleration (or the moment a descent begins decelerating).",
-      "Zero requires a = g — a cut cable, not a working elevator at 2 m/s²."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A 10 kg block rests motionless on a 20° incline. μ_s = 0.8. The static friction force on it is:",
-     "options": [
-      "μ_s N = 0.8 · mg cos 20° ≈ 74 N",
-      "mg sin 20° ≈ 34 N — exactly what equilibrium requires",
-      "Zero, since nothing is moving",
-      "mg ≈ 98 N"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The most durable friction misconception: μ_s N is the *ceiling*, not the value. Static friction is an inequality; here it sits well below its maximum.",
-      "Right. The block is in equilibrium, so friction supplies precisely the mg sin θ needed — and only that. It would hit 74 N only at the verge of slipping (about 39°).",
-      "No *sliding* doesn't mean no friction — without it, the block would accelerate down the incline at g sin θ.",
-      "That's the full weight; only the along-incline component needs balancing by friction."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "A car accelerates forward on dry pavement without spinning its tires. The external force that actually accelerates the car is:",
-     "options": [
-      "The engine's force on the drivetrain",
-      "Kinetic friction from the road, opposing tire motion",
-      "Static friction from the road on the tires, pointing forward",
-      "The reaction to the exhaust pushed backward"
-     ],
-     "answer": 2,
-     "feedback": [
-      "The engine's forces are internal — a system can't accelerate itself with internal forces (N3 guarantees they sum to zero). Something external must push.",
-      "Kinetic would mean the contact patch is sliding — a burnout. Normal driving keeps the patch momentarily at rest on the road: static.",
-      "Right. The tire pushes the road backward; the road pushes the tire forward — static friction, since the patch doesn't slip. Friction is the engine's ambassador to the outside world.",
-      "Cars aren't rockets; exhaust momentum is negligible. (For a rocket, though, this is exactly the mechanism.)"
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "Which arrow does NOT belong on the free-body diagram of a ball whirling on a string (horizontal circle)?",
-     "options": [
-      "Tension from the string",
-      "Gravity from the Earth",
-      "A centripetal force arrow pointing at the center",
-      "All three belong"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Tension is real — a rope touching the body always earns an arrow.",
-      "Gravity acts on everything with mass; it's always on the diagram.",
-      "Right. 'Centripetal' is a job description, and here tension already holds the job. Drawing it separately double-counts the force — the classic FBD error, unpacked fully in concept 6.",
-      "One of them is a job title, not a force. Look again."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "MIT OCW 8.01SC — Classical Mechanics",
-     "url": "https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/",
-     "type": "video",
-     "note": "The full MIT course, free. Week 2's Newton's-laws problem sessions are FBD boot camp for the returning engineer."
-    },
-    {
-     "label": "Wikipedia — Normal force",
-     "url": "https://en.wikipedia.org/wiki/Normal_force",
-     "type": "reading",
-     "note": "Short and precise on the constraint-force character — why N has no formula and the elevator changes it."
-    },
-    {
-     "label": "Feynman Lectures I, Ch. 12 — Characteristics of Force",
-     "url": "https://www.feynmanlectures.caltech.edu/I_12.html",
-     "type": "reading",
-     "note": "What friction, tension, and 'force' itself really are, one level below the freshman story."
-    }
-   ]
-  },
-  {
-   "id": "c04-energy",
-   "title": "Energy and work",
-   "summary": "Work is ∫F·dx — a signed scalar that can be zero while you sweat. Kinetic energy bookkeeping always works; potential energy exists only for conservative forces; friction reroutes energy to heat.",
-   "cards": [
-    {
-     "h": "Work is not effort",
-     "md": "**W = ∫ F · dx** — force dotted with displacement, summed along the path. Three consequences your muscles will argue with:\n\n- Hold a 50 kg barbell motionless for a minute: **zero work** on the barbell. No displacement, no work — your burning arms are paying a biological cost, not a mechanical one.\n- Carry a tray horizontally at constant velocity: the vertical force from your hand does **zero work** — force ⊥ displacement, and the dot product knows it.\n- Lower a weight slowly: your upward force does **negative work** (force opposite displacement). Negative work is how energy leaves a body.\n\nAnd the theorem that makes work worth defining — always true, no exceptions, because it's N2 integrated over distance:\n\n## W_net = ΔKE = Δ(½mv²)"
-    },
-    {
-     "h": "Potential energy is earned, not assumed",
-     "md": "A force gets a potential energy **only if it's conservative** — work independent of path, so 'energy stored by position' is well-defined. Gravity and ideal springs qualify: mgh and ½kx² are the receipts. Friction does not: its work depends on path length (drag a crate the long way and lose more), so there is no 'friction potential energy' to cash back. The work is rerouted to thermal energy, permanently, as far as mechanics is concerned.\n\nSo the bookkeeping has tiers:\n\n- **W_net = ΔKE** — always true, any forces.\n- **KE + PE = const** — true when only conservative forces do work.\n- **KE + PE + heat = const** — always true again (this is why 'energy conservation' never actually fails; friction just moves the money to an account mechanics can't withdraw from).\n\nTwo footnotes that restore old precision: only **ΔU** ever matters — the zero of potential energy is yours to place; and U belongs to the *system* (Earth + ball), not to the ball alone."
-    },
-    {
-     "h": "Why energy methods win",
-     "md": "The power move you half-remember: energy methods **skip the trajectory**. A bead slides down a frictionless wire of any lunatic shape from height h: speed at the bottom is √(2gh), full stop. Computing that with F = ma means wrestling the normal force at every point of the curve; energy conservation doesn't even ask for the shape.\n\nThe trade: energy is a **scalar** and carries no clock. It tells you *how fast at that point*, never *when it arrives* or *which way it's pointing*. When direction or timing matters, you need F = ma or momentum (next concept).\n\nRule of thumb worth re-installing: forces for *why and when*, energy for *how fast and how far*, momentum for *collisions and recoils*."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A waiter carries a loaded tray across a level room at constant velocity. The work done by his hand on the tray is:",
-     "options": [
-      "Positive — he's clearly exerting himself",
-      "Zero — his force on the tray is vertical, the displacement horizontal",
-      "Negative — friction opposes him",
-      "Equal to the tray's weight times the distance walked"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Exertion is metabolism, not mechanics. The dot product doesn't care how tired he gets.",
-      "Right. F ⊥ dx at every step, so F·dx = 0 throughout. Consistency check: the tray's KE is unchanged, and W_net = ΔKE demands zero net work.",
-      "Negative work would drain the tray's kinetic energy — but its speed is constant.",
-      "mg·d would apply if he lifted it a distance d *vertically*. Direction is the entire point of the dot product."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A crate slides down a rough (frictional) ramp at constant speed. Which statement is the correct energy account?",
-     "options": [
-      "Mechanical energy is conserved because speed is constant",
-      "Potential energy converts to kinetic energy",
-      "Potential energy is converted entirely to thermal energy via friction; mechanical energy falls, total energy doesn't",
-      "Energy conservation fails when friction acts"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Constant speed means constant KE — but PE is steadily draining. Mechanical energy (KE+PE) is falling; something's collecting the difference.",
-      "KE isn't growing (constant speed). The PE has to be going somewhere else.",
-      "Right. With ΔKE = 0, every joule of lost mgh becomes heat at the sliding interface. Friction never destroys energy — it moves it to an account mechanics can't withdraw from.",
-      "Total energy conservation never fails. What fails is *mechanical* energy conservation — the KE+PE subtotal."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why is there no such thing as 'friction potential energy'?",
-     "options": [
-      "Friction forces are too small to store meaningful energy",
-      "Friction's work depends on the path taken, so no position-based energy function can represent it",
-      "Friction only acts on moving objects",
-      "There is — it's the thermal energy in the surfaces"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Magnitude is irrelevant — a tiny conservative force still earns a potential; a huge friction force never does.",
-      "Right. Potential energy is a function of position alone; that only works when work between two points is path-independent. Drag a crate the long way around and friction takes more — no single U(x) can encode that.",
-      "Static friction acts on stationary objects constantly. And the issue is path-dependence, not motion.",
-      "Thermal energy is where the work *goes*, but it isn't recoverable by retracing the path — which is exactly what disqualifies it as potential energy."
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "Two frictionless slides drop through the same height h — one straight and steep, one long and winding. A child starts from rest on each. Compare arrival speeds at the bottom:",
-     "options": [
-      "Steep slide is faster — shorter path",
-      "Winding slide is faster — more time to accelerate",
-      "Same speed: √(2gh) — gravity is conservative, so only the height drop matters",
-      "Cannot be determined without the slide shapes"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Shorter path means earlier *arrival*, not faster arrival speed. Energy carries no clock — time and speed are different questions.",
-      "More time at lower acceleration; the energy books balance to the same speed regardless.",
-      "Right. mgh = ½mv² on any frictionless path. The shape drops out entirely — the whole superpower of conservative forces.",
-      "The shapes matter for the arrival *time*, the normal forces, the thrill — everything except the final speed."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Feynman Lectures I, Ch. 4 — Conservation of Energy",
-     "url": "https://www.feynmanlectures.caltech.edu/I_04.html",
-     "type": "reading",
-     "note": "The famous Dennis-the-Menace blocks analogy: energy as an abstract conserved count, not a substance. Worth rereading once a decade."
-    },
-    {
-     "label": "Feynman Lectures I, Ch. 13 — Work and Potential Energy",
-     "url": "https://www.feynmanlectures.caltech.edu/I_13.html",
-     "type": "reading",
-     "note": "Work, conservative forces, and why the theorem W = ΔKE is just N2 integrated."
-    },
-    {
-     "label": "Khan Academy — Work and energy",
-     "url": "https://www.khanacademy.org/science/physics/work-and-energy",
-     "type": "video",
-     "note": "Problem reps for the rebuilt machinery; cherry-pick the ramp and spring problems."
-    }
-   ]
-  },
-  {
-   "id": "c05-momentum",
-   "title": "Momentum and collisions",
-   "summary": "Impulse ∫F dt = Δp; internal forces cancel in pairs, so total momentum survives any collision — including ones that destroy kinetic energy. Knowing which conservation law applies when is the skill.",
-   "cards": [
-    {
-     "h": "Impulse, and why momentum rules collisions",
-     "md": "Integrate F = dp/dt over time: **∫F dt = Δp** (impulse–momentum). This is N2's other integral — over time, where work was the integral over distance.\n\nNow take a *system* of colliding bodies. Every internal force comes in a third-law pair, so the internal impulses cancel **exactly**, however violent, brief, or messy the collision. Only external forces can change the total p — and during a millisecond impact, gravity's impulse is negligible next to the enormous contact forces. Hence the rule you can lean on with full weight:\n\n## In any collision, total momentum is conserved.\n\nElastic, inelastic, explosive, bodies shattering — doesn't matter. Momentum conservation is the third law in integrated form, and it holds even when you know nothing about the forces involved. (Everyday impulse corollary: airbags and crumple zones stretch Δt to shrink F for the same unavoidable Δp.)"
-    },
-    {
-     "h": "Momentum vs energy: which law when",
-     "md": "The confusion worth an hour of anyone's refresher time:\n\n- **Momentum**: conserved in *every* collision. A vector — conserved per component, direction included.\n- **Kinetic energy**: conserved only in *elastic* collisions (hardened steel, billiards approximately, atomic collisions). In a **perfectly inelastic** collision (bodies stick), the maximum possible KE is lost to deformation and heat — yet momentum is untouched.\n- **Explosions** are collisions run backward: momentum conserved (zero before, zero total after), KE *increases* — cashed out of chemical energy.\n\nThe diagnostic: momentum is the ledger no interaction can cheat; kinetic energy is a currency that freely changes denomination (heat, deformation, sound). When bodies stick, crumple, or thud, KE left the mechanical books — but p never did."
-    },
-    {
-     "h": "The ballistic pendulum: one problem, both laws",
-     "md": "The classic that tests whether you really have the boundary: a bullet embeds in a hanging block, which swings up to height h. Find the bullet's speed.\n\nThe tempting one-liner — ½mv² = (m+M)gh — is **wrong**, and knowing why is the mastery: the embedding is perfectly inelastic, and most of the bullet's KE (typically ~99%) becomes heat and splintered wood. Energy accounting across the impact is fiction.\n\nThe correct split, law by law:\n\n1. **Impact** (inelastic, milliseconds): momentum. mv = (m+M)V.\n2. **Swing** (smooth, no sliding, no collision): energy. ½(m+M)V² = (m+M)gh.\n\nChain them: v = (1 + M/m)√(2gh). Every collision problem decomposes this way — momentum across the crunch, energy across the glide. Draw the boundary where the crunch ends."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Two railcars collide and couple together. For the coupling collision itself, which is conserved?",
-     "options": [
-      "Both momentum and kinetic energy",
-      "Momentum only — coupling is perfectly inelastic, so KE is necessarily lost",
-      "Kinetic energy only",
-      "Neither — coupling forces are too complicated to say"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Both survive only in elastic collisions. Sticking together is the *defining opposite* of elastic.",
-      "Right. Internal impulses cancel by N3 (momentum safe); sticking maximizes KE loss to deformation and heat for the given momentum.",
-      "KE is precisely the casualty here; momentum is precisely the survivor. You have them swapped.",
-      "Complexity is the beauty of it: momentum conservation holds *regardless* of the force details — that's why it's the collision tool."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "In the ballistic pendulum (bullet embeds in block, block swings to height h), why is ½mv² = (m+M)gh the wrong first equation?",
-     "options": [
-      "It omits the bullet's rotational energy",
-      "The embedding is inelastic — most of the bullet's KE becomes heat, so energy accounting across the impact is invalid",
-      "Momentum isn't conserved during the swing",
-      "It's actually correct — the algebra just gets harder"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Spin is a rounding error here; the missing physics is 20 dB bigger than that.",
-      "Right. Use momentum across the crunch (mv = (m+M)V), then energy across the swing. Applied naively, the one-liner overestimates h by a factor of roughly (m+M)/m — enormous for a bullet.",
-      "During the swing momentum *isn't* conserved (gravity and string tension act) — but that phase is exactly where *energy* methods are valid. You've got the map inverted.",
-      "It's wrong in the first line, not hard in the third: it silently assumes zero energy loss in a maximally lossy collision."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "You stand on frictionless ice holding a heavy ball, everything at rest, and throw the ball forward. Just afterward, the total momentum of you+ball is:",
-     "options": [
-      "Forward — the throw created momentum",
-      "Backward — recoil dominates because you're heavier",
-      "Zero, as before: the ball's forward momentum exactly cancels your backward recoil",
-      "Indeterminate without the throwing force profile"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Internal forces can't create system momentum — your push on the ball and its push on you cancel to the newton, at every instant.",
-      "Mass changes the *speeds* (you recoil slowly, ball flies fast), never the momentum balance — m_you·v_you = m_ball·v_ball exactly.",
-      "Right. The system started at p = 0 with no external horizontal force, so p = 0 forever. This is also precisely how rockets work — exhaust is the thrown ball, continuously.",
-      "That's the beauty: the force profile is irrelevant. Any internal push, however wild, leaves total p at zero."
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "An airbag saves you in a crash. In impulse–momentum terms, what does it actually change?",
-     "options": [
-      "It reduces your momentum change Δp",
-      "It extends the stopping time Δt, reducing the peak force for the same Δp",
-      "It absorbs your momentum into the bag",
-      "It converts your momentum into energy"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Δp is fixed by the crash: your mv must reach zero regardless. No cushion negotiates that.",
-      "Right. ∫F dt = Δp is a contract: same area under the curve, but stretched over 10× the time means ~1/10 the peak force. Crumple zones, helmets, and bending your knees on landing are all the same theorem.",
-      "Momentum isn't a fluid the bag soaks up — it flows to the car and Earth through forces. The bag just meters the flow rate.",
-      "Momentum and energy aren't interconvertible — different quantities, different units, different conservation laws."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Feynman Lectures I, Ch. 10 — Conservation of Momentum",
-     "url": "https://www.feynmanlectures.caltech.edu/I_10.html",
-     "type": "reading",
-     "note": "Momentum conservation derived straight from the third law, then aimed at collisions."
-    },
-    {
-     "label": "Khan Academy — Linear momentum and collisions",
-     "url": "https://www.khanacademy.org/science/physics/linear-momentum",
-     "type": "video",
-     "note": "Elastic vs inelastic worked examples, including the ballistic pendulum."
-    },
-    {
-     "label": "Wikipedia — Elastic collision",
-     "url": "https://en.wikipedia.org/wiki/Elastic_collision",
-     "type": "reading",
-     "note": "The 1-D two-body formulas and the limiting cases (equal masses swap velocities; wall reverses you)."
-    }
-   ]
-  },
-  {
-   "id": "c06-circular",
-   "title": "Circular motion and gravitation",
-   "summary": "Circular motion at constant speed is still acceleration — v²/r toward the center — and 'centripetal' names the job some real force performs. Orbits are the same idea: perpetual free fall.",
-   "cards": [
-    {
-     "h": "Centripetal is a job description",
-     "md": "Uniform circular motion is *accelerated* motion: speed constant, velocity turning, and the turning is an acceleration of magnitude\n\n## a = v²/r, pointed at the center.\n\nHere is the confusion to kill permanently: **there is no force called centripetal**. 'Centripetal' is the *requirement* — N2 says something real must supply mv²/r toward the center, and the supplier is always an ordinary force already on your free-body diagram:\n\n- Ball on a string → tension\n- Car on a flat curve → static friction\n- Car on a banked curve → a component of the normal force\n- Moon around Earth → gravity\n\nWriting 'centripetal force' as an extra FBD arrow double-counts. The right procedure: draw the real forces, sum the components toward the center, set the sum equal to mv²/r. If the real forces can't total mv²/r — friction maxes out, string snaps — the body simply stops turning that tightly and slides wide."
-    },
-    {
-     "h": "Centrifugal, and the released ball",
-     "md": "The outward 'force' you feel in a turning car is your **inertia** viewed from a rotating frame: your body tries to continue straight while the car curves in under you. In the ground frame there is no outward force on you at all — only an inward one (the door, the seat) making you turn. In the car's rotating frame you may legally add a fictitious centrifugal force to balance the books; both tells from concept 1 apply (mass-proportional, no reaction partner).\n\nThe litmus test: whirl a ball on a string and release. If an outward force existed, the ball would fly radially outward. It doesn't — it departs on the **tangent**, exactly along the velocity it already had, then falls like any projectile. Nothing was ever pulling it out; something had been pulling it *in*, and stopped."
-    },
-    {
-     "h": "An orbit is falling and missing",
-     "md": "Newton's cannonball: fire horizontally from a mountain, faster and faster. The ball falls the whole time; at ~7.9 km/s the Earth's surface curves away exactly as fast as the ball falls toward it. It falls forever and never lands. **That is an orbit** — free fall with enough sideways speed. Gravity supplies the centripetal requirement: GMm/r² = mv²/r, and Kepler's laws tumble out of the inverse square.\n\nThis kills the most durable misconception in the subject: astronauts are *not* weightless because they escaped gravity. At ISS altitude, g is still about **90%** of its surface value. They float because station and astronaut are **falling together** — the same N = 0 as the cut-cable elevator of concept 3, sustained forever. 'Weightlessness' is free fall, not the absence of weight."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A ball whirls on a string in a horizontal circle. The string suddenly breaks. Viewed from above, the ball initially travels:",
-     "options": [
-      "Radially outward, flung by centrifugal force",
-      "Along the tangent — straight, in the direction of its velocity at release",
-      "In a spiral that gradually unwinds",
-      "It continues on the circle briefly before departing"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The outward force never existed — it was the rotating frame's bookkeeping. Nothing real points outward at the moment of release.",
-      "Right. With the inward pull gone, N1 takes over: constant velocity, which at that instant is tangent to the circle.",
-      "Spirals require a continuing tangential force; after release the ball is force-free (horizontally).",
-      "Circular motion requires continuous inward force. The instant it vanishes, curvature vanishes with it — no grace period."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A car rounds an unbanked highway curve at constant speed. The force playing the centripetal role is:",
-     "options": [
-      "The centripetal force, a distinct inward force that arises in turns",
-      "The engine's forward force, redirected by the steering",
-      "Static friction from the road on the tires, pointing toward the curve's center",
-      "The normal force from the road"
-     ],
-     "answer": 2,
-     "feedback": [
-      "No such distinct force exists — 'centripetal' is the job title, and on a flat curve friction holds the job.",
-      "Engine force is internal and points along the car's motion; something external and *sideways* must curve the path.",
-      "Right. The turned tires would slide outward without friction gripping inward — mv²/r of it. Exceed μ_s N (ice, speed) and the car obeys N1: straight ahead, off the curve.",
-      "On a *flat* road the normal force is vertical — no horizontal component to bend the path. Banking the curve is exactly the trick that gives N an inward component."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Astronauts float aboard the ISS (~400 km up) because:",
-     "options": [
-      "Gravity is essentially zero at that altitude",
-      "Their centrifugal force balances gravity, leaving zero net force",
-      "They and the station are in continuous free fall together — the orbit IS the falling",
-      "The station's speed generates lift that cancels their weight"
-     ],
-     "answer": 2,
-     "feedback": [
-      "g at 400 km is ~8.7 m/s² — about 90% of surface gravity. If gravity were zero the station wouldn't orbit at all; it would leave in a straight line.",
-      "In the inertial frame there's no centrifugal force and the net force is decidedly nonzero — gravity, providing exactly the v²/r acceleration of the orbit.",
-      "Right. Everything falls together, so nothing presses on anything: N = 0, the cut-cable elevator sustained forever. Weight is nearly full; *apparent* weight is zero.",
-      "Lift needs air. The mechanism is pure gravity plus sideways speed — falling and perpetually missing."
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "For a satellite in circular orbit, the equation GMm/r² = mv²/r expresses:",
-     "options": [
-      "A balance of two forces, leaving the satellite in equilibrium",
-      "Gravity as the sole force, exactly supplying the centripetal requirement for that r and v",
-      "The condition where gravity cancels the satellite's inertia",
-      "An approximation valid only near the Earth's surface"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Equilibrium means a = 0 and straight-line motion. An orbiting satellite accelerates continuously — that's what orbiting is. One side of this equation is a force; the other is ma.",
-      "Right. It's N2, not a balance: F_gravity = ma_centripetal. One real force, doing exactly the turning job. Solve it for v and Kepler's third law is twenty seconds away.",
-      "Inertia isn't a force to cancel — it's the straight-line tendency that gravity continuously bends.",
-      "It holds at any r — that's the inverse-square law's whole content, from LEO to the Moon (Newton's original check)."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Feynman Lectures I, Ch. 7 — The Theory of Gravitation",
-     "url": "https://www.feynmanlectures.caltech.edu/I_07.html",
-     "type": "reading",
-     "note": "The Moon as a falling body, Kepler from inverse-square, and the universality of gravitation — the best short telling in print."
-    },
-    {
-     "label": "Khan Academy — Centripetal force and gravitation",
-     "url": "https://www.khanacademy.org/science/physics/centripetal-force-and-gravitation",
-     "type": "video",
-     "note": "Flat and banked curves, orbits, and the 'no extra arrow' discipline in worked form."
-    },
-    {
-     "label": "Wikipedia — Centrifugal force",
-     "url": "https://en.wikipedia.org/wiki/Centrifugal_force",
-     "type": "reading",
-     "note": "The rotating-frame bookkeeping done properly — when the fictitious force is legitimate and when it's a blunder."
-    }
-   ]
-  },
-  {
-   "id": "c07-oscillation",
-   "title": "Oscillation",
-   "summary": "A linear restoring force F = −kx yields sinusoidal motion whose period ignores amplitude. The pendulum only joins the club through the small-angle approximation — the textbook's quietest lie.",
-   "cards": [
-    {
-     "h": "SHM in one line of ODE",
-     "md": "Simple harmonic motion is what happens when the restoring force is **linear** in displacement:\n\nF = −kx  →  m x″ = −kx  →  x(t) = A cos(ωt + φ), with **ω = √(k/m)**.\n\nYou solved this equation for a living once; the physics worth re-savoring is what the solution *says*:\n\n- Period **T = 2π√(m/k)** — no A anywhere. Double the amplitude: same period (**isochronism**). The spring pulls harder exactly in proportion to the longer path, and the two effects cancel — a privilege of *linearity*, not of oscillation in general.\n- Velocity is maximal at the center where a = 0; acceleration is maximal at the turning points where v = 0. Position, velocity, acceleration: each 90° ahead of the last.\n- Energy sloshes: ½kA² total, all kinetic at center, all potential at the extremes, trading twice per cycle.\n\nWhy this one equation is everywhere: near almost any stable equilibrium, U(x) is approximately parabolic (Taylor: the first surviving term is quadratic), so **every small oscillation is approximately SHM** — molecules, buildings, circuits, markets' toy models. SHM is the universal small-wiggle."
-    },
-    {
-     "h": "The pendulum's small-angle lie",
-     "md": "The pendulum is *not* a simple harmonic oscillator. Its restoring torque goes as **sin θ**, not θ — the true equation is θ″ = −(g/L) sin θ, and it has no elementary solution.\n\nThe textbook move: for small θ, sin θ ≈ θ, the equation linearizes, and out comes the formula you remember:\n\n## T = 2π√(L/g) — *small angles only.*\n\nThe fine print, quantified: the true period *grows* with amplitude — by ~0.05% at 5°, ~1.7% at 30°, ~18% at 90°. Grandfather clocks keep the swing tiny for exactly this reason.\n\nAnd the deeper gem you may have forgotten you knew: **mass cancels**. The m in F = ma (inertia) and the m in mg (gravitational pull) divide out — heavy and light bobs swing identically, just as all masses free-fall identically. That equality of inertial and gravitational mass is, in Newton, a shrug-worthy coincidence. Einstein will make it the cornerstone (next concept)."
-    },
-    {
-     "h": "Damping and resonance",
-     "md": "Two add-ons complete the practical picture:\n\n- **Damping** (−bv): amplitude decays exponentially; the frequency droops slightly. Push damping far enough and oscillation dies entirely (critical damping — what shock absorbers and instrument needles are tuned to: fastest settling, no overshoot).\n- **Driving**: push the system periodically and it answers at *your* frequency — but the response amplitude explodes as the drive frequency approaches ω₀ = √(k/m). That's **resonance**: each push arrives timed to add energy, like a well-timed playground swing. Lightly damped systems build enormous amplitude from small periodic inputs — opera glass and wineglass, bridge and marching soldiers, quartz watch and its 32,768 Hz tuning fork.\n\nResonance is the design constraint *and* the design tool: you tune radios with it and stiffen bridges against it. Q — how many radians of oscillation before energy decays substantially — is the one number engineers pass around."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "You double the amplitude of a mass-on-spring oscillator. Its period:",
-     "options": [
-      "Doubles — twice the distance to cover",
-      "Halves — the spring pulls harder",
-      "Is unchanged — larger force and longer path cancel exactly, because F is linear in x",
-      "Increases by √2"
-     ],
-     "answer": 2,
-     "feedback": [
-      "The path doubles, but so does the average force, hence the average speed. For F ∝ x the cancellation is exact.",
-      "It does pull harder — and the mass travels proportionally farther and faster. Neither effect wins.",
-      "Right. Isochronism: T = 2π√(m/k), amplitude-blind. This is a special privilege of *linear* restoring forces — the pendulum at large angles loses it.",
-      "√2 scalings belong to changing m or k, not A. T = 2π√(m/k) has no amplitude in it."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A pendulum clock is set swinging at 60° amplitude instead of its designed 3°. Compared with T = 2π√(L/g), its actual period is:",
-     "options": [
-      "The same — pendulum period is independent of amplitude",
-      "Longer — sin θ < θ means weaker restoring torque than SHM assumes at large angles",
-      "Shorter — bigger swings mean higher speeds",
-      "Longer or shorter depending on the bob's mass"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That independence was the small-angle approximation talking — it's a property of the *linearized* pendulum, not the real one.",
-      "Right. At large θ the true restoring torque (∝ sin θ) lags the linear one (∝ θ), so the return trip takes longer — several percent longer at 60°. The clock runs slow.",
-      "Speeds are higher, but the distances grow faster than the restoring force can service. The nonlinearity loses the exact cancellation that linear springs enjoy.",
-      "Mass cancels from the pendulum equation entirely — inertial m and gravitational m divide out. Amplitude is the culprit."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why does a pendulum's period not depend on the mass of the bob?",
-     "options": [
-      "It does, weakly — heavier bobs swing slightly slower",
-      "The inertial mass (resisting acceleration) and gravitational mass (feeling the pull) cancel — the same equivalence that makes all objects free-fall alike",
-      "Air resistance compensates for the extra weight",
-      "Because the string's tension adjusts to the mass"
-     ],
-     "answer": 1,
-     "feedback": [
-      "In vacuum, not even weakly — m appears on both sides of the equation of motion and cancels identically.",
-      "Right. mL θ″ = −mg sin θ: the m's divide out, exactly as in free fall. Newton measured this equivalence with pendulums to ~1 part in 1000; Einstein promoted the 'coincidence' to the founding principle of general relativity.",
-      "The cancellation is exact in vacuum, where air plays no role at all.",
-      "Tension does scale with mass, but that's a symptom of the same cancellation, not its cause — the along-arc dynamics never see m."
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "In SHM, where is the acceleration largest in magnitude?",
-     "options": [
-      "At the center, where the speed is greatest",
-      "At the turning points, where the displacement — and hence restoring force — is greatest",
-      "It's constant throughout the cycle",
-      "Halfway between center and extreme"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The center is where acceleration is exactly *zero* — maximum speed and zero force coincide. Speed and acceleration peak in different places; that gap trips everyone.",
-      "Right. a = −(k/m)x: extreme displacement, extreme force, extreme acceleration — at the very instant v = 0. The oscillator is a machine for keeping v and a out of phase.",
-      "Constant acceleration is projectile motion's signature. SHM's acceleration swings sinusoidally between ±ω²A.",
-      "a tracks displacement linearly — it peaks at the extremes, with nothing special at the midpoint."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Feynman Lectures I, Ch. 21 — The Harmonic Oscillator",
-     "url": "https://www.feynmanlectures.caltech.edu/I_21.html",
-     "type": "reading",
-     "note": "Why the same equation runs springs, circuits, and light — SHM as physics' universal small-wiggle."
-    },
-    {
-     "label": "3Blue1Brown — Differential equations, a tourist's guide",
-     "url": "https://www.3blue1brown.com/lessons/differential-equations",
-     "type": "video",
-     "note": "The pendulum done honestly — phase space, the sin θ nonlinearity, and exactly where the small-angle approximation lives."
-    },
-    {
-     "label": "Wikipedia — Pendulum (mechanics)",
-     "url": "https://en.wikipedia.org/wiki/Pendulum_(mechanics)",
-     "type": "reading",
-     "note": "The full nonlinear treatment with the amplitude-correction series — the small-angle lie itemized to any precision you like."
-    }
-   ],
-   "anim": "spring_phase"
-  },
-  {
-   "id": "c08-limits",
-   "title": "Where Newton breaks",
-   "summary": "Too fast, too small, too much gravity: three regimes where Newtonian mechanics fails — and precisely how it fails, what survives (F = dp/dt, conservation laws), and why it remains the right tool inside its domain.",
-   "cards": [
-    {
-     "h": "Too fast: relativity",
-     "md": "The Galilean rule from concept 1 — velocities add, v′ = v − u — is the piece that breaks first. Measure the speed of light from a moving platform and you get **the same c**, contradicting the addition rule that seemed too obvious to state. Einstein (1905) kept the physics-is-frame-independent principle and let simultaneity, time, and length bend instead.\n\nWhat happens to mechanics:\n\n- **F = ma fails.** No force can push a body past c; as v → c, the same force buys less and less acceleration.\n- **F = dp/dt survives**, with momentum corrected to p = γmv, γ = 1/√(1 − v²/c²). Newton's own formulation, again, was the durable one.\n- Every Newtonian formula is recovered as the **v ≪ c limit**: γ ≈ 1 + ½v²/c², and the corrections at everyday speeds are parts per trillion.\n\nNewton isn't wrong so much as *embedded* — the low-speed face of a deeper theory."
-    },
-    {
-     "h": "Too small: quantum mechanics",
-     "md": "Newton's deepest assumption is so quiet you never noticed it: that a particle *has* a definite position and momentum at every instant — a trajectory. Below the atomic scale, that assumption fails. Electrons interfere like waves; position and momentum can't both be sharp (Δx·Δp ≳ ℏ); identical setups yield different outcomes, lawfully random.\n\nThere is no orbit in a hydrogen atom — there is a standing wave of probability. The determinism of F = ma is replaced by deterministic evolution of a *probability amplitude* (Schrödinger's equation).\n\nYet the correspondence holds here too: when actions are huge compared with ℏ ≈ 10⁻³⁴ J·s — any object you can see — quantum expectation values obey Newton's equations (Ehrenfest's theorem). A baseball is a quantum object whose wave spreading is unmeasurably tiny. Newton is the **large-action limit**, just as he was the low-speed limit."
-    },
-    {
-     "h": "Too much gravity — and the first crack",
-     "md": "The crack appeared *within* Newtonian astronomy's greatest triumph. Planetary perturbation theory predicted Neptune from Uranus's wobbles (1846) — Newton at his imperial best. The same method applied to Mercury left a stubborn residue: its perihelion precesses **43 arcseconds per century** more than every Newtonian influence could explain. Astronomers hypothesized a hidden planet ('Vulcan'). It doesn't exist.\n\nGeneral relativity (1915) resolved it to the arcsecond, with no free parameters: gravity is not a force but the **curvature of spacetime**, and Mercury, deepest in the Sun's curvature, feels the strongest correction. The equivalence of inertial and gravitational mass — the pendulum 'coincidence' of concept 7 — is the load-bearing principle: gravity can be locally erased by free fall (your ISS astronauts, again), which only geometry explains cleanly.\n\nThe honest summary: Newtonian mechanics is a **superbly accurate limiting case** — valid when v ≪ c, action ≫ ℏ, gravity weak. Inside that domain (bridges, engines, spacecraft trajectories) it remains the correct engineering physics, and NASA flies missions on it. Your GPS receiver, meanwhile, quietly corrects for both special and general relativity (−7 μs and +45 μs per day) — the breakdown is in your pocket."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "At relativistic speeds F = ma fails, yet F = dp/dt survives. What makes the momentum form the durable one?",
-     "options": [
-      "It's easier to measure momentum than acceleration",
-      "With p = γmv, the momentum form remains exactly correct — mass's growing 'reluctance' near c is absorbed into p, while ma hard-codes the low-speed relation",
-      "Momentum is a vector while acceleration is not",
-      "It doesn't survive; both forms fail equally at high speed"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Measurability isn't the criterion — correctness of the law's form under the new kinematics is.",
-      "Right. The law 'force changes momentum' is deeper than 'force produces acceleration'; only the expression *for* momentum needed repair. Newton's original phrasing outlived his kinematics.",
-      "Both are vectors. The difference is that dp/dt correctly encodes the γ factor's velocity dependence; ma cannot.",
-      "Experiments in every accelerator on Earth run on F = dp/dt with relativistic p — it survives spectacularly."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Mercury's perihelion precesses 43″/century more than Newtonian perturbation theory predicts. Historically, what did this anomaly turn out to mean?",
-     "options": [
-      "Observational error — resolved with better telescopes",
-      "A hidden inner planet (Vulcan) perturbing Mercury",
-      "Newtonian gravity itself is incomplete; general relativity predicted the 43″ exactly, with no adjustable parameters",
-      "Mercury's unusual density distorts its orbit"
-     ],
-     "answer": 2,
-     "feedback": [
-      "The residue survived every improvement in instruments and analysis for six decades — it was in the physics, not the glass.",
-      "The community's actual first guess — the same move that had triumphantly found Neptune. But Vulcan was never there; the missing planet was missing physics.",
-      "Right. The first observed crack in Newtonian mechanics, hiding inside its best-tested domain, and GR's first confirmation. A theory's residuals are where its successor is born.",
-      "The planet's internal structure is irrelevant at these scales — the effect is the Sun's spacetime curvature, strongest for the innermost orbit."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Given relativity and quantum mechanics, what is the accurate status of Newtonian mechanics today?",
-     "options": [
-      "Falsified — retained only for historical and teaching purposes",
-      "A limiting case, essentially exact for v ≪ c, action ≫ ℏ, and weak gravity — which is why real engineering and spaceflight still run on it",
-      "Correct for solids; the newer theories cover only light and atoms",
-      "An unresolved rivalry among three competing frameworks"
-     ],
-     "answer": 1,
-     "feedback": [
-      "'Falsified' misreads how physics grows: the successors *reproduce* Newton inside his domain — that reproduction (the correspondence principle) was a design requirement for accepting them.",
-      "Right. Newton bounds his own validity now: parts-per-trillion accurate for a car, and good enough to navigate probes across the solar system. Knowing a theory's domain is knowing the theory.",
-      "The split isn't by material — a fast-enough solid is relativistic, a cold-enough solid is quantum. It's by regime: speed, action, field strength.",
-      "No rivalry: nested domains with agreed boundaries and exact correspondence in the overlaps."
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "GPS satellite clocks are corrected for relativity (net ≈ +38 μs/day). Uncorrected, roughly what would happen to positioning?",
-     "options": [
-      "Nothing measurable — the effect is parts per trillion",
-      "Errors accumulating at kilometers per day — light covers ~11 km in 38 μs",
-      "A one-time fixed offset, easily calibrated away",
-      "GPS uses only geometry, so clock rates don't matter"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Parts-per-trillion is everyday-speed intuition, but GPS runs on nanosecond timing at orbital speed in weaker gravity — both corrections (special: −7, general: +45 μs/day) are enormous at that precision.",
-      "Right. Position is timing: c × 38 μs ≈ 11 km of drift per day. Relativity isn't philosophy here — it's a line item in the error budget of the map on your phone.",
-      "It's a *rate* mismatch, not an offset — the error compounds daily. You can't calibrate away a clock that runs fast.",
-      "GPS geometry IS timing — position comes from time-of-flight differences. The clocks are the whole instrument."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Feynman Lectures I, Ch. 15 — The Special Theory of Relativity",
-     "url": "https://www.feynmanlectures.caltech.edu/I_15.html",
-     "type": "reading",
-     "note": "Picks up exactly where Galilean invariance breaks, and repairs mechanics from the inside."
-    },
-    {
-     "label": "Feynman Lectures I, Ch. 37 — Quantum Behavior",
-     "url": "https://www.feynmanlectures.caltech.edu/I_37.html",
-     "type": "reading",
-     "note": "The double-slit chapter — 'the only mystery.' The cleanest possible account of where trajectories end."
-    },
-    {
-     "label": "Wikipedia — Tests of general relativity",
-     "url": "https://en.wikipedia.org/wiki/Tests_of_general_relativity",
-     "type": "reading",
-     "note": "Mercury's 43″, light deflection, gravitational time dilation, GPS — the receipts for the third break."
-    }
-   ]
-  }
- ]
+  ]
 }

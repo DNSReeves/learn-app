@@ -1,599 +1,603 @@
 {
- "id": "roman-engineering",
- "title": "Engineering of the Roman Empire",
- "tagline": "How to build for two thousand years.",
- "description": "Concrete, arches, aqueducts, roads, and the systems thinking that held an empire together — and why some of it still stands.",
- "prereqs": [],
- "concepts": [
-  {
-   "id": "c01-concrete",
-   "title": "Roman concrete",
-   "summary": "Opus caementicium — lime, volcanic pozzolana ash, and aggregate — set underwater and grew more durable over centuries; it was the enabling material of Roman architecture.",
-   "cards": [
+  "id": "roman-engineering",
+  "title": "Engineering of the Roman Empire",
+  "tagline": "How to build for two thousand years.",
+  "description": "Concrete, arches, aqueducts, roads, and the systems thinking that held an empire together — and why some of it still stands.",
+  "prereqs": [],
+  "concepts": [
     {
-     "h": "The material that changed what was buildable",
-     "md": "Greek architecture was cut stone: precise, beautiful, and limited to what stacked blocks can do. Rome's revolution was **opus caementicium** — concrete: lime mortar mixed with **pozzolana** (volcanic ash, named for Pozzuoli near Naples) and rubble aggregate.\n\nThe pozzolana was the magic. Its reactive silica and alumina bond with lime into a mineral glue that cures without air — meaning Roman concrete **sets underwater**. Harbors, bridge piers, and foundations could be poured where no stone could be laid. And poured material takes *any shape a mold can hold* — which is what made the vaults and domes of the next concept possible."
+      "id": "c01-concrete",
+      "title": "Roman concrete",
+      "summary": "Opus caementicium — lime, volcanic pozzolana ash, and aggregate — set underwater and grew more durable over centuries; it was the enabling material of Roman architecture.",
+      "cards": [
+        {
+          "h": "The material that changed what was buildable",
+          "md": "Greek architecture was cut stone: precise, beautiful, and limited to what stacked blocks can do. Rome's revolution was **opus caementicium** — concrete: lime mortar mixed with **pozzolana** (volcanic ash, named for Pozzuoli near Naples) and rubble aggregate.\n\nThe pozzolana was the magic. Its reactive silica and alumina bond with lime into a mineral glue that cures without air — meaning Roman concrete **sets underwater**. Harbors, bridge piers, and foundations could be poured where no stone could be laid. And poured material takes *any shape a mold can hold* — which is what made the vaults and domes of the next concept possible."
+        },
+        {
+          "h": "Why it outlasts ours",
+          "md": "Roman marine concrete has survived two millennia of pounding surf; modern rebar-reinforced concrete often spalls within a century. Two reasons, both now understood:\n\n- Seawater reacting with the pozzolanic mix grows interlocking minerals (like aluminous tobermorite) *inside* cracks — the material heals and strengthens with exposure. Modern analysis also credits hot-mixed lime clasts that dissolve into fresh cracks and reseal them.\n- No steel inside. Rebar gives modern concrete tensile strength but rusts, expands, and bursts its cover. Romans avoided the failure mode by never relying on tension — which is why the *shape* of Roman structures (next concept) had to do the work steel does for us."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The ingredient that let Roman concrete cure underwater:",
+          "options": [
+            "Marble dust",
+            "Pozzolana — reactive volcanic ash",
+            "Lead oxide",
+            "Sea salt"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Marble is decorative calcium carbonate — no hydraulic reaction.",
+            "Right — its silica/alumina react with lime to form a binder that needs water, not air, to set.",
+            "Lead was for pipes and cramps, never the binder.",
+            "Salt attacks most concrete; the pozzolanic chemistry is what *tolerates* and even exploits seawater."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Modern reinforced concrete often fails within a century primarily because:",
+          "options": [
+            "Modern cement is weaker than Roman lime",
+            "Embedded steel rusts, expands, and cracks the concrete from within",
+            "Modern concrete can't set underwater",
+            "Buildings are taller now"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Modern Portland cement is *stronger* in compression — longevity, not strength, is the trade-off.",
+            "Right — corrosion-driven spalling. The Romans sidestepped it by using no tension steel at all and letting geometry carry the loads.",
+            "Modern marine concretes set underwater fine; durability under attack is the issue.",
+            "Height changes loads, but the rebar-corrosion mechanism operates at any scale."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Concrete's deepest architectural consequence for Rome was:",
+          "options": [
+            "Cheaper decoration",
+            "Freedom of form — poured material takes the shape of its mold, enabling vaults and domes cut stone can't achieve",
+            "Faster demolition",
+            "Lighter buildings"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Decoration stayed expensive — concrete cores were faced with brick or marble.",
+            "Right — the material unlocked curved, continuous, monolithic interiors. The Pantheon is a poured shape, not a stacked one.",
+            "Roman concrete is famously miserable to demolish.",
+            "Roman concrete is heavy; the Pantheon's designers had to lighten the mix toward the top deliberately."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "MIT News — Riddle solved: why was Roman concrete so durable?",
+          "url": "https://news.mit.edu/2023/roman-concrete-durability-lime-casts-0106",
+          "type": "reading",
+          "note": "The 2023 self-healing lime-clast research, from the source institution."
+        },
+        {
+          "label": "Open Yale — Roman Architecture (Diana Kleiner)",
+          "url": "https://oyc.yale.edu/history-of-art/hsar-252",
+          "type": "video",
+          "note": "Full free Yale course; the concrete revolution is a running theme. The companion resource for this whole topic."
+        }
+      ],
+      "anim": "roman_concrete_heal"
     },
     {
-     "h": "Why it outlasts ours",
-     "md": "Roman marine concrete has survived two millennia of pounding surf; modern rebar-reinforced concrete often spalls within a century. Two reasons, both now understood:\n\n- Seawater reacting with the pozzolanic mix grows interlocking minerals (like aluminous tobermorite) *inside* cracks — the material heals and strengthens with exposure. Modern analysis also credits hot-mixed lime clasts that dissolve into fresh cracks and reseal them.\n- No steel inside. Rebar gives modern concrete tensile strength but rusts, expands, and bursts its cover. Romans avoided the failure mode by never relying on tension — which is why the *shape* of Roman structures (next concept) had to do the work steel does for us."
+      "id": "c02-arch",
+      "title": "The arch, the vault, and the dome",
+      "summary": "The arch converts loads into compression, which stone and concrete handle superbly; extrude it into vaults, rotate it into domes — the Pantheon is the proof.",
+      "cards": [
+        {
+          "h": "Turning weight into squeeze",
+          "md": "Stone and concrete are strong in **compression** (squeezing) and weak in **tension** (pulling). A flat stone beam bends under load — its underside goes into tension and cracks. Span limit: a few meters.\n\nThe **arch** solves this with geometry: wedge-shaped stones (voussoirs) locked by a central keystone redirect the load *along the curve*, so every joint is squeezed shut. The heavier the load, the tighter it locks. All that redirected force emerges sideways at the base as **thrust** — which is why arches need massive abutments or neighboring arches to lean against. The material's weakness never gets asked a question it can't answer."
+        },
+        {
+          "h": "Extrude, intersect, rotate",
+          "md": "Master the arch and three moves give you Roman interior space:\n\n- **Extrude** an arch along a line → the **barrel vault**: a corridor of ceiling\n- **Intersect** two barrel vaults → the **groin vault**: loads concentrate at four corner points, freeing the walls between (the skeleton of the great bath halls and basilicas)\n- **Rotate** an arch around its center → the **dome**\n\nThe Pantheon (c. 126 AD) is the masterclass: a 43.3 m concrete dome — the world's largest unreinforced dome to this day — with walls graded from heavy aggregate at the base to light pumice near the top, coffers carved to shed weight, and a 9 m oculus where the compression ring needs no center at all."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The arch outperforms the flat stone beam because it:",
+          "options": [
+            "Uses less material",
+            "Redirects loads into compression along its curve, avoiding the tension that cracks stone",
+            "Is more beautiful",
+            "Eliminates all forces"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Arches often use *more* material once abutments count — the win is where the forces go, not how much stone.",
+            "Right — geometry converts the material's fatal weakness into its greatest strength.",
+            "Rome agreed, but the structural argument is what let beauty span 30 meters.",
+            "Forces never vanish; the thrust re-emerges at the base and must be bought with buttressing."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A groin vault (two intersecting barrel vaults) improved on the plain barrel vault by:",
+          "options": [
+            "Weighing nothing",
+            "Concentrating loads onto four corner piers, so the walls between could open into windows and arcades",
+            "Requiring no formwork",
+            "Spanning shorter distances"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It's still massive concrete overhead.",
+            "Right — point loads instead of continuous wall loads. Light and openness follow; the imperial bath halls are the showcase.",
+            "Vault concrete was poured over enormous wooden formwork either way.",
+            "Spans grew, not shrank — that was the point."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The Pantheon's builders graded the aggregate from basalt at the base to pumice near the oculus because:",
+          "options": [
+            "Pumice was more expensive and thus prestigious",
+            "Reducing the dome's weight where it matters most cuts the stresses the lower structure must carry",
+            "Basalt was unavailable in quantity",
+            "Color matching"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Pumice was the *cheap, light* choice — the logic is structural, not status.",
+            "Right — engineered density gradient: heavy strength where loads accumulate, lightness where every kilogram would add stress below. Weight management as design.",
+            "Basalt was plentiful — it's in the foundations.",
+            "The dome was concealed and coffered; nobody saw the aggregate."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Open Yale — Roman Architecture, Pantheon lecture",
+          "url": "https://oyc.yale.edu/history-of-art/hsar-252",
+          "type": "video",
+          "note": "Kleiner's Pantheon lecture is the single best hour on this concept."
+        },
+        {
+          "label": "Smarthistory — The Pantheon",
+          "url": "https://smarthistory.org/the-pantheon/",
+          "type": "reading",
+          "note": "Concise, well-illustrated walkthrough of the structure and its engineering."
+        }
+      ],
+      "anim": "arch_thrust"
+    },
+    {
+      "id": "c03-aqueducts",
+      "title": "Aqueducts: engineering a gradient",
+      "summary": "Aqueducts moved water by gravity alone down gradients as shallow as ~1 in 3,000, mostly underground; the famous bridges and inverted siphons handled the exceptions.",
+      "cards": [
+        {
+          "h": "A slope you can barely measure",
+          "md": "No pumps — an aqueduct is a **continuous downhill path**, sometimes 90+ km long, maintained at astonishing precision: typical gradients of 1–3 m of drop per km, and stretches of the Nîmes aqueduct near **1 in 3,000** (34 cm per km). Too steep erodes the channel; too shallow stagnates the flow.\n\nSurveying tools: the **chorobates** (a long water-level bench) and the **dioptra** for angles. Holding a 3-cm-per-100-m error budget across valleys and ridges, with sight lines and water levels, remains one of antiquity's great precision achievements.\n\nThe postcard arcades are the exception: roughly 80–90% of most aqueducts ran **underground** in covered channels — cheaper, protected from fouling and sabotage."
+        },
+        {
+          "h": "Crossing the impossible",
+          "md": "Where a valley was too deep even for arcades, Romans used the **inverted siphon**: water plunges down one slope in sealed lead pipes, crosses the valley floor under pressure, and rises up the far side to a receiving tank *slightly lower* than the header tank. Gravity pays the whole bill; the pipes just have to survive the pressure (Lyon's siphons handled well over 100 m of head).\n\nAt the city end, water entered a **castellum divisorium** — a distribution tank splitting flow by civic priority: public fountains and basins first, baths and state buildings next, private subscribers last. Under shortage, the private taps failed first by design. Continuous flow, no storage: Rome's ~11 aqueducts delivered on the order of a million cubic meters a day, and the overflow flushed the sewers — a systems design, not a pipe."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The dominant engineering constraint along an aqueduct's main route:",
+          "options": [
+            "Maximizing arch height for prestige",
+            "Maintaining a continuous, precisely shallow downhill gradient across all terrain",
+            "Keeping water ice-cold",
+            "Minimizing total length"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Arcades were a cost to be minimized — most of the route hid underground.",
+            "Right — the gradient IS the machine. Everything else (tunnels, arcades, siphons) exists to preserve it through inconvenient terrain.",
+            "Covered channels helped temperature, but slope ruled the route.",
+            "Routes wandered far off the straight line precisely to hold the gradient — length was spent to buy slope."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "An inverted siphon can carry water down into a valley and up the other side because:",
+          "options": [
+            "Roman pumps pushed it uphill",
+            "Sealed pipes plus gravity: water rises toward its source level, so it climbs the far slope to any outlet slightly lower than the inlet",
+            "The water was heated to rise",
+            "It cannot — Romans always bridged"
+          ],
+          "answer": 1,
+          "feedback": [
+            "No pumps anywhere in the system — that's the marvel.",
+            "Right — hydrostatics: water seeks its own level. The engineering challenge was pipes (lead, in parallel banks) that survive the pressure at the bottom.",
+            "Thermal lift moves air, not pressurized water mains.",
+            "Several major crossings (Lyon, Pergamon) were siphons exactly because bridges couldn't reach."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "In the castellum divisorium, private connections were plumbed to fail first during shortages. This reveals:",
+          "options": [
+            "Sloppy construction",
+            "Deliberate priority engineering — public water supply was protected by the physical design, not by policy alone",
+            "Private users paid nothing",
+            "Random chance"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The tank geometry was careful — outlet heights encode the priority.",
+            "Right — policy cast in masonry: draw-off levels meant fountains ran while subscribers went dry. Infrastructure as governance.",
+            "Private users paid handsomely — and were still last in line.",
+            "The outlet elevations were chosen; nothing about it was accidental."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Smarthistory — Roman aqueducts (Pont du Gard)",
+          "url": "https://smarthistory.org/pont-du-gard/",
+          "type": "reading",
+          "note": "The Nîmes aqueduct and its near-flat gradient, illustrated."
+        },
+        {
+          "label": "UNESCO — Pont du Gard",
+          "url": "https://whc.unesco.org/en/list/344/",
+          "type": "reading",
+          "note": "World Heritage documentation on the most famous surviving crossing."
+        }
+      ],
+      "anim": "roman_siphon"
+    },
+    {
+      "id": "c04-roads",
+      "title": "Roads and surveying",
+      "summary": "Layered, cambered, drained road construction plus straight-line surveying with the groma built a ~80,000 km all-weather network engineered above all for drainage.",
+      "cards": [
+        {
+          "h": "A machine for staying dry",
+          "md": "The enemy of every road is water. Rome's answer was structure:\n\n- Excavate to firm ground; edge with curbstones\n- **Statumen**: large stone foundation layer\n- **Rudus**: coarse gravel/rubble, often lime-bound\n- **Nucleus**: finer concrete-like bedding\n- **Summum dorsum**: fitted paving stones on top, laid with a **camber** — a crown that sheds rain to side ditches\n\nA meter or more of engineered section, drained by design. That's why via appia stretches survive: the water never got to stay. Major highways ran ~4 m wide with margins — two carts could pass."
+        },
+        {
+          "h": "Straightness as a decision",
+          "md": "Roman roads are famously straight — not because engineers couldn't curve, but because straightness was *cheap to survey and fast to march*. The **groma** (plumb-lines on a cross-staff) aligned successive sighting stakes into dead-straight legs between high points; grades were checked with the same leveling tools as aqueducts. Where terrain argued, Rome cut, filled, zig-zagged passes, or bridged — the line bent at decision points, not by drift.\n\nThe network — on the order of 80,000 km of paved highways plus far more secondary road — was the empire's nervous system: legions moving at ~30 km/day, the **cursus publicus** relay post carrying imperial mail at 75+ km/day, milestones indexing it all to the golden milestone in the Forum. Roads were military infrastructure first; commerce inherited them."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The single design priority that most explains Roman road longevity:",
+          "options": [
+            "Decorative paving patterns",
+            "Drainage — cambered surface, layered permeable structure, and side ditches keep water out of the foundation",
+            "Extreme width",
+            "Painted lane markings"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Paving was fitted for load and wear, not looks.",
+            "Right — freeze-thaw and softened subgrade destroy roads; the entire section is a water-management design. Modern road engineering agrees on the priority.",
+            "About 4 m for major roads — modest; the depth mattered more than the width.",
+            "No paint; milestones and curbs did the signaling."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Roman roads ran straight primarily because:",
+          "options": [
+            "Romans lacked the geometry for curves",
+            "Straight lines were efficient to survey with the groma and fastest for military movement — straightness was a chosen optimization",
+            "Law required it",
+            "The terrain of the empire is naturally flat"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Their arches, siphons, and amphitheater ellipses show complete command of curves.",
+            "Right — stake-to-stake sighting scales; and the roads' first customers marched in columns. Where slopes demanded it, they curved without hesitation.",
+            "No such statute — economics and the army set the habit.",
+            "From Welsh hills to Alpine passes — anything but flat, which is what makes the straightness impressive."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The cursus publicus (imperial relay post) mattered strategically because:",
+          "options": [
+            "It carried tourists",
+            "Information moving at 75+ km/day let a single center govern and defend a continent-scale empire",
+            "It was the empire's main revenue source",
+            "It replaced the need for legions"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Strictly official traffic, by permit.",
+            "Right — an empire is bounded by its command latency. Roads plus relays shrank the effective size of the world Rome had to manage.",
+            "It was a cost, levied on communities along the routes.",
+            "It's what made the legions *deployable* — orders and armies rode the same network."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Open Yale — Roman Architecture (infrastructure lectures)",
+          "url": "https://oyc.yale.edu/history-of-art/hsar-252",
+          "type": "video",
+          "note": "Roads, colonies, and city planning in the imperial system."
+        },
+        {
+          "label": "Stanford ORBIS — geospatial model of the Roman world",
+          "url": "https://orbis.stanford.edu",
+          "type": "interactive",
+          "note": "Compute travel times and costs across the actual Roman network — the road system as a living graph."
+        }
+      ]
+    },
+    {
+      "id": "c05-bridges",
+      "title": "Bridges and foundations in water",
+      "summary": "Semicircular arch spans on piers founded by cofferdams and underwater concrete; the hard problem was the riverbed, not the span.",
+      "cards": [
+        {
+          "h": "The hard part is underwater",
+          "md": "Spanning is the visible achievement; **founding piers in a flowing river** was the real problem. The Roman solution:\n\n1. Drive a double ring of timber piles into the riverbed — a **cofferdam** — packed with clay between the rings to seal it\n2. Bail/pump out the enclosure (bucket chains, Archimedean screws)\n3. Excavate to firm ground and pour **pozzolanic concrete** — the underwater-setting material from concept 1 — or lay stone footings in the dry\n\nOn those piers: semicircular stone arches, pier faces shaped with **cutwaters** (pointed prows) to part the current and shed debris and ice. Trajan's engineer Apollodorus bridged the Danube itself (~1.1 km, timber arches on masonry piers) in two years."
+        },
+        {
+          "h": "Redundancy and its price",
+          "md": "Each Roman arch thrusts against its neighbors and finally the abutments, but classic multi-span design made every pier thick enough to act as an abutment — so one span's loss didn't unzip the bridge. The price: piers fat enough to constrict the river (sometimes 30%+ of the channel), accelerating the current and scouring the riverbed at the very foundations. Scour, not load, is what felled most ancient bridges — and it's still the leading killer of bridges today.\n\nSurvivors like the Pons Fabricius in Rome (62 BC, still carrying pedestrians) and Alcántara in Spain testify to the ones that got the foundations right. Alcántara's architect left an inscription boasting the bridge would last forever; nineteen centuries in, the claim is holding."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The cofferdam's role in bridge construction:",
+          "options": [
+            "A decorative fence",
+            "A temporary watertight enclosure allowing excavation and foundation work in a dry pocket of riverbed",
+            "A permanent part of the bridge",
+            "A boat dock for workers"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Nothing decorative about clay-packed piles in a current.",
+            "Right — make a dry room inside the river, build the pier, let the river back in. Modern bridge builders still do exactly this.",
+            "The timber was temporary; the concrete and stone it enabled were forever.",
+            "Access mattered, but sealing out the river was the function."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why did massive multi-span Roman bridges tend to fail at the riverbed rather than in their arches?",
+          "options": [
+            "Roman arches were weak",
+            "Thick piers constricted the channel, speeding the current and scouring sediment from under the foundations",
+            "Stone dissolves in freshwater",
+            "They didn't — no Roman bridge ever fell"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The arches were typically the overbuilt part.",
+            "Right — each-pier-an-abutment redundancy came at the cost of blockage, and faster water digs. Undermined foundations, not crushed arches, brought them down.",
+            "Roman granite and travertine laugh at freshwater.",
+            "Many fell — which is what makes the surviving ones informative."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The cutwater (pointed upstream face of a pier) exists to:",
+          "options": [
+            "Look like a ship's prow for style",
+            "Divide the current smoothly and deflect debris and ice, reducing pressure and scour at the pier",
+            "House a shrine",
+            "Anchor fishing nets"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The resemblance is real; the purpose is hydraulic.",
+            "Right — streamlining before fluid dynamics had a name: less turbulence, less impact, less digging at the base.",
+            "Shrines went on top of bridges, not in the current.",
+            "The current at a pier nose is the last place for nets."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Smarthistory — Roman engineering and construction",
+          "url": "https://smarthistory.org/roman-architecture/",
+          "type": "reading",
+          "note": "Survey of Roman construction methods including bridge and foundation work."
+        }
+      ],
+      "anim": "roman_scour"
+    },
+    {
+      "id": "c06-water-city",
+      "title": "The water city: baths, sewers, sanitation",
+      "summary": "Continuous aqueduct flow powered baths, fountains, and latrines, and its overflow flushed the Cloaca Maxima — an integrated urban water cycle at million-person scale.",
+      "cards": [
+        {
+          "h": "One flow, many jobs",
+          "md": "Roman urban water was a **cascade**: aqueduct → distribution tank → fountains and baths → latrines and street washing → sewers → river. No storage, no shut-off — the system worked *because* it never stopped flowing. Waste water was working water on its second shift.\n\nThe **Cloaca Maxima**, begun as an open drain in the 6th century BC and later vaulted, still drains parts of Rome today. Public **latrines** (rows of seats over a flushing channel) and hundreds of neighborhood fountains put running water within a short walk of nearly everyone — an urban sanitation baseline Europe would not see again for over a thousand years."
+        },
+        {
+          "h": "The baths as social infrastructure",
+          "md": "The great **thermae** were the aqueducts' flagship customers — the Baths of Caracalla served thousands of bathers a day across cold, warm, and hot halls (frigidarium, tepidarium, caldarium). Heat came from the **hypocaust**: floors raised on brick pillars with furnace gases circulating beneath and up wall flues — radiant heating, engineered per room's target temperature.\n\nAn honest ledger requires the debits: lead pipes (the plumber's *plumbum*) carried supply — though constantly flowing hard water laid protective mineral scale inside them, moderating the poison. Sewers drained to the Tiber untreated, and cities downstream drank the result. Rome mastered water *movement*; water *treatment* waited nearly two thousand more years."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Roman sewers stayed functional at scale primarily because:",
+          "options": [
+            "They were cleaned daily by hand",
+            "The aqueducts' continuous overflow provided constant flushing flow",
+            "Romans produced no waste",
+            "Chemical treatment"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Maintenance existed, but no city hand-cleans its way to functioning sewers.",
+            "Right — the 'waste' of a storage-free supply was the sewer system's power source. Integrated design: one gradient, multiple jobs.",
+            "A million people produce what a million people produce.",
+            "Treatment is a 19th–20th century invention; Rome moved waste, it didn't neutralize it."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The hypocaust heated bath halls by:",
+          "options": [
+            "Open fires in each room",
+            "Circulating furnace gases under raised floors and up hollow wall flues — radiant heat from the structure itself",
+            "Solar panels",
+            "Heated water pipes in the ceiling"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Open flames in a crowded oiled-bather hall — no.",
+            "Right — the building was the radiator. Floor temperature graded by room, caldarium closest to the furnace.",
+            "South-facing windows helped the warm rooms, but the furnace did the work.",
+            "Water was heated in boilers over the same furnaces, but the room heat came through floor and walls."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The most defensible verdict on Roman lead water pipes:",
+          "options": [
+            "Harmless — lead is safe",
+            "A real hazard, moderated in practice by mineral scale deposited inside constantly flowing hard-water pipes",
+            "The sole cause of Rome's fall",
+            "Romans knew nothing of lead's dangers"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Lead is not safe at any era.",
+            "Right — calcium carbonate lining and no-stagnation flow reduced (not eliminated) leaching. A nuanced hazard, not a clean bill and not a civilization-killer.",
+            "The single-cause lead theory doesn't survive contact with the evidence or the chronology.",
+            "Vitruvius himself warned that water from clay pipes was more wholesome — they knew, and built with lead anyway. A familiar story."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Smarthistory — The Baths of Caracalla",
+          "url": "https://smarthistory.org/baths-of-caracalla/",
+          "type": "reading",
+          "note": "The thermae as architecture and social machine."
+        },
+        {
+          "label": "Open Yale — Roman Architecture, baths lectures",
+          "url": "https://oyc.yale.edu/history-of-art/hsar-252",
+          "type": "video",
+          "note": "Kleiner on bathing culture and the imperial thermae."
+        }
+      ],
+      "anim": "roman_cascade"
+    },
+    {
+      "id": "c07-machines",
+      "title": "Machines, cranes, and military engineering",
+      "summary": "Human-powered cranes, waterwheels, and disciplined field engineering — the legion as a construction corps was itself Rome's greatest machine.",
+      "cards": [
+        {
+          "h": "Force multipliers",
+          "md": "Roman mechanical power was muscle, multiplied by machines Vitruvius catalogued:\n\n- **Cranes**: compound pulleys on shear-legs, driven by a **treadwheel** — men walking inside a great wheel. Mechanical advantage let small crews raise multi-ton blocks; the drum of Trajan's Column and temple architraves went up this way\n- **Water power**: the **Barbegal** complex in Gaul ran sixteen overshot waterwheels in two cascading rows — an industrial flour factory feeding a region\n- **Construction logistics**: standardized bricks and pipes, stamped and dated by their makers — interchangeable parts and supply-chain accountability, two millennia early"
+        },
+        {
+          "h": "The legion as an engineering corps",
+          "md": "Rome's decisive machine was organizational. Every legion carried surveyors, masons, and carpenters, and every soldier carried entrenching tools. Each night's halt built a standardized fortified camp — same layout from Scotland to Syria, so any Roman soldier could navigate any Roman camp in the dark.\n\nCaesar's engineers bridged the Rhine in **ten days** — piles driven at an angle against the current — used the bridge for a show of force, then tore it down. At Alesia, his legions built two concentric siege rings totaling over 30 km of fortifications, facing in and out at once. At Masada, a stone-and-earth assault ramp up a desert mesa ended the siege. The message every project sent was the same: *engineering itself was the weapon* — resistance to a power that builds like this is futile.\n\nThat's the through-line of this whole topic: material (concrete) → form (arch) → systems (water, roads) → organization (the legion). Each layer multiplied the last."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The treadwheel crane's significance:",
+          "options": [
+            "It was steam-powered",
+            "Compound pulleys plus a large-radius wheel multiplied human muscle enough to lift multi-ton stones with small crews",
+            "It could only lift bricks",
+            "It was purely ceremonial"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Steam stayed a curiosity (Hero's toys) — never harnessed for work.",
+            "Right — mechanical advantage stacked twice: pulley ratios times wheel leverage. Cathedral builders were still using the same design 1,200 years later.",
+            "Column drums and architrave blocks — the heaviest lifts of ancient construction.",
+            "The lifting marks are still visible on the stones."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The nightly fortified marching camp, identical across the empire, bought the legions:",
+          "options": [
+            "Comfort",
+            "Security plus interoperability — no night assault caught them unfortified, and every soldier knew every camp's layout instantly",
+            "Cheaper food",
+            "Nothing — it was tradition"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Ditch-digging after a 30 km march is many things; comfortable isn't one.",
+            "Right — a standardized, engineered instant fortress every single night. Discipline compounded into strategic invulnerability in the field.",
+            "Logistics ran on roads and granaries; the camp bought safety.",
+            "It was doctrine because it worked — armies that skipped it show up in the casualty lists."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Caesar bridging the Rhine in ten days, crossing, and then demolishing the bridge was primarily:",
+          "options": [
+            "An engineering failure — the bridge should have stayed",
+            "Strategic communication — demonstrating that Rome could project force across any barrier at will",
+            "A religious ritual",
+            "An accident"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The demolition was the plan; the bridge had already done its job.",
+            "Right — the bridge's message outlived its timbers: your river is not a wall. Engineering as deterrence.",
+            "Auguries were taken, but the audience was Germanic, not divine.",
+            "Nothing about ten-day precision piling is accidental."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Open Yale — Roman Architecture (full course)",
+          "url": "https://oyc.yale.edu/history-of-art/hsar-252",
+          "type": "video",
+          "note": "The consolidation resource for the whole topic — watch end to end after mastery."
+        },
+        {
+          "label": "Stanford ORBIS",
+          "url": "https://orbis.stanford.edu",
+          "type": "interactive",
+          "note": "Play logistics officer: route a legion or a grain shipment across the network you just studied."
+        }
+      ]
     }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "The ingredient that let Roman concrete cure underwater:",
-     "options": [
-      "Marble dust",
-      "Pozzolana — reactive volcanic ash",
-      "Lead oxide",
-      "Sea salt"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Marble is decorative calcium carbonate — no hydraulic reaction.",
-      "Right — its silica/alumina react with lime to form a binder that needs water, not air, to set.",
-      "Lead was for pipes and cramps, never the binder.",
-      "Salt attacks most concrete; the pozzolanic chemistry is what *tolerates* and even exploits seawater."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Modern reinforced concrete often fails within a century primarily because:",
-     "options": [
-      "Modern cement is weaker than Roman lime",
-      "Embedded steel rusts, expands, and cracks the concrete from within",
-      "Modern concrete can't set underwater",
-      "Buildings are taller now"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Modern Portland cement is *stronger* in compression — longevity, not strength, is the trade-off.",
-      "Right — corrosion-driven spalling. The Romans sidestepped it by using no tension steel at all and letting geometry carry the loads.",
-      "Modern marine concretes set underwater fine; durability under attack is the issue.",
-      "Height changes loads, but the rebar-corrosion mechanism operates at any scale."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Concrete's deepest architectural consequence for Rome was:",
-     "options": [
-      "Cheaper decoration",
-      "Freedom of form — poured material takes the shape of its mold, enabling vaults and domes cut stone can't achieve",
-      "Faster demolition",
-      "Lighter buildings"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Decoration stayed expensive — concrete cores were faced with brick or marble.",
-      "Right — the material unlocked curved, continuous, monolithic interiors. The Pantheon is a poured shape, not a stacked one.",
-      "Roman concrete is famously miserable to demolish.",
-      "Roman concrete is heavy; the Pantheon's designers had to lighten the mix toward the top deliberately."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "MIT News — Riddle solved: why was Roman concrete so durable?",
-     "url": "https://news.mit.edu/2023/roman-concrete-durability-lime-casts-0106",
-     "type": "reading",
-     "note": "The 2023 self-healing lime-clast research, from the source institution."
-    },
-    {
-     "label": "Open Yale — Roman Architecture (Diana Kleiner)",
-     "url": "https://oyc.yale.edu/history-of-art/hsar-252",
-     "type": "video",
-     "note": "Full free Yale course; the concrete revolution is a running theme. The companion resource for this whole topic."
-    }
-   ]
-  },
-  {
-   "id": "c02-arch",
-   "title": "The arch, the vault, and the dome",
-   "summary": "The arch converts loads into compression, which stone and concrete handle superbly; extrude it into vaults, rotate it into domes — the Pantheon is the proof.",
-   "cards": [
-    {
-     "h": "Turning weight into squeeze",
-     "md": "Stone and concrete are strong in **compression** (squeezing) and weak in **tension** (pulling). A flat stone beam bends under load — its underside goes into tension and cracks. Span limit: a few meters.\n\nThe **arch** solves this with geometry: wedge-shaped stones (voussoirs) locked by a central keystone redirect the load *along the curve*, so every joint is squeezed shut. The heavier the load, the tighter it locks. All that redirected force emerges sideways at the base as **thrust** — which is why arches need massive abutments or neighboring arches to lean against. The material's weakness never gets asked a question it can't answer."
-    },
-    {
-     "h": "Extrude, intersect, rotate",
-     "md": "Master the arch and three moves give you Roman interior space:\n\n- **Extrude** an arch along a line → the **barrel vault**: a corridor of ceiling\n- **Intersect** two barrel vaults → the **groin vault**: loads concentrate at four corner points, freeing the walls between (the skeleton of the great bath halls and basilicas)\n- **Rotate** an arch around its center → the **dome**\n\nThe Pantheon (c. 126 AD) is the masterclass: a 43.3 m concrete dome — the world's largest unreinforced dome to this day — with walls graded from heavy aggregate at the base to light pumice near the top, coffers carved to shed weight, and a 9 m oculus where the compression ring needs no center at all."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "The arch outperforms the flat stone beam because it:",
-     "options": [
-      "Uses less material",
-      "Redirects loads into compression along its curve, avoiding the tension that cracks stone",
-      "Is more beautiful",
-      "Eliminates all forces"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Arches often use *more* material once abutments count — the win is where the forces go, not how much stone.",
-      "Right — geometry converts the material's fatal weakness into its greatest strength.",
-      "Rome agreed, but the structural argument is what let beauty span 30 meters.",
-      "Forces never vanish; the thrust re-emerges at the base and must be bought with buttressing."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "A groin vault (two intersecting barrel vaults) improved on the plain barrel vault by:",
-     "options": [
-      "Weighing nothing",
-      "Concentrating loads onto four corner piers, so the walls between could open into windows and arcades",
-      "Requiring no formwork",
-      "Spanning shorter distances"
-     ],
-     "answer": 1,
-     "feedback": [
-      "It's still massive concrete overhead.",
-      "Right — point loads instead of continuous wall loads. Light and openness follow; the imperial bath halls are the showcase.",
-      "Vault concrete was poured over enormous wooden formwork either way.",
-      "Spans grew, not shrank — that was the point."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "The Pantheon's builders graded the aggregate from basalt at the base to pumice near the oculus because:",
-     "options": [
-      "Pumice was more expensive and thus prestigious",
-      "Reducing the dome's weight where it matters most cuts the stresses the lower structure must carry",
-      "Basalt was unavailable in quantity",
-      "Color matching"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Pumice was the *cheap, light* choice — the logic is structural, not status.",
-      "Right — engineered density gradient: heavy strength where loads accumulate, lightness where every kilogram would add stress below. Weight management as design.",
-      "Basalt was plentiful — it's in the foundations.",
-      "The dome was concealed and coffered; nobody saw the aggregate."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Open Yale — Roman Architecture, Pantheon lecture",
-     "url": "https://oyc.yale.edu/history-of-art/hsar-252",
-     "type": "video",
-     "note": "Kleiner's Pantheon lecture is the single best hour on this concept."
-    },
-    {
-     "label": "Smarthistory — The Pantheon",
-     "url": "https://smarthistory.org/the-pantheon/",
-     "type": "reading",
-     "note": "Concise, well-illustrated walkthrough of the structure and its engineering."
-    }
-   ],
-   "anim": "arch_thrust"
-  },
-  {
-   "id": "c03-aqueducts",
-   "title": "Aqueducts: engineering a gradient",
-   "summary": "Aqueducts moved water by gravity alone down gradients as shallow as ~1 in 3,000, mostly underground; the famous bridges and inverted siphons handled the exceptions.",
-   "cards": [
-    {
-     "h": "A slope you can barely measure",
-     "md": "No pumps — an aqueduct is a **continuous downhill path**, sometimes 90+ km long, maintained at astonishing precision: typical gradients of 1–3 m of drop per km, and stretches of the Nîmes aqueduct near **1 in 3,000** (34 cm per km). Too steep erodes the channel; too shallow stagnates the flow.\n\nSurveying tools: the **chorobates** (a long water-level bench) and the **dioptra** for angles. Holding a 3-cm-per-100-m error budget across valleys and ridges, with sight lines and water levels, remains one of antiquity's great precision achievements.\n\nThe postcard arcades are the exception: roughly 80–90% of most aqueducts ran **underground** in covered channels — cheaper, protected from fouling and sabotage."
-    },
-    {
-     "h": "Crossing the impossible",
-     "md": "Where a valley was too deep even for arcades, Romans used the **inverted siphon**: water plunges down one slope in sealed lead pipes, crosses the valley floor under pressure, and rises up the far side to a receiving tank *slightly lower* than the header tank. Gravity pays the whole bill; the pipes just have to survive the pressure (Lyon's siphons handled well over 100 m of head).\n\nAt the city end, water entered a **castellum divisorium** — a distribution tank splitting flow by civic priority: public fountains and basins first, baths and state buildings next, private subscribers last. Under shortage, the private taps failed first by design. Continuous flow, no storage: Rome's ~11 aqueducts delivered on the order of a million cubic meters a day, and the overflow flushed the sewers — a systems design, not a pipe."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "The dominant engineering constraint along an aqueduct's main route:",
-     "options": [
-      "Maximizing arch height for prestige",
-      "Maintaining a continuous, precisely shallow downhill gradient across all terrain",
-      "Keeping water ice-cold",
-      "Minimizing total length"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Arcades were a cost to be minimized — most of the route hid underground.",
-      "Right — the gradient IS the machine. Everything else (tunnels, arcades, siphons) exists to preserve it through inconvenient terrain.",
-      "Covered channels helped temperature, but slope ruled the route.",
-      "Routes wandered far off the straight line precisely to hold the gradient — length was spent to buy slope."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "An inverted siphon can carry water down into a valley and up the other side because:",
-     "options": [
-      "Roman pumps pushed it uphill",
-      "Sealed pipes plus gravity: water rises toward its source level, so it climbs the far slope to any outlet slightly lower than the inlet",
-      "The water was heated to rise",
-      "It cannot — Romans always bridged"
-     ],
-     "answer": 1,
-     "feedback": [
-      "No pumps anywhere in the system — that's the marvel.",
-      "Right — hydrostatics: water seeks its own level. The engineering challenge was pipes (lead, in parallel banks) that survive the pressure at the bottom.",
-      "Thermal lift moves air, not pressurized water mains.",
-      "Several major crossings (Lyon, Pergamon) were siphons exactly because bridges couldn't reach."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "In the castellum divisorium, private connections were plumbed to fail first during shortages. This reveals:",
-     "options": [
-      "Sloppy construction",
-      "Deliberate priority engineering — public water supply was protected by the physical design, not by policy alone",
-      "Private users paid nothing",
-      "Random chance"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The tank geometry was careful — outlet heights encode the priority.",
-      "Right — policy cast in masonry: draw-off levels meant fountains ran while subscribers went dry. Infrastructure as governance.",
-      "Private users paid handsomely — and were still last in line.",
-      "The outlet elevations were chosen; nothing about it was accidental."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Smarthistory — Roman aqueducts (Pont du Gard)",
-     "url": "https://smarthistory.org/pont-du-gard/",
-     "type": "reading",
-     "note": "The Nîmes aqueduct and its near-flat gradient, illustrated."
-    },
-    {
-     "label": "UNESCO — Pont du Gard",
-     "url": "https://whc.unesco.org/en/list/344/",
-     "type": "reading",
-     "note": "World Heritage documentation on the most famous surviving crossing."
-    }
-   ]
-  },
-  {
-   "id": "c04-roads",
-   "title": "Roads and surveying",
-   "summary": "Layered, cambered, drained road construction plus straight-line surveying with the groma built a ~80,000 km all-weather network engineered above all for drainage.",
-   "cards": [
-    {
-     "h": "A machine for staying dry",
-     "md": "The enemy of every road is water. Rome's answer was structure:\n\n- Excavate to firm ground; edge with curbstones\n- **Statumen**: large stone foundation layer\n- **Rudus**: coarse gravel/rubble, often lime-bound\n- **Nucleus**: finer concrete-like bedding\n- **Summum dorsum**: fitted paving stones on top, laid with a **camber** — a crown that sheds rain to side ditches\n\nA meter or more of engineered section, drained by design. That's why via appia stretches survive: the water never got to stay. Major highways ran ~4 m wide with margins — two carts could pass."
-    },
-    {
-     "h": "Straightness as a decision",
-     "md": "Roman roads are famously straight — not because engineers couldn't curve, but because straightness was *cheap to survey and fast to march*. The **groma** (plumb-lines on a cross-staff) aligned successive sighting stakes into dead-straight legs between high points; grades were checked with the same leveling tools as aqueducts. Where terrain argued, Rome cut, filled, zig-zagged passes, or bridged — the line bent at decision points, not by drift.\n\nThe network — on the order of 80,000 km of paved highways plus far more secondary road — was the empire's nervous system: legions moving at ~30 km/day, the **cursus publicus** relay post carrying imperial mail at 75+ km/day, milestones indexing it all to the golden milestone in the Forum. Roads were military infrastructure first; commerce inherited them."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "The single design priority that most explains Roman road longevity:",
-     "options": [
-      "Decorative paving patterns",
-      "Drainage — cambered surface, layered permeable structure, and side ditches keep water out of the foundation",
-      "Extreme width",
-      "Painted lane markings"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Paving was fitted for load and wear, not looks.",
-      "Right — freeze-thaw and softened subgrade destroy roads; the entire section is a water-management design. Modern road engineering agrees on the priority.",
-      "About 4 m for major roads — modest; the depth mattered more than the width.",
-      "No paint; milestones and curbs did the signaling."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Roman roads ran straight primarily because:",
-     "options": [
-      "Romans lacked the geometry for curves",
-      "Straight lines were efficient to survey with the groma and fastest for military movement — straightness was a chosen optimization",
-      "Law required it",
-      "The terrain of the empire is naturally flat"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Their arches, siphons, and amphitheater ellipses show complete command of curves.",
-      "Right — stake-to-stake sighting scales; and the roads' first customers marched in columns. Where slopes demanded it, they curved without hesitation.",
-      "No such statute — economics and the army set the habit.",
-      "From Welsh hills to Alpine passes — anything but flat, which is what makes the straightness impressive."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "The cursus publicus (imperial relay post) mattered strategically because:",
-     "options": [
-      "It carried tourists",
-      "Information moving at 75+ km/day let a single center govern and defend a continent-scale empire",
-      "It was the empire's main revenue source",
-      "It replaced the need for legions"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Strictly official traffic, by permit.",
-      "Right — an empire is bounded by its command latency. Roads plus relays shrank the effective size of the world Rome had to manage.",
-      "It was a cost, levied on communities along the routes.",
-      "It's what made the legions *deployable* — orders and armies rode the same network."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Open Yale — Roman Architecture (infrastructure lectures)",
-     "url": "https://oyc.yale.edu/history-of-art/hsar-252",
-     "type": "video",
-     "note": "Roads, colonies, and city planning in the imperial system."
-    },
-    {
-     "label": "Stanford ORBIS — geospatial model of the Roman world",
-     "url": "https://orbis.stanford.edu",
-     "type": "interactive",
-     "note": "Compute travel times and costs across the actual Roman network — the road system as a living graph."
-    }
-   ]
-  },
-  {
-   "id": "c05-bridges",
-   "title": "Bridges and foundations in water",
-   "summary": "Semicircular arch spans on piers founded by cofferdams and underwater concrete; the hard problem was the riverbed, not the span.",
-   "cards": [
-    {
-     "h": "The hard part is underwater",
-     "md": "Spanning is the visible achievement; **founding piers in a flowing river** was the real problem. The Roman solution:\n\n1. Drive a double ring of timber piles into the riverbed — a **cofferdam** — packed with clay between the rings to seal it\n2. Bail/pump out the enclosure (bucket chains, Archimedean screws)\n3. Excavate to firm ground and pour **pozzolanic concrete** — the underwater-setting material from concept 1 — or lay stone footings in the dry\n\nOn those piers: semicircular stone arches, pier faces shaped with **cutwaters** (pointed prows) to part the current and shed debris and ice. Trajan's engineer Apollodorus bridged the Danube itself (~1.1 km, timber arches on masonry piers) in two years."
-    },
-    {
-     "h": "Redundancy and its price",
-     "md": "Each Roman arch thrusts against its neighbors and finally the abutments, but classic multi-span design made every pier thick enough to act as an abutment — so one span's loss didn't unzip the bridge. The price: piers fat enough to constrict the river (sometimes 30%+ of the channel), accelerating the current and scouring the riverbed at the very foundations. Scour, not load, is what felled most ancient bridges — and it's still the leading killer of bridges today.\n\nSurvivors like the Pons Fabricius in Rome (62 BC, still carrying pedestrians) and Alcántara in Spain testify to the ones that got the foundations right. Alcántara's architect left an inscription boasting the bridge would last forever; nineteen centuries in, the claim is holding."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "The cofferdam's role in bridge construction:",
-     "options": [
-      "A decorative fence",
-      "A temporary watertight enclosure allowing excavation and foundation work in a dry pocket of riverbed",
-      "A permanent part of the bridge",
-      "A boat dock for workers"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Nothing decorative about clay-packed piles in a current.",
-      "Right — make a dry room inside the river, build the pier, let the river back in. Modern bridge builders still do exactly this.",
-      "The timber was temporary; the concrete and stone it enabled were forever.",
-      "Access mattered, but sealing out the river was the function."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why did massive multi-span Roman bridges tend to fail at the riverbed rather than in their arches?",
-     "options": [
-      "Roman arches were weak",
-      "Thick piers constricted the channel, speeding the current and scouring sediment from under the foundations",
-      "Stone dissolves in freshwater",
-      "They didn't — no Roman bridge ever fell"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The arches were typically the overbuilt part.",
-      "Right — each-pier-an-abutment redundancy came at the cost of blockage, and faster water digs. Undermined foundations, not crushed arches, brought them down.",
-      "Roman granite and travertine laugh at freshwater.",
-      "Many fell — which is what makes the surviving ones informative."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "The cutwater (pointed upstream face of a pier) exists to:",
-     "options": [
-      "Look like a ship's prow for style",
-      "Divide the current smoothly and deflect debris and ice, reducing pressure and scour at the pier",
-      "House a shrine",
-      "Anchor fishing nets"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The resemblance is real; the purpose is hydraulic.",
-      "Right — streamlining before fluid dynamics had a name: less turbulence, less impact, less digging at the base.",
-      "Shrines went on top of bridges, not in the current.",
-      "The current at a pier nose is the last place for nets."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Smarthistory — Roman engineering and construction",
-     "url": "https://smarthistory.org/roman-architecture/",
-     "type": "reading",
-     "note": "Survey of Roman construction methods including bridge and foundation work."
-    }
-   ]
-  },
-  {
-   "id": "c06-water-city",
-   "title": "The water city: baths, sewers, sanitation",
-   "summary": "Continuous aqueduct flow powered baths, fountains, and latrines, and its overflow flushed the Cloaca Maxima — an integrated urban water cycle at million-person scale.",
-   "cards": [
-    {
-     "h": "One flow, many jobs",
-     "md": "Roman urban water was a **cascade**: aqueduct → distribution tank → fountains and baths → latrines and street washing → sewers → river. No storage, no shut-off — the system worked *because* it never stopped flowing. Waste water was working water on its second shift.\n\nThe **Cloaca Maxima**, begun as an open drain in the 6th century BC and later vaulted, still drains parts of Rome today. Public **latrines** (rows of seats over a flushing channel) and hundreds of neighborhood fountains put running water within a short walk of nearly everyone — an urban sanitation baseline Europe would not see again for over a thousand years."
-    },
-    {
-     "h": "The baths as social infrastructure",
-     "md": "The great **thermae** were the aqueducts' flagship customers — the Baths of Caracalla served thousands of bathers a day across cold, warm, and hot halls (frigidarium, tepidarium, caldarium). Heat came from the **hypocaust**: floors raised on brick pillars with furnace gases circulating beneath and up wall flues — radiant heating, engineered per room's target temperature.\n\nAn honest ledger requires the debits: lead pipes (the plumber's *plumbum*) carried supply — though constantly flowing hard water laid protective mineral scale inside them, moderating the poison. Sewers drained to the Tiber untreated, and cities downstream drank the result. Rome mastered water *movement*; water *treatment* waited nearly two thousand more years."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "Roman sewers stayed functional at scale primarily because:",
-     "options": [
-      "They were cleaned daily by hand",
-      "The aqueducts' continuous overflow provided constant flushing flow",
-      "Romans produced no waste",
-      "Chemical treatment"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Maintenance existed, but no city hand-cleans its way to functioning sewers.",
-      "Right — the 'waste' of a storage-free supply was the sewer system's power source. Integrated design: one gradient, multiple jobs.",
-      "A million people produce what a million people produce.",
-      "Treatment is a 19th–20th century invention; Rome moved waste, it didn't neutralize it."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The hypocaust heated bath halls by:",
-     "options": [
-      "Open fires in each room",
-      "Circulating furnace gases under raised floors and up hollow wall flues — radiant heat from the structure itself",
-      "Solar panels",
-      "Heated water pipes in the ceiling"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Open flames in a crowded oiled-bather hall — no.",
-      "Right — the building was the radiator. Floor temperature graded by room, caldarium closest to the furnace.",
-      "South-facing windows helped the warm rooms, but the furnace did the work.",
-      "Water was heated in boilers over the same furnaces, but the room heat came through floor and walls."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "The most defensible verdict on Roman lead water pipes:",
-     "options": [
-      "Harmless — lead is safe",
-      "A real hazard, moderated in practice by mineral scale deposited inside constantly flowing hard-water pipes",
-      "The sole cause of Rome's fall",
-      "Romans knew nothing of lead's dangers"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Lead is not safe at any era.",
-      "Right — calcium carbonate lining and no-stagnation flow reduced (not eliminated) leaching. A nuanced hazard, not a clean bill and not a civilization-killer.",
-      "The single-cause lead theory doesn't survive contact with the evidence or the chronology.",
-      "Vitruvius himself warned that water from clay pipes was more wholesome — they knew, and built with lead anyway. A familiar story."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Smarthistory — The Baths of Caracalla",
-     "url": "https://smarthistory.org/baths-of-caracalla/",
-     "type": "reading",
-     "note": "The thermae as architecture and social machine."
-    },
-    {
-     "label": "Open Yale — Roman Architecture, baths lectures",
-     "url": "https://oyc.yale.edu/history-of-art/hsar-252",
-     "type": "video",
-     "note": "Kleiner on bathing culture and the imperial thermae."
-    }
-   ]
-  },
-  {
-   "id": "c07-machines",
-   "title": "Machines, cranes, and military engineering",
-   "summary": "Human-powered cranes, waterwheels, and disciplined field engineering — the legion as a construction corps was itself Rome's greatest machine.",
-   "cards": [
-    {
-     "h": "Force multipliers",
-     "md": "Roman mechanical power was muscle, multiplied by machines Vitruvius catalogued:\n\n- **Cranes**: compound pulleys on shear-legs, driven by a **treadwheel** — men walking inside a great wheel. Mechanical advantage let small crews raise multi-ton blocks; the drum of Trajan's Column and temple architraves went up this way\n- **Water power**: the **Barbegal** complex in Gaul ran sixteen overshot waterwheels in two cascading rows — an industrial flour factory feeding a region\n- **Construction logistics**: standardized bricks and pipes, stamped and dated by their makers — interchangeable parts and supply-chain accountability, two millennia early"
-    },
-    {
-     "h": "The legion as an engineering corps",
-     "md": "Rome's decisive machine was organizational. Every legion carried surveyors, masons, and carpenters, and every soldier carried entrenching tools. Each night's halt built a standardized fortified camp — same layout from Scotland to Syria, so any Roman soldier could navigate any Roman camp in the dark.\n\nCaesar's engineers bridged the Rhine in **ten days** — piles driven at an angle against the current — used the bridge for a show of force, then tore it down. At Alesia, his legions built two concentric siege rings totaling over 30 km of fortifications, facing in and out at once. At Masada, a stone-and-earth assault ramp up a desert mesa ended the siege. The message every project sent was the same: *engineering itself was the weapon* — resistance to a power that builds like this is futile.\n\nThat's the through-line of this whole topic: material (concrete) → form (arch) → systems (water, roads) → organization (the legion). Each layer multiplied the last."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "The treadwheel crane's significance:",
-     "options": [
-      "It was steam-powered",
-      "Compound pulleys plus a large-radius wheel multiplied human muscle enough to lift multi-ton stones with small crews",
-      "It could only lift bricks",
-      "It was purely ceremonial"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Steam stayed a curiosity (Hero's toys) — never harnessed for work.",
-      "Right — mechanical advantage stacked twice: pulley ratios times wheel leverage. Cathedral builders were still using the same design 1,200 years later.",
-      "Column drums and architrave blocks — the heaviest lifts of ancient construction.",
-      "The lifting marks are still visible on the stones."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The nightly fortified marching camp, identical across the empire, bought the legions:",
-     "options": [
-      "Comfort",
-      "Security plus interoperability — no night assault caught them unfortified, and every soldier knew every camp's layout instantly",
-      "Cheaper food",
-      "Nothing — it was tradition"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Ditch-digging after a 30 km march is many things; comfortable isn't one.",
-      "Right — a standardized, engineered instant fortress every single night. Discipline compounded into strategic invulnerability in the field.",
-      "Logistics ran on roads and granaries; the camp bought safety.",
-      "It was doctrine because it worked — armies that skipped it show up in the casualty lists."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Caesar bridging the Rhine in ten days, crossing, and then demolishing the bridge was primarily:",
-     "options": [
-      "An engineering failure — the bridge should have stayed",
-      "Strategic communication — demonstrating that Rome could project force across any barrier at will",
-      "A religious ritual",
-      "An accident"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The demolition was the plan; the bridge had already done its job.",
-      "Right — the bridge's message outlived its timbers: your river is not a wall. Engineering as deterrence.",
-      "Auguries were taken, but the audience was Germanic, not divine.",
-      "Nothing about ten-day precision piling is accidental."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Open Yale — Roman Architecture (full course)",
-     "url": "https://oyc.yale.edu/history-of-art/hsar-252",
-     "type": "video",
-     "note": "The consolidation resource for the whole topic — watch end to end after mastery."
-    },
-    {
-     "label": "Stanford ORBIS",
-     "url": "https://orbis.stanford.edu",
-     "type": "interactive",
-     "note": "Play logistics officer: route a legion or a grain shipment across the network you just studied."
-    }
-   ]
-  }
- ]
+  ]
 }
