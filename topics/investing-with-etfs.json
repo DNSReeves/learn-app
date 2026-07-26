@@ -1,819 +1,1294 @@
 {
-  "id": "investing-with-etfs",
-  "title": "Investing with ETFs",
-  "tagline": "Own the whole market for the price of a sandwich.",
-  "description": "What an ETF actually is, how to read one like a label, how to assemble a portfolio that's diversified in fact and not just in fund count, and the handful of well-mapped mistakes that cost real investors more than any fee ever will. No finance background assumed.",
-  "prereqs": [],
-  "concepts": [
+ "id": "investing-with-etfs",
+ "title": "Investing with ETFs",
+ "tagline": "Own the whole market for the price of a sandwich.",
+ "description": "What an ETF actually is, how to read one like a label, how to assemble a portfolio that's diversified in fact and not just in fund count, and the handful of well-mapped mistakes that cost real investors more than any fee ever will. No finance background assumed.",
+ "prereqs": [],
+ "concepts": [
+  {
+   "id": "c01-what-is-an-etf",
+   "title": "What an ETF is",
+   "summary": "An exchange-traded fund is a basket of investments you buy with one ticker. A clever creation/redemption machine keeps its price honest and makes the wrapper unusually tax-efficient.",
+   "cards": [
     {
-      "id": "c01-what-is-an-etf",
-      "title": "What an ETF is",
-      "summary": "An exchange-traded fund is a basket of investments you buy with one ticker. A clever creation/redemption machine keeps its price honest and makes the wrapper unusually tax-efficient.",
-      "cards": [
-        {
-          "h": "A basket with a ticker",
-          "md": "An **ETF** (exchange-traded fund) is a single share that owns a slice of a whole basket of investments — often hundreds or thousands of stocks or bonds. Buy one share of a total-US-market ETF and you own a proportional sliver of essentially every public American company, for the price of a nice dinner.\n\nIts older cousin, the **mutual fund**, is also a basket — but you can only buy or sell it once a day, after markets close, at a price computed that evening (the **NAV**, net asset value: the basket's contents divided by the number of shares). An ETF instead trades on the stock exchange all day, like a stock: live price, buy or sell any moment the market is open.\n\nThat raises an obvious worry. A stock's price floats wherever buyers and sellers push it. If an ETF trades like a stock, what stops its price from drifting away from what the basket inside is actually worth?"
-        },
-        {
-          "h": "The machine that keeps the price honest",
-          "md": "The answer is the ETF's core invention: **creation and redemption**.\n\nA short list of big trading firms — **authorized participants** (APs) — can do something you and I can't: hand the fund company the actual basket of underlying stocks and receive newly created ETF shares in exchange, or hand back ETF shares and receive the underlying stocks. No cash changes hands; it's an **in-kind** swap at true basket value.\n\nNow suppose greed pushes an ETF's market price to $101 while the basket inside is worth $100. An AP buys the cheap ingredients, swaps them for new ETF shares, sells those at $101, and pockets the difference — and that very act (new supply) pushes the price back down. If the ETF trades *below* basket value, the machine runs in reverse. The price stays honest not because anyone is trusted to set it, but because any gap is **free money for the first arbitrageur to close it** — and there is always a line.\n\nSo an ETF gives you a stock's convenience with a fund's diversification, and the price you pay tracks what the contents are worth — usually to within pennies."
-        },
-        {
-          "h": "Why the wrapper is tax-friendly",
-          "md": "Here's a mutual-fund trap that surprises people. When other investors cash out of a mutual fund, the manager may have to **sell holdings** to raise the cash. Selling winners realizes capital gains — and by law the fund distributes those gains across **all remaining shareholders**. You can hold a mutual fund all year in a taxable account, sell nothing, even watch it *lose* value, and still get a tax bill in December for gains other people's exits forced.\n\nThe ETF's in-kind machinery sidesteps this. When APs redeem, the fund doesn't sell anything — it **hands out shares of stock directly**. No sale, no realized gain. Better yet, the fund can hand out its *lowest-cost* shares (the ones carrying the biggest embedded gains), quietly flushing future tax liability out of the fund.\n\nThe result: broad stock ETFs typically distribute **little or no capital gains** year after year, while otherwise-similar mutual funds routinely do. You still owe tax on dividends, and on your own gains when *you* sell — nothing is tax-free. But inside a taxable account, the ETF wrapper defers taxes you'd otherwise pay annually, and money not sent to the IRS this year keeps compounding for you."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "What actually keeps an ETF's market price close to the value of the basket it holds?",
-          "options": [
-            "Regulators set the price each morning",
-            "Arbitrage: authorized participants profit from any gap via in-kind creation and redemption, which closes the gap",
-            "The fund company buys and sells its own shares all day",
-            "Nothing — ETF prices drift freely like any stock"
-          ],
-          "answer": 1,
-          "feedback": [
-            "No regulator prices ETFs — the market does, disciplined by a mechanism, not a decree.",
-            "Right — a price above basket value makes creating new shares profitable; below, redeeming is profitable. Either trade pushes the price back. Greed does the enforcement.",
-            "Issuers generally don't trade their own ETF shares intraday — the arbitrage is done by outside trading firms with their own money at stake.",
-            "The quoted price does float, but any meaningful gap from basket value is free money to an arbitrageur, so gaps get closed in seconds for liquid funds."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "You hold a mutual fund in a taxable account all year and never sell a share. Can you still owe capital gains tax on it for that year?",
-          "options": [
-            "No — tax is only triggered when you sell",
-            "Yes — the fund distributes gains it realized selling holdings (often to pay departing investors), and all remaining shareholders owe tax on them",
-            "Only if the fund gained more than 10%",
-            "Yes, but only in retirement accounts"
-          ],
-          "answer": 1,
-          "feedback": [
-            "That's true for individual stocks, but a fund is a pass-through: gains realized *inside* it are distributed to you and taxed, sale or no sale.",
-            "Right — other people's redemptions can force sales inside the fund, and the resulting tax bill lands on everyone still holding. This is the specific leak the ETF structure plugs.",
-            "There's no threshold — any net realized gains inside the fund get distributed and taxed, even in a down year.",
-            "Backwards — retirement accounts are where distributions *don't* matter; the trap bites in taxable accounts."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Why do broad ETFs rarely distribute capital gains, while similar mutual funds often do?",
-          "options": [
-            "ETFs are legally exempt from capital gains tax",
-            "ETF managers are better stock pickers",
-            "Redemptions are paid in-kind — securities handed out, not sold — so the fund realizes no gains, and it can offload its lowest-cost shares in the process",
-            "ETFs never hold winning stocks long enough to have gains"
-          ],
-          "answer": 2,
-          "feedback": [
-            "No exemption exists — the ETF plays by the same tax code and simply avoids *realizing* gains through in-kind swaps.",
-            "Most broad ETFs pick nothing — they track an index. The tax edge is structural plumbing, not skill.",
-            "Right — handing out shares isn't a sale, so no gain is realized, and shipping out the lowest-cost lots steadily drains embedded tax liability from the fund.",
-            "Index ETFs hold winners for years, even decades — the embedded gains are enormous. The structure just avoids realizing them."
-          ]
-        },
-        {
-          "id": "q4",
-          "type": "mcq",
-          "prompt": "The practical trading difference between an ETF and a mutual fund:",
-          "options": [
-            "An ETF trades all day at a live market price; a mutual fund transacts once daily at that evening's NAV",
-            "Mutual funds trade all day; ETFs price once daily",
-            "ETFs can only be bought through the fund company",
-            "There is no difference in how they trade"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Right — the ETF behaves like a stock at trade time and like a fund in what it holds. That flexibility is convenient, though concept 7 covers why using it *constantly* backfires.",
-            "Reversed — the mutual fund is the once-a-day vehicle; the ETF lives on the exchange.",
-            "Backwards — mutual funds often involve the fund company directly; ETFs are bought from other investors on an exchange through any broker.",
-            "The holding might be identical, but when and how you transact — and at what price — differs fundamentally."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "SEC Investor.gov — Exchange-Traded Funds (ETFs), the official basics",
-          "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-2",
-          "type": "reading",
-          "note": "The regulator's own plain-language explainer of the wrapper, including creation/redemption and the in-kind tax point."
-        },
-        {
-          "label": "Investopedia — Exchange-Traded Fund (ETF)",
-          "url": "https://www.investopedia.com/terms/e/etf.asp",
-          "type": "reading",
-          "note": "Standard reference entry; good glossary jumping-off point."
-        },
-        {
-          "label": "Bogleheads wiki — ETFs",
-          "url": "https://www.bogleheads.org/wiki/ETFs",
-          "type": "reading",
-          "note": "The practitioner community's accumulated wisdom, including creation/redemption and tax mechanics."
-        }
-      ],
-      "anim": "etf_arb"
+     "h": "A basket with a ticker",
+     "md": "An **ETF** (exchange-traded fund) is a single share that owns a slice of a whole basket of investments — often hundreds or thousands of stocks or bonds. Buy one share of a total-US-market ETF and you own a proportional sliver of essentially every public American company, for the price of a nice dinner.\n\nIts older cousin, the **mutual fund**, is also a basket — but you can only buy or sell it once a day, after markets close, at a price computed that evening (the **NAV**, net asset value: the basket's contents divided by the number of shares). An ETF instead trades on the stock exchange all day, like a stock: live price, buy or sell any moment the market is open.\n\nThat raises an obvious worry. A stock's price floats wherever buyers and sellers push it. If an ETF trades like a stock, what stops its price from drifting away from what the basket inside is actually worth?"
     },
     {
-      "id": "c02-reading-a-fund",
-      "title": "Reading a fund",
-      "summary": "Five numbers tell you most of what matters: expense ratio (gross vs net), assets under management, bid-ask spread, and tracking difference — with the prospectus as the label on the tin.",
-      "cards": [
-        {
-          "h": "The expense ratio: rent, charged invisibly",
-          "md": "Every fund charges rent: the **expense ratio**, quoted as a percent of your money per year. You never see a bill — it's shaved off the fund's value a tiny sliver at a time, every day. A 0.03% ratio costs $3 a year per $10,000 invested; a 1% fund costs $100.\n\nThat sounds like pocket change until you compound it. $100,000 growing 30 years at 7% becomes about **$761,000**. The same money at 6% — just one percent skimmed annually — becomes about **$574,000**. The quiet 1% fee ate roughly **$187,000**, about a quarter of your ending wealth. Fees compound with exactly the same relentlessness as returns, just against you.\n\nOne trap on the label: funds report a **gross** expense ratio and a **net** one. When they differ, the fund is temporarily waiving part of its fee — and waivers **expire**. The gross number is what the fund reserves the right to charge. For the giant broad index ETFs this rarely matters (fees are already near zero); for small new funds advertising a suspiciously low rate, check whether it's a teaser."
-        },
-        {
-          "h": "AUM and the spread: will it live, and what's the toll?",
-          "md": "**AUM** (assets under management) is the fund's total size. It's less a quality score than a **survival indicator**: running a fund costs real money, so tiny funds (roughly under $50–100M) that fail to attract assets get liquidated. A fund closure doesn't vaporize your money — you're paid out at fair value — but it forces a sale on someone else's schedule, possibly at a tax-inconvenient moment, plus paperwork and reinvestment hassle. Big, boring, and popular is a *feature* in a fund.\n\nThe **bid-ask spread** is the gap between the price buyers are offering (bid) and sellers are asking (ask) at any moment. Buy and you pay the ask; sell and you get the bid; the sliver between goes to the market's middlemen. It's a toll paid **per round trip**, not per year — which is why it barely matters to a decade-long holder and quietly bleeds a frequent trader. Mega-ETFs trade at spreads of a penny (~0.01%); niche funds can run 0.5% or worse. The spread mostly reflects how easily the *underlying holdings* trade, which is why an ETF of obscure small stocks costs more to enter and exit than one holding Apple and Microsoft."
-        },
-        {
-          "h": "Tracking difference, and where the prospectus fits",
-          "md": "An index fund's whole job is to match its index. So the truest single report card is the **tracking difference**: the fund's actual return minus the index's return over the same period. If the index earned 10.00% and the fund delivered 9.92%, the tracking difference is −0.08% — that's the *all-in* cost of owning the fund, with everything netted in: fees, trading frictions, sampling shortcuts, even small income the fund earns lending out its shares (which can partially offset the fee).\n\nYou'll also see **tracking error**, a related but different number: how much the gap *wobbles* from period to period. Difference tells you the average toll; error tells you how consistent it is. For a buy-and-hold investor, the difference is the one to watch — a fund with a 0.03% fee but sloppy 0.30% tracking difference is a 0.30% fund in practice.\n\nWhere do you find any of this on paper? The **prospectus** — the legal disclosure document every fund must publish. The short **summary prospectus** is genuinely readable: the objective, the exact index tracked, the fee table (this is where gross-vs-net waivers and their expiry dates hide), and the principal risks. You don't need to read it like a lawyer. You do need to confirm the fund does what its ticker and marketing name imply — because as concept 7 will show, names are marketing."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "A new ETF advertises a 0.19% net expense ratio; the fee table shows 0.59% gross. What's going on?",
-          "options": [
-            "A typo in the fee table",
-            "Part of the fee is temporarily waived — the waiver can expire, and the gross figure is what the fund may charge later",
-            "You pay 0.59% only in years the fund loses money",
-            "The difference is a government tax"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Both numbers are real and legally required — they differ precisely because a waiver is in effect.",
-            "Right — the net rate is a promotional discount with an expiration date disclosed in the prospectus. Judge a long-term holding by what it can charge, not the teaser.",
-            "Expense ratios don't flex with performance — they're charged on assets every year, gain or loss.",
-            "No tax hides in the expense ratio — the gap is simply the fund company's own waived (for now) fee."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "The main practical risk of buying a tiny, $20M ETF is:",
-          "options": [
-            "Your money disappears if the fund shuts down",
-            "The fund may be liquidated — forcing a sale at a time you didn't choose, with possible tax consequences and reinvestment hassle",
-            "Small funds are illegal to sell for a year",
-            "Small funds always underperform large ones"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Closure isn't loss — holders are paid out at fair value of the assets. The cost is disruption, not disappearance.",
-            "Right — subscale funds get closed by their sponsors routinely. You're cashed out whether or not it suits your tax year or plan. AUM is a survival signal.",
-            "No such rule — small funds trade freely; they just may not exist next year.",
-            "Performance depends on what it holds, not its size — the small-fund problem is viability, not returns."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Better single measure of what an index fund really costs you per year:",
-          "options": [
-            "The expense ratio alone",
-            "Tracking difference — actual fund return minus index return — because it nets fees, trading costs, sampling, and lending income together",
-            "The bid-ask spread",
-            "The fund's total AUM"
-          ],
-          "answer": 1,
-          "feedback": [
-            "The expense ratio is the largest *advertised* component but not the whole story — funds can lag by more, or claw some back through securities lending.",
-            "Right — it's the bottom line: everything the fund gains or leaks versus its benchmark, measured in delivered return. A cheap fund that tracks badly is not cheap.",
-            "The spread is a real cost, but it's paid per trade, not per year of holding — it belongs in the cost picture, not as the annual measure.",
-            "AUM measures size and survival odds; it says nothing about the yearly cost of holding."
-          ]
-        },
-        {
-          "id": "q4",
-          "type": "mcq",
-          "prompt": "Who does the bid-ask spread cost the most?",
-          "options": [
-            "A retiree who buys and holds for 15 years",
-            "A trader making dozens of round trips a year",
-            "Everyone equally — it's an annual fee",
-            "No one — spreads are paid by the fund company"
-          ],
-          "answer": 1,
-          "feedback": [
-            "A single round trip's spread amortized over 15 years rounds to nothing — long holders barely feel it.",
-            "Right — the spread is a toll per transaction. Cross it 50 times and a 'small' 0.1% spread has cost 5% of your money. Trading frequency turns pennies into a tax.",
-            "It's transactional, not annual — hold without trading and you pay it exactly once each way.",
-            "The spread goes to market makers and comes out of your execution price — the fund company never touches it."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "Investopedia — Expense Ratio",
-          "url": "https://www.investopedia.com/terms/e/expenseratio.asp",
-          "type": "reading",
-          "note": "Gross vs net, and what's inside the number."
-        },
-        {
-          "label": "SEC Investor Bulletin — How fees and expenses affect your portfolio (PDF)",
-          "url": "https://www.sec.gov/investor/alerts/ib_fees_expenses.pdf",
-          "type": "reading",
-          "note": "The regulator's worked examples of fee drag over time."
-        },
-        {
-          "label": "Investopedia — Tracking Error",
-          "url": "https://www.investopedia.com/terms/t/trackingerror.asp",
-          "type": "reading",
-          "note": "The tracking error / tracking difference distinction in more depth."
-        }
-      ]
+     "h": "The machine that keeps the price honest",
+     "md": "The answer is the ETF's core invention: **creation and redemption**.\n\nA short list of big trading firms — **authorized participants** (APs) — can do something you and I can't: hand the fund company the actual basket of underlying stocks and receive newly created ETF shares in exchange, or hand back ETF shares and receive the underlying stocks. No cash changes hands; it's an **in-kind** swap at true basket value.\n\nNow suppose greed pushes an ETF's market price to $101 while the basket inside is worth $100. An AP buys the cheap ingredients, swaps them for new ETF shares, sells those at $101, and pockets the difference — and that very act (new supply) pushes the price back down. If the ETF trades *below* basket value, the machine runs in reverse. The price stays honest not because anyone is trusted to set it, but because any gap is **free money for the first arbitrageur to close it** — and there is always a line.\n\nSo an ETF gives you a stock's convenience with a fund's diversification, and the price you pay tracks what the contents are worth — usually to within pennies."
     },
     {
-      "id": "c03-fund-taxonomy",
-      "title": "The ETF zoo: a field guide",
-      "summary": "Broad index, sector, factor, bond, and commodity ETFs each answer a different question — and the leveraged/inverse cage has a warning sign on it for a mathematical reason: daily resets make losses compound in choppy markets.",
-      "cards": [
-        {
-          "h": "Five families, five jobs",
-          "md": "Thousands of ETFs sort into a few families, each built for a different question:\n\n- **Broad index** — \"give me the whole market.\" One fund owning all (or nearly all) of the US, international, or global stock market at rock-bottom cost. This is the default core of almost every sane portfolio.\n- **Sector** — \"give me one industry\": tech, energy, healthcare. A concentrated opinion that one slice will beat the rest.\n- **Factor** (or \"smart beta\") — \"tilt me toward a characteristic.\" Rules-based screens for stocks that are cheap (*value*), rising (*momentum*), profitable (*quality*), or small (*size*) — patterns with long academic paper trails of *modestly* higher average returns, paid for with years-long stretches of lagging. It's systematic rules, not a manager's stock picks, and nothing about it is guaranteed.\n- **Bond** — \"lend, don't own.\" A basket of loans to governments or companies, collecting interest. One non-obvious mechanic: unlike an individual bond, a bond ETF **never matures** — it perpetually rolls into new bonds, so its price moves with interest rates indefinitely (rates up → existing lower-rate bonds worth less → fund price down, and vice versa).\n- **Commodity** — \"own stuff\": gold, oil, wheat. A few hold physical metal; most hold **futures contracts**, whose returns can drift well away from the headline spot price you see in the news, thanks to the cost of perpetually rolling contracts.\n\nOne more cage sits at the back of the zoo, and it needs its own card."
-        },
-        {
-          "h": "Leveraged and inverse: read the fine print on the cage",
-          "md": "A **2x leveraged ETF** promises twice the index's return; an **inverse** ETF promises the opposite of it. The fine print is one word: **daily**. These funds deliver 2x (or −1x) of each single day's move, resetting every night — *not* 2x your return over the weeks or months you hold.\n\nThat distinction isn't legalese; it's arithmetic that eats money. Watch two days:\n\n**The index:** starts at 100 → up 10% → 110 → down 10% → **99**. Net: −1%.\n\n**The 2x fund:** starts at 100 → up 20% → 120 → down 20% → **96**. Net: **−4%**.\n\nTwice the daily moves produced *four times* the loss — not twice. The culprit is compounding from a shifting base: the second day's −20% bites a bigger number (120) than the first day's +20% grew (100). Every down-up or up-down wiggle grinds a leveraged fund down a little; the choppier the ride, the faster the grind. Hold one through a volatile sideways month and you can lose meaningful money while the index goes **nowhere**. In a smooth, relentless trend they can beat 2x — but markets rarely stay smooth for long, and you're betting on the path, not just the destination.\n\nThese are tools for traders measuring holding periods in hours or days. As a buy-and-hold instrument, a leveraged ETF is a boat with a slow leak: fine for crossing the bay, wrong for crossing the ocean. If a fund name contains \"2x,\" \"3x,\" \"Ultra,\" \"Daily,\" or \"Inverse,\" it belongs in this cage."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "An index goes +10% one day, then −10% the next (ending at 99, down 1%). A 2x daily leveraged fund on that index ends at:",
-          "options": [
-            "98, down 2% — exactly twice the index's loss",
-            "96, down 4% — worse than twice, because each day's move compounds from a new base",
-            "100, unchanged — the moves cancel",
-            "102, up 2%"
-          ],
-          "answer": 1,
-          "feedback": [
-            "The intuitive answer, and the trap — 2x applies to each *day*, and compounding across days makes the combined result worse than 2x the total.",
-            "Right — 100 → 120 → 96. The −20% day operates on 120, not 100, so it takes back more than the +20% day gave. This asymmetry is the whole warning label.",
-            "Even the unleveraged index doesn't cancel (−10% of 110 exceeds +10% of 100) — leverage doubles each step and worsens the asymmetry.",
-            "Both funds lose over this path — leverage amplifies the loss, it can't reverse the direction."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "Over a choppy sideways month in which the index finishes flat, a 2x daily leveraged ETF most likely:",
-          "options": [
-            "Also finishes flat",
-            "Finishes up — leverage always amplifies gains",
-            "Finishes down — every up-down wiggle compounds against it (volatility decay)",
-            "Cannot be traded during volatile periods"
-          ],
-          "answer": 2,
-          "feedback": [
-            "Flat *index* doesn't mean flat *fund* — the daily reset makes the fund's outcome depend on the path taken, and a choppy path grinds it down.",
-            "Leverage amplifies daily moves in both directions; across an oscillating sequence, the amplified losses outweigh the amplified gains from a shifting base.",
-            "Right — this is volatility decay: each round trip down-and-back costs a little, and a choppy month is many round trips. Flat index, negative fund.",
-            "They trade every market day like any ETF — the danger is in holding, not access."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "A factor (\"smart beta\") ETF is best described as:",
-          "options": [
-            "A star manager picking stocks by judgment",
-            "A rules-based tilt toward characteristics like value, momentum, or profitability — historically rewarded on average, with long stretches of underperformance",
-            "A guaranteed way to beat the index",
-            "A fund that only holds technology stocks"
-          ],
-          "answer": 1,
-          "feedback": [
-            "The defining feature is that no one is exercising judgment trade-by-trade — a published rulebook does the picking.",
-            "Right — systematic exposure to well-documented return patterns. The honest fine print: the historical premium is modest and can vanish for years at a time.",
-            "Nothing rewarded by markets is guaranteed — factor premiums are compensation for risks and discomfort, which is arguably why they persist.",
-            "That's a sector fund — factors cut *across* industries, selecting by financial characteristics, not by what the company does."
-          ]
-        },
-        {
-          "id": "q4",
-          "type": "mcq",
-          "prompt": "Interest rates rise sharply. Your bond ETF's price falls. What's the mechanism?",
-          "options": [
-            "The fund manager sold everything in a panic",
-            "Existing bonds paying old, lower rates are worth less when new bonds pay more — and a bond fund, which never matures, marks that repricing continuously",
-            "Bond ETFs are actually stocks in disguise",
-            "The government confiscates bond interest when rates rise"
-          ],
-          "answer": 1,
-          "feedback": [
-            "No panic required — the repricing is automatic arithmetic that would happen to any bondholder's portfolio, managed or not.",
-            "Right — nobody pays full price for a 3% bond when new ones pay 5%. An individual bond can be held to maturity for its face value; the fund perpetually rolls, so rate sensitivity never expires.",
-            "A bond ETF holds actual bonds — it inherits bond math (rate sensitivity, interest income), not stock behavior.",
-            "Interest keeps flowing — in fact rising rates mean the fund gradually reinvests into *higher*-paying bonds, which is the long-run silver lining."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "SEC alert — Leveraged and inverse ETFs: special risks for buy-and-hold investors",
-          "url": "https://www.sec.gov/investor/pubs/leveragedetfs-alert.htm",
-          "type": "reading",
-          "note": "The regulator's own worked examples of daily-reset decay — written after real investors got burned."
-        },
-        {
-          "label": "Investopedia — Leveraged ETFs",
-          "url": "https://www.investopedia.com/terms/l/leveraged-etf.asp",
-          "type": "reading",
-          "note": "Mechanics of daily rebalancing and why holding period matters."
-        },
-        {
-          "label": "Bogleheads wiki — Bond basics",
-          "url": "https://www.bogleheads.org/wiki/Bond_basics",
-          "type": "reading",
-          "note": "Rates, prices, and duration — the bond-fund mechanics in plain language."
-        }
-      ],
-      "anim": "etf_levdecay"
-    },
-    {
-      "id": "c04-building-a-portfolio",
-      "title": "Building a portfolio",
-      "summary": "Core-satellite structure puts cheap broad funds at the center and sized-to-fail experiments at the edge; real diversification is about how holdings behave, not how many funds you own — and the 3×3 style box gives you the vocabulary.",
-      "cards": [
-        {
-          "h": "Core and satellite",
-          "md": "A time-tested structure: put most of your money — commonly 80–90% — in a **core** of broad, cheap index ETFs (total US market, total international, total bond, in proportions matching your appetite for rough years). The core's job is to compound quietly for decades and never surprise you.\n\nAround it, optionally, **satellites**: small positions expressing opinions — a sector you know professionally, a factor tilt, a region you believe in. The design rule that makes this work: **size each satellite so that being completely wrong doesn't matter**. A 5% position that drops by half costs you 2.5% — annoying, survivable, educational. A 40% position that drops by half changes your retirement date.\n\nThe honest psychology: satellites exist partly to scratch the itch to *do something*, so the core never gets tinkered with. Plenty of excellent portfolios are 100% core, zero satellites — three or four funds, rebalanced occasionally, held for decades. Boring is not a defect. Boring is the strategy."
-        },
-        {
-          "h": "Diversification: real versus cosmetic",
-          "md": "Here's a portfolio that looks diversified: an S&P 500 fund, a total US market fund, a Nasdaq-100 fund, and a growth fund. Four funds, four tickers — and mostly **one bet**. All four are stuffed with the same giant US companies; the same handful of mega-cap stocks can dominate the top ten of each. When those stocks fall, all four funds fall together. That's **cosmetic** diversification: more line items, same risk.\n\n**Real** diversification means holding things that respond *differently* to the same news — that are weakly **correlated**. Stocks and high-quality bonds. US and international. Assets that zig on days others zag. The test is never \"how many funds do I own?\" but \"**how many independent bets do I own?**\" Four overlapping US large-cap funds is one bet. One total-US fund plus one international fund plus one bond fund — three tickers — is three genuinely different bets.\n\nBefore adding any fund, look through the wrapper at the holdings: compare its top ten against what you already own. If the lists rhyme, you're not diversifying — you're photocopying. (And the fine print on the whole idea: diversification smooths the ride and protects against any single bet failing, but in a true panic almost all *stocks* fall together. That's precisely what the bonds are for.)"
-        },
-        {
-          "h": "The style box: a map of what you own",
-          "md": "Morningstar's **style box** is a 3×3 grid that's become the industry's shared map for stock funds. Vertical axis: company **size** — large, mid, small. Horizontal: **value** (cheap, unglamorous, priced low relative to profits) through **blend** to **growth** (expensive because big futures are expected). Nine squares; every stock fund lands somewhere.\n\nA total-market fund sits in the large-blend center, tapering into everything else. A small-value fund lives in its bottom-left corner. The overlapping foursome from the last card? All crowding the top row, tilted right — visible at a glance.\n\nTwo practical uses. First, **X-ray your whole portfolio**: plot everything you own on the grid and see your actual footprint — most investors discover they're far more concentrated in large growth than they intended, because that's what recent winners always are. Second, **catch mislabeled funds**: a fund with \"value\" in its name sitting in the growth column is telling you the marketing department won an argument with the index methodology. The box turns \"I own eight funds\" into \"here is the shape of my bet\" — and shape is what you actually own."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "An investor holds an S&P 500 fund, a total US market fund, a Nasdaq-100 fund, and a US growth fund. How diversified is this?",
-          "options": [
-            "Very — four different funds is four different bets",
-            "Barely — all four are dominated by the same US mega-cap stocks and will rise and fall together",
-            "Perfectly — it covers every asset class",
-            "Not at all — one of these funds must be fraudulent"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Counting tickers is the classic mistake — the question is what's *inside*, and inside these four are largely the same companies.",
-            "Right — heavy overlap means one bet in four wrappers. Check any two funds' top-ten holdings before assuming they diversify each other.",
-            "It's all US stocks, mostly large ones — no bonds, no international, no small caps to speak of. One asset class, one country, one size bracket.",
-            "All four are legitimate funds doing what they claim — the problem is redundancy, not fraud."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "What makes diversification real rather than cosmetic?",
-          "options": [
-            "Owning at least ten funds",
-            "Holding assets that respond differently to the same events — low correlation — so they don't all fall together",
-            "Buying funds from several different fund companies",
-            "Owning only the single best-performing fund"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Ten overlapping funds diversify nothing — fund count is the cosmetic measure, not the real one.",
-            "Right — the protection comes from independence of behavior. Three uncorrelated holdings beat ten copies of the same bet.",
-            "Vanguard's and iShares' S&P 500 funds hold the same 500 stocks — the brand on the wrapper changes nothing about the bet.",
-            "Concentration is diversification's opposite — and 'best-performing' is only knowable in the rearview mirror, as concept 7 will make painful."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "The two axes of the Morningstar style box are:",
-          "options": [
-            "Risk level and past return",
-            "Company size (large/mid/small) and valuation style (value/blend/growth)",
-            "Fee level and fund age",
-            "US versus international and stocks versus bonds"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Neither risk score nor trailing return appears in the box — it maps what a fund *holds*, not how it has behaved.",
-            "Right — nine squares of size × style. Its power is showing the combined footprint of everything you own on one grid.",
-            "Fees and age matter for fund selection but live in the fact sheet, not on this map.",
-            "The classic style box is for stock funds within a market — geography and asset class are separate dimensions of the portfolio."
-          ]
-        },
-        {
-          "id": "q4",
-          "type": "mcq",
-          "prompt": "In a core-satellite portfolio, satellites should be sized so that:",
-          "options": [
-            "They can double the portfolio if right",
-            "Being completely wrong is affordable — a total failure costs only a few percent",
-            "Each equals the core",
-            "They can be traded daily for extra returns"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Sizing for maximum upside is the same thing as sizing for maximum damage — the two are inseparable in a concentrated bet.",
-            "Right — the sizing rule is written for the failure case, not the success case. A 5% satellite going to zero is a lesson; a 40% one is a life change.",
-            "A satellite that equals the core isn't a satellite — it's a second core, and the portfolio is now a coin flip between two opinions.",
-            "Frequent trading multiplies spreads and taxes (concept 6) — satellites are small *positions*, not day-trading accounts."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "Bogleheads wiki — Three-fund portfolio",
-          "url": "https://www.bogleheads.org/wiki/Three-fund_portfolio",
-          "type": "reading",
-          "note": "The canonical all-core portfolio: total US + total international + bonds, and why it's hard to beat."
-        },
-        {
-          "label": "Investopedia — Style Box",
-          "url": "https://www.investopedia.com/terms/s/stylebox.asp",
-          "type": "reading",
-          "note": "The 3×3 grid, its history, and how to read it."
-        },
-        {
-          "label": "justETF — How to implement the core-satellite strategy with ETFs",
-          "url": "https://www.justetf.com/en/news/etf/how-to-implement-the-core-satellite-strategy-with-etfs.html",
-          "type": "reading",
-          "note": "The structure and its rationale, with worked ETF examples."
-        }
-      ],
-      "anim": "etf_divers"
-    },
-    {
-      "id": "c05-execution",
-      "title": "Placing the trade",
-      "summary": "Market orders buy speed, limit orders buy price certainty; spreads bite at the open, the close, and in panics; and an ETF's premium or discount to NAV sometimes means the ETF is wrong — but sometimes means the NAV is.",
-      "cards": [
-        {
-          "h": "Market versus limit",
-          "md": "Two ways to buy (or sell) any exchange-traded thing:\n\n- A **market order** says \"fill me *now*, at whatever the going price is.\" You're guaranteed execution, not price.\n- A **limit order** says \"fill me at this price *or better*, or not at all.\" You're guaranteed price, not execution.\n\nFor a huge, liquid ETF on a calm day, a market order costs you a penny of spread — fine. The danger is the *un*calm moment: thin trading, a fast market, a fat-fingered moment — a market order will happily execute at a terrible price, because \"whatever the going price is\" was the instruction. The 2010 Flash Crash filled market sell orders in respectable ETFs at absurd prices, pennies in extreme cases, minutes before prices snapped back.\n\nThe professional habit costs nothing to adopt: use a **marketable limit order** — a buy limit set at or a hair above the current ask. Normally it fills instantly, exactly like a market order. But if the market gaps in the seconds your order is in flight, the limit is a seatbelt: you simply don't fill, instead of filling catastrophically. You wear it not for the ordinary day but for the abnormal one."
-        },
-        {
-          "h": "When spreads bite",
-          "md": "The bid-ask spread isn't constant — it breathes. Three moments it widens, and a patient investor simply declines to trade through them:\n\n- **The first and last ~15 minutes of the trading day.** Just after the open, some of an ETF's underlying stocks haven't started trading yet, so market makers quoting the ETF are partly guessing — and they charge for guessing with wider spreads. The close has its own scramble of rebalancing flows.\n- **During market panics.** Exactly when the urge to act peaks, the cost of acting peaks with it: volatility makes the basket harder to price, and spreads gap wide.\n- **In thinly traded funds, always.** A niche ETF trading a few thousand shares a day carries a permanently wide spread — a toll the fact sheet's expense ratio never mentions.\n\nThe pattern: spreads are widest precisely when trading feels most urgent. A long-term investor's edge is that almost nothing about a good portfolio is ever actually urgent — mid-morning or mid-afternoon on an ordinary day is the cheap time to trade, and that appointment is nearly always available."
-        },
-        {
-          "h": "Premium, discount, and who's actually right",
-          "md": "An ETF's market price can sit above its NAV (a **premium**) or below it (a **discount**). Concept 1's arbitrage machine keeps big domestic stock ETFs pinned within a few hundredths of a percent, so for those, ignore it.\n\nBut here's the aha worth keeping: when a gap does appear, it's not always the ETF that's wrong. **Sometimes the NAV is stale.** Consider an ETF of Japanese stocks trading in New York at noon — Tokyo has been closed for hours, so the NAV is built from hours-old closing prices. If news breaks that would move Tokyo, the live ETF price incorporates it *now*; the NAV can't until Tokyo reopens. The \"premium\" is the ETF doing price discovery, not making an error.\n\nThe same happened dramatically in March 2020: big bond ETFs traded at discounts to NAV, and analysis broadly concluded the live ETF prices were the truer read — the NAVs rested on stale quotes for bonds that weren't actually trading. The ETF wasn't broken; it was the only part still reporting live.\n\nPractical rules: for liquid mainstream ETFs, premium/discount is a non-issue. For international, bond, or niche funds, check the fund's premium/discount history (published on every issuer's site) before assuming today's gap is a bargain or a rip-off — and be suspicious of anyone selling you a \"discount\" on a fund whose NAV can't currently be trusted."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "Why is a limit order the safer habit for ETF trades?",
-          "options": [
-            "It always executes faster than a market order",
-            "It caps the price you'll accept, so a sudden market dislocation can't fill you at an absurd price — at worst you don't fill",
-            "It's free while market orders cost commissions",
-            "It guarantees both execution and price"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Speed is the market order's one advantage — the limit order trades a sliver of certainty-of-fill for certainty-of-price.",
-            "Right — set at the current ask it behaves like a market order on a normal day, and like a seatbelt on the abnormal one. Flash-crash fills happened to market orders.",
-            "Commissions don't differ by order type at mainstream brokers — the difference is what each order guarantees.",
-            "No order type guarantees both — that's the fundamental trade-off. Limit picks price; market picks execution."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "Why do experienced ETF investors avoid trading in the first minutes after the market opens?",
-          "options": [
-            "Trading is prohibited before 10 a.m.",
-            "Spreads are wide because some underlying holdings haven't started trading, so market makers price the ETF with a guessing margin",
-            "Prices are always lowest at the close",
-            "Brokers charge extra at the open"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Trading opens at 9:30 sharp and is perfectly legal — it's just relatively expensive for a few minutes.",
-            "Right — an ETF's fair price depends on its basket, and until the whole basket is trading, quoting it involves guesswork that you pay for in the spread.",
-            "There's no reliable intraday price pattern to exploit — the open/close issue is about transaction *cost*, not direction.",
-            "Commissions don't vary by time of day — the extra cost hides in the spread, not the fee schedule."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "At noon in New York, an ETF of Japanese stocks trades 0.7% above its NAV. The most likely explanation:",
-          "options": [
-            "The fund manager is inflating the price",
-            "Arbitrage has failed permanently",
-            "The NAV is stale — built from Tokyo's hours-old closing prices — while the ETF's live price already reflects newer information",
-            "Japanese stocks are exempt from NAV calculations"
-          ],
-          "answer": 2,
-          "feedback": [
-            "Managers don't set the market price at all — buyers, sellers, and arbitrageurs do.",
-            "Arbitrage is working fine — APs price the fund off where Tokyo *will* open, not where it closed. The gap measures new information, not failure.",
-            "Right — when the underlying market is closed, the ETF becomes the live price and the NAV becomes the memory. The 'premium' is information, not error.",
-            "Every holding goes into NAV — the issue is *when* those holdings were last priced, not whether."
-          ]
-        },
-        {
-          "id": "q4",
-          "type": "mcq",
-          "prompt": "During a sharp market panic, ETF bid-ask spreads typically:",
-          "options": [
-            "Narrow, because trading volume rises",
-            "Widen — pricing the basket gets harder, so the cost of trading peaks exactly when the urge to trade peaks",
-            "Are frozen by the exchange at one penny",
-            "Disappear entirely"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Volume does rise, but uncertainty rises faster — market makers widen quotes to protect themselves from being run over.",
-            "Right — and this timing is the trap: panic makes trading feel urgent at the exact moment it's most expensive. Patience is literally paid.",
-            "No such freeze exists — spreads float with risk, which is the point of the warning.",
-            "Spreads never disappear; they're the market maker's compensation for standing in traffic, and traffic is worst in a crash."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "Investopedia — Limit orders",
-          "url": "https://www.investopedia.com/terms/l/limitorder.asp",
-          "type": "reading",
-          "note": "Order-type mechanics and the execution/price trade-off."
-        },
-        {
-          "label": "ETF.com — Understanding net asset value",
-          "url": "https://www.etf.com/sections/etf-basics/understanding-net-asset-value",
-          "type": "reading",
-          "note": "How NAV, premiums, and discounts arise and when they matter."
-        },
-        {
-          "label": "SEC Investor.gov — Exchange-traded funds",
-          "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary/exchange-traded-fund-etf",
-          "type": "reading",
-          "note": "Quick regulator's reference on how ETF trading differs from mutual funds."
-        }
-      ]
-    },
-    {
-      "id": "c06-costs-and-taxes",
-      "title": "Costs and taxes",
-      "summary": "Think in all-in cost, not just the sticker fee; know what distributions are and how tax lots work; and put each asset in the account type where the tax code punishes it least — location can be worth more than fund selection.",
-      "cards": [
-        {
-          "h": "All-in cost",
-          "md": "The expense ratio is the sticker price. What you actually pay to own a fund is the **all-in cost**:\n\n- **Expense ratio** — charged per year of holding\n- **Bid-ask spread** — charged per round trip\n- **Tracking difference beyond the fee** — sloppy indexing leaks return invisibly\n- **Taxes** — on distributions each year, and on your gains when you sell\n\nThe useful insight is that these scale with *different things*. Holding costs scale with **time**; trading costs scale with **activity**; taxes scale with both, plus account type. So the cheapest possible setup is no accident: broad low-fee ETFs (tiny ratio, penny spreads, near-zero capital-gains distributions), traded rarely, in the right account. Each term in the cost equation gets minimized by the same boring behavior.\n\nAnd the sticker can mislead in both directions: a 0.03% fund traded weekly can cost more than a 0.20% fund held for a decade. For an ETF investor, *activity itself* is a cost center — remember that when concept 7's temptations show up."
-        },
-        {
-          "h": "Distributions and tax lots",
-          "md": "Two pieces of plumbing every taxable-account investor should know.\n\n**Distributions.** Funds pass through what they collect. Stock ETFs pay **dividends** (typically quarterly); most broad-ETF dividends are *qualified*, taxed at the lower capital-gains rates rather than as ordinary income. Bond fund interest is generally taxed as **ordinary income** — at your full marginal rate; remember that for the next card. Capital-gains distributions, the mutual-fund December surprise from concept 1, are rare in broad ETFs. Note that reinvesting a distribution doesn't dodge the tax — it's taxable the year it's paid, reinvested or not.\n\n**Tax lots.** Every separate purchase you make is a **lot** with its own price paid (**cost basis**) and its own clock. Sell after holding a lot more than a year and the gain is **long-term** — taxed at favorable rates (0/15/20%). A year or less is **short-term** — taxed like salary. The clock alone can change the tax on the same gain by a third or more.\n\nWhen you sell *part* of a position, your broker's default is often \"first in, first out\" — usually your oldest, cheapest, biggest-gain shares. But you can elect **specific identification** and choose which lots to sell: pick high-basis lots to shrink the taxable gain, or harvest a losing lot to offset gains elsewhere. Same sale, same proceeds, different tax bill — set the cost-basis method in your account settings *before* you need it."
-        },
-        {
-          "h": "Asset location: the free lunch nobody eats",
-          "md": "You likely have accounts with different tax treatment: **taxable** brokerage, **tax-deferred** (401(k), traditional IRA — pay ordinary income tax on the way out), and **tax-free** (Roth — never taxed again). **Asset location** is the art of placing each asset where the tax code hurts it least. Same portfolio, same funds, same risk — measurably more money kept.\n\nThe logic follows directly from the last card. Ask of each asset: *how heavily is its return taxed each year?*\n\n- **Taxable bonds and REITs** throw off income taxed at full ordinary rates, every single year. In a taxable account that's a steady leak; **shelter them** in tax-advantaged accounts where the annual tax simply doesn't happen.\n- **Broad stock ETFs** are already nearly tax-optimal: qualified dividends at low rates, capital gains deferred until *you* choose to sell (thanks to the wrapper from concept 1). They **tolerate a taxable account** better than almost anything else you could put there.\n- **Highest-expected-growth assets** have a natural home in the **Roth**, where all that growth escapes tax entirely.\n\nStudies of the taxable-vs-sheltered decision typically put the benefit in the range of **0.1–0.3% per year** — comparable to the entire fee difference between a cheap fund and an expensive one, earned not by picking anything better but purely by *placement*. Most investors agonize over which fund and never think about which account. This card is the cheaper worry."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "Which cost do you pay every time you trade, regardless of how long you've held?",
-          "options": [
-            "The expense ratio",
-            "The bid-ask spread",
-            "Capital gains distributions",
-            "The gross-to-net fee waiver"
-          ],
-          "answer": 1,
-          "feedback": [
-            "The expense ratio accrues with time held — it's the rent, not the toll; trading more doesn't raise it.",
-            "Right — the spread is charged per transaction, which is exactly why activity itself is a cost center for an ETF investor.",
-            "Distributions arrive on the fund's schedule whether you trade or not — they scale with holding, not with trading.",
-            "The waiver is a discount on the expense ratio, not a per-trade charge — it affects the rent, not the toll."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "You hold taxable bond funds and broad stock ETFs, plus both a taxable account and an IRA. The tax-smart arrangement is:",
-          "options": [
-            "Bonds in taxable, stocks in the IRA",
-            "Bonds in the IRA, stock ETFs in taxable — bond interest is taxed annually at ordinary rates and needs shelter; stock ETFs defer gains and pay lower-taxed dividends",
-            "Split everything 50/50 across both accounts",
-            "It makes no difference where anything goes"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Backwards — this parks the heavily-taxed annual income stream in the taxed account and shelters the asset that barely needed it.",
-            "Right — shelter what leaks (ordinary-income interest, every year), expose what's naturally tax-efficient (deferred gains, qualified dividends). Same portfolio, more kept.",
-            "Splitting evenly forfeits the choice entirely — location only adds value when assets are deliberately sorted by tax burden.",
-            "Placement is typically worth 0.1–0.3% per year — on par with the whole cheap-vs-expensive fund fee gap, for zero change in risk."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "You bought shares of the same ETF in 2019 (at $100) and last month (at $195). Price today: $200. You need to sell some shares while minimizing this year's tax bill. You should:",
-          "options": [
-            "Let the broker's default pick the shares — it's all the same",
-            "Use specific identification to sell last month's $195-basis lot — a $5/share gain instead of $100/share",
-            "Sell the 2019 lot because older shares are always taxed less",
-            "Sell everything to keep the bookkeeping simple"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Defaults are often first-in-first-out, which here sells the $100-basis lot and books twenty times the gain — the default is the expensive choice.",
-            "Right — same shares sold, same cash raised, $5 of taxable gain per share instead of $100. (Check the fine print: gains on lots held under a year are short-term, but $5 short-term beats $100 long-term here by a mile.)",
-            "Older lots get the long-term *rate*, but the rate applies to a $100 gain — the lot's basis matters more than its birthday in this case.",
-            "Selling everything realizes the full gain on every lot at once — maximum possible tax bill, purchased for a tidier spreadsheet."
-          ]
-        },
-        {
-          "id": "q4",
-          "type": "mcq",
-          "prompt": "You have dividends automatically reinvested. Are they still taxed in a taxable account?",
-          "options": [
-            "No — reinvested dividends aren't income",
-            "Yes — a distribution is taxable the year it's paid, whether you pocket it or reinvest it; the reinvestment just creates a new tax lot",
-            "Only if the fund's price also went up that year",
-            "Only when you eventually sell the fund"
-          ],
-          "answer": 1,
-          "feedback": [
-            "The IRS sees the dividend the moment it's paid — what you do next (spend or reinvest) doesn't change its character as income.",
-            "Right — and that new lot has its own basis and clock, which is why long-held reinvesting positions accumulate dozens of lots. Brokers track this, but the specific-ID option is yours.",
-            "Dividend taxation is independent of price movement — a fund can fall all year and its dividends are still taxable income.",
-            "That's how capital *gains* on your shares work — dividends are taxed on arrival, not at sale."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "Bogleheads wiki — Tax-efficient fund placement",
-          "url": "https://www.bogleheads.org/wiki/Tax-efficient_fund_placement",
-          "type": "reading",
-          "note": "The canonical asset-location guide, with priority tables."
-        },
-        {
-          "label": "Bogleheads wiki — Cost basis methods",
-          "url": "https://www.bogleheads.org/wiki/Cost_basis_methods",
-          "type": "reading",
-          "note": "Tax lots, specific identification, and how to set your broker's default."
-        },
-        {
-          "label": "SEC Investor Bulletin — How fees and expenses affect your portfolio (PDF)",
-          "url": "https://www.sec.gov/investor/alerts/ib_fees_expenses.pdf",
-          "type": "reading",
-          "note": "The compounding cost of small annual drags, from the regulator."
-        }
-      ],
-      "anim": "fee_drag"
-    },
-    {
-      "id": "c07-failure-modes",
-      "title": "How investors actually lose",
-      "summary": "The expensive ETF mistakes are behavioral, not technical: chasing last year's winner, treating theme funds as lottery tickets, over-trading, mistaking overlap for diversification, and selling in the middle of a crash.",
-      "cards": [
-        {
-          "h": "Performance chasing and the behavior gap",
-          "md": "The most reliable finding in fund-investor research is embarrassing in its simplicity: **investors earn less than the funds they invest in.**\n\nHow can that be? Timing of the money. A fund posts a hot three-year run; money floods in *after* the gains are already banked; the hot streak cools (as hot streaks statistically do — that's what made them streaks); money flees near the bottom. The fund's posted return counts the whole ride. The average *dollar* only showed up for the ending. Morningstar's long-running \"Mind the Gap\" studies put this **behavior gap** around one percentage point per year — for many investors, bigger than every fee, spread, and tax drag combined. The killer detail: the gap is *widest* in the most exciting, volatile funds, because exciting funds are the ones that get bought high and sold low.\n\nThe mechanism to internalize: a stellar recent record mostly tells you a fund's holdings just got *more expensive*, not that they're about to repeat. Past performance isn't just a weak signal — buying it systematically puts your dollars in *after* the returns happened. Buy the boring plan, automate the contributions, and the gap mostly closes by itself."
-        },
-        {
-          "h": "Lottery tickets and busy hands",
-          "md": "**Theme funds.** Every hype cycle mints ETFs to match — genomics, robotics, cannabis, blockchain, AI. Here's the structural problem, beyond mere fashion: a theme ETF launches *when the theme can sell*, which is at or near **peak excitement** — after the story is famous and the stocks are already expensive. Research on thematic funds finds exactly what that predicts: on average they underperform badly *after* launch, whatever the theme later achieves in the real world. The theme can change the world and the fund can still lose money — because the price you paid had the world-changing already in it. A fund launch is a measure of what's sellable, never of what's cheap.\n\n**Over-trading.** ETFs trade in one click, and the click is the trap. Every trade pays the spread; every profitable sale in a taxable account books a tax bill (short-term rates if you're quick, per concept 6); and every trade is a fresh chance for the timing errors of the last card. Decades of brokerage-account research agree: **the more retail investors trade, the worse they do** — the famous study title is simply \"Trading Is Hazardous to Your Wealth.\" The ETF's greatest convenience, always-on tradability, is thus its subtlest hazard: the instrument is liquid, but your *plan* shouldn't be. Activity feels like diligence; in investing it's usually leakage. When the itch strikes, size it like a satellite: small enough that being wrong doesn't matter."
-        },
-        {
-          "h": "The one mistake that ends compounding",
-          "md": "Cheap funds, clean diversification, tax-smart placement — one act can undo a decade of all of it: **selling in the middle of a crash**.\n\nThe market's rhythm is brutal on this specific plan: its **best days cluster tightly around its worst days**, because rebounds are born in the depths of panics. So \"sell now, get back in when things calm down\" doesn't sidestep the crash — it locks in the losses, then *specifically* misses the violent rebound days, because by the time things feel calm, the snapback already happened. Miss a small handful of those days over a few decades and a huge slice of the total return is gone. The people who caught them weren't nimble; they were simply **still there** — the strategy known, only half-jokingly, as staying in your seat.\n\nTwo defenses, both built in advance:\n\n- **Set your stock/bond mix by the crash, not the average year.** Decide what drop you could watch without selling — then size stocks so the plausible worst case stays inside that line. The mix you can hold through a panic beats the optimal mix you'll abandon in one, by exactly the amount the panic costs.\n- **Write the plan down in peacetime** — target mix, when you rebalance, what you'll do in a 30% drawdown (spoiler: mostly nothing, perhaps rebalance *into* the drop). In a crash you don't want to be deciding; you want to be *complying* with a decision made by the calmer person you were.\n\nEvery concept in this pack compounds only if you stay invested. Protecting against the big, permanent loss — including the self-inflicted kind — *is* the strategy."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "The \"behavior gap\" — investors earning about 1% per year less than their own funds — is caused by:",
-          "options": [
-            "Fund companies skimming returns secretly",
-            "The timing of investors' money: it arrives after the gains and leaves near the bottoms, so the average dollar misses the posted return",
-            "Government taxes on fund investors",
-            "Rounding errors in fund accounting"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Fees are disclosed and already deducted from the fund return — the gap is measured *after* fees, in the investor's own timing.",
-            "Right — the fund's return counts the whole ride; chasing dollars only show up for the ending. The gap is widest in the most exciting funds, which is a hint about what to own.",
-            "Taxes are real but separate — the gap appears even in tax-sheltered accounts, purely from buy-high/sell-low flow timing.",
-            "Fund accounting is audited to the penny — the leak is in investor behavior, which no audit can fix."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "Why do thematic ETFs (AI, robotics, genomics...) tend to disappoint even when the underlying technology succeeds?",
-          "options": [
-            "The technologies always fail",
-            "They launch when hype — and the stocks' prices — peak, because that's when the fund can sell; the world-changing future is already in the purchase price",
-            "Theme funds are illegal in most states",
-            "They hold no actual stocks"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Many themed technologies succeed spectacularly — the fund can still lose money because success was pre-paid in the entry price.",
-            "Right — launch timing follows salability, and salability peaks with hype. You can be exactly right about the future and still overpay for it today.",
-            "They're fully legal and heavily marketed — the problem is economics, not law.",
-            "They hold real stocks — bought at prices that already assumed the theme wins."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "An investor sells everything during a crash, planning to \"get back in when things calm down.\" The predictable flaw:",
-          "options": [
-            "Brokers prohibit re-buying for five years",
-            "The market's best days cluster around its worst — by the time things feel calm, the violent rebound has already happened without them",
-            "Selling in a crash is impossible",
-            "There is no flaw — this reliably works"
-          ],
-          "answer": 1,
-          "feedback": [
-            "No such restriction exists — the barrier to getting back in is psychological and informational, which is exactly why it fails.",
-            "Right — the plan sells the losses at the bottom and then specifically misses the recovery days, which are born inside the panic, not after it. 'Calm' is the all-clear that comes too late.",
-            "Selling is all too possible — panics have plenty of liquidity at falling prices; the spread is wider (concept 5), but the real damage is the exit itself.",
-            "Study after study finds this the single most expensive pattern in retail investing — it converts a temporary decline into a permanent loss."
-          ]
-        },
-        {
-          "id": "q4",
-          "type": "mcq",
-          "prompt": "Decades of brokerage-account research on retail trading frequency finds:",
-          "options": [
-            "Frequent traders outperform through practice",
-            "The more investors trade, the worse their net results — spreads, taxes, and timing errors compound against activity",
-            "Trading frequency has no measurable effect",
-            "Only professionals are allowed to trade frequently"
-          ],
-          "answer": 1,
-          "feedback": [
-            "Practice improves skills where feedback is fast and causal — markets give noisy, delayed feedback, and costs are certain while edge is not.",
-            "Right — every trade pays a spread, may book a tax, and re-rolls the timing dice. 'Trading Is Hazardous to Your Wealth' is a research title, not a slogan.",
-            "The effect is large, measurable, and one of the most replicated results in household finance — activity predicts underperformance.",
-            "Anyone may trade at will — the finding is that most would be richer if they exercised the right far less often."
-          ]
-        },
-        {
-          "id": "q5",
-          "type": "mcq",
-          "prompt": "The best defense against selling in a panic is:",
-          "options": [
-            "Watching financial news continuously for early warnings",
-            "Choosing a stock/bond mix whose worst case you can genuinely sit through, and writing the plan down before the storm",
-            "Keeping everything in cash permanently",
-            "Planning to sell quickly at the first sign of trouble"
-          ],
-          "answer": 1,
-          "feedback": [
-            "More news flow raises the urge to act — it's an accelerant for panic-selling, not a warning system; crashes aren't announced in advance.",
-            "Right — the mix you can hold beats the optimal mix you'll abandon. Decide in peacetime so that in a crash you're complying with a plan, not making one.",
-            "Cash can't crash, but it also can't compound — decades of inflation quietly deliver the big permanent loss you were avoiding.",
-            "That IS panic-selling, scheduled in advance — 'the first sign of trouble' is indistinguishable from ordinary volatility until too late, and the rebound clusters right behind it."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "Ben Felix — The (Expected) Cost of Pessimism (myth of outperforming funds)",
-          "url": "https://www.youtube.com/watch?v=rU4wanoRWbE",
-          "type": "video",
-          "note": "Evidence-based take on chasing winning funds, with the academic citations on screen."
-        },
-        {
-          "label": "Bogleheads wiki — Behavioral pitfalls",
-          "url": "https://www.bogleheads.org/wiki/Behavioral_pitfalls",
-          "type": "reading",
-          "note": "The catalog: recency bias, overconfidence, loss aversion, and their portfolio symptoms."
-        },
-        {
-          "label": "SPIVA — S&P's active-vs-index scorecards",
-          "url": "https://www.spglobal.com/spdji/en/research-insights/spiva/",
-          "type": "interactive",
-          "note": "The standing scoreboard of how few funds beat their index over time — the base rates behind this whole concept."
-        }
-      ],
-      "anim": "etf_bestdays"
+     "h": "Why the wrapper is tax-friendly",
+     "md": "Here's a mutual-fund trap that surprises people. When other investors cash out of a mutual fund, the manager may have to **sell holdings** to raise the cash. Selling winners realizes capital gains — and by law the fund distributes those gains across **all remaining shareholders**. You can hold a mutual fund all year in a taxable account, sell nothing, even watch it *lose* value, and still get a tax bill in December for gains other people's exits forced.\n\nThe ETF's in-kind machinery sidesteps this. When APs redeem, the fund doesn't sell anything — it **hands out shares of stock directly**. No sale, no realized gain. Better yet, the fund can hand out its *lowest-cost* shares (the ones carrying the biggest embedded gains), quietly flushing future tax liability out of the fund.\n\nThe result: broad stock ETFs typically distribute **little or no capital gains** year after year, while otherwise-similar mutual funds routinely do. You still owe tax on dividends, and on your own gains when *you* sell — nothing is tax-free. But inside a taxable account, the ETF wrapper defers taxes you'd otherwise pay annually, and money not sent to the IRS this year keeps compounding for you."
     }
-  ]
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "What actually keeps an ETF's market price close to the value of the basket it holds?",
+     "options": [
+      "Regulators set the price each morning",
+      "Arbitrage: authorized participants profit from any gap via in-kind creation and redemption, which closes the gap",
+      "The fund company buys and sells its own shares all day",
+      "Nothing — ETF prices drift freely like any stock"
+     ],
+     "answer": 1,
+     "feedback": [
+      "No regulator prices ETFs — the market does, disciplined by a mechanism, not a decree.",
+      "Right — a price above basket value makes creating new shares profitable; below, redeeming is profitable. Either trade pushes the price back. Greed does the enforcement.",
+      "Issuers generally don't trade their own ETF shares intraday — the arbitrage is done by outside trading firms with their own money at stake.",
+      "The quoted price does float, but any meaningful gap from basket value is free money to an arbitrageur, so gaps get closed in seconds for liquid funds."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "You hold a mutual fund in a taxable account all year and never sell a share. Can you still owe capital gains tax on it for that year?",
+     "options": [
+      "No — tax is only triggered when you sell",
+      "Yes — the fund distributes gains it realized selling holdings (often to pay departing investors), and all remaining shareholders owe tax on them",
+      "Only if the fund gained more than 10%",
+      "Yes, but only in retirement accounts"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's true for individual stocks, but a fund is a pass-through: gains realized *inside* it are distributed to you and taxed, sale or no sale.",
+      "Right — other people's redemptions can force sales inside the fund, and the resulting tax bill lands on everyone still holding. This is the specific leak the ETF structure plugs.",
+      "There's no threshold — any net realized gains inside the fund get distributed and taxed, even in a down year.",
+      "Backwards — retirement accounts are where distributions *don't* matter; the trap bites in taxable accounts."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why do broad ETFs rarely distribute capital gains, while similar mutual funds often do?",
+     "options": [
+      "ETFs are legally exempt from capital gains tax",
+      "ETF managers are better stock pickers",
+      "Redemptions are paid in-kind — securities handed out, not sold — so the fund realizes no gains, and it can offload its lowest-cost shares in the process",
+      "ETFs never hold winning stocks long enough to have gains"
+     ],
+     "answer": 2,
+     "feedback": [
+      "No exemption exists — the ETF plays by the same tax code and simply avoids *realizing* gains through in-kind swaps.",
+      "Most broad ETFs pick nothing — they track an index. The tax edge is structural plumbing, not skill.",
+      "Right — handing out shares isn't a sale, so no gain is realized, and shipping out the lowest-cost lots steadily drains embedded tax liability from the fund.",
+      "Index ETFs hold winners for years, even decades — the embedded gains are enormous. The structure just avoids realizing them."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "The practical trading difference between an ETF and a mutual fund:",
+     "options": [
+      "An ETF trades all day at a live market price; a mutual fund transacts once daily at that evening's NAV",
+      "Mutual funds trade all day; ETFs price once daily",
+      "ETFs can only be bought through the fund company",
+      "There is no difference in how they trade"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right — the ETF behaves like a stock at trade time and like a fund in what it holds. That flexibility is convenient, though concept 7 covers why using it *constantly* backfires.",
+      "Reversed — the mutual fund is the once-a-day vehicle; the ETF lives on the exchange.",
+      "Backwards — mutual funds often involve the fund company directly; ETFs are bought from other investors on an exchange through any broker.",
+      "The holding might be identical, but when and how you transact — and at what price — differs fundamentally."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "SEC Investor.gov — Exchange-Traded Funds (ETFs), the official basics",
+     "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-2",
+     "type": "reading",
+     "note": "The regulator's own plain-language explainer of the wrapper, including creation/redemption and the in-kind tax point."
+    },
+    {
+     "label": "Investopedia — Exchange-Traded Fund (ETF)",
+     "url": "https://www.investopedia.com/terms/e/etf.asp",
+     "type": "reading",
+     "note": "Standard reference entry; good glossary jumping-off point."
+    },
+    {
+     "label": "Bogleheads wiki — ETFs",
+     "url": "https://www.bogleheads.org/wiki/ETFs",
+     "type": "reading",
+     "note": "The practitioner community's accumulated wisdom, including creation/redemption and tax mechanics."
+    }
+   ],
+   "anim": "etf_arb"
+  },
+  {
+   "id": "c01b-open-vs-closed",
+   "title": "Open-end vs closed-end: the wrapper that changes everything",
+   "summary": "The fund wrapper — open-end (mutual fund/ETF) vs closed-end — decides whether your price tracks NAV or floats free of it, because only one has a create/redeem valve.",
+   "cards": [
+    {
+     "h": "Two ways to package a fund (open-end: mutual fund vs ETF)",
+     "md": "Same portfolio, two very different price experiences. The variable that matters isn't the assets inside — it's whether the **share count can change**.\n\n**Open-end** means the fund can mint and retire shares on demand. New money in → new shares created at NAV. Money out → shares redeemed at NAV. The float breathes, so **price stays tethered to net asset value**. Both classic mutual funds AND ETFs are open-end.\n\n- **Mutual fund:** you transact **once a day**, at the NAV struck *after* the close (**forward pricing**). Put in an order at 11am, you still get the 4pm NAV. No intraday quote, no premium, no discount — you always trade at asset value, full stop.\n- **ETF:** exchange-listed, trades **intraday** like a stock. Its market price *can* drift from NAV tick to tick — but **Authorized Participants** (APs) arbitrage it back. If the ETF trades rich, APs create new baskets in-kind and sell; if cheap, they buy and redeem. That valve keeps liquid-ETF premiums/discounts to **basis points**.\n\nWorked example: an ETF quotes \\$50.10 against a \\$50.00 NAV — a +0.2% premium. An AP delivers the underlying basket, gets shares worth \\$50.10, pockets \\$0.10, and the selling pressure drags price back to \\$50.00. The profit motive *is* the tether.\n\n**Rule:** In any open-end wrapper you're transacting at (mutual fund) or near (ETF) NAV by construction. The create/redeem valve is the whole reason — remember it, because the next wrapper rips it out."
+    },
+    {
+     "h": "The closed-end twist: fixed shares, floating price",
+     "md": "A **closed-end fund (CEF)** raises capital **once**, at an IPO. After that the door is welded shut: **no ongoing creation, no ongoing redemption**. The share count is **fixed**.\n\nPull that valve out and everything changes. There's no AP standing by to arbitrage price to NAV, and you can't redeem your shares back to the fund for asset value. To get out, you **sell to another buyer** on the exchange — full stop. Price is now set by pure **secondary-market supply and demand**, not by the assets.\n\nSo two numbers diverge and *stay* diverged:\n\n- **NAV** — what a share of the portfolio is actually worth.\n- **Market price** — what someone will pay you today.\n\nNothing mechanical forces them together. A CEF can trade at a **premium** (price > NAV) or, far more often, a **discount** (price < NAV) — and it can sit there for **years**.\n\n## Discount % = (Market Price − NAV) / NAV\n\nWorked: NAV \\$20.00, the fund trades at \\$18.00 → (18 − 20)/20 = **−10%**. You're buying \\$1.00 of assets for **\\$0.90**.\n\nThat sounds like free money — and sometimes it's a real edge. But there's no catalyst that *makes* the gap close. Unlike an ETF, where a premium is an arbitrage opportunity someone will act on within minutes, a CEF discount is just… the price. It can persist, or widen.\n\n**Rule:** In a CEF you're buying two things — a portfolio *and* a sentiment-driven discount. The wrapper gives you no mechanism to collect that discount; only a buyer at a narrower discount can."
+    },
+    {
+     "h": "The discount that persists — and the return-of-capital trap",
+     "md": "Why don't discounts just close? Because **nothing forces them to**. A −10% CEF discount can stay −10%, drift to −5%, or gap to −15% — driven by sentiment, not arithmetic. Buying the discount is a *bet on mean-reversion with no referee*. Persistent −5% to −15% discounts are normal and can last for years.\n\nTwo CEF features make the trap deeper:\n\n- **Leverage.** CEFs commonly **borrow to buy more assets**. A fund 30% levered turns a −10% portfolio year into roughly **−13%** on NAV (and amplifies the upside the same way). Leverage magnifies NAV swings *both* directions — great in a rally, brutal in a drawdown, and it's why CEF NAVs are more volatile than the assets suggest.\n- **Headline distribution rates.** A CEF advertising a **9% distribution** looks like rich income. But part of that payout can be **return of capital (ROC)** — the fund handing you back **your own principal**, not earnings.\n\nWhy ROC matters: it isn't income, and it **erodes NAV**. If a fund earns 5% but pays out 9%, the extra ~4% comes out of assets. Worked: NAV \\$20, pays \\$1.80/yr (9%) but earns only \\$1.00 → NAV bleeds ~\\$0.80/yr before markets even move. You're being paid with your own money and calling it yield.\n\n**Trap to avoid:** never buy a CEF on distribution rate alone. Check the **NAV total return** and the **ROC line** in the fund's Section 19 notice — a fat yield funded by destructive ROC is a wealth transfer *from* you, dressed up as income. The discount can be an edge; the yield can be a lie."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "An ETF is quoting \\$40.20 while its underlying basket (NAV) is worth \\$40.00. What mechanism, unique to the open-end ETF wrapper, most directly pushes the price back toward \\$40.00?",
+     "options": [
+      "Authorized Participants create new shares in-kind and sell them, arbitraging the premium away",
+      "The fund manager issues a press release correcting the price",
+      "SEC forward-pricing rules force the trade to settle at the 4pm NAV",
+      "Retail buyers eventually notice and stop paying the premium on their own"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right — APs exploit the \\$0.20 gap by delivering the basket for shares worth more, and their selling drags price to NAV. The profit motive is the valve.",
+      "No mechanism here — managers don't move secondary-market price with statements. The tether is the AP create/redeem arbitrage, which acts in minutes, not via PR.",
+      "Forward pricing is the mutual-fund once-a-day-at-NAV rule; ETFs trade intraday. It's the AP arbitrage, not forward pricing, that keeps an ETF near NAV.",
+      "Retail sentiment is too slow and unreliable to hold a tight tether. What actually keeps ETF premiums to basis points is APs acting on the arbitrage profit."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A closed-end fund holds a portfolio worth \\$25.00/share (NAV) but trades at \\$21.25. You buy, reasoning you're getting assets at a discount. What is the honest characterization of this trade?",
+     "options": [
+      "A guaranteed 15% gain, since price must eventually converge to NAV",
+      "A −15% discount you can arbitrage yourself by redeeming shares at NAV",
+      "A −15% discount with no mechanism forcing it to close — it can persist or widen",
+      "A pricing error the exchange will correct by the next session"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Nothing is guaranteed — (21.25−25)/25 = −15%, but no catalyst forces convergence. CEF discounts routinely persist for years or deepen; this is the core trap.",
+      "You can't redeem a CEF share back to the fund for NAV — that valve only exists in open-end funds. Your only exit is selling to another buyer on the exchange.",
+      "Right — (21.25−25)/25 = −15%, you're paying \\$0.85 for \\$1.00 of assets, but the fixed-share wrapper has no create/redeem arbitrage to close the gap. It's a mean-reversion bet with no referee.",
+      "It's not an error — with fixed shares and no redemption, secondary supply/demand legitimately sets price below NAV, sometimes indefinitely."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A CEF advertises a 9% distribution rate. Its NAV is \\$20, it pays \\$1.80/share annually, but the portfolio only earns about \\$1.00/share. What's actually happening?",
+     "options": [
+      "The fund is a high-yield bargain — 9% income beats almost any ETF",
+      "Roughly \\$0.80/share is return of capital, eroding NAV — you're being paid with your own principal",
+      "The 9% is fully covered because distribution rate always equals earnings yield",
+      "Leverage guarantees the 9% payout is safe regardless of what the portfolio earns"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A high headline rate isn't income if it isn't earned. Paying \\$1.80 on \\$1.00 of earnings means ~\\$0.80 is destructive return of capital, not yield.",
+      "Right — earns \\$1.00 but pays \\$1.80, so ~\\$0.80 is ROC that bleeds NAV ~4%/yr before markets move. Check the Section 19 notice and NAV total return, never the distribution rate alone.",
+      "Distribution rate and earnings yield are not the same thing — the gap here is exactly the ROC that erodes NAV. That's the whole trap.",
+      "Leverage amplifies NAV moves both ways and adds borrowing cost; it doesn't create earnings. Overpaying relative to earnings still returns your own capital."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Closed-End Fund (CEF) — definition & mechanics",
+     "url": "https://www.investopedia.com/terms/c/closed-endinvestment.asp",
+     "type": "reading",
+     "note": "Fixed share count, IPO-once structure, and why CEFs trade at premiums/discounts to NAV."
+    },
+    {
+     "label": "SEC investor.gov — Closed-End Funds",
+     "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-1",
+     "type": "docs",
+     "note": "Regulator's plain-language contrast of mutual funds, ETFs, and closed-end funds and how each is priced."
+    },
+    {
+     "label": "Return of Capital — how distributions can erode NAV",
+     "url": "https://www.investopedia.com/terms/r/returnofcapital.asp",
+     "type": "reading",
+     "note": "Explains why part of a fat CEF distribution is your own principal, not income — the Section 19 trap."
+    }
+   ]
+  },
+  {
+   "id": "c01c-etn",
+   "title": "ETNs: the fund that isn’t a fund",
+   "summary": "An ETN is unsecured bank debt that tracks its index perfectly by contract but can go to near-zero if the issuer defaults — the worst case is the bank failing, not the market.",
+   "cards": [
+    {
+     "h": "A note, not a fund: perfect tracking, borrowed on trust",
+     "md": "An **ETN (exchange-traded note)** looks like an ETF on your screen and trades like one. It is not one. It holds **no assets** — no stocks, no futures, nothing. It is a **senior unsecured debt obligation** of an issuing bank: an IOU that promises to pay you the index return minus fees at maturity or redemption.\n\nThat structure buys you one genuinely valuable thing: **essentially zero tracking error**. A real fund has to *hold* the exposure — buy the stocks, roll the futures, rebalance — and every one of those frictions leaks return. An ETN skips all of it. The bank simply *owes* you the index number.\n\n- **ETF:** owns a basket → net asset value drifts from the index (fees, roll, rebalancing, cash drag).\n- **ETN:** owns nothing → pays the index by **contract**. If the index is up 14.3% and the fee is 0.9%, the note owes you **14.3% − 0.9% = 13.4%**, full stop.\n\nThis is why ETNs dominate awkward exposures — **VIX futures, some commodities** — where an ETF's roll and tracking problems can bleed several percent a year. The note sidesteps the plumbing entirely.\n\nBut read that promise carefully. \"The bank owes you the number\" is exactly as strong as **the bank**. You have traded fund mechanics for a **counterparty**.\n\n**Rule:** an ETN's clean tracking is not magic — it is credit. You are lending money to a bank and getting paid the index."
+    },
+    {
+     "h": "Issuer credit risk — the worst case is not the market",
+     "md": "Here is the trap that catches people who think an ETN is \"just an index fund.\" Your worst case is **not** the index falling. It is the **issuer failing**.\n\nYou own **no assets** — only the bank's promise. So if the issuer defaults, you are an **unsecured creditor** standing in line at bankruptcy court, and the note can collapse toward **zero regardless of where the index sits**.\n\n- **2008 — Lehman Brothers ETNs.** Lehman's notes went to **near-total losses** when the bank failed. The **indices they tracked were fine.** Holders didn't lose because the market fell; they lost because the *issuer* did.\n- Contrast an ETF: its securities sit in a **trust** and **survive the sponsor's bankruptcy**. If the ETF sponsor goes under, you still own a claim on **real assets** — the basket gets liquidated or transferred, not zeroed.\n\nTwo more issuer-side landmines:\n\n- **Call / closure:** the issuer can **call the note** or **suspend new issuance**. When creation stops, the ETN can detach and trade at a **premium** to its indicative value — you're now paying for scarcity, not exposure, and that premium can evaporate.\n- **Tax:** often **no annual distributions**, so treatment differs from a fund holding the same assets. Don't assume the 1099 looks the same.\n\n**Rule:** before you buy the *exposure*, price the *issuer*. Check the bank's credit — the note is only as good as the balance sheet behind it."
+    },
+    {
+     "h": "When an ETN is the right tool anyway",
+     "md": "None of this makes ETNs junk. It makes them a **specialist's instrument** with a cost you must underwrite consciously.\n\nReach for an ETN when the exposure is genuinely **hard to hold** and the fund alternative bleeds:\n\n- **VIX / volatility futures**, certain **commodities**, some leveraged or niche strategies — places where an ETF's **roll and tracking error** cost you real money every year. The ETN's **contractual tracking** can be worth more than the credit risk you take on.\n- **Short-dated, tactical** positions. Credit risk is a function of *time exposed*. A two-week tactical VIX trade carries far less issuer risk than a five-year buy-and-hold.\n\nThe checklist before you click buy:\n\n- **Who is the issuer, and what's their credit?** A note from a strong, well-capitalized bank is a different animal from a weak one. Same index, different survival odds.\n- **Is there a fund that does this cleanly?** If a plain ETF tracks the same exposure with tolerable error, take the **trust-held assets** — you keep your claim if the sponsor fails.\n- **Am I being paid for the credit risk?** If the ETN's edge over the ETF is a fraction of a percent, you are lending to a bank for almost nothing.\n\nThink of it as a bond that pays an index coupon: you'd never buy a bond without checking the issuer, and an ETN is a bond.\n\n**Rule:** ETN for exposures a fund can't hold cleanly, sized and dated for the *credit* you're accepting — never as a lazy stand-in for an ETF that would have survived the issuer."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A volatility ETN and a volatility ETF both track the same VIX-futures index. Overnight, the ETN's issuing bank files for bankruptcy — but the index itself is unchanged. What happens to each holder?",
+     "options": [
+      "Both fall together, since they track the identical index",
+      "The ETN can collapse toward zero; the ETF holder still owns a claim on assets in a trust",
+      "The ETF is wiped out because the sponsor failed; the ETN is fine because it holds no assets to lose",
+      "Neither is affected — bankruptcy of a financial firm never touches index products"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Wrong, and this is the core ETN trap: the two do NOT move together on issuer default. The ETF tracks the index; the ETN tracks the index ONLY as far as the bank's solvency. Same index, opposite outcomes.",
+      "Right — the ETN is unsecured bank debt with no assets behind it, so issuer default can zero it regardless of the index (Lehman 2008). The ETF's securities sit in a trust and survive the sponsor's bankruptcy, so that holder keeps a claim on real assets.",
+      "Backwards. The ETF's assets live in a trust and SURVIVE the sponsor's bankruptcy; it's the ETN's lack of assets — only an IOU — that makes it vulnerable. Holding nothing is the weakness here, not the protection.",
+      "Wrong — issuer bankruptcy is precisely what harms an ETN, because the note is an unsecured claim on that specific issuer. Lehman's ETNs were near-total losses in 2008 while their indices were fine."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "An investor prefers an ETN over the comparable ETF specifically because the ETN shows almost no tracking error. What is the most accurate read of that decision?",
+     "options": [
+      "The ETN is strictly superior — perfect tracking with no downside",
+      "The tight tracking is contractual, and the price of it is taking on the issuer's credit risk",
+      "The ETN tracks better because it holds the index securities more efficiently than the ETF",
+      "Tracking error is irrelevant; both products are legally identical"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Wrong — there's no free lunch. The perfect tracking is real, but it is bought with issuer credit risk that a trust-holding ETF doesn't carry. 'Strictly superior' ignores the counterparty exposure.",
+      "Right — the ETN matches its index by contract precisely because it holds nothing to manage; that clean tracking IS the bank's promise, and the promise is only as good as the bank's balance sheet. You've swapped fund mechanics for a counterparty.",
+      "Wrong on the mechanism: the ETN holds NO securities at all. Its tight tracking comes from being a debt contract, not from holding the basket more efficiently — the ETF is the one holding real securities.",
+      "Wrong — they are structurally different. An ETF owns assets in a trust; an ETN is unsecured debt. That legal difference is the whole point and drives the credit risk."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "An ETN's issuer suspends new issuance (stops creating new units) but keeps the note outstanding. What is the practical danger to a current holder?",
+     "options": [
+      "Nothing changes — outstanding notes track the index the same as before",
+      "The note can trade at a premium detached from its indicative index value, which can later collapse",
+      "The note is immediately called and cashed out at index value",
+      "The issuer's credit risk disappears once issuance stops"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Wrong — halting creations removes the arbitrage that keeps price near indicative value. Without new supply, scarcity can push the ETN above what the index justifies.",
+      "Right — when creation stops, the arbitrage mechanism breaks and the ETN can trade at a premium driven by scarcity, not exposure; buy at that inflated price and you can lose the premium even if the index holds. It's a documented ETN-specific hazard.",
+      "Wrong — suspending issuance is not a call. The note stays outstanding and keeps trading; a call is a separate action where the issuer redeems it. Conflating the two misreads the risk.",
+      "Wrong — the note is still unsecured debt of the same issuer, so credit risk is unchanged. Suspending issuance is a supply/premium problem layered ON TOP of the existing credit risk, not a cure for it."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Exchange-Traded Note (ETN) — Investopedia",
+     "url": "https://www.investopedia.com/terms/e/etn.asp",
+     "type": "reading",
+     "note": "Clear breakdown of the unsecured-debt structure, issuer credit risk, and how ETNs differ from ETFs."
+    },
+    {
+     "label": "SEC Investor Bulletin: Exchange-Traded Notes (ETNs)",
+     "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/exchange-traded-notes-etns",
+     "type": "docs",
+     "note": "Regulator's plain-language warning on credit risk, call/redemption features, and premium/discount detachment."
+    },
+    {
+     "label": "ETN vs. ETF: What's the Difference? — Investopedia",
+     "url": "https://www.investopedia.com/articles/investing/060915/introduction-exchange-traded-notes.asp",
+     "type": "article",
+     "note": "Side-by-side on why an ETF's trust-held assets survive sponsor bankruptcy while an ETN holder is an unsecured creditor."
+    }
+   ]
+  },
+  {
+   "id": "c02-reading-a-fund",
+   "title": "Reading a fund",
+   "summary": "Five numbers tell you most of what matters: expense ratio (gross vs net), assets under management, bid-ask spread, and tracking difference — with the prospectus as the label on the tin.",
+   "cards": [
+    {
+     "h": "The expense ratio: rent, charged invisibly",
+     "md": "Every fund charges rent: the **expense ratio**, quoted as a percent of your money per year. You never see a bill — it's shaved off the fund's value a tiny sliver at a time, every day. A 0.03% ratio costs $3 a year per $10,000 invested; a 1% fund costs $100.\n\nThat sounds like pocket change until you compound it. $100,000 growing 30 years at 7% becomes about **$761,000**. The same money at 6% — just one percent skimmed annually — becomes about **$574,000**. The quiet 1% fee ate roughly **$187,000**, about a quarter of your ending wealth. Fees compound with exactly the same relentlessness as returns, just against you.\n\nOne trap on the label: funds report a **gross** expense ratio and a **net** one. When they differ, the fund is temporarily waiving part of its fee — and waivers **expire**. The gross number is what the fund reserves the right to charge. For the giant broad index ETFs this rarely matters (fees are already near zero); for small new funds advertising a suspiciously low rate, check whether it's a teaser."
+    },
+    {
+     "h": "AUM and the spread: will it live, and what's the toll?",
+     "md": "**AUM** (assets under management) is the fund's total size. It's less a quality score than a **survival indicator**: running a fund costs real money, so tiny funds (roughly under $50–100M) that fail to attract assets get liquidated. A fund closure doesn't vaporize your money — you're paid out at fair value — but it forces a sale on someone else's schedule, possibly at a tax-inconvenient moment, plus paperwork and reinvestment hassle. Big, boring, and popular is a *feature* in a fund.\n\nThe **bid-ask spread** is the gap between the price buyers are offering (bid) and sellers are asking (ask) at any moment. Buy and you pay the ask; sell and you get the bid; the sliver between goes to the market's middlemen. It's a toll paid **per round trip**, not per year — which is why it barely matters to a decade-long holder and quietly bleeds a frequent trader. Mega-ETFs trade at spreads of a penny (~0.01%); niche funds can run 0.5% or worse. The spread mostly reflects how easily the *underlying holdings* trade, which is why an ETF of obscure small stocks costs more to enter and exit than one holding Apple and Microsoft."
+    },
+    {
+     "h": "Tracking difference, and where the prospectus fits",
+     "md": "An index fund's whole job is to match its index. So the truest single report card is the **tracking difference**: the fund's actual return minus the index's return over the same period. If the index earned 10.00% and the fund delivered 9.92%, the tracking difference is −0.08% — that's the *all-in* cost of owning the fund, with everything netted in: fees, trading frictions, sampling shortcuts, even small income the fund earns lending out its shares (which can partially offset the fee).\n\nYou'll also see **tracking error**, a related but different number: how much the gap *wobbles* from period to period. Difference tells you the average toll; error tells you how consistent it is. For a buy-and-hold investor, the difference is the one to watch — a fund with a 0.03% fee but sloppy 0.30% tracking difference is a 0.30% fund in practice.\n\nWhere do you find any of this on paper? The **prospectus** — the legal disclosure document every fund must publish. The short **summary prospectus** is genuinely readable: the objective, the exact index tracked, the fee table (this is where gross-vs-net waivers and their expiry dates hide), and the principal risks. You don't need to read it like a lawyer. You do need to confirm the fund does what its ticker and marketing name imply — because as concept 7 will show, names are marketing."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A new ETF advertises a 0.19% net expense ratio; the fee table shows 0.59% gross. What's going on?",
+     "options": [
+      "A typo in the fee table",
+      "Part of the fee is temporarily waived — the waiver can expire, and the gross figure is what the fund may charge later",
+      "You pay 0.59% only in years the fund loses money",
+      "The difference is a government tax"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Both numbers are real and legally required — they differ precisely because a waiver is in effect.",
+      "Right — the net rate is a promotional discount with an expiration date disclosed in the prospectus. Judge a long-term holding by what it can charge, not the teaser.",
+      "Expense ratios don't flex with performance — they're charged on assets every year, gain or loss.",
+      "No tax hides in the expense ratio — the gap is simply the fund company's own waived (for now) fee."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "The main practical risk of buying a tiny, $20M ETF is:",
+     "options": [
+      "Your money disappears if the fund shuts down",
+      "The fund may be liquidated — forcing a sale at a time you didn't choose, with possible tax consequences and reinvestment hassle",
+      "Small funds are illegal to sell for a year",
+      "Small funds always underperform large ones"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Closure isn't loss — holders are paid out at fair value of the assets. The cost is disruption, not disappearance.",
+      "Right — subscale funds get closed by their sponsors routinely. You're cashed out whether or not it suits your tax year or plan. AUM is a survival signal.",
+      "No such rule — small funds trade freely; they just may not exist next year.",
+      "Performance depends on what it holds, not its size — the small-fund problem is viability, not returns."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Better single measure of what an index fund really costs you per year:",
+     "options": [
+      "The expense ratio alone",
+      "Tracking difference — actual fund return minus index return — because it nets fees, trading costs, sampling, and lending income together",
+      "The bid-ask spread",
+      "The fund's total AUM"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The expense ratio is the largest *advertised* component but not the whole story — funds can lag by more, or claw some back through securities lending.",
+      "Right — it's the bottom line: everything the fund gains or leaks versus its benchmark, measured in delivered return. A cheap fund that tracks badly is not cheap.",
+      "The spread is a real cost, but it's paid per trade, not per year of holding — it belongs in the cost picture, not as the annual measure.",
+      "AUM measures size and survival odds; it says nothing about the yearly cost of holding."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Who does the bid-ask spread cost the most?",
+     "options": [
+      "A retiree who buys and holds for 15 years",
+      "A trader making dozens of round trips a year",
+      "Everyone equally — it's an annual fee",
+      "No one — spreads are paid by the fund company"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A single round trip's spread amortized over 15 years rounds to nothing — long holders barely feel it.",
+      "Right — the spread is a toll per transaction. Cross it 50 times and a 'small' 0.1% spread has cost 5% of your money. Trading frequency turns pennies into a tax.",
+      "It's transactional, not annual — hold without trading and you pay it exactly once each way.",
+      "The spread goes to market makers and comes out of your execution price — the fund company never touches it."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Expense Ratio",
+     "url": "https://www.investopedia.com/terms/e/expenseratio.asp",
+     "type": "reading",
+     "note": "Gross vs net, and what's inside the number."
+    },
+    {
+     "label": "SEC Investor Bulletin — How fees and expenses affect your portfolio (PDF)",
+     "url": "https://www.sec.gov/investor/alerts/ib_fees_expenses.pdf",
+     "type": "reading",
+     "note": "The regulator's worked examples of fee drag over time."
+    },
+    {
+     "label": "Investopedia — Tracking Error",
+     "url": "https://www.investopedia.com/terms/t/trackingerror.asp",
+     "type": "reading",
+     "note": "The tracking error / tracking difference distinction in more depth."
+    }
+   ]
+  },
+  {
+   "id": "c03-fund-taxonomy",
+   "title": "The ETF zoo: a field guide",
+   "summary": "Broad index, sector, factor, bond, and commodity ETFs each answer a different question — and the leveraged/inverse cage has a warning sign on it for a mathematical reason: daily resets make losses compound in choppy markets.",
+   "cards": [
+    {
+     "h": "Five families, five jobs",
+     "md": "Thousands of ETFs sort into a few families, each built for a different question:\n\n- **Broad index** — \"give me the whole market.\" One fund owning all (or nearly all) of the US, international, or global stock market at rock-bottom cost. This is the default core of almost every sane portfolio.\n- **Sector** — \"give me one industry\": tech, energy, healthcare. A concentrated opinion that one slice will beat the rest.\n- **Factor** (or \"smart beta\") — \"tilt me toward a characteristic.\" Rules-based screens for stocks that are cheap (*value*), rising (*momentum*), profitable (*quality*), or small (*size*) — patterns with long academic paper trails of *modestly* higher average returns, paid for with years-long stretches of lagging. It's systematic rules, not a manager's stock picks, and nothing about it is guaranteed.\n- **Bond** — \"lend, don't own.\" A basket of loans to governments or companies, collecting interest. One non-obvious mechanic: unlike an individual bond, a bond ETF **never matures** — it perpetually rolls into new bonds, so its price moves with interest rates indefinitely (rates up → existing lower-rate bonds worth less → fund price down, and vice versa).\n- **Commodity** — \"own stuff\": gold, oil, wheat. A few hold physical metal; most hold **futures contracts**, whose returns can drift well away from the headline spot price you see in the news, thanks to the cost of perpetually rolling contracts.\n\nOne more cage sits at the back of the zoo, and it needs its own card."
+    },
+    {
+     "h": "Leveraged and inverse: read the fine print on the cage",
+     "md": "A **2x leveraged ETF** promises twice the index's return; an **inverse** ETF promises the opposite of it. The fine print is one word: **daily**. These funds deliver 2x (or −1x) of each single day's move, resetting every night — *not* 2x your return over the weeks or months you hold.\n\nThat distinction isn't legalese; it's arithmetic that eats money. Watch two days:\n\n**The index:** starts at 100 → up 10% → 110 → down 10% → **99**. Net: −1%.\n\n**The 2x fund:** starts at 100 → up 20% → 120 → down 20% → **96**. Net: **−4%**.\n\nTwice the daily moves produced *four times* the loss — not twice. The culprit is compounding from a shifting base: the second day's −20% bites a bigger number (120) than the first day's +20% grew (100). Every down-up or up-down wiggle grinds a leveraged fund down a little; the choppier the ride, the faster the grind. Hold one through a volatile sideways month and you can lose meaningful money while the index goes **nowhere**. In a smooth, relentless trend they can beat 2x — but markets rarely stay smooth for long, and you're betting on the path, not just the destination.\n\nThese are tools for traders measuring holding periods in hours or days. As a buy-and-hold instrument, a leveraged ETF is a boat with a slow leak: fine for crossing the bay, wrong for crossing the ocean. If a fund name contains \"2x,\" \"3x,\" \"Ultra,\" \"Daily,\" or \"Inverse,\" it belongs in this cage."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "An index goes +10% one day, then −10% the next (ending at 99, down 1%). A 2x daily leveraged fund on that index ends at:",
+     "options": [
+      "98, down 2% — exactly twice the index's loss",
+      "96, down 4% — worse than twice, because each day's move compounds from a new base",
+      "100, unchanged — the moves cancel",
+      "102, up 2%"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The intuitive answer, and the trap — 2x applies to each *day*, and compounding across days makes the combined result worse than 2x the total.",
+      "Right — 100 → 120 → 96. The −20% day operates on 120, not 100, so it takes back more than the +20% day gave. This asymmetry is the whole warning label.",
+      "Even the unleveraged index doesn't cancel (−10% of 110 exceeds +10% of 100) — leverage doubles each step and worsens the asymmetry.",
+      "Both funds lose over this path — leverage amplifies the loss, it can't reverse the direction."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Over a choppy sideways month in which the index finishes flat, a 2x daily leveraged ETF most likely:",
+     "options": [
+      "Also finishes flat",
+      "Finishes up — leverage always amplifies gains",
+      "Finishes down — every up-down wiggle compounds against it (volatility decay)",
+      "Cannot be traded during volatile periods"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Flat *index* doesn't mean flat *fund* — the daily reset makes the fund's outcome depend on the path taken, and a choppy path grinds it down.",
+      "Leverage amplifies daily moves in both directions; across an oscillating sequence, the amplified losses outweigh the amplified gains from a shifting base.",
+      "Right — this is volatility decay: each round trip down-and-back costs a little, and a choppy month is many round trips. Flat index, negative fund.",
+      "They trade every market day like any ETF — the danger is in holding, not access."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A factor (\"smart beta\") ETF is best described as:",
+     "options": [
+      "A star manager picking stocks by judgment",
+      "A rules-based tilt toward characteristics like value, momentum, or profitability — historically rewarded on average, with long stretches of underperformance",
+      "A guaranteed way to beat the index",
+      "A fund that only holds technology stocks"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The defining feature is that no one is exercising judgment trade-by-trade — a published rulebook does the picking.",
+      "Right — systematic exposure to well-documented return patterns. The honest fine print: the historical premium is modest and can vanish for years at a time.",
+      "Nothing rewarded by markets is guaranteed — factor premiums are compensation for risks and discomfort, which is arguably why they persist.",
+      "That's a sector fund — factors cut *across* industries, selecting by financial characteristics, not by what the company does."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Interest rates rise sharply. Your bond ETF's price falls. What's the mechanism?",
+     "options": [
+      "The fund manager sold everything in a panic",
+      "Existing bonds paying old, lower rates are worth less when new bonds pay more — and a bond fund, which never matures, marks that repricing continuously",
+      "Bond ETFs are actually stocks in disguise",
+      "The government confiscates bond interest when rates rise"
+     ],
+     "answer": 1,
+     "feedback": [
+      "No panic required — the repricing is automatic arithmetic that would happen to any bondholder's portfolio, managed or not.",
+      "Right — nobody pays full price for a 3% bond when new ones pay 5%. An individual bond can be held to maturity for its face value; the fund perpetually rolls, so rate sensitivity never expires.",
+      "A bond ETF holds actual bonds — it inherits bond math (rate sensitivity, interest income), not stock behavior.",
+      "Interest keeps flowing — in fact rising rates mean the fund gradually reinvests into *higher*-paying bonds, which is the long-run silver lining."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "SEC alert — Leveraged and inverse ETFs: special risks for buy-and-hold investors",
+     "url": "https://www.sec.gov/investor/pubs/leveragedetfs-alert.htm",
+     "type": "reading",
+     "note": "The regulator's own worked examples of daily-reset decay — written after real investors got burned."
+    },
+    {
+     "label": "Investopedia — Leveraged ETFs",
+     "url": "https://www.investopedia.com/terms/l/leveraged-etf.asp",
+     "type": "reading",
+     "note": "Mechanics of daily rebalancing and why holding period matters."
+    },
+    {
+     "label": "Bogleheads wiki — Bond basics",
+     "url": "https://www.bogleheads.org/wiki/Bond_basics",
+     "type": "reading",
+     "note": "Rates, prices, and duration — the bond-fund mechanics in plain language."
+    }
+   ],
+   "anim": "etf_levdecay"
+  },
+  {
+   "id": "c04-building-a-portfolio",
+   "title": "Building a portfolio",
+   "summary": "Core-satellite structure puts cheap broad funds at the center and sized-to-fail experiments at the edge; real diversification is about how holdings behave, not how many funds you own — and the 3×3 style box gives you the vocabulary.",
+   "cards": [
+    {
+     "h": "Core and satellite",
+     "md": "A time-tested structure: put most of your money — commonly 80–90% — in a **core** of broad, cheap index ETFs (total US market, total international, total bond, in proportions matching your appetite for rough years). The core's job is to compound quietly for decades and never surprise you.\n\nAround it, optionally, **satellites**: small positions expressing opinions — a sector you know professionally, a factor tilt, a region you believe in. The design rule that makes this work: **size each satellite so that being completely wrong doesn't matter**. A 5% position that drops by half costs you 2.5% — annoying, survivable, educational. A 40% position that drops by half changes your retirement date.\n\nThe honest psychology: satellites exist partly to scratch the itch to *do something*, so the core never gets tinkered with. Plenty of excellent portfolios are 100% core, zero satellites — three or four funds, rebalanced occasionally, held for decades. Boring is not a defect. Boring is the strategy."
+    },
+    {
+     "h": "Diversification: real versus cosmetic",
+     "md": "Here's a portfolio that looks diversified: an S&P 500 fund, a total US market fund, a Nasdaq-100 fund, and a growth fund. Four funds, four tickers — and mostly **one bet**. All four are stuffed with the same giant US companies; the same handful of mega-cap stocks can dominate the top ten of each. When those stocks fall, all four funds fall together. That's **cosmetic** diversification: more line items, same risk.\n\n**Real** diversification means holding things that respond *differently* to the same news — that are weakly **correlated**. Stocks and high-quality bonds. US and international. Assets that zig on days others zag. The test is never \"how many funds do I own?\" but \"**how many independent bets do I own?**\" Four overlapping US large-cap funds is one bet. One total-US fund plus one international fund plus one bond fund — three tickers — is three genuinely different bets.\n\nBefore adding any fund, look through the wrapper at the holdings: compare its top ten against what you already own. If the lists rhyme, you're not diversifying — you're photocopying. (And the fine print on the whole idea: diversification smooths the ride and protects against any single bet failing, but in a true panic almost all *stocks* fall together. That's precisely what the bonds are for.)"
+    },
+    {
+     "h": "The style box: a map of what you own",
+     "md": "Morningstar's **style box** is a 3×3 grid that's become the industry's shared map for stock funds. Vertical axis: company **size** — large, mid, small. Horizontal: **value** (cheap, unglamorous, priced low relative to profits) through **blend** to **growth** (expensive because big futures are expected). Nine squares; every stock fund lands somewhere.\n\nA total-market fund sits in the large-blend center, tapering into everything else. A small-value fund lives in its bottom-left corner. The overlapping foursome from the last card? All crowding the top row, tilted right — visible at a glance.\n\nTwo practical uses. First, **X-ray your whole portfolio**: plot everything you own on the grid and see your actual footprint — most investors discover they're far more concentrated in large growth than they intended, because that's what recent winners always are. Second, **catch mislabeled funds**: a fund with \"value\" in its name sitting in the growth column is telling you the marketing department won an argument with the index methodology. The box turns \"I own eight funds\" into \"here is the shape of my bet\" — and shape is what you actually own."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "An investor holds an S&P 500 fund, a total US market fund, a Nasdaq-100 fund, and a US growth fund. How diversified is this?",
+     "options": [
+      "Very — four different funds is four different bets",
+      "Barely — all four are dominated by the same US mega-cap stocks and will rise and fall together",
+      "Perfectly — it covers every asset class",
+      "Not at all — one of these funds must be fraudulent"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Counting tickers is the classic mistake — the question is what's *inside*, and inside these four are largely the same companies.",
+      "Right — heavy overlap means one bet in four wrappers. Check any two funds' top-ten holdings before assuming they diversify each other.",
+      "It's all US stocks, mostly large ones — no bonds, no international, no small caps to speak of. One asset class, one country, one size bracket.",
+      "All four are legitimate funds doing what they claim — the problem is redundancy, not fraud."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "What makes diversification real rather than cosmetic?",
+     "options": [
+      "Owning at least ten funds",
+      "Holding assets that respond differently to the same events — low correlation — so they don't all fall together",
+      "Buying funds from several different fund companies",
+      "Owning only the single best-performing fund"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Ten overlapping funds diversify nothing — fund count is the cosmetic measure, not the real one.",
+      "Right — the protection comes from independence of behavior. Three uncorrelated holdings beat ten copies of the same bet.",
+      "Vanguard's and iShares' S&P 500 funds hold the same 500 stocks — the brand on the wrapper changes nothing about the bet.",
+      "Concentration is diversification's opposite — and 'best-performing' is only knowable in the rearview mirror, as concept 7 will make painful."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "The two axes of the Morningstar style box are:",
+     "options": [
+      "Risk level and past return",
+      "Company size (large/mid/small) and valuation style (value/blend/growth)",
+      "Fee level and fund age",
+      "US versus international and stocks versus bonds"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Neither risk score nor trailing return appears in the box — it maps what a fund *holds*, not how it has behaved.",
+      "Right — nine squares of size × style. Its power is showing the combined footprint of everything you own on one grid.",
+      "Fees and age matter for fund selection but live in the fact sheet, not on this map.",
+      "The classic style box is for stock funds within a market — geography and asset class are separate dimensions of the portfolio."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "In a core-satellite portfolio, satellites should be sized so that:",
+     "options": [
+      "They can double the portfolio if right",
+      "Being completely wrong is affordable — a total failure costs only a few percent",
+      "Each equals the core",
+      "They can be traded daily for extra returns"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Sizing for maximum upside is the same thing as sizing for maximum damage — the two are inseparable in a concentrated bet.",
+      "Right — the sizing rule is written for the failure case, not the success case. A 5% satellite going to zero is a lesson; a 40% one is a life change.",
+      "A satellite that equals the core isn't a satellite — it's a second core, and the portfolio is now a coin flip between two opinions.",
+      "Frequent trading multiplies spreads and taxes (concept 6) — satellites are small *positions*, not day-trading accounts."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Bogleheads wiki — Three-fund portfolio",
+     "url": "https://www.bogleheads.org/wiki/Three-fund_portfolio",
+     "type": "reading",
+     "note": "The canonical all-core portfolio: total US + total international + bonds, and why it's hard to beat."
+    },
+    {
+     "label": "Investopedia — Style Box",
+     "url": "https://www.investopedia.com/terms/s/stylebox.asp",
+     "type": "reading",
+     "note": "The 3×3 grid, its history, and how to read it."
+    },
+    {
+     "label": "justETF — How to implement the core-satellite strategy with ETFs",
+     "url": "https://www.justetf.com/en/news/etf/how-to-implement-the-core-satellite-strategy-with-etfs.html",
+     "type": "reading",
+     "note": "The structure and its rationale, with worked ETF examples."
+    }
+   ],
+   "anim": "etf_divers"
+  },
+  {
+   "id": "c04b-cagr",
+   "title": "CAGR: the only average that spends",
+   "summary": "CAGR is the geometric growth rate that actually maps to ending wealth, sits below the arithmetic mean by a volatility-drag term, and must be paired with drawdown because it hides the path.",
+   "cards": [
+    {
+     "h": "The average that maps to money",
+     "md": "There are two ways to \"average\" a return stream, and only one of them corresponds to your bank balance.\n\n**CAGR** — compound annual growth rate — is the single constant rate that turns your starting value into your ending value:\n\n## CAGR = (V_end / V_begin)^(1/years) − 1\n\nIt is a **geometric mean** of the annual growth factors (1.10, 0.75, 1.30…), not an arithmetic average of the returns. That distinction is the whole game.\n\n**The trap that kills naive averaging:** a fund returns **+100%** one year, **−50%** the next.\n\n- Arithmetic average: (+100 − 50) / 2 = **+25% per year**. Sounds great.\n- Now follow the dollar: $1 → doubles to $2 → halves back to **$1**.\n- Ending wealth is *unchanged*. So CAGR = (1/1)^(1/2) − 1 = **0%**.\n\nThe +25% is a fiction. No one ended the two years 25%/yr richer — they ended flat. Only CAGR touched real money.\n\nThis is why a manager can truthfully quote a rosy \"average annual return\" that never landed in any client's account. The arithmetic mean rewards a violent up-year and a violent down-year symmetrically; compounding does not — a −50% needs a **+100%** just to break even.\n\n**Rule:** when a return is called an \"average,\" ask *arithmetic or compound?* If it's arithmetic, it doesn't spend. Convert to CAGR or ignore it."
+    },
+    {
+     "h": "Why CAGR sits below the arithmetic mean (volatility drag)",
+     "md": "CAGR is **always ≤** the arithmetic average of the same annual returns, and the gap has a name: **volatility drag** (a.k.a. variance drain).\n\nThe approximation every practitioner should carry:\n\n## CAGR ≈ arithmetic_mean − (variance / 2)\n\nThe drag term is **half the variance** of the annual returns. It is not a fee or a behavioral mistake — it is arithmetic. Losses compound off a smaller base than the gains they must recover from, so dispersion mechanically bleeds compounded wealth.\n\n**Work it:** two funds, same **+8%** arithmetic mean.\n\n- Fund A: +8%, +8% every year. σ = 0, drag ≈ 0. CAGR ≈ **8%**.\n- Fund B: +38% then −22% (mean still +8%). Growth factors 1.38 × 0.78 = **1.0764** over two years → CAGR = √1.0764 − 1 ≈ **3.75%**.\n\nSame average return. Fund B gives up **~4.25 points of compounded growth per year** purely to volatility. Over 20 years that is the difference between 4.7× and 2.1× your money.\n\n**The consequences:**\n\n- **Higher volatility at the same average return = lower ending wealth.** Full stop.\n- This is the mathematical case for reducing drawdowns rather than chasing raw return: shaving variance lifts CAGR even if the mean return doesn't move.\n- Two funds with identical arithmetic means are *not* equivalent — the smoother one wins the dollar race.\n\n**Rule:** never compare funds on average return alone. A lower-mean, lower-vol fund routinely out-*compounds* a higher-mean, wilder one. Ask for CAGR, or estimate the drag yourself."
+    },
+    {
+     "h": "What CAGR hides: the path",
+     "md": "CAGR is a summary statistic, and every summary discards something. What CAGR throws away is the **path** — the order and depth of the ride.\n\n**Two portfolios, identical CAGR of 8%/yr over 15 years:**\n\n- Portfolio X: a near-straight 8% every year. Worst peak-to-trough loss: a few percent.\n- Portfolio Y: same start, same end, same 8% CAGR — but got there via a **−55% crater** in year 6 before clawing back.\n\nOn a CAGR sheet they are *twins*. In real life they are nothing alike. Portfolio Y forces you to sit through more than half your capital vanishing — the exact moment most investors capitulate, sell at the bottom, and never realize the 8%. **CAGR is a promise you only collect if you survive the path.**\n\nCAGR answers one question: *\"how much did $1 become?\"* It is silent on the question that decides whether you stay invested: *\"how bad did it get along the way?\"*\n\nThat second question needs a **path/risk measure** riding shotgun:\n\n- **Maximum drawdown** — the worst peak-to-trough decline. The single best companion to CAGR.\n- **Calmar ratio** — CAGR ÷ |max drawdown| — return *per unit of worst-case pain*.\n- Time-to-recovery — how long underwater.\n\n**Rule:** never quote or accept a CAGR alone. Pair it with **max drawdown**. A 10% CAGR with a −20% max drawdown and a 10% CAGR with a −60% max drawdown are different products — and for a capital-preservation investor, the second one is often uninvestable regardless of the matching CAGR."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A newsletter brags that its model portfolio returned +80% one year and −40% the next, for an \"average annual return of +20%.\" You invested $1,000 at the start. What is it actually worth after the two years, and what's the real CAGR?",
+     "options": [
+      "$1,440; CAGR ≈ 20% — the arithmetic average is correct",
+      "$1,080; CAGR ≈ 3.9% — the arithmetic average overstates it",
+      "$1,200; CAGR ≈ 9.5% — split the difference",
+      "$1,000; CAGR = 0% — the two years perfectly cancel"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This just compounds nothing and trusts the +20% headline. Follow the dollars: 1,000 × 1.8 × 0.6 = $1,080, not $1,440. The arithmetic mean is not what landed in the account.",
+      "Right — $1,000 × 1.80 × 0.60 = $1,080. CAGR = 1.08^(1/2) − 1 ≈ 3.9%. The +20% arithmetic average is a fiction; only the geometric CAGR maps to the real ending balance.",
+      "There's no averaging-of-the-averages shortcut. Compute the growth factors: 1.8 × 0.6 = 1.08, so it's $1,080 and ~3.9%, not $1,200.",
+      "That's the +100/−50 trap answer, but these numbers are +80/−40: 1.8 × 0.6 = 1.08, so wealth grew slightly. It doesn't fully cancel — CAGR ≈ 3.9%, not 0%."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Fund A and Fund B both posted an arithmetic-mean annual return of 10% over the same period. Fund A's returns were far more volatile than Fund B's. Assuming nothing else differs, which compounded more wealth, and why?",
+     "options": [
+      "Fund A — higher volatility means higher upside capture, so it compounds faster",
+      "Fund B — lower variance means less volatility drag, so its CAGR is higher",
+      "They tie — identical arithmetic means always produce identical ending wealth",
+      "Impossible to say without knowing the fees"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Volatility is not a compounding tailwind. CAGR ≈ mean − variance/2, so more variance *subtracts* more. The wild fund gives up growth to drag, it doesn't capture extra upside.",
+      "Right — CAGR ≈ arithmetic_mean − variance/2. Same 10% mean, but Fund B's smaller variance means a smaller drag term, so it compounds to more ending wealth. Smoothness wins the dollar race.",
+      "This is the core misconception. Identical arithmetic means do NOT give identical CAGR — the higher-variance fund is dragged below by half its variance. Ending wealth differs.",
+      "Fees would matter in practice, but the question holds everything else equal. Even at identical fees, the volatility-drag term alone makes Fund B compound more."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Two ETFs show an identical 9% CAGR over 12 years. ETF Y suffered a −58% max drawdown in year 4; ETF Z's worst drawdown was −16%. For a retired, capital-preservation investor, what's the right read?",
+     "options": [
+      "They're equivalent — identical CAGR means identical risk-adjusted outcome",
+      "Prefer Y — surviving a −58% drawdown proves it's the more resilient fund",
+      "Prefer Z — same compounded return with far less path risk; CAGR hid the −58% crater",
+      "Neither is investable, since CAGR tells you nothing useful"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Identical CAGR says nothing about the path. CAGR is silent on how bad it got; a −58% vs −16% drawdown is a huge risk difference the single number concealed.",
+      "A −58% drawdown isn't evidence of resilience — it's the exact event that makes investors capitulate and sell the bottom, forfeiting the CAGR. It's a strike against Y, not for it.",
+      "Right — same 9% CAGR, but CAGR hides the path. Pair it with max drawdown and Z delivers the identical compounded return at −16% vs −58% pain. For a preservation-first investor, Z clearly wins.",
+      "Too far — CAGR is genuinely useful; it just needs a path measure beside it. Paired with max drawdown here, it makes Z the obvious choice, so the numbers ARE decision-useful."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Compound Annual Growth Rate (CAGR) — definition and formula",
+     "url": "https://www.investopedia.com/terms/c/cagr.asp",
+     "type": "reading",
+     "note": "The canonical CAGR formula with worked examples; confirms it's the single constant rate mapping begin to end value."
+    },
+    {
+     "label": "Geometric Mean vs. Arithmetic Mean of returns",
+     "url": "https://www.investopedia.com/ask/answers/06/geometricmean.asp",
+     "type": "article",
+     "note": "Shows exactly why the geometric (compound) mean sits below the arithmetic mean and which one corresponds to actual wealth."
+    },
+    {
+     "label": "Maximum Drawdown (MDD)",
+     "url": "https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp",
+     "type": "reading",
+     "note": "The path/risk measure to pair with CAGR — worst peak-to-trough loss, the number CAGR alone conceals."
+    }
+   ]
+  },
+  {
+   "id": "c04c-irr",
+   "title": "IRR and money-weighted return: your dollars’ actual experience",
+   "summary": "IRR is the discount rate that zeroes the NPV of your actual contributions and withdrawals — the money-weighted return that grades your dollars' real timing, not the fund's headline CAGR.",
+   "cards": [
+    {
+     "h": "The rate that zeroes your NPV",
+     "md": "IRR is the one discount rate **r** that makes the present value of every cash flow — money in and money out — net to exactly zero.\n\n## Σ CF_t / (1 + r)^t = 0\n\n**Sign convention is everything:**\n- Money you **put in** (contributions, purchases) is **negative**.\n- Money you **take out**, plus the **ending value**, is **positive**.\n\nWorked, simplest case: you invest $1,000, and two years later it's worth $1,210.\n- Flows: −1,000 at t=0, +1,210 at t=2.\n- Solve −1,000 + 1,210/(1+r)² = 0 → (1+r)² = 1.21 → 1+r = 1.10 → **r = 10%**.\n\nThere's no closed form once you have three or more flows — a solver (Excel `XIRR`, `numpy_financial.irr`) iterates until NPV hits zero. But the meaning never changes: IRR is the constant growth rate that, applied to your actual dollars over their actual time in the market, reproduces your ending value.\n\n**Rule:** IRR is not asserted, it's *solved* — the rate that balances your own cash-flow ledger, not a number the fund hands you."
+    },
+    {
+     "h": "Money-weighted: timing and size both count",
+     "md": "IRR is **money-weighted** (a.k.a. dollar-weighted): a period counts toward your return in proportion to *how many of your dollars were invested during it*. A big balance during a good stretch lifts it; a big balance during a bad stretch sinks it.\n\nSame fund, two investors. Fund does **+30%** in year 1, **−10%** in year 2.\n\n**Investor A** — $10k at the start, nothing added:\n- 10,000 → 13,000 → 11,700\n- IRR solves −10,000 + 11,700/(1+r)² = 0 → **+8.2%**. With no external flows, IRR = the fund's CAGR.\n\n**Investor B** — $10k at start, then adds **$40k** at the start of year 2 (right before the −10%):\n- 10,000 → 13,000, +40,000 → 53,000 → 47,700\n- Flows −10,000, −40,000, +47,700 → IRR = **−3.9%**.\n\nSame fund, same two years. A earns +8%, B *loses* 4% — purely because B had ~$50k exposed to the down year and only $13k to the up year. The dollars, not the fund, decided it.\n\n**Trap:** don't read a low personal return as a bad fund. Money-weighting can bury a fine fund under bad contribution timing — and flatter a mediocre one with lucky timing."
+    },
+    {
+     "h": "Why your IRR is not the fund's return",
+     "md": "A fund's published **CAGR** (time-weighted) assumes one dollar rode from start to finish — it deliberately strips out your contribution timing to grade the *manager*. Your **IRR** puts that timing back in to grade *you*.\n\nThey diverge the moment you add or withdraw. The classic drag:\n- t=0: invest **$10,000**.\n- Fund runs **+50%** → 15,000.\n- t=1: you add **$50,000** → balance 65,000.\n- Fund then drops **−20%** → 65,000 × 0.8 = **52,000**.\n- t=2: value 52,000.\n\nFlows: −10,000, −50,000, +52,000. Solve and **IRR ≈ −11.6%/yr**. Yet the fund's own CAGR was (1.5 × 0.8)^(½) − 1 = **+9.5%/yr**. The fund made money; *you lost it*, because $50k of your $60k showed up right before the loss.\n\n**Caveat — multiple roots:** with several sign changes in the stream (−,+,−,+…), the NPV polynomial can have *more than one* IRR, or none. For a clean contribute-then-withdraw stream (one sign change) it's unique and safe.\n\n**Where you'll meet it:** private-equity and real-estate returns are quoted as IRR, and your brokerage's \"personal rate of return\" is an IRR.\n\n**Rule:** compare your IRR to the fund's CAGR to see what your *timing* cost or earned — never assume they're the same number."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Two investors hold the same ETF over the same two years; the fund's CAGR is +9%. Investor A's personal IRR is +9%, but Investor B's is −12%. What best explains the gap?",
+     "options": [
+      "Investor B must have paid much higher fees than A.",
+      "IRR is money-weighted — B added a large sum right before a decline, so more of B's dollars were exposed to the loss.",
+      "One of them miscalculated; the same fund must produce the same IRR for everyone.",
+      "B simply held the fund longer, and a longer holding period always lowers IRR."
+     ],
+     "answer": 1,
+     "feedback": [
+      "Fees can nick returns, but they can't open a 21-point gap between two holders of the identical fund — the timing of cash flows can.",
+      "Right — IRR weights by dollars-at-work, so a big contribution just before a drop drags B's money-weighted return far below the fund's CAGR.",
+      "This is the core misconception: IRR is a property of YOUR cash-flow stream, not of the fund, so two investors in it can differ widely.",
+      "Holding period alone doesn't set IRR's direction; a longer hold in a rising fund would raise it. The driver here is contribution timing, not duration."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "When does your personal IRR equal the fund's published CAGR?",
+     "options": [
+      "Always — they are two names for the same number.",
+      "Only in years when the fund never posts a loss.",
+      "When you make a single lump investment and neither add nor withdraw until the end.",
+      "When you dollar-cost average steadily into the fund."
+     ],
+     "answer": 2,
+     "feedback": [
+      "No — they coincide only in a special case; any contribution or withdrawal drives a wedge between money-weighted and time-weighted return.",
+      "Losses aren't the issue; even a fund that only rises shows IRR ≠ CAGR once you add or withdraw mid-stream.",
+      "Right — with no external cash flows your single dollar rides start to finish, so money-weighting and time-weighting produce the identical rate.",
+      "DCA is the opposite case: every new contribution is a dated cash flow, so your IRR will generally diverge from the fund's CAGR."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why can IRR be unreliable for a cash-flow stream that moves in and out repeatedly (e.g., −, +, −, +)?",
+     "options": [
+      "Multiple sign changes let the NPV equation have several roots — or none — so a unique IRR may not exist.",
+      "IRR ignores the size of each cash flow, so repeated flows confuse it.",
+      "IRR is defined only for individual stocks, not for funds with reinvestment.",
+      "Repeated cash flows force the IRR to always equal exactly zero."
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right — each sign change adds a possible root to the NPV polynomial, so a −,+,−,+ stream can yield multiple IRRs or none; a single contribute-then-withdraw sign change stays unique.",
+      "The opposite is true: IRR fully weights each flow by its size and timing — that weighting is exactly what makes it money-weighted.",
+      "IRR applies to any dated cash-flow stream — funds, projects, real estate — not just single stocks.",
+      "Nothing forces IRR to zero; the NPV is set to zero to solve for r, which is generally a nonzero rate."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Internal Rate of Return (IRR) — Investopedia",
+     "url": "https://www.investopedia.com/terms/i/irr.asp",
+     "type": "reading",
+     "note": "Definition, the NPV-zeroing formula, and worked multi-flow examples."
+    },
+    {
+     "label": "Money-Weighted Rate of Return — Investopedia",
+     "url": "https://www.investopedia.com/terms/m/money-weighted-return.asp",
+     "type": "reading",
+     "note": "Frames IRR as the dollar-weighted measure and shows how contribution timing moves it."
+    },
+    {
+     "label": "Time-Weighted Rate of Return — Investopedia",
+     "url": "https://www.investopedia.com/terms/t/time-weightedror.asp",
+     "type": "reading",
+     "note": "The CAGR-style counterpart that strips out your timing — the number to compare your IRR against."
+    }
+   ]
+  },
+  {
+   "id": "c04d-twr-mwr",
+   "title": "TWR vs MWR: the two truths of return",
+   "summary": "Time-weighted return grades the fund with your timing stripped out; money-weighted return (the IRR) grades your actual dollars with your timing baked in — compare managers with the first, judge yourself with the second.",
+   "cards": [
+    {
+     "h": "Two returns for the same fund",
+     "md": "A fund's factsheet says **+10%**. Your statement, same period, same fund, no fee difference, says **+4%**. Nobody lied. You're looking at two different, both-correct return definitions.\n\n- **TWR (time-weighted return)** = the return of a dollar left in the *whole* time. It chains each period's return and **neutralizes when you added or pulled cash**. This is what funds report under **GIPS** — the +10%.\n- **MWR (money-weighted return)** = the **IRR** of *your* cash flows. It weights each period by how many of your dollars were actually exposed to it. That's the +4% — *your* experience.\n\nThe **6-point gap is not the fund. It's your timing.** You had more money in the account during its weaker stretches and less during the rally.\n\nWork one fund, two halves: H1 **−20%**, H2 **+30%**.\n\nTWR = 0.80 × 1.30 − 1 = **+4%** — the same for everyone who held it.\n\n- **Pat** lumps $10k in at the start: 10,000 × 0.80 × 1.30 = **$10,400** → MWR = +4%. One lump, so MWR = TWR.\n- **Dana** puts $10k in, then adds another $10k *after the drop, before the rally*: 10,000×0.80 = 8,000; +10,000 = 18,000; ×1.30 = **$23,400**. In $20k, out $23.4k.\n\nSame fund, same TWR of +4% — but Dana's dollars did far better because she fed them in at the bottom.\n\n**Rule:** \"The fund returned X\" and \"I made Y\" are *both* honest. The wedge between them is a story about *your* deposits, not the strategy."
+    },
+    {
+     "h": "TWR judges the manager; MWR judges you",
+     "md": "The two numbers answer two different questions, and the math shows why.\n\n**TWR** breaks the timeline at every cash flow and geometrically links the pure per-period returns:\n\n## TWR = (1 + r₁)(1 + r₂)···(1 + rₙ) − 1\n\nBecause it *re-bases* at each flow, the size and timing of your deposits **cancel out**. Two investors in the same fund get the **identical TWR** — it's a property of the fund, not of them. That's exactly what makes it fair for **comparing managers**.\n\n**MWR** is the discount rate that sets the present value of every cash flow to zero:\n\n## 0 = Σ CFₜ / (1 + MWR)ᵗ\n\nThat's the **IRR**. A dollar in during a great period counts more than a dollar in during a dud, so *your* deposit timing moves it.\n\nBack to Dana (−$10k at t0, −$10k at t1, +$23,400 at t2). Solve 10,000x² + 10,000x = 23,400 for x = 1+r:\n\nx² + x − 2.34 = 0 → x = (−1 + √10.36)/2 = **1.109**\n\nDana's MWR ≈ **+11% per period** versus the fund's TWR of √1.04 − 1 ≈ **+2% per period**. She didn't pick a better fund — she fed cash in before the rally.\n\nNow flip it: add that second $10k *before* a −20% leg instead, and MWR sinks **below** TWR. Same fund, opposite verdict on *you*.\n\n**Rule:** identical TWR, different MWR = the difference is entirely your hands on the deposit button."
+    },
+    {
+     "h": "Which number to trust for which question",
+     "md": "Pick the metric by the question you're actually asking. Using the wrong one is how people fire good funds and credit themselves for luck.\n\n- **Comparing funds or managers?** Use **TWR**. It's timing-neutral, so it isolates the strategy. A manager can't be blamed or rewarded for *when you* deposited — GIPS reporting exists precisely so the comparison is clean.\n- **Judging your own outcome?** Use **MWR**. It includes your entry/exit decisions, which are part of *your* result even though they're not part of the fund's.\n\nThe trap runs both ways:\n- **Crediting yourself with the fund's TWR** hides your own timing damage — you \"made 10%\" only if your dollars were fully invested the whole time.\n- **Grading a manager on your MWR** punishes them for your deposit schedule. Don't switch funds because *your* MWR lagged; that's often *your* timing, not their skill.\n\nThe systematic tell: across real investors, **dollar-weighted (MWR) returns lag time-weighted (TWR) returns** — the **behavior gap**. Money piles in *after* rallies and flees *during* slumps, so aggregate MWR lands below TWR year after year. **MWR < TWR is the fingerprint of buying high and selling low.**\n\n**Rule:** TWR to choose the vehicle, MWR to grade the driver. If your MWR trails the fund's TWR, don't blame the fund — check your buy and sell dates."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Two investors held the identical index ETF over the same three years but report different personal returns on their statements. Fees were the same. What's the most likely explanation?",
+     "options": [
+      "The ETF quietly ran two share classes with different time-weighted returns",
+      "They added and withdrew cash at different times, so their MWRs differ even though the fund's TWR is identical for both",
+      "One investor compounded and the other didn't",
+      "Statement rounding across three years"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Same fund and same period means one TWR, not two — the fund's per-period returns don't fork by investor.",
+      "Right — TWR is a property of the fund and is identical for both, but MWR (the IRR of each person's cash flows) moves with deposit timing, so their personal returns legitimately differ.",
+      "Both experience the same compounding of the fund's returns; compounding isn't optional or investor-specific here.",
+      "A multi-point gap between two real investors is far too large to be rounding; the driver is cash-flow timing."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A fund's GIPS factsheet shows +10% for a period. Your account statement shows +4% over the exact same period, with no fee difference. What does the 6-point gap represent?",
+     "options": [
+      "The factsheet overstated performance and should be reported",
+      "Your cash-flow timing: +10% is the fund's TWR; +4% is your MWR because you had more dollars in during weaker stretches",
+      "MWR ignores compounding, so it always reads about 6 points low",
+      "TWR structurally overstates real returns by roughly 6 points"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Nothing is misstated — TWR and MWR are both correct answers to different questions about the same period.",
+      "Right — the fund reports timing-neutral TWR (+10%); your statement reflects MWR, which your deposit timing dragged to +4%. The gap is your dollars' schedule, not fund misconduct.",
+      "MWR fully accounts for compounding — it's an IRR; there's no fixed 6-point discount, the gap depends entirely on your flows.",
+      "TWR has no built-in bias; it simply strips out timing. The size of any gap is investor-specific, not a constant."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Across large samples of real investors, dollar-weighted (MWR) returns tend to fall below the funds' time-weighted (TWR) returns. What does this reveal, and which metric fairly compares managers?",
+     "options": [
+      "It shows investor skill (MWR > TWR); use MWR to rank managers",
+      "It's the behavior gap — investors add after rallies and sell in slumps, pushing MWR below TWR; use TWR because it's timing-neutral",
+      "It's a data error; TWR and MWR should always match",
+      "Use MWR to compare managers because it reflects real dollars invested"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The pattern is MWR below TWR, not above — that's a drag, not evidence of skill.",
+      "Right — MWR lagging TWR is the behavior gap: money chases performance after rallies and flees during drops, so aggregate timing costs money. Compare managers with TWR, which cancels that timing out.",
+      "They routinely diverge by design; MWR includes flow timing, TWR strips it — a persistent gap is expected, not an error.",
+      "MWR bakes in each investor's timing, so it would punish a manager for your deposit schedule; that's exactly why it's unfair for comparing managers."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Time-Weighted Rate of Return (TWR)",
+     "url": "https://www.investopedia.com/terms/t/time-weightedror.asp",
+     "type": "reading",
+     "note": "Walks the geometric-linking method and shows why TWR neutralizes cash-flow timing."
+    },
+    {
+     "label": "Money-Weighted Rate of Return (MWR)",
+     "url": "https://www.investopedia.com/terms/m/money-weighted-return.asp",
+     "type": "reading",
+     "note": "Defines MWR as the IRR of your cash flows and contrasts it directly with TWR."
+    },
+    {
+     "label": "Internal Rate of Return (IRR)",
+     "url": "https://www.investopedia.com/terms/i/irr.asp",
+     "type": "reading",
+     "note": "The discount-rate mechanics behind MWR — the equation you solve for the money-weighted number."
+    }
+   ]
+  },
+  {
+   "id": "c05-execution",
+   "title": "Placing the trade",
+   "summary": "Market orders buy speed, limit orders buy price certainty; spreads bite at the open, the close, and in panics; and an ETF's premium or discount to NAV sometimes means the ETF is wrong — but sometimes means the NAV is.",
+   "cards": [
+    {
+     "h": "Market versus limit",
+     "md": "Two ways to buy (or sell) any exchange-traded thing:\n\n- A **market order** says \"fill me *now*, at whatever the going price is.\" You're guaranteed execution, not price.\n- A **limit order** says \"fill me at this price *or better*, or not at all.\" You're guaranteed price, not execution.\n\nFor a huge, liquid ETF on a calm day, a market order costs you a penny of spread — fine. The danger is the *un*calm moment: thin trading, a fast market, a fat-fingered moment — a market order will happily execute at a terrible price, because \"whatever the going price is\" was the instruction. The 2010 Flash Crash filled market sell orders in respectable ETFs at absurd prices, pennies in extreme cases, minutes before prices snapped back.\n\nThe professional habit costs nothing to adopt: use a **marketable limit order** — a buy limit set at or a hair above the current ask. Normally it fills instantly, exactly like a market order. But if the market gaps in the seconds your order is in flight, the limit is a seatbelt: you simply don't fill, instead of filling catastrophically. You wear it not for the ordinary day but for the abnormal one."
+    },
+    {
+     "h": "When spreads bite",
+     "md": "The bid-ask spread isn't constant — it breathes. Three moments it widens, and a patient investor simply declines to trade through them:\n\n- **The first and last ~15 minutes of the trading day.** Just after the open, some of an ETF's underlying stocks haven't started trading yet, so market makers quoting the ETF are partly guessing — and they charge for guessing with wider spreads. The close has its own scramble of rebalancing flows.\n- **During market panics.** Exactly when the urge to act peaks, the cost of acting peaks with it: volatility makes the basket harder to price, and spreads gap wide.\n- **In thinly traded funds, always.** A niche ETF trading a few thousand shares a day carries a permanently wide spread — a toll the fact sheet's expense ratio never mentions.\n\nThe pattern: spreads are widest precisely when trading feels most urgent. A long-term investor's edge is that almost nothing about a good portfolio is ever actually urgent — mid-morning or mid-afternoon on an ordinary day is the cheap time to trade, and that appointment is nearly always available."
+    },
+    {
+     "h": "Premium, discount, and who's actually right",
+     "md": "An ETF's market price can sit above its NAV (a **premium**) or below it (a **discount**). Concept 1's arbitrage machine keeps big domestic stock ETFs pinned within a few hundredths of a percent, so for those, ignore it.\n\nBut here's the aha worth keeping: when a gap does appear, it's not always the ETF that's wrong. **Sometimes the NAV is stale.** Consider an ETF of Japanese stocks trading in New York at noon — Tokyo has been closed for hours, so the NAV is built from hours-old closing prices. If news breaks that would move Tokyo, the live ETF price incorporates it *now*; the NAV can't until Tokyo reopens. The \"premium\" is the ETF doing price discovery, not making an error.\n\nThe same happened dramatically in March 2020: big bond ETFs traded at discounts to NAV, and analysis broadly concluded the live ETF prices were the truer read — the NAVs rested on stale quotes for bonds that weren't actually trading. The ETF wasn't broken; it was the only part still reporting live.\n\nPractical rules: for liquid mainstream ETFs, premium/discount is a non-issue. For international, bond, or niche funds, check the fund's premium/discount history (published on every issuer's site) before assuming today's gap is a bargain or a rip-off — and be suspicious of anyone selling you a \"discount\" on a fund whose NAV can't currently be trusted."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Why is a limit order the safer habit for ETF trades?",
+     "options": [
+      "It always executes faster than a market order",
+      "It caps the price you'll accept, so a sudden market dislocation can't fill you at an absurd price — at worst you don't fill",
+      "It's free while market orders cost commissions",
+      "It guarantees both execution and price"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Speed is the market order's one advantage — the limit order trades a sliver of certainty-of-fill for certainty-of-price.",
+      "Right — set at the current ask it behaves like a market order on a normal day, and like a seatbelt on the abnormal one. Flash-crash fills happened to market orders.",
+      "Commissions don't differ by order type at mainstream brokers — the difference is what each order guarantees.",
+      "No order type guarantees both — that's the fundamental trade-off. Limit picks price; market picks execution."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why do experienced ETF investors avoid trading in the first minutes after the market opens?",
+     "options": [
+      "Trading is prohibited before 10 a.m.",
+      "Spreads are wide because some underlying holdings haven't started trading, so market makers price the ETF with a guessing margin",
+      "Prices are always lowest at the close",
+      "Brokers charge extra at the open"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Trading opens at 9:30 sharp and is perfectly legal — it's just relatively expensive for a few minutes.",
+      "Right — an ETF's fair price depends on its basket, and until the whole basket is trading, quoting it involves guesswork that you pay for in the spread.",
+      "There's no reliable intraday price pattern to exploit — the open/close issue is about transaction *cost*, not direction.",
+      "Commissions don't vary by time of day — the extra cost hides in the spread, not the fee schedule."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "At noon in New York, an ETF of Japanese stocks trades 0.7% above its NAV. The most likely explanation:",
+     "options": [
+      "The fund manager is inflating the price",
+      "Arbitrage has failed permanently",
+      "The NAV is stale — built from Tokyo's hours-old closing prices — while the ETF's live price already reflects newer information",
+      "Japanese stocks are exempt from NAV calculations"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Managers don't set the market price at all — buyers, sellers, and arbitrageurs do.",
+      "Arbitrage is working fine — APs price the fund off where Tokyo *will* open, not where it closed. The gap measures new information, not failure.",
+      "Right — when the underlying market is closed, the ETF becomes the live price and the NAV becomes the memory. The 'premium' is information, not error.",
+      "Every holding goes into NAV — the issue is *when* those holdings were last priced, not whether."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "During a sharp market panic, ETF bid-ask spreads typically:",
+     "options": [
+      "Narrow, because trading volume rises",
+      "Widen — pricing the basket gets harder, so the cost of trading peaks exactly when the urge to trade peaks",
+      "Are frozen by the exchange at one penny",
+      "Disappear entirely"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Volume does rise, but uncertainty rises faster — market makers widen quotes to protect themselves from being run over.",
+      "Right — and this timing is the trap: panic makes trading feel urgent at the exact moment it's most expensive. Patience is literally paid.",
+      "No such freeze exists — spreads float with risk, which is the point of the warning.",
+      "Spreads never disappear; they're the market maker's compensation for standing in traffic, and traffic is worst in a crash."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Limit orders",
+     "url": "https://www.investopedia.com/terms/l/limitorder.asp",
+     "type": "reading",
+     "note": "Order-type mechanics and the execution/price trade-off."
+    },
+    {
+     "label": "ETF.com — Understanding net asset value",
+     "url": "https://www.etf.com/sections/etf-basics/understanding-net-asset-value",
+     "type": "reading",
+     "note": "How NAV, premiums, and discounts arise and when they matter."
+    },
+    {
+     "label": "SEC Investor.gov — Exchange-traded funds",
+     "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary/exchange-traded-fund-etf",
+     "type": "reading",
+     "note": "Quick regulator's reference on how ETF trading differs from mutual funds."
+    }
+   ]
+  },
+  {
+   "id": "c06-costs-and-taxes",
+   "title": "Costs and taxes",
+   "summary": "Think in all-in cost, not just the sticker fee; know what distributions are and how tax lots work; and put each asset in the account type where the tax code punishes it least — location can be worth more than fund selection.",
+   "cards": [
+    {
+     "h": "All-in cost",
+     "md": "The expense ratio is the sticker price. What you actually pay to own a fund is the **all-in cost**:\n\n- **Expense ratio** — charged per year of holding\n- **Bid-ask spread** — charged per round trip\n- **Tracking difference beyond the fee** — sloppy indexing leaks return invisibly\n- **Taxes** — on distributions each year, and on your gains when you sell\n\nThe useful insight is that these scale with *different things*. Holding costs scale with **time**; trading costs scale with **activity**; taxes scale with both, plus account type. So the cheapest possible setup is no accident: broad low-fee ETFs (tiny ratio, penny spreads, near-zero capital-gains distributions), traded rarely, in the right account. Each term in the cost equation gets minimized by the same boring behavior.\n\nAnd the sticker can mislead in both directions: a 0.03% fund traded weekly can cost more than a 0.20% fund held for a decade. For an ETF investor, *activity itself* is a cost center — remember that when concept 7's temptations show up."
+    },
+    {
+     "h": "Distributions and tax lots",
+     "md": "Two pieces of plumbing every taxable-account investor should know.\n\n**Distributions.** Funds pass through what they collect. Stock ETFs pay **dividends** (typically quarterly); most broad-ETF dividends are *qualified*, taxed at the lower capital-gains rates rather than as ordinary income. Bond fund interest is generally taxed as **ordinary income** — at your full marginal rate; remember that for the next card. Capital-gains distributions, the mutual-fund December surprise from concept 1, are rare in broad ETFs. Note that reinvesting a distribution doesn't dodge the tax — it's taxable the year it's paid, reinvested or not.\n\n**Tax lots.** Every separate purchase you make is a **lot** with its own price paid (**cost basis**) and its own clock. Sell after holding a lot more than a year and the gain is **long-term** — taxed at favorable rates (0/15/20%). A year or less is **short-term** — taxed like salary. The clock alone can change the tax on the same gain by a third or more.\n\nWhen you sell *part* of a position, your broker's default is often \"first in, first out\" — usually your oldest, cheapest, biggest-gain shares. But you can elect **specific identification** and choose which lots to sell: pick high-basis lots to shrink the taxable gain, or harvest a losing lot to offset gains elsewhere. Same sale, same proceeds, different tax bill — set the cost-basis method in your account settings *before* you need it."
+    },
+    {
+     "h": "Asset location: the free lunch nobody eats",
+     "md": "You likely have accounts with different tax treatment: **taxable** brokerage, **tax-deferred** (401(k), traditional IRA — pay ordinary income tax on the way out), and **tax-free** (Roth — never taxed again). **Asset location** is the art of placing each asset where the tax code hurts it least. Same portfolio, same funds, same risk — measurably more money kept.\n\nThe logic follows directly from the last card. Ask of each asset: *how heavily is its return taxed each year?*\n\n- **Taxable bonds and REITs** throw off income taxed at full ordinary rates, every single year. In a taxable account that's a steady leak; **shelter them** in tax-advantaged accounts where the annual tax simply doesn't happen.\n- **Broad stock ETFs** are already nearly tax-optimal: qualified dividends at low rates, capital gains deferred until *you* choose to sell (thanks to the wrapper from concept 1). They **tolerate a taxable account** better than almost anything else you could put there.\n- **Highest-expected-growth assets** have a natural home in the **Roth**, where all that growth escapes tax entirely.\n\nStudies of the taxable-vs-sheltered decision typically put the benefit in the range of **0.1–0.3% per year** — comparable to the entire fee difference between a cheap fund and an expensive one, earned not by picking anything better but purely by *placement*. Most investors agonize over which fund and never think about which account. This card is the cheaper worry."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Which cost do you pay every time you trade, regardless of how long you've held?",
+     "options": [
+      "The expense ratio",
+      "The bid-ask spread",
+      "Capital gains distributions",
+      "The gross-to-net fee waiver"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The expense ratio accrues with time held — it's the rent, not the toll; trading more doesn't raise it.",
+      "Right — the spread is charged per transaction, which is exactly why activity itself is a cost center for an ETF investor.",
+      "Distributions arrive on the fund's schedule whether you trade or not — they scale with holding, not with trading.",
+      "The waiver is a discount on the expense ratio, not a per-trade charge — it affects the rent, not the toll."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "You hold taxable bond funds and broad stock ETFs, plus both a taxable account and an IRA. The tax-smart arrangement is:",
+     "options": [
+      "Bonds in taxable, stocks in the IRA",
+      "Bonds in the IRA, stock ETFs in taxable — bond interest is taxed annually at ordinary rates and needs shelter; stock ETFs defer gains and pay lower-taxed dividends",
+      "Split everything 50/50 across both accounts",
+      "It makes no difference where anything goes"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Backwards — this parks the heavily-taxed annual income stream in the taxed account and shelters the asset that barely needed it.",
+      "Right — shelter what leaks (ordinary-income interest, every year), expose what's naturally tax-efficient (deferred gains, qualified dividends). Same portfolio, more kept.",
+      "Splitting evenly forfeits the choice entirely — location only adds value when assets are deliberately sorted by tax burden.",
+      "Placement is typically worth 0.1–0.3% per year — on par with the whole cheap-vs-expensive fund fee gap, for zero change in risk."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "You bought shares of the same ETF in 2019 (at $100) and last month (at $195). Price today: $200. You need to sell some shares while minimizing this year's tax bill. You should:",
+     "options": [
+      "Let the broker's default pick the shares — it's all the same",
+      "Use specific identification to sell last month's $195-basis lot — a $5/share gain instead of $100/share",
+      "Sell the 2019 lot because older shares are always taxed less",
+      "Sell everything to keep the bookkeeping simple"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Defaults are often first-in-first-out, which here sells the $100-basis lot and books twenty times the gain — the default is the expensive choice.",
+      "Right — same shares sold, same cash raised, $5 of taxable gain per share instead of $100. (Check the fine print: gains on lots held under a year are short-term, but $5 short-term beats $100 long-term here by a mile.)",
+      "Older lots get the long-term *rate*, but the rate applies to a $100 gain — the lot's basis matters more than its birthday in this case.",
+      "Selling everything realizes the full gain on every lot at once — maximum possible tax bill, purchased for a tidier spreadsheet."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "You have dividends automatically reinvested. Are they still taxed in a taxable account?",
+     "options": [
+      "No — reinvested dividends aren't income",
+      "Yes — a distribution is taxable the year it's paid, whether you pocket it or reinvest it; the reinvestment just creates a new tax lot",
+      "Only if the fund's price also went up that year",
+      "Only when you eventually sell the fund"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The IRS sees the dividend the moment it's paid — what you do next (spend or reinvest) doesn't change its character as income.",
+      "Right — and that new lot has its own basis and clock, which is why long-held reinvesting positions accumulate dozens of lots. Brokers track this, but the specific-ID option is yours.",
+      "Dividend taxation is independent of price movement — a fund can fall all year and its dividends are still taxable income.",
+      "That's how capital *gains* on your shares work — dividends are taxed on arrival, not at sale."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Bogleheads wiki — Tax-efficient fund placement",
+     "url": "https://www.bogleheads.org/wiki/Tax-efficient_fund_placement",
+     "type": "reading",
+     "note": "The canonical asset-location guide, with priority tables."
+    },
+    {
+     "label": "Bogleheads wiki — Cost basis methods",
+     "url": "https://www.bogleheads.org/wiki/Cost_basis_methods",
+     "type": "reading",
+     "note": "Tax lots, specific identification, and how to set your broker's default."
+    },
+    {
+     "label": "SEC Investor Bulletin — How fees and expenses affect your portfolio (PDF)",
+     "url": "https://www.sec.gov/investor/alerts/ib_fees_expenses.pdf",
+     "type": "reading",
+     "note": "The compounding cost of small annual drags, from the regulator."
+    }
+   ],
+   "anim": "fee_drag"
+  },
+  {
+   "id": "c07-failure-modes",
+   "title": "How investors actually lose",
+   "summary": "The expensive ETF mistakes are behavioral, not technical: chasing last year's winner, treating theme funds as lottery tickets, over-trading, mistaking overlap for diversification, and selling in the middle of a crash.",
+   "cards": [
+    {
+     "h": "Performance chasing and the behavior gap",
+     "md": "The most reliable finding in fund-investor research is embarrassing in its simplicity: **investors earn less than the funds they invest in.**\n\nHow can that be? Timing of the money. A fund posts a hot three-year run; money floods in *after* the gains are already banked; the hot streak cools (as hot streaks statistically do — that's what made them streaks); money flees near the bottom. The fund's posted return counts the whole ride. The average *dollar* only showed up for the ending. Morningstar's long-running \"Mind the Gap\" studies put this **behavior gap** around one percentage point per year — for many investors, bigger than every fee, spread, and tax drag combined. The killer detail: the gap is *widest* in the most exciting, volatile funds, because exciting funds are the ones that get bought high and sold low.\n\nThe mechanism to internalize: a stellar recent record mostly tells you a fund's holdings just got *more expensive*, not that they're about to repeat. Past performance isn't just a weak signal — buying it systematically puts your dollars in *after* the returns happened. Buy the boring plan, automate the contributions, and the gap mostly closes by itself."
+    },
+    {
+     "h": "Lottery tickets and busy hands",
+     "md": "**Theme funds.** Every hype cycle mints ETFs to match — genomics, robotics, cannabis, blockchain, AI. Here's the structural problem, beyond mere fashion: a theme ETF launches *when the theme can sell*, which is at or near **peak excitement** — after the story is famous and the stocks are already expensive. Research on thematic funds finds exactly what that predicts: on average they underperform badly *after* launch, whatever the theme later achieves in the real world. The theme can change the world and the fund can still lose money — because the price you paid had the world-changing already in it. A fund launch is a measure of what's sellable, never of what's cheap.\n\n**Over-trading.** ETFs trade in one click, and the click is the trap. Every trade pays the spread; every profitable sale in a taxable account books a tax bill (short-term rates if you're quick, per concept 6); and every trade is a fresh chance for the timing errors of the last card. Decades of brokerage-account research agree: **the more retail investors trade, the worse they do** — the famous study title is simply \"Trading Is Hazardous to Your Wealth.\" The ETF's greatest convenience, always-on tradability, is thus its subtlest hazard: the instrument is liquid, but your *plan* shouldn't be. Activity feels like diligence; in investing it's usually leakage. When the itch strikes, size it like a satellite: small enough that being wrong doesn't matter."
+    },
+    {
+     "h": "The one mistake that ends compounding",
+     "md": "Cheap funds, clean diversification, tax-smart placement — one act can undo a decade of all of it: **selling in the middle of a crash**.\n\nThe market's rhythm is brutal on this specific plan: its **best days cluster tightly around its worst days**, because rebounds are born in the depths of panics. So \"sell now, get back in when things calm down\" doesn't sidestep the crash — it locks in the losses, then *specifically* misses the violent rebound days, because by the time things feel calm, the snapback already happened. Miss a small handful of those days over a few decades and a huge slice of the total return is gone. The people who caught them weren't nimble; they were simply **still there** — the strategy known, only half-jokingly, as staying in your seat.\n\nTwo defenses, both built in advance:\n\n- **Set your stock/bond mix by the crash, not the average year.** Decide what drop you could watch without selling — then size stocks so the plausible worst case stays inside that line. The mix you can hold through a panic beats the optimal mix you'll abandon in one, by exactly the amount the panic costs.\n- **Write the plan down in peacetime** — target mix, when you rebalance, what you'll do in a 30% drawdown (spoiler: mostly nothing, perhaps rebalance *into* the drop). In a crash you don't want to be deciding; you want to be *complying* with a decision made by the calmer person you were.\n\nEvery concept in this pack compounds only if you stay invested. Protecting against the big, permanent loss — including the self-inflicted kind — *is* the strategy."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "The \"behavior gap\" — investors earning about 1% per year less than their own funds — is caused by:",
+     "options": [
+      "Fund companies skimming returns secretly",
+      "The timing of investors' money: it arrives after the gains and leaves near the bottoms, so the average dollar misses the posted return",
+      "Government taxes on fund investors",
+      "Rounding errors in fund accounting"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Fees are disclosed and already deducted from the fund return — the gap is measured *after* fees, in the investor's own timing.",
+      "Right — the fund's return counts the whole ride; chasing dollars only show up for the ending. The gap is widest in the most exciting funds, which is a hint about what to own.",
+      "Taxes are real but separate — the gap appears even in tax-sheltered accounts, purely from buy-high/sell-low flow timing.",
+      "Fund accounting is audited to the penny — the leak is in investor behavior, which no audit can fix."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why do thematic ETFs (AI, robotics, genomics...) tend to disappoint even when the underlying technology succeeds?",
+     "options": [
+      "The technologies always fail",
+      "They launch when hype — and the stocks' prices — peak, because that's when the fund can sell; the world-changing future is already in the purchase price",
+      "Theme funds are illegal in most states",
+      "They hold no actual stocks"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Many themed technologies succeed spectacularly — the fund can still lose money because success was pre-paid in the entry price.",
+      "Right — launch timing follows salability, and salability peaks with hype. You can be exactly right about the future and still overpay for it today.",
+      "They're fully legal and heavily marketed — the problem is economics, not law.",
+      "They hold real stocks — bought at prices that already assumed the theme wins."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "An investor sells everything during a crash, planning to \"get back in when things calm down.\" The predictable flaw:",
+     "options": [
+      "Brokers prohibit re-buying for five years",
+      "The market's best days cluster around its worst — by the time things feel calm, the violent rebound has already happened without them",
+      "Selling in a crash is impossible",
+      "There is no flaw — this reliably works"
+     ],
+     "answer": 1,
+     "feedback": [
+      "No such restriction exists — the barrier to getting back in is psychological and informational, which is exactly why it fails.",
+      "Right — the plan sells the losses at the bottom and then specifically misses the recovery days, which are born inside the panic, not after it. 'Calm' is the all-clear that comes too late.",
+      "Selling is all too possible — panics have plenty of liquidity at falling prices; the spread is wider (concept 5), but the real damage is the exit itself.",
+      "Study after study finds this the single most expensive pattern in retail investing — it converts a temporary decline into a permanent loss."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Decades of brokerage-account research on retail trading frequency finds:",
+     "options": [
+      "Frequent traders outperform through practice",
+      "The more investors trade, the worse their net results — spreads, taxes, and timing errors compound against activity",
+      "Trading frequency has no measurable effect",
+      "Only professionals are allowed to trade frequently"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Practice improves skills where feedback is fast and causal — markets give noisy, delayed feedback, and costs are certain while edge is not.",
+      "Right — every trade pays a spread, may book a tax, and re-rolls the timing dice. 'Trading Is Hazardous to Your Wealth' is a research title, not a slogan.",
+      "The effect is large, measurable, and one of the most replicated results in household finance — activity predicts underperformance.",
+      "Anyone may trade at will — the finding is that most would be richer if they exercised the right far less often."
+     ]
+    },
+    {
+     "id": "q5",
+     "type": "mcq",
+     "prompt": "The best defense against selling in a panic is:",
+     "options": [
+      "Watching financial news continuously for early warnings",
+      "Choosing a stock/bond mix whose worst case you can genuinely sit through, and writing the plan down before the storm",
+      "Keeping everything in cash permanently",
+      "Planning to sell quickly at the first sign of trouble"
+     ],
+     "answer": 1,
+     "feedback": [
+      "More news flow raises the urge to act — it's an accelerant for panic-selling, not a warning system; crashes aren't announced in advance.",
+      "Right — the mix you can hold beats the optimal mix you'll abandon. Decide in peacetime so that in a crash you're complying with a plan, not making one.",
+      "Cash can't crash, but it also can't compound — decades of inflation quietly deliver the big permanent loss you were avoiding.",
+      "That IS panic-selling, scheduled in advance — 'the first sign of trouble' is indistinguishable from ordinary volatility until too late, and the rebound clusters right behind it."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Ben Felix — The (Expected) Cost of Pessimism (myth of outperforming funds)",
+     "url": "https://www.youtube.com/watch?v=rU4wanoRWbE",
+     "type": "video",
+     "note": "Evidence-based take on chasing winning funds, with the academic citations on screen."
+    },
+    {
+     "label": "Bogleheads wiki — Behavioral pitfalls",
+     "url": "https://www.bogleheads.org/wiki/Behavioral_pitfalls",
+     "type": "reading",
+     "note": "The catalog: recency bias, overconfidence, loss aversion, and their portfolio symptoms."
+    },
+    {
+     "label": "SPIVA — S&P's active-vs-index scorecards",
+     "url": "https://www.spglobal.com/spdji/en/research-insights/spiva/",
+     "type": "interactive",
+     "note": "The standing scoreboard of how few funds beat their index over time — the base rates behind this whole concept."
+    }
+   ],
+   "anim": "etf_bestdays"
+  }
+ ]
 }
