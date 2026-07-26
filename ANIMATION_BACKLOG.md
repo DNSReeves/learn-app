@@ -12,10 +12,12 @@
 >   **8 real bugs** (envelope σ, term-structure skew, off-canvas labels, a tangent
 >   overshoot, a narration rounding, a bars/narration contradiction, a wrong
 >   Wilbraham–Gibbs constant); gate green (`e9d6710`).
-> - **IN PROGRESS — ETF-module expansion:** 5 new concepts with dedicated animations —
->   `c01b` open-vs-closed (create/redeem tanks), `c01c` ETNs (issuer-default wipeout),
->   `c04b` CAGR, `c04c` IRR/money-weighted, `c04d` TWR-vs-MWR. Authored + finance-verified
->   via fan-out, integrated behind the same `predeploy.sh` gate.
+> - **DELIVERED — ETF-module expansion** (`62d4ed6` content, `71cb100` animations):
+>   5 new concepts, each animated — `c01b` open-vs-closed (create/redeem tanks),
+>   `c01c` ETNs (issuer-default wipeout), `c04b` CAGR (jagged→smooth), `c04c` IRR
+>   (discount-rate dial → NPV=0), `c04d` TWR-vs-MWR (good/bad timer). Authored via
+>   fan-out, finance-verified (all 5 clean), each animation node-checked + bounds-checked.
+>   ETF module: 7 → 12 concepts.
 >
 > This doc is retained for the **P3.10 declarative-vs-imperative decision record** below,
 > which is still the standing guidance for how new animations get built.
