@@ -499,6 +499,7 @@ async function viewConcept(tid,cid){
   renderCard(tid);
 }
 function renderCard(tid){
+  loadAudioManifest();   // preload so playCard() can start audio synchronously (Safari gesture rule)
   const card=C.cards[cardIx], last=cardIx===C.cards.length-1;
   $("#stage").innerHTML = stripHTML(C.p_mastery,C.streak,C.mastered) + `
   <section class="stage">
@@ -546,11 +547,14 @@ function cardPlainText(card){
   const d=document.createElement("div"); d.innerHTML=md(card.md||"");
   return (card.h?card.h+". ":"") + (d.textContent||"").replace(/\s+/g," ").trim();
 }
-async function playCard(tid){
+/* MUST stay synchronous: Safari only allows audio.play()/speechSynthesis.speak()
+   inside the user gesture. An `await` before playback drops the gesture and Safari
+   silently blocks BOTH paths → dead silence. The manifest is preloaded in renderCard
+   so it's already in hand here; if it somehow isn't, we narrate now (still in-gesture)
+   and warm it for next time. */
+function playCard(tid){
   const btn=$("#cardplay");
   if((_cardAudio && !_cardAudio.paused) || speechSynthesis.speaking){ stopCardAudio(); return; }  // toggle off
-  await loadAudioManifest();
-  const url=audioUrlForCard(tid, cardIx);
   const speak=()=>{
     if(!("speechSynthesis" in window)){ if(btn) btn.textContent="🔇 No voice"; return; }
     speechSynthesis.cancel();
@@ -558,14 +562,16 @@ async function playCard(tid){
     u.onend=u.onerror=()=>{ if(btn) btn.textContent="🔊 Listen"; };
     if(btn) btn.textContent="⏸ Pause"; speechSynthesis.speak(u);
   };
+  const url = _audioManifest ? audioUrlForCard(tid, cardIx) : null;   // read synchronously — no await
   if(url){
     _cardAudio=new Audio(url);
     _cardAudio.onended=()=>{ _cardAudio=null; if(btn) btn.textContent="🔊 Listen"; };
-    _cardAudio.onerror=()=>{ _cardAudio=null; speak(); };            // file 404 → narrate instead
+    _cardAudio.onerror=()=>{ _cardAudio=null; speak(); };            // 404/decode → narrate instead
     if(btn) btn.textContent="⏸ Pause";
-    _cardAudio.play().catch(()=>{ _cardAudio=null; speak(); });
+    _cardAudio.play().catch(()=>{ _cardAudio=null; speak(); });      // called in-gesture
     return;
   }
+  if(_audioManifest===undefined) loadAudioManifest();               // warm for next click
   speak();
 }
 function resHTML(){
