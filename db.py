@@ -183,21 +183,44 @@ def authenticate(username: str, password: str) -> str | None:
         now = time.time()
         c.execute(
             "INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?,?,?,?)",
-            (token, row["id"], now, now + 30 * 86400),
+            (token, row["id"], now, now + SESSION_TTL_S),
         )
         return token
+
+
+# Phase A shared-device hardening (2026-07-31, operator-directed): sessions were
+# 30 DAYS — whoever picked up a shared iPad silently continued as the last user
+# for a month. Now 12h SLIDING: active use never interrupts (each authenticated
+# request renews), an idle session dies the same day. The always-login-at-launch
+# behavior itself is client-side (sessionStorage token); this is defense in depth.
+SESSION_TTL_S = 12 * 3600
 
 
 def user_for_token(token: str):
     if not token:
         return None
+    now = time.time()
     with conn() as c:
         row = c.execute(
             """SELECT u.id, u.username, u.role FROM sessions s JOIN users u ON u.id = s.user_id
                WHERE s.token = ? AND s.expires_at > ?""",
-            (token, time.time()),
+            (token, now),
         ).fetchone()
+        if row:
+            c.execute("UPDATE sessions SET expires_at = ? WHERE token = ?",
+                      (now + SESSION_TTL_S, token))          # sliding renewal
         return dict(row) if row else None
+
+
+def list_usernames() -> list[str]:
+    """Phase A profile chooser — usernames ONLY (no ids, no roles)."""
+    with conn() as c:
+        return [r[0] for r in c.execute("SELECT username FROM users ORDER BY username")]
+
+
+def user_count() -> int:
+    with conn() as c:
+        return c.execute("SELECT COUNT(*) FROM users").fetchone()[0]
 
 
 def set_role(username: str, role: str) -> bool:

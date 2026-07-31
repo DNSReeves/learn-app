@@ -8,7 +8,9 @@ import os
 import re
 import time
 
-from fastapi import FastAPI, Header, HTTPException
+import hmac
+
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -65,16 +67,47 @@ def require_user(authorization: str | None):
 class Creds(BaseModel):
     username: str
     password: str
+    invite: str | None = None
+
+
+def _lan_client(request) -> bool:
+    """True when the request came from loopback / RFC1918 / the tailnet CGNAT
+    range. Coarse by design — the point is that internet exposure never gets
+    the open behaviors (registration bootstrap, the username chooser)."""
+    host = (request.client.host if request and request.client else "") or ""
+    return (host == "::1" or host.startswith(("127.", "10.", "192.168.", "100."))
+            or host.startswith("172.") and host.split(".")[1].isdigit()
+            and 16 <= int(host.split(".")[1]) <= 31)
 
 
 @app.post("/api/register")
-def register(c: Creds):
+def register(c: Creds, request: Request = None):
+    # Phase A: registration is INVITE-GATED (shared devices today, possibly the
+    # internet tomorrow — an open /api/register is an account-creation hole).
+    # LEARN_INVITE_CODE enables invites; without it registration is closed,
+    # except the bootstrap case: a fresh install with zero users, from the LAN.
+    code = os.environ.get("LEARN_INVITE_CODE", "")
+    if code:
+        if not c.invite or not hmac.compare_digest(c.invite, code):
+            raise HTTPException(403, "Registration needs a valid invite code.")
+    elif not (db.user_count() == 0 and _lan_client(request)):
+        raise HTTPException(403, "Registration is closed — ask the operator "
+                                 "for an invite code.")
     try:
         db.create_user(c.username, c.password)
     except ValueError as e:
         raise HTTPException(400, str(e))
     token = db.authenticate(c.username, c.password)
     return {"token": token, "role": (db.user_for_token(token) or {}).get("role", "learner")}
+
+
+@app.get("/api/users")
+def users_chooser(request: Request = None):
+    """Phase A profile chooser: usernames only, and only for LAN/tailnet
+    clients — an internet-exposed deployment reveals nothing."""
+    if not _lan_client(request):
+        raise HTTPException(404, "Not available.")
+    return {"users": db.list_usernames()}
 
 
 @app.post("/api/login")

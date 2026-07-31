@@ -338,3 +338,75 @@ def test_be16_be22_answer_writes_in_one_txn_with_snapshot(client):
     with dbmod.conn() as c:
         row = c.execute("SELECT interval_at FROM answers ORDER BY id DESC LIMIT 1").fetchone()
     assert row["interval_at"] == pytest.approx(7.5)        # BE-22 snapshot
+
+
+# ── Phase A (2026-07-31): shared-device auth hardening ───────────────────────
+
+def test_phase_a_sessions_are_12h_sliding(tmp_path, monkeypatch):
+    monkeypatch.setenv("LEARN_DB", str(tmp_path / "learn.db"))
+    import db as dbmod
+    importlib.reload(dbmod)
+    dbmod.init()
+    dbmod.create_user("u", "pw-secret-1")
+    tok = dbmod.authenticate("u", "pw-secret-1")
+    with dbmod.conn() as c:
+        exp0 = c.execute("SELECT expires_at FROM sessions WHERE token=?", (tok,)).fetchone()[0]
+    assert exp0 - time.time() < 12.5 * 3600            # 12h, not 30d
+    with dbmod.conn() as c:                            # simulate an old session
+        c.execute("UPDATE sessions SET expires_at=? WHERE token=?",
+                  (time.time() + 60, tok))
+    assert dbmod.user_for_token(tok)                   # still valid → renews
+    with dbmod.conn() as c:
+        exp1 = c.execute("SELECT expires_at FROM sessions WHERE token=?", (tok,)).fetchone()[0]
+    assert exp1 - time.time() > 11 * 3600              # slid forward
+
+
+def test_phase_a_register_closed_without_invite(client, monkeypatch):
+    tc, amod, dbmod, tmp, h = client                   # a user already exists
+    monkeypatch.delenv("LEARN_INVITE_CODE", raising=False)
+    r = tc.post("/api/register", json={"username": "kate", "password": "secret1"})
+    assert r.status_code == 403                        # closed: users exist, no code
+
+
+def test_phase_a_register_with_invite_code(client, monkeypatch):
+    tc, amod, dbmod, tmp, h = client
+    monkeypatch.setenv("LEARN_INVITE_CODE", "family-code-1")
+    r = tc.post("/api/register", json={"username": "kate", "password": "secret1",
+                                       "invite": "wrong"})
+    assert r.status_code == 403
+    r2 = tc.post("/api/register", json={"username": "kate", "password": "secret1",
+                                        "invite": "family-code-1"})
+    assert r2.status_code == 200 and r2.json()["token"]
+    assert "kate" in dbmod.list_usernames()
+
+
+def test_phase_a_bootstrap_first_user_from_lan(tmp_path, monkeypatch):
+    monkeypatch.setenv("LEARN_DB", str(tmp_path / "learn.db"))
+    monkeypatch.delenv("LEARN_INVITE_CODE", raising=False)
+    import db as dbmod
+    importlib.reload(dbmod)
+    dbmod.init()
+    import app as amod
+    importlib.reload(amod)
+    from fastapi.testclient import TestClient
+    tc = TestClient(amod.app)
+    monkeypatch.setattr(amod, "_lan_client", lambda r: True)   # TestClient host is "testclient"
+    r = tc.post("/api/register", json={"username": "first", "password": "secret1"})
+    assert r.status_code == 200                        # zero-user bootstrap allowed
+    r2 = tc.post("/api/register", json={"username": "second", "password": "secret1"})
+    assert r2.status_code == 403                       # and only once
+
+
+def test_phase_a_users_chooser_lan_only(client, monkeypatch):
+    tc, amod, dbmod, tmp, h = client
+    monkeypatch.setattr(amod, "_lan_client", lambda r: getattr(getattr(r, "client", None), "host", "") != "203.0.113.9")
+    r = tc.get("/api/users")
+    assert r.status_code == 200 and r.json()["users"] == ["u"]
+    assert list(r.json().keys()) == ["users"]          # names only, nothing else
+    # a public client sees nothing
+    class FakeClient:  # request.client stand-in
+        host = "203.0.113.9"
+    class FakeReq:
+        client = FakeClient()
+    with pytest.raises(Exception):
+        amod.users_chooser(FakeReq())

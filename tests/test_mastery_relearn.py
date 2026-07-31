@@ -62,9 +62,14 @@ def client(tmp_path, monkeypatch):
     return TestClient(appmod.app), dbmod
 
 
-def _auth(c):
-    r = c.post("/api/register", json={"username": "t", "password": "secret1"})
-    return {"Authorization": f"Bearer {r.json()['token']}"}
+def _auth(c, dbmod=None):
+    # Phase A (2026-07-31): /api/register is invite-gated now — tests create
+    # the account at the db layer and log in like a real client would.
+    if dbmod is None:
+        import db as dbmod
+    dbmod.create_user("t", "secret1")
+    tok = dbmod.authenticate("t", "secret1")
+    return {"Authorization": f"Bearer {tok}"}
 
 
 def _first_topic_concepts(c, H):
