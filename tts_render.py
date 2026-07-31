@@ -46,6 +46,26 @@ def _card_path(pack_id: str, concept_id: str, idx: int, text: str) -> Path:
     return AUDIO / pack_id / f"{concept_id}_c{idx}_{h8}.m4a"
 
 
+def _audio_duration(path: Path) -> float:
+    """Decoded duration via afinfo — the REAL render assertion. (2026-07-30
+    lesson, media-verification invariant round 2: `say` in a headless
+    SSH/Background session exits 0 and writes a well-formed ~32KB m4a with
+    ~0.005s of silence — exists/size/200 all pass while every file is empty.
+    Only duration>0 proves audio was synthesized.)"""
+    try:
+        r = subprocess.run(["/usr/bin/afinfo", str(path)],
+                           capture_output=True, text=True, timeout=30)
+        for line in r.stdout.splitlines():
+            if "estimated duration" in line:
+                return float(line.split(":")[1].strip().split()[0])
+    except Exception:
+        pass
+    return 0.0
+
+
+MIN_DURATION_S = 0.3   # any real card narration is far longer; empties are ~0.005s
+
+
 def _synthesize(text: str, out: Path, voice: str | None) -> bool:
     out.parent.mkdir(parents=True, exist_ok=True)
     cmd = [SAY, "--file-format=m4af", "--data-format=aac", "-o", str(out)]
@@ -54,9 +74,37 @@ def _synthesize(text: str, out: Path, voice: str | None) -> bool:
     cmd.append(text)
     try:
         r = subprocess.run(cmd, capture_output=True, timeout=120)
-        return r.returncode == 0 and out.exists() and out.stat().st_size > 0
+        ok = (r.returncode == 0 and out.exists()
+              and _audio_duration(out) >= MIN_DURATION_S)
+        if not ok:
+            out.unlink(missing_ok=True)     # never leave a silent file behind
+        return ok
     except Exception:
+        out.unlink(missing_ok=True)
         return False
+
+
+def preflight() -> bool:
+    """Render one probe utterance and assert real audio BEFORE touching packs.
+    Fails loudly in headless (SSH/launchd Background) sessions where `say`
+    silently produces empty files — run from a console/Screen-Sharing login."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "probe.m4a"
+        cmd = [SAY, "--file-format=m4af", "--data-format=aac", "-o", str(p),
+               "text to speech preflight probe"]
+        subprocess.run(cmd, capture_output=True, timeout=60)
+        dur = _audio_duration(p)
+    if dur < MIN_DURATION_S:
+        mgr = subprocess.run(["launchctl", "managername"], capture_output=True,
+                             text=True).stdout.strip() or "?"
+        print(f"✗ PREFLIGHT FAILED: say produced {dur:.3f}s of audio "
+              f"(session domain: {mgr}). macOS synthesizes NO audio outside a "
+              f"GUI (Aqua) session — run this from a console/Screen-Sharing "
+              f"login, not SSH/launchd. Nothing was rendered.", file=sys.stderr)
+        return False
+    print(f"✓ preflight: {dur:.2f}s probe audio — session can synthesize")
+    return True
 
 
 def render_pack(pack: dict, voice: str | None = None) -> dict:
@@ -122,6 +170,8 @@ if __name__ == "__main__":
     ap.add_argument("--packs", help="comma-separated pack ids (default: all)")
     ap.add_argument("--voice", help="say voice (default: system / $LEARN_TTS_VOICE)")
     a = ap.parse_args()
+    if not preflight():
+        sys.exit(1)
     m = render_all(a.packs.split(",") if a.packs else None, a.voice)
     n = sum(1 for per in m.values() for urls in per.values() for u in urls if u)
     misses = sum(1 for per in m.values() for urls in per.values() for u in urls if u is None)
