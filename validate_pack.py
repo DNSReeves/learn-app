@@ -35,11 +35,45 @@ def _registered_anims():
 _ANIMS = _registered_anims()
 
 
+import concurrent.futures as _cf
+import threading as _threading
+
+_tl = _threading.local()
+
+
 def err(m):
-    errs.append(m)
+    # BE-7: collect into a thread-local list — the old module-global raced
+    # across the server threadpool (concurrent validations clobbered each
+    # other; worst case a bad pack validated clean and its non-slug id walked
+    # into a filesystem path). The global `errs` stays for CLI back-compat.
+    getattr(_tl, "errs", errs).append(m)
+
+
+def _regex_issue(pat) -> str | None:
+    """Compile + pathological-input probe for an authored grading pattern.
+    Returns a description of the problem, or None if the pattern is usable."""
+    if not isinstance(pat, str) or not pat.strip():
+        return "empty or non-string pattern"
+    try:
+        cp = re.compile(pat, re.IGNORECASE)
+    except re.error as e:
+        return f"does not compile ({e})"
+    probes = ["a" * 300, "ab" * 150, ("a" * 40 + "!") * 6, "no " * 100]
+    ex = _cf.ThreadPoolExecutor(max_workers=1)
+    try:
+        fut = ex.submit(lambda: [cp.fullmatch(p) for p in probes])
+        fut.result(timeout=0.25)
+    except _cf.TimeoutError:
+        return "pathological backtracking (probe exceeded 250ms) — rewrite without nested quantifiers"
+    except Exception as e:  # noqa: BLE001
+        return f"probe failed ({type(e).__name__})"
+    finally:
+        ex.shutdown(wait=False)
+    return None
 
 
 def check(pack):
+    _tl.errs = []
     for k in ("id", "title", "concepts"):
         if k not in pack:
             err(f"pack missing '{k}'")
@@ -78,8 +112,25 @@ def check(pack):
                 g = q.get("grading") or {}
                 if g.get("kind") not in ("numeric", "regex", "rubric"):
                     err(f"{qt}: free grading.kind must be numeric|regex|rubric (got {g.get('kind')!r})")
-                if g.get("kind") in ("numeric", "regex") and "answer" not in g:
-                    err(f"{qt}: free {g.get('kind')} grading needs an 'answer'")
+                if g.get("kind") == "numeric":
+                    # BE-9: the grader formats answer with :g — it must BE numeric
+                    if not isinstance(g.get("answer"), (int, float)) or isinstance(g.get("answer"), bool):
+                        err(f"{qt}: numeric grading needs a numeric 'answer'")
+                    if "tolerance" in g and (not isinstance(g["tolerance"], (int, float))
+                                             or isinstance(g["tolerance"], bool)):
+                        err(f"{qt}: numeric 'tolerance' must be a number")
+                if g.get("kind") == "regex":
+                    # BE-10: the grader matches g['patterns'] — requiring 'answer'
+                    # here meant a validator-passing regex question could never
+                    # grade correct, and a working one failed predeploy.
+                    pats = g.get("patterns")
+                    if not isinstance(pats, list) or not pats:
+                        err(f"{qt}: regex grading needs a non-empty 'patterns' list")
+                    else:
+                        for p in pats:
+                            issue = _regex_issue(p)
+                            if issue:
+                                err(f"{qt}: pattern {p!r}: {issue}")
                 if g.get("kind") == "rubric":
                     # rubric-graded: per-category feedback lives in grading.rubric, so a single
                     # feedback_incorrect is not required (the rubric supplies it).
@@ -135,6 +186,12 @@ def check(pack):
         unknown = set(mig) - {"renamed_concepts"}
         if unknown:
             err(f"migrations: unknown key(s) {sorted(unknown)}")
+    # BE-7: return the thread-local collection; mirror into the module global
+    # so the CLI path (`check(pack); if errs:`) keeps working single-threaded.
+    collected = _tl.errs
+    del _tl.errs
+    errs.extend(collected)
+    return collected
 
 
 def check_links(pack):

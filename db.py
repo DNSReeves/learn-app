@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS concept_state_archive (
     concept_id  TEXT NOT NULL,
     p_mastery   REAL, attempts INTEGER, correct INTEGER, streak INTEGER,
     unlocked    INTEGER, mastered_at REAL, interval_d REAL, ease REAL, due_at REAL,
-    stability   REAL, difficulty REAL,
+    stability   REAL, difficulty REAL, relearn INTEGER,
     archived_at REAL NOT NULL,
     reason      TEXT NOT NULL,     -- concept_removed | rename_collision:<old>-><new>
     from_hash   TEXT,
@@ -134,6 +134,16 @@ def init():
                     c.execute(f"ALTER TABLE {table} ADD COLUMN {col}")
                 except sqlite3.OperationalError:
                     pass
+    # BE-15: the archive predates the relearn flag; BE-22: answers snapshot the
+    # scheduled interval AT ANSWER TIME (retention buckets were re-bucketing
+    # history by the CURRENT interval).
+    with conn() as c:
+        for stmt in ("ALTER TABLE concept_state_archive ADD COLUMN relearn INTEGER",
+                     "ALTER TABLE answers ADD COLUMN interval_at REAL"):
+            try:
+                c.execute(stmt)
+            except sqlite3.OperationalError:
+                pass
 
 
 def _hash(pw: str, salt: bytes) -> bytes:
@@ -162,7 +172,12 @@ def authenticate(username: str, password: str) -> str | None:
             "SELECT id, pw_salt, pw_hash FROM users WHERE username = ?",
             (username.strip().lower(),),
         ).fetchone()
-        if not row or not hmac.compare_digest(_hash(password, row["pw_salt"]), row["pw_hash"]):
+        if not row:
+            # BE-24: burn the same PBKDF2 cost as the real branch so response
+            # timing cannot enumerate which usernames exist.
+            _hash(password, b"\x00" * 16)
+            return None
+        if not hmac.compare_digest(_hash(password, row["pw_salt"]), row["pw_hash"]):
             return None
         token = secrets.token_urlsafe(32)
         now = time.time()
@@ -211,33 +226,54 @@ def get_states(user_id: int, topic_id: str) -> dict:
         return {r["concept_id"]: dict(r) for r in rows}
 
 
-def upsert_state(user_id: int, topic_id: str, concept_id: str, **fields):
+def upsert_state(user_id: int, topic_id: str, concept_id: str, c=None, **fields):
     keys = ["p_mastery", "attempts", "correct", "streak", "unlocked",
             "mastered_at", "interval_d", "ease", "due_at", "relearn",
             "stability", "difficulty"]
     vals = {k: fields[k] for k in keys if k in fields}
+    if c is not None:                      # BE-16: join the caller's transaction
+        _upsert_state_in(c, user_id, topic_id, concept_id, vals)
+        return
     with conn() as c:
-        c.execute(
-            """INSERT INTO concept_state (user_id, topic_id, concept_id)
-               VALUES (?,?,?) ON CONFLICT(user_id, topic_id, concept_id) DO NOTHING""",
-            (user_id, topic_id, concept_id),
-        )
-        if vals:
-            sets = ", ".join(f"{k} = ?" for k in vals)
-            c.execute(
-                f"UPDATE concept_state SET {sets} WHERE user_id=? AND topic_id=? AND concept_id=?",
-                (*vals.values(), user_id, topic_id, concept_id),
-            )
+        _upsert_state_in(c, user_id, topic_id, concept_id, vals)
 
 
-def log_answer(user_id, topic_id, concept_id, question_id, given, is_correct, latency_ms):
-    with conn() as c:
+def _upsert_state_in(c, user_id, topic_id, concept_id, vals):
+    c.execute(
+        """INSERT INTO concept_state (user_id, topic_id, concept_id)
+           VALUES (?,?,?) ON CONFLICT(user_id, topic_id, concept_id) DO NOTHING""",
+        (user_id, topic_id, concept_id),
+    )
+    if vals:
+        sets = ", ".join(f"{k} = ?" for k in vals)
         c.execute(
-            """INSERT INTO answers (user_id, topic_id, concept_id, question_id, given,
-               is_correct, latency_ms, at) VALUES (?,?,?,?,?,?,?,?)""",
-            (user_id, topic_id, concept_id, question_id,
-             json.dumps(given), int(is_correct), latency_ms, time.time()),
+            f"UPDATE concept_state SET {sets} WHERE user_id=? AND topic_id=? AND concept_id=?",
+            (*vals.values(), user_id, topic_id, concept_id),
         )
+
+
+def log_answer(user_id, topic_id, concept_id, question_id, given, is_correct,
+               latency_ms, interval_at=None, c=None):
+    """interval_at (BE-22): the concept's scheduled interval when this answer
+    happened — retention analytics bucket on it, not on today's value.
+    c (BE-16): join an already-open transaction instead of opening one."""
+    if c is not None:
+        _log_answer_in(c, user_id, topic_id, concept_id, question_id, given,
+                       is_correct, latency_ms, interval_at)
+        return
+    with conn() as cc:
+        _log_answer_in(cc, user_id, topic_id, concept_id, question_id, given,
+                       is_correct, latency_ms, interval_at)
+
+
+def _log_answer_in(c, user_id, topic_id, concept_id, question_id, given,
+                   is_correct, latency_ms, interval_at):
+    c.execute(
+        """INSERT INTO answers (user_id, topic_id, concept_id, question_id, given,
+           is_correct, latency_ms, at, interval_at) VALUES (?,?,?,?,?,?,?,?,?)""",
+        (user_id, topic_id, concept_id, question_id,
+         json.dumps(given), int(is_correct), latency_ms, time.time(), interval_at),
+    )
 
 
 def recent_misses(user_id, topic_id, concept_id, limit=6):

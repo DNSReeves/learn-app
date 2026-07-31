@@ -5,6 +5,7 @@ Run:  uvicorn app:app --host 0.0.0.0 --port 8090
 import json
 import logging
 import os
+import re
 import time
 
 from fastapi import FastAPI, Header, HTTPException
@@ -29,8 +30,16 @@ def load_topics() -> dict:
     packs = {}
     for fn in sorted(os.listdir(TOPIC_DIR)):
         if fn.endswith(".json") and not fn.startswith("_"):
-            with open(os.path.join(TOPIC_DIR, fn)) as f:
-                p = json.load(f)
+            # BE-12: one malformed file (a half-written edit→refresh save, a bad
+            # drop) must not 500 the WHOLE app — log, skip, serve the rest.
+            try:
+                with open(os.path.join(TOPIC_DIR, fn)) as f:
+                    p = json.load(f)
+                if not isinstance(p, dict) or not p.get("id") or "concepts" not in p:
+                    raise ValueError("not a topic pack (id/concepts missing)")
+            except Exception as e:
+                logging.getLogger("learn").error("topic %s skipped: %s", fn, e)
+                continue
             packs[p["id"]] = p
     # P5.17 (iss_8d424360): register/diff pack versions; migrate or archive
     # concept_state on a live edit instead of silently orphaning. In-memory
@@ -123,15 +132,48 @@ def progress_import(body: ProgressImport, authorization: str | None = Header(def
                   "unlocked", "mastered_at", "interval_d", "ease", "due_at", "relearn",
                   "stability", "difficulty"}
     imported = skipped = 0
+    def _num(v, lo, hi, default=None):
+        try:
+            f = float(v)
+        except (TypeError, ValueError):
+            return default
+        return min(hi, max(lo, f))
+
+    now_ts = time.time()
     with db.conn() as c:
         for row in body.concept_state:
-            if not STATE_COLS.issuperset(row) or "topic_id" not in row or "concept_id" not in row:
+            # BE-5: malformed rows (non-dicts, missing keys) skip, never 500
+            if (not isinstance(row, dict) or not STATE_COLS.issuperset(row)
+                    or not isinstance(row.get("topic_id"), str)
+                    or not isinstance(row.get("concept_id"), str)):
                 skipped += 1; continue
-            cur = c.execute("SELECT attempts, p_mastery FROM concept_state WHERE user_id=? AND "
-                            "topic_id=? AND concept_id=?",
+            # BE-4: clamp/validate every client value — imports are forgeable
+            # self-harm otherwise (p=5.0 breaks decay math; mastered_at in the
+            # future corrupts review; correct > attempts corrupts analytics)
+            row = dict(row)
+            row["p_mastery"] = _num(row.get("p_mastery"), 0.0, 1.0, 0.0)
+            row["attempts"] = int(_num(row.get("attempts"), 0, 1e9, 0))
+            row["correct"] = int(min(_num(row.get("correct"), 0, 1e9, 0), row["attempts"]))
+            row["streak"] = int(_num(row.get("streak"), 0, 1e6, 0))
+            if row.get("mastered_at") is not None:
+                row["mastered_at"] = _num(row["mastered_at"], 0, now_ts, None)
+            for k, lo, hi in (("interval_d", 0, 36500), ("ease", 1.0, 5.0),
+                              ("stability", 0, 36500), ("difficulty", 1.0, 10.0)):
+                if row.get(k) is not None:
+                    row[k] = _num(row[k], lo, hi, None)
+            cur = c.execute("SELECT attempts, p_mastery, mastered_at FROM concept_state "
+                            "WHERE user_id=? AND topic_id=? AND concept_id=?",
                             (user["id"], row["topic_id"], row["concept_id"])).fetchone()
-            if cur and (row.get("attempts", 0), row.get("p_mastery", 0)) < (cur[0], cur[1]):
-                skipped += 1; continue        # local evidence is stronger — never regress
+            # BE-1: the old lexicographic tuple compare let a weaker row with
+            # MORE attempts overwrite mastered progress. Never-regress now means:
+            # BOTH dimensions must be >= to overwrite, AND an import may never
+            # un-master or lower p on a locally-mastered row.
+            if cur is not None:
+                cur_att, cur_p, cur_mast = cur[0] or 0, cur[1] or 0.0, cur[2]
+                stronger = (row["attempts"] >= cur_att and row["p_mastery"] >= cur_p)
+                unmasters = bool(cur_mast) and not row.get("mastered_at")
+                if not stronger or unmasters:
+                    skipped += 1; continue    # local evidence is stronger — never regress
             fields = {k: row[k] for k in row if k in STATE_COLS and k not in ("topic_id", "concept_id")}
             cols = ", ".join(fields)
             c.execute(f"INSERT INTO concept_state (user_id, topic_id, concept_id, {cols}) "
@@ -141,7 +183,7 @@ def progress_import(body: ProgressImport, authorization: str | None = Header(def
                       (user["id"], row["topic_id"], row["concept_id"], *fields.values()))
             imported += 1
         for pl in body.placements:
-            if "topic_id" not in pl: continue
+            if not isinstance(pl, dict) or "topic_id" not in pl: continue
             c.execute("INSERT OR IGNORE INTO placements (user_id, topic_id, level, at) VALUES (?,?,?,?)",
                       (user["id"], pl["topic_id"], pl.get("level"), pl.get("at") or time.time()))
         c.commit()
@@ -164,15 +206,19 @@ def analytics(authorization: str | None = Header(default=None)):
             FROM concept_state s JOIN answers a
               ON a.user_id = s.user_id AND a.topic_id = s.topic_id AND a.concept_id = s.concept_id
             WHERE s.user_id = ? AND s.mastered_at IS NOT NULL AND a.at <= s.mastered_at
+              AND a.question_id NOT LIKE 'gen:%'
             GROUP BY s.topic_id, s.concept_id ORDER BY hours""", (user["id"],))]
         # retention: review-mode outcomes bucketed by scheduled interval
         ret = [dict(r) for r in c.execute("""
-            SELECT CASE WHEN s.interval_d < 2 THEN '1d' WHEN s.interval_d < 5 THEN '2-4d'
-                        WHEN s.interval_d < 10 THEN '5-9d' ELSE '10d+' END AS bucket,
+            SELECT CASE WHEN COALESCE(a.interval_at, s.interval_d) < 2 THEN '1d'
+                        WHEN COALESCE(a.interval_at, s.interval_d) < 5 THEN '2-4d'
+                        WHEN COALESCE(a.interval_at, s.interval_d) < 10 THEN '5-9d'
+                        ELSE '10d+' END AS bucket,
                    COUNT(*) AS n, ROUND(AVG(a.is_correct), 3) AS recall
             FROM answers a JOIN concept_state s
               ON s.user_id = a.user_id AND s.topic_id = a.topic_id AND s.concept_id = a.concept_id
             WHERE a.user_id = ? AND s.mastered_at IS NOT NULL AND a.at > s.mastered_at
+              AND a.question_id NOT LIKE 'gen:%'
             GROUP BY bucket""", (user["id"],))]
         weakest = [dict(r) for r in c.execute("""
             SELECT topic_id, concept_id, ROUND(p_mastery, 3) AS p, attempts, correct
@@ -180,7 +226,8 @@ def analytics(authorization: str | None = Header(default=None)):
             ORDER BY p_mastery ASC LIMIT 8""", (user["id"],))]
         n_review = c.execute("""SELECT COUNT(*) FROM answers a JOIN concept_state s
             ON s.user_id=a.user_id AND s.topic_id=a.topic_id AND s.concept_id=a.concept_id
-            WHERE a.user_id=? AND s.mastered_at IS NOT NULL AND a.at > s.mastered_at""",
+            WHERE a.user_id=? AND s.mastered_at IS NOT NULL AND a.at > s.mastered_at
+            AND a.question_id NOT LIKE 'gen:%'""",
             (user["id"],)).fetchone()[0]
     return {"time_to_mastery": ttm, "retention": ret, "weakest": weakest,
             "review_answers": n_review,
@@ -377,9 +424,16 @@ def placement(tid: str, body: PlacementBody,
         if i in gap_set:
             db.upsert_state(user["id"], tid, c["id"], p_mastery=0.30, relearn=1)
         elif i < level:
-            # trust but verify: mastered, but due for review immediately
-            db.upsert_state(user["id"], tid, c["id"], p_mastery=0.90,
-                            mastered_at=now, interval_d=0.5, due_at=now)
+            # trust but verify: mastered, but due for review immediately.
+            # BE-13: seed at MASTERY_P, not 0.90 — one miss from 0.90 lands at
+            # 0.55 < RELEARN_P and instantly demoted a placement-trusted
+            # concept; from 0.95 a single slip shortens the review, as designed.
+            # BE-14: seed FSRS stability at S0(Good), not the 0.5d floor, so
+            # the first review reschedules from real memory params.
+            db.upsert_state(user["id"], tid, c["id"], p_mastery=mastery.MASTERY_P,
+                            mastered_at=now, interval_d=0.5, due_at=now,
+                            stability=mastery.FSRS_W[2],
+                            difficulty=mastery._fsrs_d0(3))
         elif i == level:
             db.upsert_state(user["id"], tid, c["id"], p_mastery=0.50)
     db.set_placement(user["id"], tid, level)
@@ -407,9 +461,26 @@ def answer(tid: str, cid: str, a: Answer,
     c = next((c for c in (pack or {}).get("concepts", []) if c["id"] == cid), None)
     if not c:
         raise HTTPException(404, "No such concept.")
+    # BE-2: enforce the ladder gate HERE, not only on concept GET — placement
+    # leaks every concept's question ids, and the server reveals `correct`, so
+    # an ungated answer route lets a client brute-force a locked concept to
+    # mastered and walk the whole ladder around the gate.
+    idx = next(i for i, cc in enumerate(pack["concepts"]) if cc["id"] == cid)
+    if idx > 0:
+        states_gate = db.get_states(user["id"], tid)
+        prev = states_gate.get(pack["concepts"][idx - 1]["id"], {})
+        if not (prev.get("mastered_at") or prev.get("relearn")):
+            raise HTTPException(403, "That concept is still locked — master its "
+                                     "predecessor first.")
     q = next((q for q in c["questions"] if q["id"] == a.question_id), None)
     if not q:
         raise HTTPException(404, "No such question.")
+    # BE-6: validate the choice BEFORE any state moves — a missing or
+    # out-of-range index used to 500 at the feedback lookup.
+    if q.get("type") != "free":
+        if a.choice is None or not isinstance(a.choice, int) \
+                or not 0 <= a.choice < len(q.get("options", [])):
+            raise HTTPException(400, "choice must be an option index for this question")
     # P2.9 (iss_8c6eb4ee): free-response grading — LOCAL first (numeric tolerance /
     # regex need no API call); the LLM grades only rubric-kind questions. When the
     # LLM is unavailable the answer is honestly UNGRADED (mastery untouched, model
@@ -429,51 +500,63 @@ def answer(tid: str, cid: str, a: Answer,
     else:
         correct = a.choice == q["answer"]
 
-    s = db.get_states(user["id"], tid).get(cid, {})
-    p_before = s.get("p_mastery", mastery.P_INIT)
-    p_after = mastery.bkt_update(p_before, correct)
-    streak = (s.get("streak", 0) + 1) if correct else 0
-    was_mastered = bool(s.get("mastered_at"))
-    now_mastered = was_mastered or mastery.is_mastered(p_after, streak)
+    # BE-16: the read → compute → write below runs inside ONE immediate
+    # transaction — two concurrent answers for the same user (double-submit,
+    # two tabs) used to interleave get_states/upsert and lose an update.
+    # Everything in between is pure computation (grading already happened
+    # above), so the write lock is held for microseconds.
+    with db.conn() as dbc:
+        dbc.execute("BEGIN IMMEDIATE")
+        row = dbc.execute("SELECT * FROM concept_state WHERE user_id=? AND "
+                          "topic_id=? AND concept_id=?",
+                          (user["id"], tid, cid)).fetchone()
+        s = dict(row) if row else {}
+        p_before = s.get("p_mastery") if s.get("p_mastery") is not None else mastery.P_INIT
+        p_after = mastery.bkt_update(p_before, correct)
+        streak = ((s.get("streak") or 0) + 1) if correct else 0
+        was_mastered = bool(s.get("mastered_at"))
+        now_mastered = was_mastered or mastery.is_mastered(p_after, streak)
 
-    fields = dict(
-        p_mastery=p_after,
-        attempts=s.get("attempts", 0) + 1,
-        correct=s.get("correct", 0) + int(correct),
-        streak=streak,
-        mastered_at=s.get("mastered_at") or (time.time() if now_mastered else None),
-    )
-    demoted = False
-    if was_mastered and not correct and p_after < mastery.RELEARN_P:
-        # P2.6 (iss_0824d5ad): the review failed hard — the concept drops out
-        # of mastered into RELEARN: cards re-serve, the 0.95+streak gate re-runs.
-        # Successors stay unlocked (relearn is not un-learning the ladder).
-        demoted = True
-        now_mastered = False
-        fields.update(mastered_at=None, relearn=1, streak=0,
-                      interval_d=0.0, due_at=None)
-    elif was_mastered:  # review mode: reschedule (P2.7: FSRS replaced SM-2-lite)
-        # Legacy rows (stability NULL) migrate by passing interval_d as
-        # stability — exact at the 0.90 retention target where interval == S.
-        prev_s = s.get("stability") or s.get("interval_d") or 0
-        # elapsed since the last review, reconstructed from the old schedule
-        last = (s["due_at"] - (s.get("interval_d") or 0) * 86400) if s.get("due_at") else None
-        elapsed_d = max(0.0, (time.time() - last) / 86400) if last else 0.0
-        s2, d2, iv, due = mastery.fsrs_review(prev_s, s.get("difficulty"), elapsed_d, correct)
-        fields.update(stability=s2, difficulty=d2, interval_d=iv, due_at=due)
-    elif now_mastered:  # (re-)mastery: first review lands tomorrow; relearn clears
-        # Pedagogy unchanged (trust-then-verify: quick first check); FSRS state
-        # initialized so the SECOND review schedules from real memory params.
-        # A relearned concept keeps its surviving stability.
-        fields.update(interval_d=1.0, due_at=time.time() + 86400, relearn=0,
-                      mastered_at=time.time(),
-                      stability=s.get("stability") or mastery.FSRS_W[2],
-                      difficulty=s.get("difficulty") or mastery._fsrs_d0(3))
+        fields = dict(
+            p_mastery=p_after,
+            attempts=(s.get("attempts") or 0) + 1,
+            correct=(s.get("correct") or 0) + int(correct),
+            streak=streak,
+            mastered_at=s.get("mastered_at") or (time.time() if now_mastered else None),
+        )
+        demoted = False
+        if was_mastered and not correct and p_after < mastery.RELEARN_P:
+            # P2.6 (iss_0824d5ad): the review failed hard — the concept drops out
+            # of mastered into RELEARN: cards re-serve, the 0.95+streak gate re-runs.
+            # Successors stay unlocked (relearn is not un-learning the ladder).
+            demoted = True
+            now_mastered = False
+            fields.update(mastered_at=None, relearn=1, streak=0,
+                          interval_d=0.0, due_at=None)
+        elif was_mastered:  # review mode: reschedule (P2.7: FSRS replaced SM-2-lite)
+            # Legacy rows (stability NULL) migrate by passing interval_d as
+            # stability — exact at the 0.90 retention target where interval == S.
+            prev_s = s.get("stability") or s.get("interval_d") or 0
+            # elapsed since the last review, reconstructed from the old schedule
+            last = (s["due_at"] - (s.get("interval_d") or 0) * 86400) if s.get("due_at") else None
+            elapsed_d = max(0.0, (time.time() - last) / 86400) if last else 0.0
+            s2, d2, iv, due = mastery.fsrs_review(prev_s, s.get("difficulty"), elapsed_d, correct)
+            fields.update(stability=s2, difficulty=d2, interval_d=iv, due_at=due)
+        elif now_mastered:  # (re-)mastery: first review lands tomorrow; relearn clears
+            # Pedagogy unchanged (trust-then-verify: quick first check); FSRS state
+            # initialized so the SECOND review schedules from real memory params.
+            # A relearned concept keeps its surviving stability.
+            fields.update(interval_d=1.0, due_at=time.time() + 86400, relearn=0,
+                          mastered_at=time.time(),
+                          stability=s.get("stability") or mastery.FSRS_W[2],
+                          difficulty=s.get("difficulty") or mastery._fsrs_d0(3))
 
-    db.upsert_state(user["id"], tid, cid, **fields)
-    db.log_answer(user["id"], tid, cid, a.question_id,
-                  (a.text or "")[:400] if q.get("type") == "free" else a.choice,
-                  correct, a.latency_ms)
+        db.upsert_state(user["id"], tid, cid, c=dbc, **fields)
+        # BE-22: snapshot the scheduled interval AT ANSWER TIME for retention
+        db.log_answer(user["id"], tid, cid, a.question_id,
+                      (a.text or "")[:400] if q.get("type") == "free" else a.choice,
+                      correct, a.latency_ms,
+                      interval_at=s.get("interval_d"), c=dbc)
 
     return {"correct": correct,
             "feedback": fr_feedback if q.get("type") == "free" else q["feedback"][a.choice],
@@ -550,14 +633,13 @@ def require_author(authorization: str | None):
 
 def _validate_pack_dict(pack: dict) -> list[str]:
     """Run validate_pack.check on an in-memory pack; returns the error list.
-    (validate_pack collects into a module-global — reset around each run.)"""
+    (BE-7: check() now collects thread-locally and RETURNS the list, so
+    concurrent validations can no longer clobber each other's results.)"""
     import validate_pack as vp
-    vp.errs = []
     try:
-        vp.check(pack)
+        return list(vp.check(pack))
     except Exception as e:  # a malformed draft must report, not 500
-        vp.errs.append(f"validator crashed on this draft: {type(e).__name__}: {e}")
-    return list(vp.errs)
+        return [f"validator crashed on this draft: {type(e).__name__}: {e}"]
 
 
 class PackDraft(BaseModel):
@@ -577,12 +659,24 @@ def author_validate(body: PackDraft,
 def author_upload(body: PackDraft,
                   authorization: str | None = Header(default=None)):
     user = require_author(authorization)
+    # BE-23: bound the draft before any processing — a pack has no business
+    # being tens of MB or hundreds of concepts.
+    if len(json.dumps(body.pack)) > 2_000_000 or len(body.pack.get("concepts") or []) > 100:
+        raise HTTPException(413, "Draft too large (2MB / 100 concepts max).")
     errors = _validate_pack_dict(body.pack)
     if errors:
         return {"ok": False, "staged": None, "errors": errors}
-    pid = body.pack["id"]                      # slug-validated by the checker
+    # BE-7 (endpoint half): do NOT trust the validator alone for the filename —
+    # its module-global error list is shared across threads, so a race could
+    # blank the errors for a non-slug id. Re-validate the slug HERE and prove
+    # the resolved path stays inside STAGED_DIR before opening anything.
+    pid = body.pack["id"]
+    if not re.fullmatch(r"[a-z0-9-]{1,64}", pid or ""):
+        raise HTTPException(400, "pack id must be a lowercase slug")
     os.makedirs(STAGED_DIR, exist_ok=True)
-    path = os.path.join(STAGED_DIR, f"{pid}.json")
+    path = os.path.realpath(os.path.join(STAGED_DIR, f"{pid}.json"))
+    if os.path.dirname(path) != os.path.realpath(STAGED_DIR):
+        raise HTTPException(400, "resolved path escapes topics_staged/")
     with open(path, "w") as f:
         json.dump(body.pack, f, indent=1)
     live = pid in load_topics()

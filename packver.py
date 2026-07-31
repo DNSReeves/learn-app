@@ -63,14 +63,15 @@ def _archive_rows(c, topic_id: str, concept_id: str, reason: str,
             """INSERT INTO concept_state_archive
                (user_id, topic_id, concept_id, p_mastery, attempts, correct,
                 streak, unlocked, mastered_at, interval_d, ease, due_at,
-                stability, difficulty,
+                stability, difficulty, relearn,
                 archived_at, reason, from_hash, to_hash)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (r["user_id"], r["topic_id"], r["concept_id"], r["p_mastery"],
              r["attempts"], r["correct"], r["streak"], r["unlocked"],
              r["mastered_at"], r["interval_d"], r["ease"], r["due_at"],
              r["stability"] if "stability" in r.keys() else None,
              r["difficulty"] if "difficulty" in r.keys() else None,
+             r["relearn"] if "relearn" in r.keys() else 0,   # BE-15
              now, reason, from_hash, to_hash))
     c.execute("DELETE FROM concept_state WHERE topic_id=? AND concept_id=?",
               (topic_id, concept_id))
@@ -105,9 +106,14 @@ def sync_pack(pack: dict) -> dict | None:
             # 1. declared renames migrate state (old row moves unless the user
             #    already has state under the new id — then archive the old).
             renames = (pack.get("migrations") or {}).get("renamed_concepts") or {}
+            executed_renames = set()
             for old, new in renames.items():
                 if old not in old_ids or new not in new_ids:
-                    continue          # stale/forward declaration — nothing to move
+                    # BE-11: a rename whose TARGET is absent must not shield the
+                    # source from archival — fall through to step 2 instead of
+                    # leaving live state stranded under a dead id.
+                    continue
+                executed_renames.add(old)
                 cur = c.execute(
                     """UPDATE concept_state SET concept_id=?
                        WHERE topic_id=? AND concept_id=?
@@ -123,8 +129,9 @@ def sync_pack(pack: dict) -> dict | None:
                 if leftover:
                     report["collisions"][old] = {"to": new, "archived": leftover}
 
-            # 2. concepts removed outright → archive their state.
-            for rid in sorted(old_ids - new_ids - set(renames.keys())):
+            # 2. concepts removed outright → archive their state. (BE-11: only
+            #    EXECUTED renames are exempt; a dangling declaration archives.)
+            for rid in sorted(old_ids - new_ids - executed_renames):
                 n = _archive_rows(c, tid, rid, "concept_removed",
                                   latest["pack_hash"], h)
                 if n:
@@ -156,4 +163,24 @@ def maybe_sync(packs: dict) -> list:
         _seen[tid] = h
         if r:
             reports.append(r)
+    # BE-17: a topic whose FILE vanished (or whose id changed) previously
+    # stranded all its concept_state live forever — versioning only diffed
+    # within a topic_id. Archive state for registered topics no longer served.
+    gone = None
+    with db.conn() as c:
+        registered = {row[0] for row in c.execute(
+            "SELECT DISTINCT topic_id FROM pack_versions")}
+        gone = registered - set(packs.keys())
+        for tid in sorted(gone):
+            if _seen.get(tid) == "__topic_removed__":
+                continue
+            cids = [row[0] for row in c.execute(
+                "SELECT DISTINCT concept_id FROM concept_state WHERE topic_id=?", (tid,))]
+            archived = 0
+            for cid in cids:
+                archived += _archive_rows(c, tid, cid, "topic_removed", None, None)
+            _seen[tid] = "__topic_removed__"
+            if archived:
+                reports.append({"topic_id": tid, "topic_removed": True,
+                                "archived_rows": archived})
     return reports
