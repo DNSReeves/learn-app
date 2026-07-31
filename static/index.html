@@ -14,11 +14,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Learn">
 <script>
-/* PWA registration (P4.15). SW is root-scoped — served from /sw.js so it can
-   cache the "/" navigation + /api reads, not just /static. Fails quiet on
-   http/unsupported. */
-if ("serviceWorker" in navigator && window.isSecureContext) {
-  addEventListener("load", () => navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {}));
+/* Service worker REMOVED 2026-07-30 (operator: "rip it out entirely"). The PWA
+   offline cache caused recurring iOS Safari staleness that outweighed its benefit;
+   the app now always loads fresh from the server. On every load we proactively
+   unregister any SW a device still has and drop all its caches — belt-and-suspenders
+   with the self-destruct /sw.js — so a previously-cached worker cannot linger. */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(() => {});
+}
+if (window.caches && caches.keys) {
+  caches.keys().then(ks => ks.forEach(k => caches.delete(k))).catch(() => {});
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
