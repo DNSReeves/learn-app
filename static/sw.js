@@ -1,9 +1,12 @@
 /* Learn PWA service worker — P4.15 (iss_a0cef670).
-   App shell = cache-first (opens offline); GET /api/* = network-first → last-seen cache
-   (so concepts/cards you've SEEN — including mastered ones — read offline); POST always
-   network (answering, login, upload require a connection). Read-only offline by design.
+   Strategy honors this project's core invariant — edit-file → refresh, NO build:
+   the app shell + API are NETWORK-FIRST (always fresh online, so an index.html edit
+   shows on refresh) and fall back to cache only when OFFLINE. Cache-FIRST is reserved
+   for immutable content-addressed assets (hashed .m4a voice files, icons) where the
+   name changes if the bytes do, so a stale hit is impossible. POST always network
+   (answering, login, upload need a connection). Read-only offline by design.
    Served from "/" (root scope) via the app's /sw.js route + Service-Worker-Allowed: /. */
-const SHELL = "learn-shell-v2";
+const SHELL = "learn-shell-v3";
 const DATA  = "learn-data-v1";
 const SHELL_ASSETS = [
   "/", "/static/index.html", "/static/manifest.webmanifest",
@@ -33,45 +36,43 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET") return;                         // POST/PUT/etc never cached
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;          // leave cross-origin (font CDN) alone
+  const p = url.pathname;
 
-  // App shell: navigations + /static/* → cache-first, fall back to network (and cache it),
-  // ultimately fall back to the cached shell so the SPA always boots offline.
-  if (req.mode === "navigate" || url.pathname.startsWith("/static/")) {
+  // Immutable content-addressed assets → cache-first (hashed .m4a voice files, icons):
+  // the filename changes if the bytes do, so a cache hit is always correct + saves the fetch.
+  const immutable = (p.startsWith("/static/audio/") && p.endsWith(".m4a")) || p.startsWith("/static/icons/");
+  if (immutable) {
     e.respondWith(
       caches.match(req).then((hit) =>
         hit ||
-        fetch(req)
-          .then((res) => {
-            const copy = res.clone();
-            caches.open(SHELL).then((c) => c.put(req, copy));
-            return res;
-          })
-          .catch(() => caches.match("/static/index.html"))
+        fetch(req).then((res) => {
+          if (res && res.ok) { const copy = res.clone(); caches.open(SHELL).then((c) => c.put(req, copy)); }
+          return res;
+        })
       )
     );
     return;
   }
 
-  // GET /api/* : network-first (fresh online), fall back to last-seen cache (offline read).
-  if (url.pathname.startsWith("/api/")) {
-    e.respondWith(
-      fetch(req)
-        .then((res) => {
-          if (res && res.ok) {
-            const copy = res.clone();
-            caches.open(DATA).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() =>
-          caches.match(req).then((hit) =>
-            hit ||
-            new Response(
-              JSON.stringify({ offline: true, error: "You're offline — showing what was last loaded." }),
-              { status: 200, headers: { "Content-Type": "application/json" } }
-            )
-          )
+  // Everything else — the "/" navigation, index.html, manifest, /static/*, /api/* —
+  // NETWORK-FIRST so edits are always seen on refresh; fall back to cache only offline.
+  const store = p.startsWith("/api/") ? DATA : SHELL;
+  e.respondWith(
+    fetch(req)
+      .then((res) => {
+        if (res && res.ok) { const copy = res.clone(); caches.open(store).then((c) => c.put(req, copy)); }
+        return res;
+      })
+      .catch(() =>
+        caches.match(req).then((hit) =>
+          hit ||
+          (req.mode === "navigate"
+            ? caches.match("/static/index.html")
+            : new Response(
+                JSON.stringify({ offline: true, error: "You're offline — showing what was last loaded." }),
+                { status: 200, headers: { "Content-Type": "application/json" } }
+              ))
         )
-    );
-  }
+      )
+  );
 });
