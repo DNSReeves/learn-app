@@ -1,0 +1,1033 @@
+{
+ "id": "fundamental-analysis",
+ "title": "Fundamental Analysis",
+ "tagline": "Price is what you pay; value is what you get — read the business, not the chart.",
+ "description": "What a share is really worth. Read a business from its financials, value it with multiples and discounted cash flow, and apply the two great lenses — value and growth — to single stocks and to ETFs.",
+ "prereqs": [
+  "investing-with-etfs"
+ ],
+ "concepts": [
+  {
+   "id": "price-vs-value",
+   "title": "Price vs. Value — The Fundamental Premise",
+   "summary": "A share is fractional ownership of a real business, and fundamental analysis estimates what that business is worth so you can judge its price against it.",
+   "cards": [
+    {
+     "h": "A share is a slice of a business, not a chip",
+     "md": "Buy one share of a company and you own a *fraction of a real business* — its factories, brands, contracts, and future cash flows. The ticker is a claim on economics, not a lottery number.\n\n**Fundamental analysis (FA)** estimates what that business is worth — its **intrinsic value** — from the things a business actually produces: earnings, cash flow, assets, growth, and risk. That value exists whether or not the market is open.\n\n**Price** is a separate thing entirely: it is the number the market quotes right now. Price swings around value — often violently, sometimes by a factor of two within a single year — while the underlying economics barely move.\n\n## Value is estimated. Price is quoted.\n\nHold that distinction and most of investing stops being mysterious. The rest of this module is about closing the gap between the two."
+    },
+    {
+     "h": "Mr. Market: your manic-depressive partner",
+     "md": "Benjamin Graham (author of *The Intelligent Investor*, 1949) gave us the sharpest mental model here: **Mr. Market**.\n\nImagine you co-own a business with a partner named Mr. Market. Every single day he shows up and names a price — one at which he'll buy your stake, or sell you his. He is reliable in only one way: he is *emotionally unstable*.\n\n- Some days he's euphoric and quotes an absurdly **high** price.\n- Some days he's despairing and offers to sell you his half for a **pittance**.\n\nThe crucial move: *you are free to transact or ignore him.* His mood is not a verdict on the business — it is your opportunity when he panics, and your trap when he's manic.\n\n## His quote is a service, not a signpost.\n\nThe amateur asks Mr. Market what his shares are worth. The professional has already estimated value independently, and treats today's quote as an offer to be accepted, refused, or exploited. A −30% day is a data point about *him*, not about the business's cash flows."
+    },
+    {
+     "h": "Two questions, and the gap between them",
+     "md": "FA forces you to answer two *separate* questions, in order:\n\n1. **What is this business worth?** (intrinsic value — from earnings, cash flow, assets, growth, risk)\n2. **What is its price?** (whatever the market quotes today)\n\nMost people collapse these into one and let the quote answer both. The entire discipline is keeping them apart, because **the gap between value and price is the whole game.**\n\nContrast **technical analysis (TA)**, which studies price and trend — patterns in the chart itself — and is deliberately agnostic about the business. FA reads the *business behind the ticker*; TA reads the ticker's footprints. Neither is fraudulent; they answer different questions. This module is FA.\n\n### Worked gap\n\nSuppose your analysis pegs a company's intrinsic value at **$100/share** and Mr. Market is quoting **$65**. The 35% shortfall is not noise to be traded around — it is the signal. When price sits *well below* value, that cushion is the **margin of safety** (the subject of concept 5): the room for you to be wrong and still not lose money."
+    },
+    {
+     "h": "Seeing the gap oscillate",
+     "md": "Put it together and a picture emerges. Intrinsic value is a *slowly-rising line* — a good business compounds its worth over years, unevenly but persistently. Price is a jittery curve that oscillates *around* that line, driven by Mr. Market's moods.\n\n**The animation below** shows exactly this: a smoothly climbing intrinsic-value line, with price weaving above and below it. The shaded **buy-zone** is where price dips beneath value — Mr. Market despairing — and the gap opens in your favor.\n\n- Price *above* value → the market is paying you to sell, or at least to wait.\n- Price *below* value → the buy-zone; margin of safety widens.\n- Price *far* from value in either direction → the interesting cases; small gaps are noise.\n\n## Estimate value first. Let price come to you.\n\nOne caveat to carry forward: intrinsic value is an *estimate*, not a readout. Two rigorous analysts will land on different numbers. That uncertainty is precisely *why* you demand a margin of safety rather than transacting at the first hint of a gap. Everything here applies to a single stock today; later concepts extend the same logic to ETFs and baskets."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "In Graham's parable, what is the correct way to treat Mr. Market's daily quote?",
+     "options": [
+      "As the definitive measure of the business's worth, since it aggregates all information",
+      "As an offer you may accept, refuse, or exploit — independent of your own value estimate",
+      "As a momentum signal: rising quotes confirm the business is improving",
+      "As irrelevant noise that should never influence any decision you make"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This is the amateur's error: the whole point of the parable is that Mr. Market's mood is NOT the business's worth — his quote reflects his emotional state, not intrinsic value.",
+      "Correct. You estimate value independently, then treat today's quote as an offer to accept when he panics, refuse when he's manic, or ignore — his mood is your opportunity or trap, not a verdict.",
+      "This confuses the quote with a trend signal (technical analysis); a rising price tells you about Mr. Market's euphoria, not about improving cash flows.",
+      "Too far the other way: the quote is not a signpost to value, but it is exactly the actionable offer you exploit — a low quote below value is the buy opportunity, so it is far from irrelevant."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Which pairing correctly matches the term to what it measures?",
+     "options": [
+      "Intrinsic value = today's market quote; Price = the estimate from cash flows",
+      "Intrinsic value = an estimate from the business's economics; Price = the number the market quotes now",
+      "Both intrinsic value and price are read directly off the ticker tape",
+      "Intrinsic value = the 52-week high; Price = the 52-week low"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Reversed. Intrinsic value is the estimate from economics; the market quote is the price — this option swaps the two definitions.",
+      "Correct. Intrinsic value is estimated from earnings, cash flow, assets, growth, and risk; price is simply whatever the market quotes at the moment — value is estimated, price is quoted.",
+      "Only price is read off the ticker. Intrinsic value is never quoted — it must be estimated from the underlying business, which is the entire labor of fundamental analysis.",
+      "Neither term refers to a 52-week extreme; those are price statistics, and intrinsic value is not a price at all."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Your analysis pegs a company's intrinsic value at $100/share while the market quotes $65. What does the 35% shortfall represent?",
+     "options": [
+      "A margin of safety — a cushion that lets you be wrong and still avoid loss",
+      "A sell signal, since price below value means the business is deteriorating",
+      "Proof that your $100 estimate is wrong, because price is always right",
+      "A technical breakdown to be shorted for the trend continuation"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct. When price sits well below estimated value, that gap is the margin of safety: room to be wrong in your estimate and still not lose money — the buy-zone the animation shades.",
+      "Backwards. Price below value is the buy-zone, not a sell signal; a low quote reflects Mr. Market's mood, not evidence the business is deteriorating.",
+      "This is the efficient-market reflex the parable rejects: price swings around value and is frequently wrong, which is precisely why the gap is an opportunity rather than a correction to your estimate.",
+      "That is technical-analysis framing; FA reads the business, and a price far below intrinsic value widens the margin of safety rather than signaling a short."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "How does fundamental analysis (FA) differ from technical analysis (TA) in what it reads?",
+     "options": [
+      "FA reads chart patterns and trend; TA estimates cash flows and assets",
+      "FA and TA both estimate intrinsic value, differing only in time horizon",
+      "FA reads the business behind the ticker; TA reads price and trend in the chart",
+      "FA ignores price entirely; TA ignores price entirely"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Reversed. Chart patterns and trend are the domain of TA; estimating cash flows and assets is FA — this option swaps the two disciplines.",
+      "Incorrect. TA is deliberately agnostic about intrinsic value; it studies price action itself, so the two do not merely differ by horizon.",
+      "Correct. FA estimates the worth of the business from its economics; TA studies price and trend — the ticker's footprints — and is agnostic about the underlying business.",
+      "Neither ignores price wholesale: FA compares price to value, and TA is built entirely on price — so 'both ignore price' is false on both counts."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "The Intelligent Investor — Benjamin Graham",
+     "type": "book",
+     "url": "https://www.google.com/books/edition/The_Intelligent_Investor_Rev_Ed/tz0DIzhL8dsC",
+     "note": "The source of the Mr. Market parable and the margin-of-safety doctrine; Graham was Buffett's teacher and this is the canonical FA text."
+    },
+    {
+     "label": "Aswath Damodaran — Intrinsic Valuation (NYU Stern)",
+     "type": "docs",
+     "url": "https://pages.stern.nyu.edu/~adamodar/",
+     "note": "The most rigorous freely-available valuation resource; Damodaran's Stern page hosts lectures, data, and DCF models that operationalize 'what is the business worth'."
+    }
+   ],
+   "anim": "fa_price_vs_value"
+  },
+  {
+   "id": "reading-the-financials",
+   "title": "Reading the Financials — the three statements",
+   "summary": "The income statement, balance sheet, and cash flow statement answer three different questions — is it profitable, is it solvent, and is the profit real cash?",
+   "cards": [
+    {
+     "h": "Three statements, three questions",
+     "md": "A company reports itself through three linked statements. Each answers a distinct question; read alone, any one misleads.\n\n### 1. Income statement — *is it profitable?*\nA flow over a **period** (quarter/year). Top-down:\n\n- **Revenue** (sales) minus **cost of goods sold (COGS)** = *gross profit*\n- minus operating expenses = **operating income** (a.k.a. EBIT, earnings before interest and taxes)\n- minus interest and taxes = **net income** (the bottom line)\n- net income ÷ shares = **earnings per share (EPS)**\n\n### 2. Balance sheet — *is it solvent?*\nA **snapshot** at one instant. The identity always holds:\n\n## Assets = Liabilities + Shareholders' Equity\n\nWhat the firm *owns* versus what it *owes*. It exposes **leverage** (debt vs. equity) and short-term **liquidity** (current assets vs. current liabilities).\n\n### 3. Cash flow statement — *is the profit real?*\nActual cash moving, split into three activities:\n\n- **Operating** — cash from running the business\n- **Investing** — capex, acquisitions, asset sales\n- **Financing** — debt, dividends, buybacks\n\nThe income statement tells you what management *earned* on paper; the cash flow statement tells you what actually *landed in the bank*."
+    },
+    {
+     "h": "Revenue ≠ earnings ≠ cash",
+     "md": "These three numbers are **not** the same, and conflating them is the classic beginner error.\n\n**Accrual accounting** books revenue when it is *earned* — a signed contract, a shipped product — not when the cash arrives. Ship $10M of goods on 90-day terms in December and you report $10M of revenue this year with **zero cash collected**.\n\nWorse, the income statement is full of *estimates* management chooses: **depreciation** schedules, bad-debt **reserves**, inventory valuation, revenue-recognition timing. Each is a legitimate judgment — and each is a lever.\n\n> ### \"Profit is an opinion; cash is a fact.\"\n\nNet income is an *opinion* assembled from dozens of estimates. **Cash** — the change in the bank balance — is far harder to fabricate: you either have it or you don't. That is why analysts trust the cash flow statement as the reality check on reported earnings.\n\nThis is not merely academic. Enron, WorldCom, and most accounting frauds inflate **earnings** while operating **cash flow** tells a very different story. When the two diverge, believe the cash."
+    },
+    {
+     "h": "Free cash flow — the number that matters",
+     "md": "Earnings are an accounting construct. **Free cash flow (FCF)** is the cash a business can actually hand to owners or reinvest:\n\n## FCF = Operating cash flow − Capital expenditures (capex)\n\n**Capex** is spending on long-lived assets (factories, servers, equipment) needed to keep the business running and growing. Buffett calls the same idea **\"owner earnings\"**: what an owner could pull out without starving the business.\n\n### Worked example\n\n| Line | Value |\n|---|---|\n| Revenue | 1,000 |\n| Net income (reported) | 120 |\n| Operating cash flow | 150 |\n| Capex | 90 |\n| **Free cash flow** | **60** |\n\nReported EPS-driving net income is **120**, but this is a capex-heavy business — it must spend **90** just to stay in the game. The cash truly available to owners is only **60**, *half* of stated earnings.\n\nA company can post rising net income for years while FCF is thin or negative because every dollar of \"profit\" is immediately consumed by capex. Value the FCF, not the headline. Divide it by market cap and you get **FCF yield**, a cleaner valuation gauge than the price-to-earnings (P/E) ratio."
+    },
+    {
+     "h": "The convergence check & the red flag",
+     "md": "### fa_cash_engine — the waterfall\n\nThe animation traces the cash engine top to bottom: **Revenue → (minus costs) → operating cash → (minus capex) → free cash flow.** Watch how much of the top bar survives to the bottom. A wide gap between reported earnings and the final FCF sliver is where the real story lives.\n\n### Reading the three together\n\n- **Income statement** → *profitable?* Margins, EPS trend.\n- **Balance sheet** → *over-levered?* Debt/equity, current ratio, interest coverage.\n- **Cash flow** → *is the profit converting to cash?* Compare operating cash flow to net income.\n\n### The single most useful red flag\n\n**Net income rising while operating cash flow stagnates or falls.** Over a full cycle, cumulative operating cash flow should roughly track cumulative net income. When earnings climb but cash doesn't follow, suspect aggressive revenue recognition, ballooning receivables, or channel-stuffing — profit that exists only on paper.\n\nHealthy businesses convert earnings to cash. If the two diverge and stay diverged, the earnings are the fiction and the cash is the truth."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Which statement is a *snapshot at a single moment in time* rather than a flow over a period?",
+     "options": [
+      "The income statement",
+      "The balance sheet",
+      "The cash flow statement",
+      "The statement of retained earnings"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The income statement measures revenue and profit over a period (a quarter or year), not a single instant.",
+      "Correct. The balance sheet is a point-in-time snapshot: Assets = Liabilities + Shareholders' Equity as of one date.",
+      "The cash flow statement aggregates cash movements across a period, so it is a flow, not a snapshot.",
+      "Retained earnings is a reconciling flow between two balance-sheet dates, not the snapshot itself."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A firm reports operating cash flow of 150 and net income of 120, and spends 90 on capex. What is its free cash flow?",
+     "options": [
+      "120",
+      "30",
+      "60",
+      "150"
+     ],
+     "answer": 2,
+     "feedback": [
+      "120 is net income, an accounting figure — FCF is derived from cash flow, not the income statement.",
+      "30 subtracts capex from net income; FCF starts from operating cash flow (150), not net income.",
+      "Correct. FCF = operating cash flow − capex = 150 − 90 = 60, well below the reported net income of 120.",
+      "150 is operating cash flow before capex is subtracted; capex must still be deducted."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why do analysts often trust cash flow more than reported net income?",
+     "options": [
+      "Cash flow is always larger than net income",
+      "Net income relies on management estimates and accrual timing, while cash is far harder to fabricate",
+      "Cash flow is audited but net income is not",
+      "Net income excludes taxes, making it unreliable"
+     ],
+     "answer": 1,
+     "feedback": [
+      "False — cash flow is frequently smaller than net income (as in a capex-heavy firm), and can be either.",
+      "Correct. 'Profit is an opinion, cash is a fact': net income is built from estimates (depreciation, reserves, revenue timing); cash is the bank balance and is much harder to fake.",
+      "Both statements sit inside the same audited filing; auditing is not the distinction here.",
+      "Net income includes taxes — it is the after-tax bottom line — so this reasoning is simply wrong."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Which pattern is the clearest red flag that reported earnings may be low-quality or manipulated?",
+     "options": [
+      "Net income rising while operating cash flow stagnates or falls",
+      "Operating cash flow consistently exceeding net income",
+      "Capex growing in line with revenue",
+      "Shareholders' equity increasing every year"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct. When earnings climb but operating cash flow doesn't follow, suspect aggressive revenue recognition or swelling receivables — profit on paper that never becomes cash.",
+      "This is the opposite — cash exceeding earnings is generally a sign of high-quality, conservative earnings.",
+      "Capex tracking revenue is normal for a growing business and is not itself a warning sign.",
+      "Rising equity typically reflects retained profits or issuance and is not inherently a red flag."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "SEC — How to Read a 10-K/10-Q",
+     "type": "docs",
+     "url": "https://www.sec.gov/oiea/investor-alerts-and-bulletins/how-read-10-k10-q",
+     "note": "Regulator's own guide to where the three statements live in a filing and how to navigate them."
+    },
+    {
+     "label": "Berkshire Hathaway 1986 Letter — 'owner earnings'",
+     "type": "reading",
+     "url": "https://www.berkshirehathaway.com/letters/1986.html",
+     "note": "Buffett's appendix defining owner earnings (≈ FCF) and why accounting net income overstates distributable cash."
+    }
+   ],
+   "anim": "fa_cash_engine"
+  },
+  {
+   "id": "valuation-multiples",
+   "title": "Valuation Multiples — Shorthand for Value",
+   "summary": "A multiple prices a company against a fundamental — it is not a value but a compressed, testable assumption about growth, risk, and quality.",
+   "cards": [
+    {
+     "h": "The multiple and its inverse",
+     "md": "A **valuation multiple** prices a company relative to a single fundamental. The workhorse is **P/E (price-to-earnings = share price / earnings per share)** — the dollars you pay for one dollar of *annual* earnings.\n\n## P/E = Price / EPS\n\nAt a P/E of 20 you pay $20 for each $1 of yearly earnings. Flip it and you get the **earnings yield (E/P = the inverse of P/E)**:\n\n## E/P = 1 / (P/E) = 1 / 20 = 5%\n\nThat 5% is the earnings the business generates per dollar of price — directly comparable to a bond yield or a Treasury rate. This is the same **earnings yield** used later at the index and ETF level (e.g. the S&P 500's aggregate E/P versus the 10-year yield in the Fed-model style comparison). Holding the multiple in *yield* terms is the single most useful reframe: a 40x stock is a 2.5% yield, a 10x stock is a 10% yield, and now you can ask whether that spread is paid for by growth.\n\n*Two flavors matter.* **Trailing** P/E uses the last 12 months of realized EPS; **forward** P/E uses the next 12 months' estimate. For anything but a stable, mature earner, prefer forward or **normalized** (mid-cycle) earnings — a single volatile year in the denominator produces a garbage multiple."
+    },
+    {
+     "h": "The main multiples and when each fits",
+     "md": "No single multiple works everywhere; each is chosen to dodge a specific distortion.\n\n### P/E — stable, profitable earners\nPrice per dollar of earnings. Needs *positive, representative* earnings, so it breaks for cyclicals at a trough and for money-losers.\n\n### P/B — price-to-book (price / book equity)\nBook equity is assets minus liabilities. Best for **asset-heavy, mark-to-market businesses — banks, insurers, REITs** — where the balance sheet is close to economic reality. Nearly useless for asset-light software, where value sits in intangibles the balance sheet ignores.\n\n### P/S — price-to-sales (price / revenue)\nRevenue is almost always positive and far less manipulable than earnings, so P/S is the tool for **fast-growing, not-yet-profitable firms** with noisy or negative earnings. Its blind spot: it says nothing about *margins* — a dollar of revenue at 5% margin is not a dollar at 40%.\n\n### EV/EBITDA — capital-structure neutral\n**EV (enterprise value) = market cap + total debt - cash**; **EBITDA = earnings before interest, taxes, depreciation & amortization**. Because EV includes debt and EBITDA is *pre-interest*, this multiple compares firms with **different debt loads and tax situations** on equal footing — indispensable for leveraged businesses and cross-border comparisons where P/E is polluted by financing and tax choices."
+    },
+    {
+     "h": "A multiple is an assumption, not a value",
+     "md": "The central insight: **a multiple is not a value — it is a compressed assumption about growth, risk, and quality.** A P/E of 30 is not \"expensive\" in the abstract; it is only expensive relative to the growth and durability that would justify paying it. The corollary trips up most people:\n\n- **High P/E can be cheap** — if durable growth is faster than the multiple implies.\n- **Low P/E can be expensive** — a *value trap*: cheap on this year's earnings precisely because those earnings are about to fall.\n\n**Worked example.** Two firms both look identical on one number:\n\n| Firm | P/E | Earnings growth |\n|---|---|---|\n| A | 12 | *shrinking* |\n| B | 30 | +25% / yr |\n\nWhich is \"cheaper\"? A rough bridge is the **PEG (price/earnings-to-growth = P/E / annual growth %)**. Firm B's PEG = 30 / 25 = **1.2**. Firm A can't produce a meaningful PEG at all — dividing by negative growth is nonsense, which is itself the warning. Firm B compounds its $1 of earnings toward ~$3 in five years; Firm A's shrinks. The 12x is the trap and the 30x is arguably the bargain. **PEG ≈ 1** is the crude anchor: the market is roughly paying for the growth it sees.\n\nAlways compare **like-for-like** — same industry, same accounting standard, same point in the cycle — and never anchor on one screamingly low or high number without asking *what the market is assuming.*"
+    },
+    {
+     "h": "Reading the P/E-vs-growth map",
+     "md": "Put the whole idea on one chart. Plot every company with **P/E on the vertical axis** and **earnings growth on the horizontal axis**. Draw the **PEG = 1 diagonal** — the line where P/E exactly equals the growth rate.\n\n- Points **below** the line: multiple *lower* than growth would justify → potentially underpriced.\n- Points **above** the line: multiple *higher* than growth supports → priced for perfection (or a value trap in disguise).\n\nTwo natural clusters appear. A **value cluster** sits low-left: low P/E, low or modest growth — cheap on the number, but you must rule out the value trap (is growth negative, is this a cyclical peak?). A **growth cluster** sits high-right: high P/E paid for high growth — reasonable *only if* the growth persists and the business is durable enough to defend it.\n\nThe diagonal reframes the whole exercise: you stop asking *\"is the multiple high or low?\"* and start asking *\"is the multiple high or low relative to what this business will actually do?\"* That is the entire discipline of multiples in one line — and it is why the same 20x can be a screaming buy on one company and a short on another.\n\nKeep the yield lens beside it: a point at 40x is a 2.5% earnings yield you're accepting *today* in exchange for growth you have to underwrite. The chart shows the price; your judgment of durability decides whether it's worth paying."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A stock trades at a P/E of 25. What is its earnings yield?",
+     "options": [
+      "25%",
+      "4%",
+      "2.5%",
+      "It cannot be computed from P/E alone"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That is the P/E itself, not its inverse — earnings yield is E/P, not P/E.",
+      "Correct: earnings yield = E/P = 1/(P/E) = 1/25 = 4%, the dollar of earnings per dollar of price.",
+      "That would be 1/40; you inverted a P/E of 40, not 25. Recompute 1/25.",
+      "It can — earnings yield is simply the reciprocal of P/E, so 1/25 = 4%."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "You are comparing two firms with very different debt loads and tax jurisdictions. Which multiple best neutralizes those differences?",
+     "options": [
+      "P/E",
+      "P/B",
+      "EV/EBITDA",
+      "P/S"
+     ],
+     "answer": 2,
+     "feedback": [
+      "P/E sits below interest and taxes, so both debt and tax differences distort it — the opposite of neutral.",
+      "P/B compares price to book equity; it says nothing about financing or tax structure across firms.",
+      "Correct: EV includes debt and EBITDA is pre-interest and pre-tax, so the pair compares firms on capital-structure-neutral footing.",
+      "P/S ignores debt and profitability entirely; it does not adjust for financing or taxes."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Firm A trades at P/E 12 with shrinking earnings; Firm B at P/E 30 growing 25%/yr. What is the best reading?",
+     "options": [
+      "A is cheaper because a lower P/E always means better value",
+      "B may be cheaper despite the higher P/E; A's low multiple can be a value trap",
+      "Both are equally valued since P/E is the only number that matters",
+      "B is overpriced because any P/E above 20 is expensive by definition"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A low P/E is not automatically cheap — this ignores that A's earnings are falling, the classic value trap.",
+      "Correct: the multiple encodes growth expectations; B's PEG≈1.2 is defensible while A's shrinking earnings make the 12x a likely trap.",
+      "P/E is not the only input — growth, durability, and risk are exactly what the multiple is assuming.",
+      "There is no absolute threshold; a 30x is cheap or dear only relative to the growth that justifies it."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Why is P/S (price-to-sales) often preferred over P/E for a fast-growing, not-yet-profitable company?",
+     "options": [
+      "Sales are almost always positive and less noisy than early-stage earnings, which may be negative",
+      "P/S accounts for the company's debt and cash better than P/E",
+      "A high P/S guarantees the company has strong profit margins",
+      "P/S measures book equity, which is more stable for young firms"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct: with earnings noisy or negative, revenue gives a stable, positive denominator that still scales the business.",
+      "That describes EV-based multiples; P/S uses equity price and ignores debt and cash.",
+      "P/S reveals nothing about margins — that is precisely its blind spot, not a strength.",
+      "P/S uses sales, not book equity; book equity is the denominator of P/B."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Aswath Damodaran — Price and Value: Multiples and Relative Valuation",
+     "type": "reading",
+     "url": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/multiples.html",
+     "note": "The definitive practitioner treatment of how each multiple is defined, when it applies, and the errors of cross-firm comparison."
+    },
+    {
+     "label": "Investopedia — Price-to-Earnings (P/E) Ratio",
+     "type": "article",
+     "url": "https://www.investopedia.com/terms/p/price-earningsratio.asp",
+     "note": "Clear reference on trailing vs forward P/E and the earnings-yield inverse for anchoring the other multiples."
+    }
+   ],
+   "anim": "fa_pe_growth"
+  },
+  {
+   "id": "intrinsic-value-dcf",
+   "title": "Intrinsic Value & Discounted Cash Flow",
+   "summary": "A business is worth the present value of the cash it will generate for its owners over its remaining life, and DCF makes that valuation explicit.",
+   "cards": [
+    {
+     "h": "What a business is actually worth",
+     "md": "Strip away the ticker and the day's price: a business is worth **the present value of all the cash it will hand to its owners over its remaining life**. Discounted cash flow (DCF) makes that claim operational. You do three things:\n\n1. **Project** the free cash flow (FCF) the business throws off each year — the cash left after it reinvests to keep running and grow. FCF, not accounting earnings, is what owners can actually take out.\n2. **Discount** each future year's FCF back to today at a required rate r, because a dollar arriving in year 5 is worth less than a dollar in hand now.\n3. **Sum** those present values, and add a **terminal value** that captures every year beyond your explicit forecast.\n\n## PV = Σ FCF_t / (1 + r)^t  +  terminal value\n\nHere PV is the intrinsic value, FCF_t is the free cash flow in year t, and r is the required return (the discount rate / cost of capital). The Greek Σ just means 'add up the discounted FCF across every forecast year t.' The terminal value is a single lump that stands in for the cash flows stretching out past the horizon you bothered to model.\n\nThe whole method is one disciplined sentence made arithmetic: value = future cash, pulled back to today, at a rate that reflects risk and time."
+    },
+    {
+     "h": "The discount rate is the hurdle",
+     "md": "This is the same machinery as NPV and IRR from the ETF module, aimed at a single company. Money later is worth less than money now, so future cash gets penalized — more, the further out and the riskier it is. The discount rate **r** is that penalty. It is your **required return**: the hurdle the investment must clear, built from the time value of money plus a premium for risk. For a whole firm it's the cost of capital.\n\nWork one line to feel it. Suppose the business will pay you **$110 of free cash flow one year from now**, and you require **r = 10%**:\n\n## PV = 110 / (1 + 0.10) = 100\n\nSo that $110 is worth exactly **$100 to you today**. If you'd only accept a 10% return, paying $100 now to get $110 in a year is the break-even — a fair deal, zero net present value. Pay less than $100 and the investment clears your hurdle; pay more and it doesn't.\n\nCrank r up and every future dollar shrinks: at r = 20%, that same $110 is worth only $91.67 today. The discount rate isn't a footnote — it's the lever that decides whether tomorrow's cash is worth much or little. Raise your required return and you are, by definition, willing to pay less for the same future cash flows."
+    },
+    {
+     "h": "Terminal value dominates — so it's assumptions, not precision",
+     "md": "Here's the uncomfortable truth about most DCFs: the **terminal value usually dominates the total**. The perpetuity of cash flows beyond your explicit 5- or 10-year forecast — the part you understand *least* — routinely accounts for 60–80% of the computed value. Which means the answer is driven mostly by two of your softest inputs: the **long-run growth rate** you assume forever, and the **discount rate** you apply to it.\n\nBecause terminal value ≈ FCF × (1+g) / (r − g), the denominator is a small difference between two big numbers. Nudge g from 2% to 3%, or r from 9% to 8%, and the valuation can swing 20–40%. Small assumption changes, enormous output changes.\n\nThat's why the discipline is **'garbage in, garbage out.'** A DCF is not a precision oracle that tells you a stock is worth $147.32. It is a structured way to **see your own assumptions** and their consequences laid out explicitly. The output is only ever as good as the growth, margin, and rate inputs you feed it.\n\nSo the professional habit isn't a single point estimate — it's **sensitivity analysis**. Run a grid of r and g, look at the *range* of values, and ask which inputs the answer actually hinges on. Distrust any DCF quoted to the penny; trust the one that shows you its range and its pressure points. Aim for being roughly right, not precisely wrong."
+    },
+    {
+     "h": "Reverse DCF: let the price confess",
+     "md": "Forecasting the future is hard and easy to fool yourself with. So flip the machine around. In a **reverse DCF** you take the market price as given and **solve for the growth rate the price already implies**. Instead of guessing inputs to produce a value, you back out the input the current value requires — then judge whether that input is believable.\n\nThe question stops being 'what will this company do?' and becomes the sharper 'what does the market *already assume* this company will do — and is that plausible?' If the price only makes sense when the firm compounds free cash flow at 25% a year for a decade, you can ask whether any company in its industry has ever sustained that. If the implied growth is a pedestrian 4%, the bar is low and the downside is likely priced in.\n\nThis reframing sidesteps the biggest DCF trap — anchoring on your own optimistic forecast — because it makes the *market's* embedded expectation the thing under scrutiny. It's often the single most useful way to use a DCF.\n\nThe animation shows the mechanics: future FCF bars, each discounted back and shrunk by time, stacked into one present-value column — the intrinsic value — set beside the market price. When the market bar towers over what defensible assumptions can build, the price is pricing in a future you have to actively believe in."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "In a DCF, what fundamentally determines the intrinsic value of a business?",
+     "options": [
+      "Its most recent reported accounting earnings, multiplied by a peer-group P/E ratio",
+      "The present value of the free cash flow it will generate for owners over its remaining life",
+      "The book value of its assets minus its liabilities on the current balance sheet",
+      "The average price other investors have paid for the stock over the past year"
+     ],
+     "answer": 1,
+     "feedback": [
+      "That's a relative/multiples valuation, not a DCF — and accounting earnings aren't the owner cash flow a DCF discounts.",
+      "Correct — value is future free cash flow, discounted to today at a required rate and summed, plus a terminal value.",
+      "That's book (net asset) value; a going concern is worth its future cash generation, not its balance-sheet residual.",
+      "That's the market price / trading history, which is exactly what intrinsic value is meant to be judged against."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A business will pay $110 of free cash flow one year from now. At a required return (discount rate) of 10%, what is that cash worth today?",
+     "options": [
+      "$121, because you add the 10% return on top of the $110",
+      "$110, because one year is too short for discounting to matter",
+      "$100, because $110 discounted one year at 10% is 110 / 1.10",
+      "$99, because you subtract 10% of $110 from the $110"
+     ],
+     "answer": 2,
+     "feedback": [
+      "That compounds forward instead of discounting back — discounting shrinks future cash, it doesn't grow it.",
+      "Discounting always matters; even one year at 10% cuts $110 down to $100 of present value.",
+      "Correct — PV = 110 / (1 + 0.10) = 100, the break-even price for a required 10% return.",
+      "Subtracting 10% ($11) gives $99, but discounting divides by 1.10 rather than subtracting a flat percentage."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why do practitioners treat a DCF as a tool for examining assumptions rather than a precise valuation oracle?",
+     "options": [
+      "Because the terminal value often dominates the total, so small changes in far-future growth and the discount rate swing the answer enormously",
+      "Because DCF ignores the time value of money and therefore can't produce a reliable number",
+      "Because free cash flow can only be measured accurately for companies that pay dividends",
+      "Because the discount rate has no effect on the result once you include a terminal value"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — terminal value typically drives most of the total, so tiny shifts in g and r produce large output swings: garbage in, garbage out.",
+      "The opposite — the time value of money is the core of DCF; every future cash flow is discounted for it.",
+      "FCF is estimated for any firm from its cash generation and reinvestment; it isn't limited to dividend payers.",
+      "The discount rate is one of the most powerful inputs — it heavily determines the terminal value itself."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "What does a REVERSE DCF do?",
+     "options": [
+      "It discounts cash flows using a negative rate to value distressed companies",
+      "It takes the current market price as given and solves for the growth rate the price implies, then asks if that's plausible",
+      "It runs the forecast backwards in time to value the company as of a prior year",
+      "It replaces free cash flow with reported earnings to simplify the projection"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A reverse DCF doesn't use negative rates; it inverts the question, solving for an input rather than the value.",
+      "Correct — you back out the market's embedded growth expectation from today's price, then judge whether that assumption is believable.",
+      "It isn't about historical restatement; it solves forward-looking implied inputs given today's price.",
+      "It still uses free cash flow — it changes what you solve for (growth), not the cash-flow definition."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Damodaran — Discounted Cashflow Valuation (Stern teaching notes)",
+     "type": "reading",
+     "url": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/valuation/dcfveg.htm",
+     "note": "Aswath Damodaran's canonical primer on DCF structure, inputs, and terminal value — the definitive free reference on the method."
+    },
+    {
+     "label": "Damodaran — 'DCF Myth 1: If you have a D and a CF, you have a DCF'",
+     "type": "article",
+     "url": "https://aswathdamodaran.blogspot.com/2016/03/dcf-myth-1-if-you-have-d-in-dcf-you-are.html",
+     "note": "Damodaran's Musings-on-Markets essay on how DCFs are misused — reinforces the assumptions-not-precision and sensitivity themes of this concept."
+    }
+   ],
+   "anim": "fa_dcf"
+  },
+  {
+   "id": "value-investing",
+   "title": "Value Investing — Buy Below What It's Worth",
+   "summary": "Value investing means buying a business for meaningfully less than a conservative estimate of its intrinsic value, and the size of that discount — the margin of safety — is your buffer against error, bad luck, and bad timing.",
+   "cards": [
+    {
+     "h": "The margin of safety is the whole idea",
+     "md": "Value investing is one sentence: **buy a business for meaningfully less than a conservative estimate of its intrinsic value.** Everything else is machinery in service of that.\n\nBenjamin Graham (author of *Security Analysis*, 1934, and *The Intelligent Investor*, 1949; Warren Buffett's teacher) gave the discount a name — the **margin of safety**. It is the gap between the price you pay and the value you conservatively believe you're getting. That gap is not greed; it is *insurance*.\n\nWarren Buffett's compression of the idea: **\"Price is what you pay; value is what you get.\"**\n\n## Worth ~$100, buy at $65.\n\nSuppose your valuation — deliberately conservative — pegs a business at about **$100/share**, and Mr. Market quotes **$65**. The **$35 gap is the margin of safety.** Its job is to absorb the three things that *will* go wrong:\n\n- **Estimation error** — your $100 was really $80. You still paid $65.\n- **Bad luck** — a recession, a lawsuit, a bad quarter dents the business.\n- **Bad timing** — you bought before the market agreed with you.\n\nThe wider the discount, the more of these you can survive and still not lose money. Graham's insistence on a *conservative* value estimate is deliberate: the margin protects you against your own optimism, not just the market's.\n\nNote what this is *not*: it is not buying whatever has fallen the most, and not buying the lowest price-to-earnings (P/E — price divided by earnings per share) on a screen. The discount must be to *durable* value. Hold that word — it returns in card 4."
+    },
+    {
+     "h": "Why cheap has won, on average: the value factor",
+     "md": "Buying cheap isn't just folklore — it has a measured, long-run edge, though a noisy one.\n\nEugene Fama and Kenneth French (1992–93) isolated it as **HML — \"High Minus Low.\"** Rank stocks by book-to-market (book value ÷ market value; high = cheap relative to accounting net worth). Go long the cheap decile, short the expensive decile. That long-run spread — the **value premium** — has historically been *positive*.\n\n## Cheap beats dear, on average.\n\nTwo camps explain *why*, and both are partly right:\n\n- **Risk-based (Fama–French):** cheap firms are cheap because they're genuinely riskier — distressed, cyclical, leveraged. The premium is *compensation* for bearing that risk. No free lunch, just paid discomfort.\n- **Behavioral (Lakonishok, Shleifer, Vishny):** the market **over-extrapolates** recent news. A few bad quarters get priced as if they'll last forever; the stock overshoots down, then **mean-reverts** as reality proves less dire. The premium is the market's over-reaction correcting.\n\nNow the honesty most sales decks omit: **the premium is noisy and endured a brutal drought.** Through much of the 2010s, cheap stocks badly lagged expensive growth names — long enough (a full decade-plus) that serious people asked if value was *dead*. It wasn't, but a real edge you can't reliably harvest inside your own holding period is a hard master. **Average is not every year.** A value strategy is a bet on mean-reversion you must be able to *sit through* — which is exactly why the margin of safety and a long horizon are non-negotiable partners to the factor."
+    },
+    {
+     "h": "Buffett's evolution: from cigar butts to quality",
+     "md": "The most instructive thing about value investing is that its most famous practitioner *changed his mind* about what it means.\n\n**Early Buffett — Graham's \"cigar butts.\"** A cigar butt is a discarded stub with one free puff left. In investing terms: a statistically dirt-cheap, often mediocre business — trading *below* its liquidation or net-asset value — bought purely because the numbers were absurdly low. You buy it, get the \"one free puff\" (a bounce, an asset sale, a wind-down), and move on. Unglamorous, but Graham showed it worked *as a diversified basket*, precisely because the margin of safety was enormous.\n\nThen **Charlie Munger** (Buffett's partner) pushed him toward a different insight:\n\n## \"A wonderful business at a fair price beats a fair business at a wonderful price.\"\n\nA cigar butt is a one-time gain — you can't hold it, because the business doesn't *compound*. A genuinely great business — durable competitive moat, high returns on capital, pricing power (See's Candies, Coca-Cola) — keeps growing its intrinsic value year after year. Even at a merely *fair* price, holding it lets the compounding do the work. This is **quality + value**, not cheapness alone.\n\nThe load-bearing correction for a sophisticated investor: **value is NOT synonymous with a low P/E or low price-to-book.** A statistically \"cheap\" multiple is a *starting question*, never an answer. A high-quality compounder at 20× earnings can be a far better value than a melting ice cube at 6× — because value is *price relative to durable worth*, and the durable worth of the compounder is growing while the cheap one's is shrinking."
+    },
+    {
+     "h": "The value trap: cheap for a reason",
+     "md": "This is the concept that separates disciplined value investors from bargain-bin tourists.\n\nA **value trap** is a stock that looks cheap on every screen — low P/E, low price-to-book, fat dividend yield — because it *deserves* to be. The business is **structurally declining**: its earnings are eroding and will keep eroding, so the low multiple isn't a mispricing to exploit — **it's the market pricing the decline correctly.**\n\n## A cheap price on a shrinking business is not a bargain.\n\nThe classic shapes:\n\n- **Failing mall retail** — foot traffic and margins bleed out year after year as commerce moves online. The stock is \"cheap\" at every step down, and cheaper still after.\n- **Buggy-whip makers** — the textbook case of a product the world is *leaving*. No multiple is low enough to fix a market that's disappearing.\n- **Melting-ice-cube** businesses generally — newspapers pre-digital, some legacy telecom — where each year's earnings are structurally lower than the last.\n\nHere is the trap sprung in one line: **a low multiple on a falling earnings stream produces a price that keeps falling.** The screener flags it as \"value\" at $65, then $50, then $35 — because the denominator (earnings) is collapsing faster than the price.\n\nThe defense is the definition itself: **a real margin of safety requires intrinsic value to be both *higher* than price AND *durable*.** Screening on cheapness alone — the single most common beginner error — systematically *harvests* traps, because the most statistically cheap names are disproportionately the ones the market has correctly written off. You must underwrite the *durability* of the value before the discount means anything.\n\n**The animation** makes the fork visible: buy at a margin *below a rising* intrinsic-value line and price mean-reverts *up* to meet it — versus a value trap whose \"cheap\" price keeps sliding *down* as the business decays and its true value falls with it."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "You conservatively value a business at ~$100/share and buy it at $65. What is the primary role of the resulting $35 margin of safety?",
+     "options": [
+      "It guarantees a $35 profit once the market corrects the mispricing",
+      "It is a buffer that absorbs estimation error, bad luck, and bad timing without you losing money",
+      "It signals that the stock has strong upward price momentum worth trading",
+      "It is the dividend yield you are entitled to collect while holding"
+     ],
+     "answer": 1,
+     "feedback": [
+      "No guarantee exists — your $100 estimate could be wrong. The margin's job is precisely that it might be, so it cushions error rather than promising a fixed payout.",
+      "Correct. The discount is insurance: it absorbs a too-high value estimate, a bad quarter or recession, and the market taking time to agree — letting you be wrong and still not lose money.",
+      "This confuses value with momentum. The margin of safety is a valuation cushion, not a price-trend signal; a widening discount often accompanies falling, not rising, price.",
+      "A margin of safety is the gap between price and intrinsic value, not a yield — dividends are a separate cash return and don't define the discount."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "In the Fama–French framework, the value premium is captured by HML ('High Minus Low'). Which statement is most accurate about that premium?",
+     "options": [
+      "It is a smooth, reliable annual return that cheap stocks beat expensive ones every year",
+      "It is a positive long-run average that is noisy and endured a brutal multi-year drought (notably the 2010s)",
+      "It proves markets are perfectly efficient, so no premium is actually harvestable",
+      "It exists only because cheap stocks pay higher dividends than expensive stocks"
+     ],
+     "answer": 1,
+     "feedback": [
+      "It is emphatically not smooth or every-year. HML is a long-run average with enormous year-to-year variance — treating it as a steady annuity is how investors abandon it at the worst time.",
+      "Correct. The premium is positive over the long run but noisy, and cheap stocks badly lagged for much of the 2010s — long enough that people asked if value was dead. Average is not every year.",
+      "The premium's existence is evidence of a persistent factor return, not perfect efficiency; risk-based and behavioral camps debate its source, but both accept it is real, not zero.",
+      "HML is defined on book-to-market, not dividend yield. The premium reflects valuation and mean-reversion/risk, not simply a higher payout from cheap names."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Charlie Munger nudged Buffett from Graham's 'cigar butts' toward 'a wonderful business at a fair price.' What is the core reason a wonderful business at a fair price can beat a fair business at a wonderful price?",
+     "options": [
+      "The wonderful business always trades at a lower P/E, so it is mathematically cheaper",
+      "A great business compounds its intrinsic value over time, so holding it lets that growth do the work — a cigar butt is a one-time puff",
+      "Fair prices are always safer than wonderful prices because volatility is lower",
+      "A wonderful business never falls in price, eliminating any need for a margin of safety"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The opposite is often true: a great compounder frequently trades at a HIGHER multiple. Value is price relative to durable worth, not simply the lowest P/E on the screen.",
+      "Correct. A cigar butt gives one free puff and can't be held because it doesn't compound; a high-return, moated business grows its intrinsic value year after year, so time works for you even at a fair price.",
+      "This misreads the lesson — it's about compounding of business value, not about price volatility. 'Fair' vs 'wonderful' here describes valuation, not risk smoothness.",
+      "No business is immune to price declines, and quality does not remove the need for a margin of safety — it changes what you're paying a fair price FOR."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A screen flags a mall-retail stock at a low P/E and a high dividend yield; its earnings have declined every year for a decade and are expected to keep falling. Why is buying purely on the cheap multiple dangerous here?",
+     "options": [
+      "The low multiple is likely a value trap — earnings keep eroding, so the price keeps falling and the 'cheapness' is the market pricing decline correctly",
+      "Low-P/E stocks always outperform, so this is a guaranteed bargain",
+      "A high dividend yield alone proves the intrinsic value is durable",
+      "Technical analysis, not fundamentals, is the only way to value such a stock"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct. A low multiple on a structurally declining earnings stream produces a price that keeps sliding — the value trap. A margin of safety requires intrinsic value to be higher than price AND durable; screening on cheapness alone harvests traps.",
+      "This is the exact error that catches traps. Cheap-on-a-screen is a starting question, not an answer; the most statistically cheap names are disproportionately businesses the market has correctly written off.",
+      "A fat yield on a shrinking business is often a warning, not proof of durability — the yield looks high precisely because the price has collapsed, and the dividend may be cut next.",
+      "Fundamental analysis is exactly what's needed: you must underwrite the durability of the earnings. The problem isn't the method, it's screening on cheapness without checking that value is durable."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "The Intelligent Investor — Benjamin Graham",
+     "type": "book",
+     "url": "https://www.google.com/books/edition/The_Intelligent_Investor_Rev_Ed/tz0DIzhL8dsC",
+     "note": "The origin of the margin-of-safety doctrine and Mr. Market; Chapter 20 ('Margin of Safety') is the single most important chapter in value investing."
+    },
+    {
+     "label": "Fama & French, 'The Cross-Section of Expected Stock Returns' (1992)",
+     "type": "paper",
+     "url": "https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x",
+     "note": "The paper that formalized the value factor (book-to-market / HML) as a systematic, priced source of return — the empirical backbone for 'cheap has won on average.'"
+    },
+    {
+     "label": "Aswath Damodaran — 'Value Investing' lecture notes (NYU Stern)",
+     "type": "docs",
+     "url": "https://pages.stern.nyu.edu/~adamodar/",
+     "note": "Damodaran dissects the different schools of value investing and, critically, the value-trap problem — how to tell a genuine bargain from a business in structural decline."
+    }
+   ],
+   "anim": "fa_margin_of_safety"
+  },
+  {
+   "id": "growth-investing",
+   "title": "Growth Investing — Pay Up for Compounding",
+   "summary": "Growth investing buys businesses that reinvest capital at high rates of return over a long runway, so intrinsic value compounds fast enough to justify — and outrun — a rich entry multiple.",
+   "cards": [
+    {
+     "h": "You're buying a compounding engine, not a cheap price",
+     "md": "Value investing hunts for a gap between price and a roughly *static* worth. Growth investing does something different: it buys a business whose **intrinsic value itself compounds** — and is willing to pay a rich price for the privilege.\n\nThe engine is not fast revenue. It is **reinvestment at a high rate of return**. A business that can take a dollar of retained earnings and turn it into 20 cents of new earnings, *year after year, across a long runway*, mints value the way a savings account at 20% would — except the runway can last a decade or more.\n\nBuffett's compression of the whole idea (1989 letter):\n\n> *\"Time is the friend of the wonderful business, the enemy of the mediocre.\"*\n\n## The reinvestment rate is the engine, not the revenue line.\n\nA mediocre business also grows revenue — by pouring capital into projects that earn *below* its cost of capital, destroying value as it expands. A wonderful business grows by redeploying capital *above* its cost of capital. Same growth on the top line, opposite effect on worth. Growth investing is the discipline of paying up **only** for the second kind, and only while the runway lasts."
+    },
+    {
+     "h": "The math: value grows at ROIC times reinvestment",
+     "md": "Intrinsic value compounds at roughly the **return on invested capital (ROIC)** multiplied by the **reinvestment rate** — the fraction of earnings plowed back into the business rather than paid out.\n\n## value growth ≈ ROIC × reinvestment rate\n\nA firm earning **20% ROIC** that reinvests **80%** of earnings compounds intrinsic value at ≈ 0.20 × 0.80 = **16%/year**. Reinvest more, or earn a higher ROIC, and the number climbs. This is why a high-quality grower can look expensive on today's earnings and still be cheap on the value it will *become*.\n\n**Worked contrast.** Two companies, each $1 earnings per share (EPS):\n\n- **Grower** — you pay **30× ($30)**. EPS compounds 20%/yr for 10 years → EPS = 1 × 1.20¹⁰ ≈ **$6.19**. Even if the multiple *compresses* to a mature 20×, value ≈ 6.19 × 20 = **$124** — about **4.1×** your $30, ~15%/yr.\n- **Stagnant** — you pay a cheap **10× ($10)**. EPS never grows. Ten years later it is still ~$10 in price; your return is roughly the earnings yield it pays out (~10%).\n\nYou paid **three times the multiple** for the grower and still ended with ~4× your capital versus roughly flat price. A few years of high-ROIC compounding **swamp the entry multiple**. That is the entire case for paying up — *provided the growth is real*."
+    },
+    {
+     "h": "When a high multiple is rational (and PEG's limits)",
+     "md": "A rich multiple is not automatically an overpayment. Paying up is **justified** when a business (1) earns returns **above its cost of capital**, and (2) can **redeploy large sums** at those returns for **many years**. Those three conditions — high ROIC, large reinvestment runway, and durability — are what a growth thesis must establish. Absent them, a high multiple really is just a high price.\n\n**The PEG ratio** is the common back-of-envelope check:\n\n## PEG = (P/E ratio) ÷ (earnings growth rate, in %)\n\nRule of thumb: **PEG near 1.0** is \"fairly priced for its growth\" — a 30× stock growing ~30% has PEG ≈ 1.0; the same 30× stock growing 10% has PEG ≈ 3.0 and is expensive *for what you get*.\n\nPEG is useful but **crude**, and a sophisticated investor should know exactly why:\n\n- It rewards a single year's growth **rate** while ignoring the **runway** — how *long* that growth can persist is what actually drives value.\n- It ignores the **quality** of growth: growth funded by high ROIC is worth far more than the same growth funded by dilution or debt.\n- It ignores **capital intensity** — two firms growing 20% are not equal if one reinvests 40% of earnings and the other 90%.\n\nUse PEG to *flag*, never to *decide*. The real question is always durability and ROIC, not a ratio."
+    },
+    {
+     "h": "The growth trap: the two ways you lose",
+     "md": "Growth investing has a specific, brutal failure mode. There are exactly **two ways it loses money**, and they often strike together.\n\n**1. Overpaying for growth that never materializes.** The thesis assumes a long runway of 20%+ compounding; reality delivers two years, then a stall. You paid 40× for a story that priced in a decade.\n\n**2. Multiple compression when growth decelerates.** This is the one that surprises people. Price = earnings × multiple, so *both* terms move. When a fast grower slows, the market re-rates its multiple **down**, and that can overwhelm rising earnings.\n\n> A stock at **40× earnings** whose growth decelerates and re-rates to **20×** loses **half its price** on the multiple alone. If EPS still rises 25% that year, price = 1.25 × (20/40) = **0.625 → down ~38%.** Earnings *grew* and the stock *fell 38%.*\n\n## Growth must be profitable AND durable — not merely fast.\n\nThe seductive trap is **unprofitable hyper-growth** funded by share dilution: revenue rockets, but ROIC is negative and every new dollar of \"growth\" is bought by issuing stock. That is not the compounding engine — it is a bonfire with a growth chart taped to it.\n\nThe animation contrasts the two: a high-ROIC business reinvesting into a **snowball** whose curve bends upward for years, versus a business that pays its earnings out — the two paths diverge dramatically over time. Buy the snowball; verify it is actually rolling."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "What is the true engine that makes a growth stock's intrinsic value compound?",
+     "options": [
+      "Fast revenue growth, regardless of the returns earned on the capital deployed",
+      "Reinvesting earnings at a high return on invested capital (ROIC) over a long runway",
+      "Buying in at a low entry price-to-earnings (P/E) multiple",
+      "Paying out most earnings as dividends to return cash to shareholders"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This is the core misconception: a mediocre business also grows revenue, by funding projects that earn below its cost of capital and thereby destroy value. Growth of the top line is not the engine.",
+      "Correct. Value compounds at roughly ROIC times the reinvestment rate; high returns on reinvested capital, sustained over a long runway, are what mint intrinsic value — the reinvestment engine, not revenue alone.",
+      "A low entry multiple is the value investor's lever, not the growth engine. Growth investing often pays a HIGH multiple precisely because compounding value will outrun it.",
+      "High payout is the opposite of the engine: paying earnings OUT means they are not reinvested, so value compounds slowly. The engine is plowing earnings back at a high ROIC."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A firm earns a 25% return on invested capital (ROIC) and reinvests 60% of its earnings. Approximately how fast should its intrinsic value compound?",
+     "options": [
+      "About 25% per year",
+      "About 15% per year",
+      "About 60% per year",
+      "About 40% per year"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This uses ROIC alone. Only 60% of earnings are reinvested, so the full 25% return applies to just that reinvested fraction — value growth ≈ ROIC × reinvestment rate, not ROIC by itself.",
+      "Correct. Value growth ≈ ROIC × reinvestment rate = 0.25 × 0.60 = 0.15, or about 15% per year. Both the return AND the fraction reinvested matter.",
+      "60% is the reinvestment rate, not the growth rate. The reinvested earnings must still be multiplied by the ROIC they earn to get value growth.",
+      "40% is ROIC plus the reinvestment rate (25 + 60 = 85, or some additive mix) — but the terms multiply, they do not add. The correct combination is 0.25 × 0.60 = 15%."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A stock trades at 40× earnings. Over one year its growth decelerates, the market re-rates the multiple down to 20×, and earnings per share (EPS) still rise 25%. What happens to the price?",
+     "options": [
+      "It rises about 25%, tracking the earnings growth",
+      "It stays roughly flat, since the earnings growth offsets the re-rating",
+      "It falls about 38%, because the multiple halving outweighs the earnings gain",
+      "It falls about 50%, the full amount of the multiple compression"
+     ],
+     "answer": 2,
+     "feedback": [
+      "This counts only the earnings and ignores the multiple. Price = earnings × multiple; when the multiple is cut in half, that term dominates a mere 25% earnings gain.",
+      "The offset is nowhere near complete. Earnings up 25% cannot cancel a multiple cut from 40× to 20× — the price factor is 1.25 × (20/40) = 0.625, well below flat.",
+      "Correct. Price factor = 1.25 × (20/40) = 0.625, so the price falls about 38%. Earnings grew and the stock still dropped sharply — this is multiple compression, the growth investor's classic ambush.",
+      "This ignores the 25% earnings growth. A pure 40×→20× halving would be −50%, but the rising EPS partly cushions it: 1.25 × 0.5 = 0.625, a ~38% decline, not 50%."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Under what condition is paying a high P/E multiple for a business most defensible?",
+     "options": [
+      "Whenever the PEG ratio is above 2, since a high PEG confirms premium quality",
+      "When the business earns returns above its cost of capital and can redeploy large sums at those returns for years",
+      "Never — a high multiple is by definition overpaying for a stock",
+      "Whenever recent revenue growth is fast, whether or not that growth is profitable"
+     ],
+     "answer": 1,
+     "feedback": [
+      "PEG works the other way: a PEG near 1.0 is 'fairly priced for growth' and a HIGH PEG (say 3.0) flags a stock that is EXPENSIVE for its growth. A high PEG is a warning, not a quality stamp.",
+      "Correct. A rich multiple is rational when the firm earns above its cost of capital AND has a long runway to reinvest large sums at those returns — high ROIC, durability, and reinvestment scale together justify paying up.",
+      "Too absolute. A high multiple can be cheap on the value the business will BECOME; the worked case showed a 30× grower returning ~4× while a 10× stagnant stock stayed flat. Quality plus runway can justify the price.",
+      "This is the growth trap. Fast revenue that is unprofitable — negative ROIC funded by dilution — destroys value as it grows. Growth must be profitable and durable, not merely fast, to justify a premium."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Berkshire Hathaway — 1989 Chairman's Letter (Warren Buffett)",
+     "type": "reading",
+     "url": "https://www.berkshirehathaway.com/letters/1989.html",
+     "note": "Primary source of 'time is the friend of the wonderful business, the enemy of the mediocre' and Buffett's pivot from cheap-and-mediocre to quality-compounders — the intellectual root of paying up for growth."
+    },
+    {
+     "label": "Aswath Damodaran — Valuation & Growth (NYU Stern)",
+     "type": "docs",
+     "url": "https://pages.stern.nyu.edu/~adamodar/",
+     "note": "The most rigorous freely-available resource on how ROIC, reinvestment rate, and runway translate into intrinsic value; lectures, spreadsheets, and data that operationalize the value-growth math."
+    },
+    {
+     "label": "Michael Mauboussin — Counterpoint Global Insights (Morgan Stanley)",
+     "type": "paper",
+     "url": "https://www.morganstanley.com/im/en-us/individual-investor/about-us/investment-teams/active-fundamental-equity/counterpoint-global-insights.html",
+     "note": "Mauboussin's research on ROIC, reinvestment, and the durability of high returns is the sharpest working treatment of why quality of growth — not just its rate — determines what a multiple is worth."
+    }
+   ],
+   "anim": "fa_compounding"
+  },
+  {
+   "id": "quality-and-moats",
+   "title": "Quality & Moats — Why Some Earnings Last",
+   "summary": "An economic moat is the durable competitive advantage that keeps ROIC above WACC for years instead of letting competition compete it away.",
+   "cards": [
+    {
+     "h": "What a moat is, and its five sources",
+     "md": "## a moat is what keeps returns from being competed away\n\nAn **economic moat** (Warren Buffett's term) is a *durable* competitive advantage that protects a business's returns from competition. It is not a product, a good quarter, or a hot end-market — those are transient. The moat is the structural reason a company can earn high returns **and keep earning them** while rivals fail to close the gap.\n\nMorningstar and Michael Mauboussin catalog five recurring sources:\n\n- **Network effects** — the product gets more valuable as more people use it (exchanges, payment rails, marketplaces). Each new user raises the switching cost for everyone else.\n- **Switching costs** — it is expensive, risky, or disruptive for a customer to leave (enterprise software embedded in workflows, medical devices tied to a hospital's training).\n- **Cost / scale advantages** — a structurally lower unit cost from scale, process, or a unique asset that rivals cannot replicate profitably.\n- **Intangible assets** — brand, patents, or regulatory licenses that grant pricing power or legally exclude competitors.\n- **Efficient scale** — a market just large enough to support one or a few players profitably; a new entrant would flood capacity and destroy everyone's returns (pipelines, some utilities).\n\nThe test for each: does it *persist through a full cycle*, or does it evaporate the moment a well-capitalized rival attacks? A moat is the answer to the question every quality thesis must survive — **why won't competition take these profits?**"
+    },
+    {
+     "h": "The metric: ROIC vs WACC",
+     "md": "## value is created only when ROIC > WACC\n\nMoats are qualitative stories; **ROIC vs WACC** is how you make them quantitative.\n\n- **ROIC — Return on Invested Capital** — after-tax operating profit (NOPAT) divided by the capital actually put to work in the business (debt + equity, net of excess cash). It answers: *for every dollar invested, how many cents of profit does the business generate?*\n- **WACC — Weighted Average Cost of Capital** — the blended required return of the firm's debt and equity holders, weighted by how much of each finances the business. It is the *hurdle*: the minimum return the business must clear to have been worth funding.\n\nThe rule is unforgiving:\n\n> **A business creates value only when ROIC exceeds WACC.** Grow a business that earns below its cost of capital and you *destroy* value faster — every incremental dollar invested returns less than it costs.\n\nA worked line: **ROIC 18% vs WACC 8% = a 10-point spread.** That 10-point wedge is the economic prize. The moat's entire job is to *defend the spread* — to keep the 18% from collapsing toward the 8% hurdle. Aswath Damodaran frames the excess, `ROIC − WACC`, as the single cleanest read on whether a company has a franchise or just a business. A wide, stable, positive spread across years is the numerical fingerprint of a real moat; a spread that flickers positive one year and negative the next is a business without one."
+    },
+    {
+     "h": "Economic gravity: why moats matter for valuation",
+     "md": "## without a moat, ROIC mean-reverts toward WACC\n\nHigh returns are a magnet. A business earning 18% on capital in an open market advertises that opportunity to every competitor and financier watching. Capital floods in, capacity expands, prices get competed down — and ROIC **decays toward WACC**. This is *economic gravity* (mean reversion of returns): excess returns get arbitraged away. Empirically, high-ROIC cohorts fade toward the cost of capital over time; the median firm's advantage does not last.\n\nA moat is *precisely the force that resists that reversion*. It is the reason ROIC can stay elevated for a decade instead of fading in three years.\n\nThis is why quality is a **valuation** question, not just a comfort. A discounted-cash-flow (DCF) model's **terminal value** — usually the majority of the estimate — assumes cash flows persist and grow long after the explicit forecast. That assumption is only credible if a moat defends the returns generating those cash flows. **No moat → returns fade → the terminal value and the growth thesis are fiction.** The durability of ROIC is the load-bearing input.\n\nThe animation makes this literal: a moat company's ROIC stays high for years while a no-moat company's ROIC bends back down toward the WACC line. When you buy a moat, you are buying *time above the hurdle* — and time above the hurdle is what a growth thesis is actually worth."
+    },
+    {
+     "h": "Quality bridges value and growth — plus the trap",
+     "md": "## a durable-ROIC business at a fair price satisfies both lenses\n\nThe old value-vs-growth fight dissolves once you center **quality**. A high-and-durably-high-ROIC business bought at a **fair price** satisfies the value lens (you did not overpay for the spread) *and* the growth lens (reinvestment at a high ROIC compounds intrinsic value). Quality is the bridge: durable excess returns are what make growth *create* value rather than consume it.\n\nPractical moat signals — the checklist:\n\n- **Stable or rising gross / operating margins across a full cycle** — pricing power that survives a downturn, not just a boom.\n- **Demonstrable pricing power** — the ability to raise prices without losing volume.\n- **High ROIC sustained for years** — one great year is noise; a decade above WACC is a franchise.\n- **Modest capital intensity for the returns earned** — high returns that don't demand ever-more capital to maintain compound better.\n\n**The trap:** a *temporarily* high ROIC without a moat. Cyclical peaks, a fad product, a supply shortage, or a one-off cost advantage can push ROIC far above WACC — right before economic gravity drags it back. Extrapolating that peak into a terminal value is the classic quality error. The discipline: never trust a high ROIC until you can *name the moat that defends it* and point to evidence it held through a full cycle. If you can't name the moat, assume the spread reverts."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "According to the ROIC/WACC framework, a company creates economic value only when:",
+     "options": [
+      "Revenue grows faster than its competitors' revenue",
+      "ROIC exceeds WACC",
+      "WACC exceeds ROIC",
+      "Earnings per share rise year over year"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Growth alone doesn't create value — growing a business that earns below its cost of capital destroys value faster.",
+      "Correct. Value is created only when return on invested capital clears the weighted-average cost of capital hurdle; the spread is the prize.",
+      "This is backwards — when WACC exceeds ROIC each invested dollar returns less than it costs, destroying value.",
+      "Rising EPS can come from buybacks or leverage while ROIC still sits below WACC; it isn't the value-creation test."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why does an economic moat matter specifically for a DCF valuation's terminal value?",
+     "options": [
+      "It lowers the discount rate applied to future cash flows",
+      "It guarantees the company will never face a recession",
+      "It resists mean reversion, making sustained high ROIC — and thus the terminal value — credible",
+      "It increases the explicit forecast horizon required by accounting rules"
+     ],
+     "answer": 2,
+     "feedback": [
+      "A moat affects the durability of returns, not the discount rate; WACC is set by the cost of debt and equity.",
+      "No business is recession-proof; a moat protects returns from competition, not from the cycle entirely.",
+      "Correct. Terminal value assumes cash flows persist; without a moat, ROIC fades toward WACC and that assumption — the bulk of the DCF — becomes fiction.",
+      "Terminal value is a modeling assumption about persistence, not an accounting-mandated forecast length."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A company posts an ROIC of 25% this year, far above its 8% WACC, but you cannot identify any of the five moat sources protecting it. What does the framework predict?",
+     "options": [
+      "The 25% ROIC is likely durable because the spread over WACC is so wide",
+      "Economic gravity will likely pull ROIC back down toward WACC as competition arrives",
+      "WACC will rise to meet the 25% ROIC",
+      "The company is guaranteed to be a value trap and should be shorted"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A wide spread with no moat is a magnet for competition, not evidence of durability — this is the classic trap.",
+      "Correct. Without a moat to defend the spread, high returns attract entrants and price competition, and ROIC mean-reverts toward the cost of capital.",
+      "WACC is set by financing costs, not by a firm's operating returns; it doesn't rise to chase ROIC.",
+      "Mean reversion is a probabilistic prediction about returns, not a guaranteed short thesis — many no-moat firms simply fade to average."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Which of the following is the strongest evidence of a genuine, durable moat rather than a temporary advantage?",
+     "options": [
+      "A single record-high ROIC in the most recent fiscal year",
+      "Stable-to-rising operating margins and high ROIC sustained across a full economic cycle",
+      "Rapid top-line revenue growth over the last two quarters",
+      "A low current share price relative to book value"
+     ],
+     "answer": 1,
+     "feedback": [
+      "One peak year is noise — often a cyclical or one-off spike right before returns revert; it is not durability.",
+      "Correct. Pricing power and high ROIC that hold through a full cycle are the fingerprint of a structural moat, not a transient tailwind.",
+      "Two quarters of fast growth says nothing about whether returns clear WACC or can be defended from competition.",
+      "A low price-to-book is a valuation signal, not evidence of durable competitive advantage; cheap and moatless is common."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Michael Mauboussin & Dan Callahan — Measuring the Moat",
+     "type": "paper",
+     "url": "https://www.morganstanley.com/im/publication/insights/articles/articles_measuringthemoat.pdf",
+     "note": "The definitive framework for assessing the sources and sustainability of competitive advantage, tying moats directly to ROIC and value creation."
+    },
+    {
+     "label": "Aswath Damodaran — Return on Invested Capital and Value Creation",
+     "type": "article",
+     "url": "https://aswathdamodaran.blogspot.com/2014/07/return-on-capital-roic-cost-of-capital.html",
+     "note": "Damodaran on why the ROIC minus WACC excess return is the cleanest read on whether a firm has a real franchise or just a business."
+    }
+   ],
+   "anim": "fa_moat"
+  },
+  {
+   "id": "value-vs-growth",
+   "title": "Value vs. Growth — The Eternal Debate",
+   "summary": "Value and growth are two lenses on one question — what do I get for the price — and neither wins permanently; the leadership cycles with regimes and interest rates.",
+   "cards": [
+    {
+     "h": "Two styles, one question",
+     "md": "**Value** and **growth** are investment *styles* — and, in factor terms, systematic *factors* — not opposing camps. Both are just answers to a single question: **what do I get for the price I pay?**\n\n- **Value** = buying a business for *less* than it is worth. The edge comes from a low price relative to fundamentals (earnings, book value, cash flow).\n- **Growth** = paying for *future* worth that compounds. The edge comes from earnings and revenue growing fast enough to justify — and eventually outrun — a high starting price.\n\nThe historical record credits **both** with long-run premiums, but earned in *different regimes*. Value's documented long-run edge is one of the most-studied results in finance (Fama & French, 1992), and it was strong through the 2000s. Growth then dominated the low-rate 2010s. Value staged a sharp comeback in **2022**.\n\nThe key mental model: a *great* business bought too expensively is a **bad investment**; a *mediocre* business bought cheaply enough can be a **good** one. Quality and price are separate axes — style is about which one you emphasize, not about which businesses are \"better.\""
+    },
+    {
+     "h": "The false dichotomy",
+     "md": "In practice the labels blur, and treating them as enemies is a mistake.\n\n- **GARP** — *growth at a reasonable price* — explicitly blends them: buy compounding businesses, but refuse to overpay.\n- **Quality-value** strategies do the same from the other side: cheap, but only if the business is durable.\n- Buffett's *\"a wonderful business at a fair price\"* is **both lenses at once** — quality (growth's concern) and price discipline (value's concern).\n\n**Index-label caveat (important):** a \"growth ETF\" or \"value ETF\" is a *mechanical screen*, not a judgment. A growth index typically sorts on high price-to-book (**P/B**), high sales growth, and price momentum; a value index sorts on *low* P/B and high dividend/earnings yield. These screens say nothing about whether the underlying business is actually good — they are ranking rules. A stock can sit in the \"value\" bucket simply because it is cheap for a *reason* (a value trap), or in \"growth\" because it is expensive on backward-looking book value.\n\n**Style dogma is a bet on a regime.** Pure deep-value or pure momentum-growth concentrates *regime risk* — you are implicitly wagering that the current environment persists. It rarely does for long."
+    },
+    {
+     "h": "Why rates drive the cycle",
+     "md": "Interest rates are a large part of *why* leadership rotates.\n\nA stock's value is the present value of its future cash flows, discounted back at a rate that rises with interest rates. **Growth stocks are long-*duration* assets** — most of their cash flows sit far in the future — so a higher discount rate hurts them *disproportionately*. Value stocks, whose cash flows are nearer-term (current earnings, dividends), are less rate-sensitive, more like short-duration bonds.\n\nThis mechanism explains much of the recent record:\n\n- **2010s (near-zero rates):** a low discount rate inflated the present value of distant cash flows → **long-duration growth soared**.\n- **2022 (rate spike):** the discount rate jumped, deflating those same distant cash flows → **growth fell hard, value outperformed**.\n\nSo \"the cycle\" is not mystical. It rides substantially on the macro rate regime, plus valuation starting points (how stretched the spread between cheap and expensive stocks already is) and the earnings cycle.\n\n**Takeaway:** Know which lens you are using — and *whichever* it is, **do not overpay**. Value discipline protects growth investors from duration risk; growth awareness protects value investors from buying dying businesses. The durable edge is price discipline, not a permanent style allegiance."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Why do growth stocks tend to fall more than value stocks when interest rates rise sharply?",
+     "options": [
+      "Growth companies always carry more debt, so higher rates raise their interest expense",
+      "Growth stocks are longer-duration — more of their value sits in distant future cash flows, which a higher discount rate deflates more",
+      "Value stocks are legally shielded from rate changes by their dividend policies",
+      "Rising rates directly reduce the reported earnings of growth companies"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Leverage varies firm by firm and isn't the systematic reason; the driver is cash-flow timing (duration), not debt loads.",
+      "Correct. Growth is long-duration: its cash flows are far out, so a higher discount rate cuts their present value more than value's nearer-term cash flows.",
+      "Dividends offer no legal shield from discount-rate changes; value's lower rate sensitivity comes from shorter cash-flow duration, not protection.",
+      "Rates change the discount rate applied to future cash flows, not the current reported earnings themselves — the effect is on valuation, not the income statement."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "What does the module say a 'growth ETF' label actually represents?",
+     "options": [
+      "A judgment that the underlying businesses are higher quality than value names",
+      "A mechanical screen (e.g., high price-to-book, high sales growth) that says nothing about business quality",
+      "A guarantee of higher long-run returns than a value ETF",
+      "A portfolio hand-picked by analysts for durable competitive advantage"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The module warns against exactly this — the label is a ranking rule, not a quality judgment about the businesses.",
+      "Correct. Index labels are mechanical screens (high P/B, high sales growth, momentum); they rank on ratios and imply nothing about business quality.",
+      "No style guarantees higher returns; the record shows leadership cycling between value and growth across regimes.",
+      "Index ETFs follow rule-based screens, not analyst-selected 'moat' judgments — that's the caveat the module flags."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Which statement best captures the module's core takeaway about value versus growth?",
+     "options": [
+      "Value is the empirically proven permanent winner, so investors should ignore growth",
+      "Growth won the 2010s, so the low-rate playbook is the one to keep following",
+      "Neither style wins permanently; the durable edge is knowing your lens and not overpaying",
+      "The two styles are entirely unrelated and should never be combined in one strategy"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Value has a documented long-run edge but not a permanent one — growth dominated the 2010s and leadership cycles.",
+      "That playbook depended on near-zero rates; 2022's rate spike reversed it, which is the whole point about regime risk.",
+      "Correct. Both earn premiums in different regimes; the durable discipline is emphasizing your chosen lens while refusing to overpay.",
+      "The module argues the opposite — GARP, quality-value, and Buffett's approach deliberately blend both lenses."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "GARP (growth at a reasonable price) is best described as:",
+     "options": [
+      "A pure deep-value strategy that ignores growth entirely",
+      "A blend that seeks compounding businesses while refusing to overpay for them",
+      "A momentum strategy that buys whatever has risen fastest regardless of price",
+      "A rule that only buys stocks in the mechanical growth-index bucket"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Deep value ignores the growth lens; GARP explicitly incorporates it, so this is the opposite of GARP.",
+      "Correct. GARP blends both lenses — pay for growth/compounding, but with value's price discipline so you don't overpay.",
+      "Price-blind momentum is closer to the 'momentum-growth' dogma GARP is designed to avoid.",
+      "GARP is a valuation-aware philosophy, not a mechanical index-membership rule."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Fama & French (1992), 'The Cross-Section of Expected Stock Returns'",
+     "type": "paper",
+     "url": "https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x",
+     "note": "The foundational academic evidence documenting the value (book-to-market) premium in the cross-section of returns."
+    },
+    {
+     "label": "AQR — 'Is (Systematic) Value Investing Dead?'",
+     "type": "paper",
+     "url": "https://www.aqr.com/Insights/Perspectives/Is-Systematic-Value-Investing-Dead",
+     "note": "Rigorous, honest treatment of value's 2010s drawdown, valuation spreads, and why the premium cycles rather than dying — pairs directly with the rate-regime argument."
+    }
+   ],
+   "anim": "fa_value_vs_growth"
+  },
+  {
+   "id": "fundamentals-for-etfs",
+   "title": "Fundamental Analysis for ETFs: The Business Behind the Fund",
+   "summary": "You cannot DCF a 500-stock index, but you can read its aggregate fundamentals — index P/E, earnings yield, CAPE — to set return expectations and pick a value, growth, or quality tilt.",
+   "cards": [
+    {
+     "h": "Fundamentals scale up",
+     "md": "## You don't value 500 companies — you read one aggregate\n\nEverything the earlier concepts taught about a single business still applies to a fund — it just gets summed. You cannot run a **discounted cash flow (DCF)** — projecting a company's future cash and discounting it to today's value — on all 500 names in the S&P 500. You don't need to. The index publishes its **aggregate fundamentals**, and they scale up cleanly:\n\n- **Index P/E (price-to-earnings)** — total market value of the holdings divided by their total earnings. SPY's trailing P/E sits in the low-to-mid 20s in normal regimes.\n- **Earnings yield** — the inverse, earnings ÷ price. A P/E of 25 is a 4% earnings yield: the earnings the index throws off per dollar you pay.\n- **Dividend yield** — cash paid out per dollar of price. SPY runs ~1.3%; a dividend-value fund like VYM runs ~2.7%.\n- **Aggregate ROE (return on equity) and earnings growth** — how profitably the whole basket compounds shareholder capital.\n\nEvery fund fact sheet and provider page lists these. You are doing fundamental analysis — the same P/E, yield, and profitability lens from single-stock work — just on a portfolio-weighted average instead of one company. The diversification of the wrapper changes *what the numbers mean* (one blowup barely moves the average), but not *how you read them*."
+    },
+    {
+     "h": "The valuation compass",
+     "md": "## Cheap versus what? Stocks against bonds, and against their own history\n\nAggregate fundamentals become useful when you compare them to something. Two comparisons form a rough **valuation compass** — a tool for setting *expectations*, never for calling next year.\n\n**Stocks vs. bonds — the equity risk premium.** Take the market's **earnings yield** and subtract the **10-year U.S. Treasury yield**. The gap is a crude equity risk premium: what stocks pay you for their extra risk. When the S&P earnings yield is 4.2% and the 10-year is 4.4%, that premium is *negative* — equities look richly priced relative to bonds. When the earnings yield towered over bond yields (2009–2020), stocks were cheap on this measure.\n\n**Stocks vs. their own past — the CAPE.** The **CAPE**, or **cyclically-adjusted P/E** (also called the **Shiller P/E**), divides price by the *10-year average of inflation-adjusted earnings*. Smoothing a decade of earnings strips out the boom-and-bust distortion that wrecks a one-year P/E — a recession crushes trailing earnings and makes the market look *expensive* exactly when it is cheap. Shiller's series runs back to 1871; its long-run average is ~17, and it has spent recent years in the low 30s.\n\n**Read it as expectations, not a timer.** The durable finding: *high starting valuations predict lower average forward returns over 10+ years.* They say almost nothing about the next twelve months — markets stay expensive for years. Use the compass to calibrate what to expect, not to jump in and out."
+    },
+    {
+     "h": "Value vs. growth ETFs: FA in a box",
+     "md": "## The screen is the strategy — and the sector tilt is the side effect\n\nValue and growth ETFs are fundamental analysis packaged into a rules engine. You are outsourcing the screen you would otherwise run by hand.\n\n**Value funds** (VTV, IWD) mechanically select stocks with **low P/B (price-to-book — price vs. accounting net worth)**, low P/E, and high dividend yield. **Growth funds** (VUG, IWF) select the opposite: high earnings- and sales-**growth** rates, richer multiples. Same fundamental ratios from the single-stock concepts, now automated across a whole universe and rebalanced on a schedule.\n\n**The tilts arrive with baggage — sector concentration.** Because cheap, high-book, dividend-paying names cluster in certain industries, value funds skew toward **financials, energy, and industrials**. Because fast growers cluster elsewhere, growth funds skew toward **technology and consumer discretionary**. You think you bought a *style*; you also bought a *sector bet*. Check the sector weights before assuming a value fund is diversified — a 2010s value fund heavy in banks and energy behaved very differently from the tech-led index.\n\n**Factor ETFs** generalize this. A **quality** fund (QUAL) screens for high ROE, stable earnings, and low debt; a **value** factor fund systematizes cheapness. These are the single-stock fundamental signals — profitability, cheapness, growth — turned into a transparent, low-cost, rules-based portfolio. The manager's judgment is replaced by a published methodology you can read."
+    },
+    {
+     "h": "The playbook",
+     "md": "## Read the aggregate, then pick your lens\n\nPull the two ideas together. The **diversification payoff** is what makes fund-level FA forgiving. Buying the whole distribution **averages away single-name fundamental risk**: the value trap that vaporizes one stock — the cheap bank that was cheap because it was insolvent — barely dents a value index of hundreds. The cost is symmetric and worth stating honestly: you give up the one monster single-name winner, but you escape the one catastrophic single-name loss. For a **capital-preservation investor, that trade is the whole point** — you are paying away the right tail to cut off the left tail.\n\n**The workflow, start to finish:**\n\n1. **Set expectations with the compass.** Glance at the broad-market earnings yield vs. the 10-year Treasury, and at where the CAPE sits versus its own history. Rich? Temper your forward-return assumptions and your position sizing. Cheap? The odds tilt your way over a decade. Do not treat either as a buy/sell trigger.\n\n2. **Choose a tilt to taste.** Want cheapness and income → value (VTV, VYM). Want the compounders → growth (VUG). Want profitability without the deepest sector bets → quality (QUAL). Read the fund's *methodology and sector weights*, not just its label.\n\n3. **Let the wrapper do the risk work.** The index averages away the idiosyncratic blowups you would have had to underwrite one company at a time.\n\nYou never DCF 500 companies. You read the aggregate fundamentals, respect what the compass implies about expectations, and pick the lens that fits your objective."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "An S&P 500 ETF trades at a trailing P/E of 25. What is its approximate aggregate earnings yield, and what does that number represent?",
+     "options": [
+      "25% — the annual price appreciation the index is expected to deliver",
+      "4% — the index's earnings per dollar of price (earnings ÷ price)",
+      "2.5% — the dividend the index pays per dollar invested",
+      "0.4% — the fund's expense ratio expressed as a yield"
+     ],
+     "answer": 1,
+     "feedback": [
+      "P/E is not an expected return, and 25% is far too high for a mature index. Earnings yield is simply the inverse of P/E: 1/25.",
+      "Correct. Earnings yield is the inverse of P/E: 1 ÷ 25 = 4%. It is the earnings the index generates per dollar of price, and it's the value you compare against the 10-year Treasury yield.",
+      "That describes dividend yield (payout), not earnings yield. Earnings yield is total earnings ÷ price — the inverse of the P/E, here 1/25 = 4%.",
+      "Expense ratio is a fund cost, unrelated to P/E. Earnings yield is the inverse of the P/E ratio: 1 ÷ 25 = 4%."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why does the CAPE (cyclically-adjusted P/E, or Shiller P/E) use a 10-year inflation-adjusted average of earnings instead of the most recent year's earnings?",
+     "options": [
+      "Because 10-year-old earnings are more reliable than recent ones",
+      "To smooth out the business cycle so a recession's crushed earnings don't make the market look artificially expensive",
+      "Because Robert Shiller could only obtain earnings data in 10-year blocks",
+      "To adjust the index for the 10-year Treasury yield used as the discount rate"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Older earnings aren't inherently more reliable. The point is smoothing across a full cycle, not preferring stale data.",
+      "Correct. A one-year P/E spikes when a recession temporarily crushes earnings, falsely signaling 'expensive' right when stocks are cheap. Averaging a decade of inflation-adjusted earnings smooths that cyclical distortion.",
+      "Shiller's data runs continuously back to 1871, not in blocks. The 10-year window is a deliberate smoothing choice, not a data limitation.",
+      "The CAPE does not embed the Treasury yield; that is the separate stocks-vs-bonds comparison. The 10-year window smooths the earnings cycle."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "An investor buys a value ETF (VTV) expecting broad diversification. What often-overlooked exposure comes bundled with the value screen?",
+     "options": [
+      "A concentrated sector tilt — value funds skew toward financials, energy, and industrials",
+      "A tilt toward technology and consumer discretionary stocks",
+      "Higher expense ratios than an equivalent growth fund",
+      "Exposure to long-dated Treasury bonds within the equity sleeve"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct. Cheap, high-book, dividend-paying stocks cluster in financials, energy, and industrials, so a value screen mechanically produces a sector bet. You bought a style and a sector concentration together — check the weights.",
+      "That's the growth tilt (VUG, IWF), the opposite side. Value screens skew toward financials, energy, and industrials.",
+      "Value and growth index ETFs typically carry similar low expense ratios; cost is not the bundled exposure. The hidden exposure is sector concentration.",
+      "A value equity ETF holds stocks, not Treasuries. The overlooked exposure is its skew toward financials, energy, and industrials."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "How should a capital-preservation-minded investor best use the valuation compass (earnings yield vs. the 10-year Treasury, and the CAPE)?",
+     "options": [
+      "As a precise market-timing trigger: sell when CAPE is high, buy when it's low",
+      "To pick individual stocks within the index that are undervalued",
+      "To set long-run return expectations and position sizing, knowing high valuations predict lower forward returns but say little about next year",
+      "To forecast the exact level of the S&P 500 twelve months out"
+     ],
+     "answer": 2,
+     "feedback": [
+      "The compass is a poor timer — markets stay expensive for years. Treating it as a buy/sell trigger repeatedly whipsaws you out of long uptrends.",
+      "The compass reads the aggregate index, not single names; it doesn't help pick individual stocks. Its job is calibrating broad expectations.",
+      "Correct. High starting valuations reliably predict lower average returns over 10+ years but are nearly useless for the next twelve months. Use them to temper expectations and sizing, not to time entries.",
+      "No valuation measure forecasts a precise 12-month index level. The compass informs long-run expectations, not short-term point forecasts."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Robert Shiller — Online Data (CAPE / Shiller P/E)",
+     "type": "docs",
+     "url": "http://www.econ.yale.edu/~shiller/data.htm",
+     "note": "The original CAPE dataset back to 1871 — download the spreadsheet and see the cyclically-adjusted P/E and long-run average yourself."
+    },
+    {
+     "label": "Investor.gov — Index Funds & ETF Basics (SEC)",
+     "type": "docs",
+     "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-1",
+     "note": "The SEC's plain-language primer on how index and exchange-traded funds work — the neutral reference for what you're actually buying."
+    },
+    {
+     "label": "Morningstar — ETF & Fund Research",
+     "type": "article",
+     "url": "https://www.morningstar.com/etfs",
+     "note": "Where to read a fund's aggregate P/E, P/B, yield, and sector weights before you assume a style label means diversification."
+    }
+   ],
+   "anim": "fa_etf_lens"
+  }
+ ]
+}

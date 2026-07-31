@@ -5080,6 +5080,249 @@ ANIMS._ta_debug={whipsawTrades:TRADES.length,whipsawEq:EQ[EQ.length-1],
   ddBH:maxdd(BH.eq),ddNai:maxdd(NAI.eq),ddDisc:maxdd(DIS.eq),
   bhEnd:BH.eq[BH.eq.length-1],naiEnd:NAI.eq[NAI.eq.length-1],discEnd:DIS.eq[DIS.eq.length-1]};
 })();
+
+/* ================= Fundamental Analysis module (2026-07-31, fa_*) =================
+   Nine deterministic canvas lessons, one per concept. Seeded PRNG where noise is
+   used, so every viewer sees the same picture and the narration matches the pixels.
+   Append-only block; self-contained helpers. Canvas is 900x380. */
+(function(){
+const W=900,H=380;
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function scaler(arrs,x0,x1,y0,y1){
+  const flat=arrs.flat().filter(v=>v!=null);
+  let lo=Math.min(...flat),hi=Math.max(...flat); if(hi===lo)hi=lo+1;
+  const n=Math.max(...arrs.map(a=>a.length));
+  return{X:i=>x0+(x1-x0)*i/(n-1),Y:v=>y1-(v-lo)/(hi-lo)*(y1-y0),lo,hi,x0,x1,y0,y1};
+}
+function frame(ctx,title){
+  clear(ctx,{width:W,height:H});
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(56,20);ctx.lineTo(56,330);ctx.lineTo(876,330);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";ctx.textAlign="left";ctx.fillText(title,60,36);
+}
+function line(ctx,S,arr,color,frac,w){
+  ctx.strokeStyle=color;ctx.lineWidth=w||2;ctx.beginPath();let started=false;
+  const upTo=Math.max(2,Math.floor(arr.length*(frac==null?1:frac)));
+  for(let i=0;i<upTo;i++){const v=arr[i];if(v==null)continue;const x=S.X(i),y=S.Y(v);started?ctx.lineTo(x,y):(ctx.moveTo(x,y),started=true);}
+  ctx.stroke();
+}
+function label(ctx,x,y,text,color,align){
+  ctx.fillStyle=color;ctx.font="12.5px 'IBM Plex Mono'";
+  const tw=((ctx.measureText(text)||{}).width)||text.length*7.2;
+  let ax=align||"left", xx=x;
+  if(ax==="left" && x+tw>894){ ax="right"; }        // auto-flip if it would clip the canvas
+  ctx.textAlign=ax; ctx.fillText(text,xx,y);
+}
+function dashed(ctx,x0,y0,x1,y1,color){ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle=color;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();ctx.restore();}
+
+/* ---- 1. fa_price_vs_value: price swings around slowly-rising intrinsic value ---- */
+const PV_V=Array.from({length:220},(_,i)=>100*Math.pow(1.0009,i));
+const PV_P=(()=>{const r=rng(7);return PV_V.map((v,i)=>v*(1+0.17*Math.sin(i/17)+0.05*Math.sin(i/5)+0.03*(r()-0.5)));})();
+ANIMS.fa_price_vs_value=async(cv,ctx)=>{
+  const S=scaler([PV_V,PV_P],56,876,40,320);
+  const base=(kp)=>{ frame(ctx,"price swings — value compounds quietly underneath");
+    // shade the buy-zone dots (price well below value)
+    if(kp)for(let i=0;i<Math.floor(PV_P.length*kp);i++){ if(PV_P[i]<PV_V[i]*0.90){ ctx.fillStyle="rgba(95,191,149,.9)";ctx.beginPath();ctx.arc(S.X(i),S.Y(PV_P[i]),2.6,0,7);ctx.fill(); } }
+    line(ctx,S,PV_V,F.ok,1,2.6); };
+  frame(ctx,"price swings — value compounds quietly underneath");
+  await narrate("A share is a slice of a real business. Its intrinsic value — what the business is worth from its earnings and cash — compounds quietly, the smooth green line.");
+  await tween(1500,k=>{frame(ctx,"price swings — value compounds quietly underneath");line(ctx,S,PV_V,F.ok,k,2.6);});
+  await narrate("Price is a different thing: what the market will quote you today. It swings around value on mood and news — Benjamin Graham's manic Mr. Market.");
+  await tween(1700,k=>{base(0);line(ctx,S,PV_P,F.post,k,1.8);});
+  label(ctx,S.X(200)+6,S.Y(PV_V[200])-4,"intrinsic value",F.ok);
+  await narrate("Where price falls well below value — the green dots — you can buy a dollar of business for seventy cents. The gap is your margin of safety. Fundamental analysis is the work of estimating that green line.");
+  await tween(1500,k=>{base(k);line(ctx,S,PV_P,F.post,1,1.8);label(ctx,S.X(200)+6,S.Y(PV_V[200])-4,"intrinsic value",F.ok);});
+};
+ANIMS.fa_price_vs_value_static=(cv,ctx)=>{const S=scaler([PV_V,PV_P],56,876,40,320);frame(ctx,"price vs. intrinsic value");for(let i=0;i<PV_P.length;i++)if(PV_P[i]<PV_V[i]*0.90){ctx.fillStyle="rgba(95,191,149,.9)";ctx.beginPath();ctx.arc(S.X(i),S.Y(PV_P[i]),2.6,0,7);ctx.fill();}line(ctx,S,PV_V,F.ok,1,2.6);line(ctx,S,PV_P,F.post,1,1.8);};
+
+/* ---- 2. fa_cash_engine: revenue -> free cash flow waterfall ---- */
+const CE=[["Revenue",1000,"tot"],["− Operating costs",-700,"neg"],["Operating income",300,"tot"],["− Cash taxes",-60,"neg"],["+ Depreciation",80,"pos"],["− Capex",-150,"neg"],["− Working capital",-30,"neg"],["Free cash flow",140,"fcf"]];
+ANIMS.fa_cash_engine=async(cv,ctx)=>{
+  const maxv=1000, y0=70,y1=300, bx=90, bw=82, gap=17;
+  const Yv=v=>y1-(v/maxv)*(y1-y0);
+  const draw=(upTo)=>{ frame(ctx,"from revenue to free cash flow — the money that's actually yours");
+    let run=0;
+    for(let i=0;i<CE.length && i<upTo;i++){const [name,val,kind]=CE[i];const x=bx+i*(bw+gap);
+      let top,bot,col;
+      if(kind==="tot"||kind==="fcf"){ top=Yv(kind==="fcf"?val:(name==="Revenue"?val:run)); bot=Yv(0); col=kind==="fcf"?F.ok:"#5A6E8C"; if(name!=="Revenue")run=val; else run=val; }
+      else { const start=run; run+=val; top=Yv(Math.max(start,run)); bot=Yv(Math.min(start,run)); col=val<0?F.wrong:F.post; }
+      ctx.fillStyle=col; ctx.globalAlpha=.9; ctx.fillRect(x,Math.min(top,bot),bw,Math.abs(bot-top)+1); ctx.globalAlpha=1;
+      ctx.fillStyle=F.txt;ctx.font="11px 'IBM Plex Mono'";ctx.textAlign="center";
+      ctx.fillText(name,x+bw/2,315); ctx.fillText((val>0?"":"")+val,x+bw/2,Math.min(top,bot)-5);
+    }
+  };
+  frame(ctx,"from revenue to free cash flow — the money that's actually yours");
+  await narrate("Start at the top line: revenue, one thousand. Every dollar a company reports as sales.");
+  await tween(500,()=>draw(1));
+  await narrate("Strip operating costs and cash taxes — that leaves operating cash. But accounting profit is an opinion; cash is a fact.");
+  await tween(900,()=>draw(4));
+  await narrate("Add back depreciation, a non-cash charge. Then subtract the two things that actually consume cash: capital expenditure and working capital.");
+  await tween(1100,()=>draw(7));
+  await narrate("What survives is free cash flow — one hundred forty, barely half of the earnings you'd have quoted. THIS is the cash the owners can pull out or reinvest. It is the number fundamental analysis cares about.");
+  await tween(700,()=>draw(8));
+};
+ANIMS.fa_cash_engine_static=(cv,ctx)=>{const maxv=1000,y0=70,y1=300,bx=90,bw=82,gap=17;const Yv=v=>y1-(v/maxv)*(y1-y0);frame(ctx,"revenue → free cash flow");let run=0;for(let i=0;i<CE.length;i++){const[name,val,kind]=CE[i];const x=bx+i*(bw+gap);let top,bot,col;if(kind==="tot"||kind==="fcf"){top=Yv(kind==="fcf"?val:val);bot=Yv(0);col=kind==="fcf"?F.ok:"#5A6E8C";run=val;}else{const s=run;run+=val;top=Yv(Math.max(s,run));bot=Yv(Math.min(s,run));col=val<0?F.wrong:F.post;}ctx.fillStyle=col;ctx.globalAlpha=.9;ctx.fillRect(x,Math.min(top,bot),bw,Math.abs(bot-top)+1);ctx.globalAlpha=1;ctx.fillStyle=F.txt;ctx.font="11px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText(name,x+bw/2,315);}};
+
+/* ---- 3. fa_pe_growth: P/E vs growth scatter, PEG=1 line, value & growth clusters ---- */
+const PG=[ // {g: earnings growth %, pe, kind, tag}
+ {g:3,pe:10,k:"v"},{g:5,pe:12,k:"v"},{g:4,pe:9,k:"v"},{g:6,pe:14,k:"v"},{g:2,pe:8,k:"v"},
+ {g:20,pe:30,k:"g"},{g:24,pe:38,k:"g"},{g:18,pe:28,k:"g"},{g:27,pe:40,k:"g"},{g:22,pe:34,k:"g"},
+ {g:-2,pe:7,k:"trap",tag:"value trap: cheap, shrinking"},{g:12,pe:44,k:"over",tag:"priced for perfection"}];
+ANIMS.fa_pe_growth=async(cv,ctx)=>{
+  const x0=90,x1=850,y0=50,y1=300, gmin=-5,gmax=30, pmin=0,pmax=48;
+  const X=g=>x0+(g-gmin)/(gmax-gmin)*(x1-x0), Y=p=>y1-(p-pmin)/(pmax-pmin)*(y1-y0);
+  const axes=()=>{ frame(ctx,"the P/E–growth map: a multiple is a bet on growth");
+    ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText("earnings growth →",x1-70,322);
+    ctx.save();ctx.translate(70,y0+90);ctx.rotate(-Math.PI/2);ctx.fillText("P/E ratio →",0,0);ctx.restore(); };
+  axes();
+  await narrate("Every dot is a company. Across: how fast its earnings grow. Up: its price-to-earnings multiple — the dollars you pay per dollar of earnings.");
+  await sleep(200);
+  // PEG=1 line: pe = g (for g>0)
+  await tween(900,k=>{axes();dashed(ctx,X(0),Y(0),X(0+ (30)*k),Y((30)*k),"#8FA1B8");label(ctx,X(26),Y(30)-2,"PEG = 1",F.ax);});
+  await narrate("The dashed line is PEG equal to one: P/E matching the growth rate — a rough fair-price rule of thumb. Below it, you're paying less than the growth; above it, more.");
+  const plot=(kk)=>{ axes();dashed(ctx,X(0),Y(0),X(30),Y(30),"#8FA1B8");label(ctx,X(26),Y(30)-2,"PEG = 1",F.ax);
+    for(let i=0;i<Math.floor(PG.length*kk);i++){const d=PG[i];const col=d.k==="v"?F.ok:d.k==="g"?F.post:F.wrong;
+      ctx.fillStyle=col;ctx.beginPath();ctx.arc(X(d.g),Y(d.pe),6,0,7);ctx.fill();
+      if(d.tag){ctx.fillStyle=col;ctx.font="11.5px 'IBM Plex Mono'";ctx.textAlign="left";label(ctx,X(d.g)+9,Y(d.pe)+4,d.tag,col);} } };
+  await tween(1400,k=>plot(k));
+  await narrate("A value cluster sits low-left: cheap multiples, slow growth. A growth cluster sits high-right: rich multiples the market will only pay for real compounding. And two warnings — a stock cheap because it's shrinking, and one priced for perfection well above its growth. The multiple isn't the value; it's the assumption.");
+};
+ANIMS.fa_pe_growth_static=(cv,ctx)=>{const x0=90,x1=850,y0=50,y1=300,gmin=-5,gmax=30,pmax=48;const X=g=>x0+(g-gmin)/(gmax-gmin)*(x1-x0),Y=p=>y1-(p)/(pmax)*(y1-y0);frame(ctx,"P/E vs. growth — value & growth clusters");dashed(ctx,X(0),Y(0),X(30),Y(30),"#8FA1B8");for(const d of PG){const col=d.k==="v"?F.ok:d.k==="g"?F.post:F.wrong;ctx.fillStyle=col;ctx.beginPath();ctx.arc(X(d.g),Y(d.pe),6,0,7);ctx.fill();}};
+
+/* ---- 4. fa_dcf: future FCF discounted back to a present-value stack ---- */
+const DC_FCF=[100,110,121,133,146,161], DC_r=0.10;
+const DC_PV=DC_FCF.map((f,i)=>f/Math.pow(1+DC_r,i+1));
+const DC_TV=(DC_FCF[5]*1.03/(DC_r-0.03))/Math.pow(1+DC_r,6);   // terminal value, discounted
+ANIMS.fa_dcf=async(cv,ctx)=>{
+  const y0=90,y1=300, maxv=Math.max(...DC_FCF,DC_TV*0.6), Yv=v=>y1-(v/maxv)*(y1-y0);
+  const fx=i=>470+i*62, bw=40;
+  const intrinsic=DC_PV.reduce((s,v)=>s+v,0)+DC_TV;
+  frame(ctx,"a business is worth its future cash — discounted to today");
+  ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText("future free cash flow (yrs 1–6)",620,325);
+  await narrate("A business is worth the cash it will hand its owners over its life. Here are six years of projected free cash flow, growing.");
+  await tween(900,k=>{frame(ctx,"a business is worth its future cash — discounted to today");ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText("future free cash flow (yrs 1–6)",620,325);for(let i=0;i<DC_FCF.length;i++){const h=(DC_FCF[i]/maxv)*(y1-y0)*k;ctx.fillStyle=F.post;ctx.globalAlpha=.55;ctx.fillRect(fx(i)-bw/2,y1-h,bw,h);ctx.globalAlpha=1;}});
+  await narrate("But a dollar in year six is worth less than a dollar today — you'd discount it at your required return, here ten percent. Watch each year shrink to its present value and slide home.");
+  const drawAll=(kk)=>{ frame(ctx,"a business is worth its future cash — discounted to today");
+    ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText("future free cash flow (yrs 1–6)",620,325);ctx.fillText("intrinsic value",180,325);
+    // future bars (faded)
+    for(let i=0;i<DC_FCF.length;i++){const h=(DC_FCF[i]/maxv)*(y1-y0);ctx.fillStyle=F.post;ctx.globalAlpha=.25;ctx.fillRect(fx(i)-bw/2,y1-h,bw,h);ctx.globalAlpha=1;}
+    // stacked present values on the left, building up
+    let stack=0; const sx=180;
+    const upTo=Math.floor((DC_PV.length+1)*kk);
+    for(let i=0;i<DC_PV.length && i<upTo;i++){const h=(DC_PV[i]/maxv)*(y1-y0);ctx.fillStyle=F.ok;ctx.globalAlpha=.85;ctx.fillRect(sx-30,y1-stack-h,60,h);ctx.globalAlpha=1;stack+=h;}
+    if(upTo>DC_PV.length){const h=(DC_TV/maxv)*(y1-y0);ctx.fillStyle="#C77F14";ctx.globalAlpha=.8;ctx.fillRect(sx-30,y1-stack-h,60,h);ctx.globalAlpha=1;stack+=h;label(ctx,sx+36,y1-stack+10,"terminal value",F.post);} };
+  await tween(2000,k=>drawAll(k));
+  await narrate("Sum the present values, add a terminal value for everything beyond year six — and that stack is intrinsic value. Notice the terminal value dominates: your assumptions about the far future and the discount rate drive the answer. Discounted cash flow is a tool to SEE your assumptions, not a precise oracle.");
+};
+ANIMS.fa_dcf_static=(cv,ctx)=>{const y0=90,y1=300,maxv=Math.max(...DC_FCF,DC_TV*0.6),fx=i=>470+i*62,bw=40;frame(ctx,"DCF: future cash discounted to intrinsic value");for(let i=0;i<DC_FCF.length;i++){const h=(DC_FCF[i]/maxv)*(y1-y0);ctx.fillStyle=F.post;ctx.globalAlpha=.3;ctx.fillRect(fx(i)-bw/2,y1-h,bw,h);ctx.globalAlpha=1;}let stack=0;for(let i=0;i<DC_PV.length;i++){const h=(DC_PV[i]/maxv)*(y1-y0);ctx.fillStyle=F.ok;ctx.fillRect(150,y1-stack-h,60,h);stack+=h;}const th=(DC_TV/maxv)*(y1-y0);ctx.fillStyle="#C77F14";ctx.fillRect(150,y1-stack-th,60,th);};
+
+/* ---- 5. fa_margin_of_safety: buy below value + mean-revert; vs a value trap ---- */
+const MS_V=Array.from({length:200},(_,i)=>100*Math.pow(1.0011,i));
+const MS_P=MS_V.map((v,i)=> i<70 ? v*(0.68+0.001*i) : v*Math.min(1,0.74+ (i-70)*0.0037) );  // bought cheap, reverts up to value
+const TR_V=Array.from({length:200},(_,i)=>110*Math.pow(0.9945,i));  // intrinsic value DECAYS (dying business)
+const TR_P=TR_V.map(v=>v*0.82);  // price cheap vs its own (falling) value — and keeps falling
+ANIMS.fa_margin_of_safety=async(cv,ctx)=>{
+  const S=scaler([MS_V,MS_P,TR_V],56,876,40,315);
+  frame(ctx,"margin of safety — and the trap that mimics it");
+  await narrate("Value investing in one picture. The green line is a healthy business's intrinsic value, rising. You buy the orange price low — a wide gap below value.");
+  await tween(1300,k=>{frame(ctx,"margin of safety — and the trap that mimics it");line(ctx,S,MS_V,F.ok,k,2.4);});
+  await tween(1200,k=>{frame(ctx,"margin of safety — and the trap that mimics it");line(ctx,S,MS_V,F.ok,1,2.4);line(ctx,S,MS_P,F.post,k,2);});
+  // shade the margin at the buy point
+  const bi=8; ctx.strokeStyle="rgba(95,191,149,.8)";ctx.lineWidth=1.4;dashed(ctx,S.X(bi),S.Y(MS_P[bi]),S.X(bi),S.Y(MS_V[bi]),F.ok);
+  label(ctx,S.X(12),(S.Y(MS_P[bi])+S.Y(MS_V[bi]))/2,"margin of safety",F.ok);
+  await narrate("That gap is the margin of safety — room to be wrong and still not lose. When the market recognizes the value, price mean-reverts UP to the line. Buy a dollar for seventy cents, collect the thirty.");
+  await sleep(300);
+  await narrate("But cheap alone is a trap. This red business is ALSO cheap versus its price — except its intrinsic value is DECAYING, a structurally dying company. The multiple was low for a reason; the price just follows value down. A margin of safety needs value that's higher AND durable.");
+  await tween(1500,k=>{frame(ctx,"margin of safety — and the trap that mimics it");line(ctx,S,MS_V,F.ok,1,2.4);line(ctx,S,MS_P,F.post,1,2);dashed(ctx,S.X(bi),S.Y(MS_P[bi]),S.X(bi),S.Y(MS_V[bi]),F.ok);label(ctx,S.X(12),(S.Y(MS_P[bi])+S.Y(MS_V[bi]))/2,"margin of safety",F.ok);line(ctx,S,TR_V,F.wrong,k,2.2);label(ctx,S.X(150)+6,S.Y(TR_V[150])-6,"value trap: cheap & decaying",F.wrong);});
+};
+ANIMS.fa_margin_of_safety_static=(cv,ctx)=>{const S=scaler([MS_V,MS_P,TR_V],56,876,40,315);frame(ctx,"margin of safety vs. the value trap");line(ctx,S,MS_V,F.ok,1,2.4);line(ctx,S,MS_P,F.post,1,2);line(ctx,S,TR_V,F.wrong,1,2.2);};
+
+/* ---- 6. fa_compounding: reinvestment snowball vs payout ---- */
+const CO_C=[100],CO_P=[100]; for(let i=1;i<=22;i++){CO_C.push(CO_C[i-1]*1.18); CO_P.push(CO_P[i-1]*1.03);}
+ANIMS.fa_compounding=async(cv,ctx)=>{
+  const S=scaler([CO_C,CO_P],90,860,40,310);
+  frame(ctx,"growth is reinvestment: ROIC × the runway");
+  await narrate("Two businesses, same starting value. The grey one pays its earnings out — it inches along at three percent.");
+  await tween(1300,k=>{frame(ctx,"growth is reinvestment: ROIC × the runway");line(ctx,S,CO_P,"#5A6E8C",k,2);});
+  label(ctx,S.X(21)+6,S.Y(CO_P[21])+4,"pays earnings out",F.ax);
+  await narrate("The orange one earns eighteen percent on capital and REINVESTS it — return on invested capital times the reinvestment rate. That's the engine of intrinsic value, and it compounds.");
+  await tween(1900,k=>{frame(ctx,"growth is reinvestment: ROIC × the runway");line(ctx,S,CO_P,"#5A6E8C",1,2);label(ctx,S.X(21)+6,S.Y(CO_P[21])+4,"pays earnings out",F.ax);line(ctx,S,CO_C,F.post,k,2.8);});
+  label(ctx,S.X(20)+6,S.Y(CO_C[20])-8,"reinvests at 18% ROIC",F.post);
+  await narrate("Over two decades the compounder is worth many times the payer. THIS is what growth investors pay up for: a high return reinvested over a long runway. Time is the friend of the wonderful business. The risk — next concept — is overpaying, or the growth failing to show.");
+};
+ANIMS.fa_compounding_static=(cv,ctx)=>{const S=scaler([CO_C,CO_P],90,860,40,310);frame(ctx,"the reinvestment snowball vs. paying out");line(ctx,S,CO_P,"#5A6E8C",1,2);line(ctx,S,CO_C,F.post,1,2.8);};
+
+/* ---- 7. fa_moat: ROIC persistence vs mean-reversion to WACC ---- */
+const MO_W=8;
+const MO_MOAT=Array.from({length:180},(_,i)=>18-2*(1-Math.exp(-i/120)));         // stays high ~16-18
+const MO_NO=Array.from({length:180},(_,i)=>MO_W+(18-MO_W)*Math.exp(-i/40));       // decays to WACC
+ANIMS.fa_moat=async(cv,ctx)=>{
+  const S=scaler([[0],[24],MO_MOAT,MO_NO,[MO_W]],56,876,40,315);
+  const wy=S.Y(MO_W);
+  const base=()=>{ frame(ctx,"the moat is why high returns last");
+    ctx.save();ctx.setLineDash([6,4]);ctx.strokeStyle=F.ax;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(56,wy);ctx.lineTo(876,wy);ctx.stroke();ctx.restore();
+    label(ctx,860,wy-6,"cost of capital (WACC) 8%",F.ax,"right"); };
+  base();
+  await narrate("The dashed line is the cost of capital — the return investors require, eight percent. A business only creates value when its return ON invested capital sits ABOVE it.");
+  await sleep(300);
+  await narrate("Both companies start earning eighteen percent. But high returns attract competition. Without a defense, that excess is competed away — return on invested capital mean-reverts down to the cost of capital. Economic gravity.");
+  await tween(1700,k=>{base();line(ctx,S,MO_NO,F.wrong,k,2.4);});
+  label(ctx,S.X(120)+6,S.Y(MO_NO[120])-6,"no moat: reverts to WACC",F.wrong);
+  await narrate("A moat — network effects, switching costs, scale, brand — is what RESISTS the gravity. The green company defends its eighteen percent for years. That durable spread above the cost of capital is the whole game, and it's what makes a growth forecast or a DCF terminal value trustworthy.");
+  await tween(1700,k=>{base();line(ctx,S,MO_NO,F.wrong,1,2.4);label(ctx,S.X(120)+6,S.Y(MO_NO[120])-6,"no moat: reverts to WACC",F.wrong);line(ctx,S,MO_MOAT,F.ok,k,2.8);});
+  label(ctx,S.X(120)+6,S.Y(MO_MOAT[120])-8,"wide moat: ROIC persists",F.ok);
+};
+ANIMS.fa_moat_static=(cv,ctx)=>{const S=scaler([[0],[24],MO_MOAT,MO_NO,[MO_W]],56,876,40,315);const wy=S.Y(MO_W);frame(ctx,"ROIC persistence: moat vs. mean-reversion");ctx.save();ctx.setLineDash([6,4]);ctx.strokeStyle=F.ax;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(56,wy);ctx.lineTo(876,wy);ctx.stroke();ctx.restore();line(ctx,S,MO_NO,F.wrong,1,2.4);line(ctx,S,MO_MOAT,F.ok,1,2.8);};
+
+/* ---- 8. fa_value_vs_growth: two equity curves + regime shading ---- */
+const VG=(()=>{ // ~30 years, monthly-ish (n=132); regimes flip who leads
+  const n=132, val=[100], gro=[100];
+  for(let i=1;i<n;i++){ const t=i/n;
+    const growLeads = (t>0.30&&t<0.66)||(t>0.86);   // 2010s + late; value leads early + ~2022
+    const vg=growLeads? 0.004 : 0.011, gg=growLeads? 0.013 : 0.003;
+    val.push(val[i-1]*(1+vg)); gro.push(gro[i-1]*(1+gg));
+  } return {val,gro,n}; })();
+ANIMS.fa_value_vs_growth=async(cv,ctx)=>{
+  const S=scaler([VG.val,VG.gro],56,876,40,315);
+  const shade=()=>{ frame(ctx,"value vs. growth: no permanent winner, only regimes");
+    const bands=[[0.30,0.66,"growth leads"],[0.86,1.0,"growth"]];
+    for(const [a,b] of bands){ ctx.fillStyle="rgba(232,161,60,.09)";ctx.fillRect(S.X((VG.n-1)*a),20,S.X((VG.n-1)*b)-S.X((VG.n-1)*a),300); } };
+  shade();
+  await narrate("Thirty years, two disciplines. Value: buy cheap relative to worth. Growth: pay for compounding. Watch who leads.");
+  await tween(1700,k=>{shade();line(ctx,S,VG.val,F.ok,k,2.4);line(ctx,S,VG.gro,F.post,k,2.4);});
+  label(ctx,S.X(VG.n-1)+6,S.Y(VG.val[VG.n-1])+4,"value",F.ok);
+  label(ctx,S.X(VG.n-1)+6,S.Y(VG.gro[VG.n-1])+4,"growth",F.post);
+  await narrate("Value leads for long stretches, then growth runs away through the low-rate decade — the shaded bands — then value snaps back. Neither wins forever. And notice the mechanism: growth's cash is far in the future, so it's long-duration — cheap money lifts it, rising rates crush it.");
+  await sleep(200);
+  await narrate("They aren't enemies. Both answer one question — what do you get for the price? A great business bought too dear is a bad investment; a poor one bought cheap enough can be good. Know your lens, and don't overpay in either.");
+};
+ANIMS.fa_value_vs_growth_static=(cv,ctx)=>{const S=scaler([VG.val,VG.gro],56,876,40,315);frame(ctx,"value vs. growth across regimes");for(const[a,b]of[[0.30,0.66],[0.86,1.0]]){ctx.fillStyle="rgba(232,161,60,.09)";ctx.fillRect(S.X((VG.n-1)*a),20,S.X((VG.n-1)*b)-S.X((VG.n-1)*a),300);}line(ctx,S,VG.val,F.ok,1,2.4);line(ctx,S,VG.gro,F.post,1,2.4);};
+
+/* ---- 9. fa_etf_lens: market earnings yield vs 10y bond yield (the compass) ---- */
+const EL=(()=>{ const n=150, ey=[], by=[]; const r=rng(3);
+  for(let i=0;i<n;i++){ const t=i/n;
+    by.push(Math.max(1.2, 5.2 - 4.0*t + 1.6*Math.sin(t*7) + 0.15*(r()-0.5)));      // bond yield falls then rises
+    ey.push(Math.max(3.2, 6.4 - 1.4*t + 1.1*Math.sin(t*5+1) + 0.15*(r()-0.5)));    // earnings yield
+  } return {ey,by,n}; })();
+ANIMS.fa_etf_lens=async(cv,ctx)=>{
+  const S=scaler([EL.ey,EL.by,[0]],56,876,40,315);
+  frame(ctx,"the ETF compass: stock earnings yield vs. the bond yield");
+  await narrate("You can't run a DCF on five hundred companies. But you can read the whole index's fundamentals. Here's the market's earnings yield — aggregate earnings divided by price.");
+  await tween(1400,k=>{frame(ctx,"the ETF compass: stock earnings yield vs. the bond yield");line(ctx,S,EL.ey,F.post,k,2.6);});
+  label(ctx,S.X(EL.n-1)+6,S.Y(EL.ey[EL.n-1])+4,"stock earnings yield",F.post);
+  await narrate("Against it, the ten-year Treasury yield — what bonds pay for no equity risk.");
+  await tween(1400,k=>{frame(ctx,"the ETF compass: stock earnings yield vs. the bond yield");line(ctx,S,EL.ey,F.post,1,2.6);label(ctx,S.X(EL.n-1)+6,S.Y(EL.ey[EL.n-1])+4,"stock earnings yield",F.post);line(ctx,S,EL.by,F.ax,k,2.4);});
+  label(ctx,S.X(EL.n-1)+6,S.Y(EL.by[EL.n-1])+4,"10-yr bond yield",F.ax);
+  // shade the gap = equity risk premium
+  ctx.fillStyle="rgba(95,191,149,.10)"; ctx.beginPath();
+  for(let i=0;i<EL.n;i++)ctx.lineTo(S.X(i),S.Y(EL.ey[i])); for(let i=EL.n-1;i>=0;i--)ctx.lineTo(S.X(i),S.Y(EL.by[i])); ctx.fill();
+  await narrate("The gap between them is the equity risk premium — roughly, how much extra stocks pay for their risk. Wide gap, stocks look cheap versus bonds; narrow or negative, expensive. It's a compass for EXPECTATIONS, not a market-timing signal. Value and growth ETFs then let you tilt: cheap fundamentals, or fast ones — fundamental analysis, bought by the basket.");
+};
+ANIMS.fa_etf_lens_static=(cv,ctx)=>{const S=scaler([EL.ey,EL.by,[0]],56,876,40,315);frame(ctx,"ETF compass: earnings yield vs. bond yield");ctx.fillStyle="rgba(95,191,149,.10)";ctx.beginPath();for(let i=0;i<EL.n;i++)ctx.lineTo(S.X(i),S.Y(EL.ey[i]));for(let i=EL.n-1;i>=0;i--)ctx.lineTo(S.X(i),S.Y(EL.by[i]));ctx.fill();line(ctx,S,EL.ey,F.post,1,2.6);line(ctx,S,EL.by,F.ax,1,2.4);};
+
+ANIMS._fa_debug={dcfIntrinsic:DC_PV.reduce((s,v)=>s+v,0)+DC_TV, compounderEnd:CO_C[CO_C.length-1], moatEnd:MO_MOAT[MO_MOAT.length-1], noMoatEnd:MO_NO[MO_NO.length-1]};
+})();
+
 </script>
 </body>
 </html>
