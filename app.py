@@ -64,7 +64,8 @@ def register(c: Creds):
         db.create_user(c.username, c.password)
     except ValueError as e:
         raise HTTPException(400, str(e))
-    return {"token": db.authenticate(c.username, c.password)}
+    token = db.authenticate(c.username, c.password)
+    return {"token": token, "role": (db.user_for_token(token) or {}).get("role", "learner")}
 
 
 @app.post("/api/login")
@@ -72,7 +73,7 @@ def login(c: Creds):
     token = db.authenticate(c.username, c.password)
     if not token:
         raise HTTPException(401, "Username and password don't match.")
-    return {"token": token}
+    return {"token": token, "role": (db.user_for_token(token) or {}).get("role", "learner")}
 
 
 @app.post("/api/logout")
@@ -528,6 +529,69 @@ def help_me(tid: str, cid: str, body: Stuck,
     # graceful fallback: re-serve the authored summary as the hint
     return {"source": "authored",
             "text": "Re-read the cards with this in mind: " + c["summary"]}
+
+
+# ---------- P5.20 (iss_e8b3bfb8): author role — backend ----------
+# Authoring is a ROLE (users.role = 'author'; grant via `db.py grant-author`).
+# Uploads land in topics_staged/ ONLY — never the live topics/ dir; promotion
+# to live remains the operator's deploy step (predeploy gate + restart), so a
+# bad draft can never break the serving app. Validation reuses validate_pack.
+
+STAGED_DIR = os.path.join(os.path.dirname(__file__), "topics_staged")
+
+
+def require_author(authorization: str | None):
+    user = require_user(authorization)
+    if user.get("role") != "author":
+        raise HTTPException(403, "Authoring requires the author role "
+                                 "(grant: db.py grant-author <username>).")
+    return user
+
+
+def _validate_pack_dict(pack: dict) -> list[str]:
+    """Run validate_pack.check on an in-memory pack; returns the error list.
+    (validate_pack collects into a module-global — reset around each run.)"""
+    import validate_pack as vp
+    vp.errs = []
+    try:
+        vp.check(pack)
+    except Exception as e:  # a malformed draft must report, not 500
+        vp.errs.append(f"validator crashed on this draft: {type(e).__name__}: {e}")
+    return list(vp.errs)
+
+
+class PackDraft(BaseModel):
+    pack: dict
+
+
+@app.post("/api/author/pack/validate")
+def author_validate(body: PackDraft,
+                    authorization: str | None = Header(default=None)):
+    require_author(authorization)
+    errors = _validate_pack_dict(body.pack)
+    return {"ok": not errors, "errors": errors,
+            "concepts": len(body.pack.get("concepts", []) or [])}
+
+
+@app.post("/api/author/pack/upload")
+def author_upload(body: PackDraft,
+                  authorization: str | None = Header(default=None)):
+    user = require_author(authorization)
+    errors = _validate_pack_dict(body.pack)
+    if errors:
+        return {"ok": False, "staged": None, "errors": errors}
+    pid = body.pack["id"]                      # slug-validated by the checker
+    os.makedirs(STAGED_DIR, exist_ok=True)
+    path = os.path.join(STAGED_DIR, f"{pid}.json")
+    with open(path, "w") as f:
+        json.dump(body.pack, f, indent=1)
+    live = pid in load_topics()
+    return {"ok": True, "staged": f"topics_staged/{pid}.json", "errors": [],
+            "overwrites_live": live,
+            "note": ("Draft staged. Promotion to live topics/ is the deploy "
+                     "step (predeploy gate + restart) — staged packs never "
+                     "serve directly."),
+            "by": user["username"]}
 
 
 # ---------- P3.11 (iss_b98c7ee2): AI-generated supplementary practice ----------

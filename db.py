@@ -118,6 +118,12 @@ def init():
             c.execute("ALTER TABLE concept_state ADD COLUMN relearn INTEGER NOT NULL DEFAULT 0")
         except sqlite3.OperationalError:
             pass          # column already there
+    # P5.20 (iss_e8b3bfb8) additive migration — author-vs-learner roles.
+    with conn() as c:
+        try:
+            c.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'learner'")
+        except sqlite3.OperationalError:
+            pass
     # P2.7 (iss_d13d1882) additive migration — FSRS memory state. Legacy rows
     # keep NULL stability; the first FSRS review migrates them (interval_d →
     # stability, exact at the 0.90 retention target).
@@ -172,11 +178,21 @@ def user_for_token(token: str):
         return None
     with conn() as c:
         row = c.execute(
-            """SELECT u.id, u.username FROM sessions s JOIN users u ON u.id = s.user_id
+            """SELECT u.id, u.username, u.role FROM sessions s JOIN users u ON u.id = s.user_id
                WHERE s.token = ? AND s.expires_at > ?""",
             (token, time.time()),
         ).fetchone()
         return dict(row) if row else None
+
+
+def set_role(username: str, role: str) -> bool:
+    """P5.20: grant/revoke authoring. Roles: 'learner' (default) | 'author'."""
+    if role not in ("learner", "author"):
+        raise ValueError("role must be 'learner' or 'author'")
+    with conn() as c:
+        cur = c.execute("UPDATE users SET role = ? WHERE username = ?",
+                        (role, username.strip().lower()))
+        return cur.rowcount == 1
 
 
 def logout(token: str):
@@ -260,3 +276,16 @@ def has_answers(user_id: int, topic_id: str) -> bool:
             "SELECT 1 FROM answers WHERE user_id=? AND topic_id=? LIMIT 1",
             (user_id, topic_id),
         ).fetchone() is not None
+
+
+if __name__ == "__main__":
+    # P5.20 role CLI:  .venv/bin/python db.py grant-author <username>
+    #                  .venv/bin/python db.py revoke-author <username>
+    import sys
+    if len(sys.argv) == 3 and sys.argv[1] in ("grant-author", "revoke-author"):
+        init()
+        role = "author" if sys.argv[1] == "grant-author" else "learner"
+        ok = set_role(sys.argv[2], role)
+        print(f"{sys.argv[2]} → {role}" if ok else f"no such user: {sys.argv[2]}")
+        sys.exit(0 if ok else 1)
+    print(__doc__ or "usage: db.py grant-author|revoke-author <username>")
