@@ -511,6 +511,7 @@ function renderCard(tid){
     <div class="kicker">Concept · ${esc(C.title)} — chunk ${cardIx+1} of ${C.cards.length}</div>
     <h2>${esc(card.h)}</h2>
     <button class="btn ghost" id="cardplay" style="font-size:.82em;padding:3px 10px;margin:0 0 8px" title="Listen to this chunk">🔊 Listen</button>
+    <span id="audiodbg" class="mono" style="font-size:11px;color:var(--dim);margin-left:8px"></span>
     <div class="card-body">${md(card.md)}</div>
     ${last && C.anim ? animHTML() : ""}
     <div class="pager">
@@ -557,23 +558,31 @@ function cardPlainText(card){
    silently blocks BOTH paths → dead silence. The manifest is preloaded in renderCard
    so it's already in hand here; if it somehow isn't, we narrate now (still in-gesture)
    and warm it for next time. */
+let _playN=0;
 function playCard(tid){
   const btn=$("#cardplay");
-  if((_cardAudio && !_cardAudio.paused) || speechSynthesis.speaking){ stopCardAudio(); return; }  // toggle off
+  const dbg=(m)=>{ const d=$("#audiodbg"); if(d) d.textContent=m; try{console.log("[audio]",m);}catch(_){}};
+  const n=++_playN;
+  if((_cardAudio && !_cardAudio.paused) || speechSynthesis.speaking){ dbg("toggle-off (call#"+n+")"); stopCardAudio(); return; }
   const speak=()=>{
-    if(!("speechSynthesis" in window)){ if(btn) btn.textContent="🔇 No voice"; return; }
+    if(!("speechSynthesis" in window)){ dbg("no speechSynthesis"); if(btn) btn.textContent="🔇 No voice"; return; }
     speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(cardPlainText(C.cards[cardIx])); u.rate=1.02;
-    u.onend=u.onerror=()=>{ if(btn) btn.textContent="🔊 Listen"; };
-    if(btn) btn.textContent="⏸ Pause"; speechSynthesis.speak(u);
+    u.onstart=()=>dbg("speech playing");
+    u.onend=u.onerror=(ev)=>{ dbg("speech "+(ev&&ev.type||"done")); if(btn) btn.textContent="🔊 Listen"; };
+    if(btn) btn.textContent="⏸ Pause"; dbg("→ speech fallback"); speechSynthesis.speak(u);
   };
   const url = _audioManifest ? audioUrlForCard(tid, cardIx) : null;   // read synchronously — no await
+  dbg(url ? ("call#"+n+" ♪ "+url.split("/").pop()) : "call#"+n+" no url"+(_audioManifest?"":" (manifest not loaded)"));
   if(url){
     _cardAudio=new Audio(url);
-    _cardAudio.onended=()=>{ _cardAudio=null; if(btn) btn.textContent="🔊 Listen"; };
-    _cardAudio.onerror=()=>{ _cardAudio=null; speak(); };            // 404/decode → narrate instead
+    _cardAudio.preload="auto";
+    _cardAudio.addEventListener("loadedmetadata", ()=>dbg("meta dur="+(_cardAudio?_cardAudio.duration.toFixed(1):"?")+"s"));
+    _cardAudio.addEventListener("playing", ()=>dbg("playing ✓"));
+    _cardAudio.onended=()=>{ dbg("ended @"+(_cardAudio?_cardAudio.currentTime.toFixed(1):"?")+"s"); _cardAudio=null; if(btn) btn.textContent="🔊 Listen"; };
+    _cardAudio.onerror=()=>{ const c=(_cardAudio&&_cardAudio.error)?_cardAudio.error.code:"?"; dbg("AUDIO ERROR code="+c+" ("+url.split("/").pop()+")"); _cardAudio=null; speak(); };
     if(btn) btn.textContent="⏸ Pause";
-    _cardAudio.play().catch(()=>{ _cardAudio=null; speak(); });      // called in-gesture
+    _cardAudio.play().then(()=>dbg("play() ok")).catch((e)=>{ dbg("play() reject: "+(e&&e.name||e)); _cardAudio=null; speak(); });
     return;
   }
   if(_audioManifest===undefined) loadAudioManifest();               // warm for next click
