@@ -177,8 +177,8 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 /* ================= tiny infrastructure ================= */
 const $ = s => document.querySelector(s);
 const main = $("#main");
-let TOKEN = localStorage.getItem("learn_token") || "";
-let ROLE = localStorage.getItem("learn_role") || "learner";   // P5.20 author-UI gate (server 403 is the real gate)
+let TOKEN = sessionStorage.getItem("learn_token") || "";   // Phase A: sessionStorage, not localStorage — each app launch = login (shared-device safe)
+let ROLE = sessionStorage.getItem("learn_role") || "learner";   // P5.20 author-UI gate (server 403 is the real gate)
 const api = async (path, opts={}) => {
   const r = await fetch("/api"+path, {...opts,
     headers:{"Content-Type":"application/json", Authorization:"Bearer "+TOKEN, ...(opts.headers||{})},
@@ -206,21 +206,30 @@ function md(src){
   return blocks.join("");
   function inline(t){return esc(t).replace(/`([^`]+)`/g,'<code class="mono" style="background:var(--line);padding:1px 5px;border-radius:4px;font-size:.9em">$1</code>').replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>");}   /* FE-9: inline `code` */
 }
-function signout(){ TOKEN=""; ROLE="learner"; localStorage.removeItem("learn_token"); localStorage.removeItem("learn_role"); route(); }
+function signout(){ TOKEN=""; ROLE="learner"; sessionStorage.removeItem("learn_token"); sessionStorage.removeItem("learn_role");
+  clearTimeout(_idleTimer); if(typeof SESH==="object"){ SESH.moves={}; SESH.mastered=[]; }   // Phase A: clear per-user session state on switch/sign-out
+  route(); }
+/* Phase A: idle auto-sign-out (~60 min) — a shared device shouldn't stay logged in. Any
+   interaction resets the clock; the 12h sliding server session means an active lesson never drops. */
+let _idleTimer=null;
+function armIdleSignout(){ clearTimeout(_idleTimer); if(!TOKEN) return; _idleTimer=setTimeout(()=>{ if(TOKEN) signout(); }, 60*60*1000); }
+["click","keydown","touchstart","pointerdown"].forEach(ev=>addEventListener(ev,()=>{ if(TOKEN) armIdleSignout(); },{passive:true}));
 $("#signout").onclick = async()=>{ try{await api("/logout",{method:"POST"});}catch(e){} signout(); };
 
 /* ================= views ================= */
-function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else speechSynthesis.cancel(); TOKEN ? viewDash() : viewAuth(); }
+function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else speechSynthesis.cancel(); if(TOKEN) armIdleSignout(); TOKEN ? viewDash() : viewAuth(); }
 
-function viewAuth(mode="login"){
+async function viewAuth(mode="login"){
   $("#who").textContent=""; $("#signout").hidden=true;
   main.innerHTML = `
   <div class="auth">
     <h1>${mode==="login"?"Welcome back":"Create your profile"}</h1>
-    <p>Mastery-based learning. Your progress is stored locally and privately.</p>
+    <p>Mastery-based learning. Your progress is stored privately, per profile.</p>
+    <div id="chooser"></div>
     <form id="af">
       <input id="u" placeholder="Username" autocomplete="username" required>
-      <input id="p" type="password" placeholder="Password (6+ characters)" autocomplete="current-password" required>
+      <input id="p" type="password" placeholder="Password (6+ characters)" autocomplete="${mode==="login"?"current-password":"new-password"}" required>
+      ${mode==="register"?`<input id="inv" placeholder="Invite code (if your install requires one)" autocomplete="off">`:""}
       <div class="err" id="err"></div>
       <button class="btn" style="width:100%">${mode==="login"?"Sign in":"Create profile"}</button>
     </form>
@@ -229,12 +238,29 @@ function viewAuth(mode="login"){
   $("#swap").onclick=()=>viewAuth(mode==="login"?"register":"login");
   $("#af").onsubmit=async e=>{
     e.preventDefault();
+    const body={username:$("#u").value, password:$("#p").value};
+    if(mode==="register"){ const inv=$("#inv"); if(inv && inv.value.trim()) body.invite=inv.value.trim(); }
     try{
-      const d=await api("/"+mode,{method:"POST",body:{username:$("#u").value,password:$("#p").value}});
+      const d=await api("/"+mode,{method:"POST",body});
       TOKEN=d.token; ROLE=d.role||"learner";
-      localStorage.setItem("learn_token",TOKEN); localStorage.setItem("learn_role",ROLE); route();
-    }catch(err){ $("#err").textContent=err.message; }
+      sessionStorage.setItem("learn_token",TOKEN); sessionStorage.setItem("learn_role",ROLE);
+      armIdleSignout(); route();
+    }catch(err){ $("#err").textContent=err.message; }   // surfaces the backend detail verbatim (e.g. invite required)
   };
+  /* Phase A profile chooser — LAN/tailnet only; /api/users 404s on a public install → plain form.
+     Tapping a name prefills the username; a password is still always required. */
+  if(mode==="login"){
+    try{
+      const r=await api("/users");
+      const names=(r.users||[]).filter(Boolean);
+      if(names.length){
+        $("#chooser").innerHTML=`<div class="sub" style="margin:0 0 8px">Tap your profile:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+          ${names.map(n=>`<button type="button" class="btn ghost prof" data-n="${esc(n)}">${esc(n)}</button>`).join("")}</div>`;
+        $("#chooser").querySelectorAll(".prof").forEach(b=>b.onclick=()=>{ const u=$("#u"); u.value=b.dataset.n; const p=$("#p"); if(p) p.focus(); });
+      }
+    }catch(_){ /* not LAN / no users → plain username+password form */ }
+  }
 }
 
 /* P5.20 (iss_e8b3bfb8): author UI — paste/load a draft pack, validate against the
@@ -315,7 +341,7 @@ function viewAuthor(){
 }
 async function viewDash(){
   const d = await api("/topics");
-  if(d.role){ ROLE=d.role; localStorage.setItem("learn_role",ROLE); }   // server-fresh author gate when provided
+  if(d.role){ ROLE=d.role; sessionStorage.setItem("learn_role",ROLE); }   // server-fresh author gate when provided
   $("#who").textContent=d.user; $("#signout").hidden=false;
   const _mv=Object.entries(SESH.moves);
   const sessionCard = _mv.length ? `
