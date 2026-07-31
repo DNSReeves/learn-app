@@ -124,6 +124,74 @@ def do_logout(authorization: str | None = Header(default=None)):
     return {"ok": True}
 
 
+# ---------- ANIM-TTS (operator, 2026-07-31: "the new voice system did not make it to the
+# animation panels") ----------
+# Card narration is PRE-rendered (kokoro_render.py) because card text is static. Animation
+# narration is DYNAMIC — the lines interpolate numbers from the running scene — so it needs
+# live synthesis. This proxies the shared Kokoro engine (127.0.0.1:8807, loopback-only by
+# design) for signed-in users, in the ACTIVE house voice (static/audio/active_voice.json,
+# the same one the card renders use), with a content-addressed disk cache so a replayed
+# anim never re-synthesizes. On ANY failure the endpoint 503s and the client falls back to
+# the paced browser voice — narration must never go silent because the engine is down.
+
+_ANIM_TTS_URL = os.environ.get("KOKORO_TTS_URL", "http://127.0.0.1:8807/tts")
+_ANIM_TTS_CACHE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "static", "audio", "_anim")
+_ANIM_TTS_MAX_CHARS = 800          # anim lines are 1-3 sentences; a novel is a bug
+
+
+def _active_voice() -> str:
+    try:
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "static", "audio", "active_voice.json")
+        return (json.load(open(p)).get("voice") or "af_heart").strip()
+    except Exception:
+        return "af_heart"
+
+
+class AnimTTS(BaseModel):
+    text: str
+
+
+@app.post("/api/anim_tts")
+def anim_tts(body: AnimTTS, authorization: str | None = Header(default=None)):
+    require_user(authorization)
+    text = " ".join((body.text or "").split()).strip()
+    if not text:
+        raise HTTPException(400, "empty text")
+    if len(text) > _ANIM_TTS_MAX_CHARS:
+        text = text[:_ANIM_TTS_MAX_CHARS]
+    voice = _active_voice()
+    import hashlib as _hl
+    key = _hl.sha256(f"{voice}|{text}".encode()).hexdigest()[:16]
+    cdir = os.path.join(_ANIM_TTS_CACHE, voice)
+    cpath = os.path.join(cdir, f"{key}.m4a")
+    if os.path.isfile(cpath) and os.path.getsize(cpath) > 200:
+        return FileResponse(cpath, media_type="audio/mp4")
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            _ANIM_TTS_URL,
+            data=json.dumps({"text": text, "voice": voice, "format": "m4a"}).encode(),
+            headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req, timeout=25) as r:
+            data = r.read()
+        # the engine duration-verifies (media-verification rule) — but never cache a stub
+        if len(data) < 200:
+            raise ValueError(f"suspiciously small render ({len(data)} bytes)")
+        os.makedirs(cdir, exist_ok=True)
+        tmp = cpath + ".tmp"
+        with open(tmp, "wb") as f:
+            f.write(data)
+        os.replace(tmp, cpath)
+        return FileResponse(cpath, media_type="audio/mp4")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.getLogger("learn").warning("anim_tts: engine unavailable (%s)", e)
+        raise HTTPException(503, "tts engine unavailable — client should fall back")
+
+
 # ---------- dashboard ----------
 
 # ---------- P4.16 progress export/import (iss_bbc24580) ----------

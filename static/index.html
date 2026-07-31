@@ -217,7 +217,7 @@ function armIdleSignout(){ clearTimeout(_idleTimer); if(!TOKEN) return; _idleTim
 $("#signout").onclick = async()=>{ try{await api("/logout",{method:"POST"});}catch(e){} signout(); };
 
 /* ================= views ================= */
-function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else speechSynthesis.cancel(); if(TOKEN) armIdleSignout(); TOKEN ? viewDash() : viewAuth(); }
+function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else speechSynthesis.cancel(); try{ if(typeof cancelVoice==="function") cancelVoice(); }catch(_){} if(TOKEN) armIdleSignout(); TOKEN ? viewDash() : viewAuth(); }
 
 async function viewAuth(mode="login"){
   $("#who").textContent=""; $("#signout").hidden=true;
@@ -817,7 +817,8 @@ function animHTML(){
    sounds robotic. Split narration at paragraph / sentence / dash / comma boundaries and speak
    the pieces in sequence with a punctuation-scaled gap between them. */
 let _paceTimer=null;
-function cancelVoice(){ try{speechSynthesis.cancel();}catch(_){} clearTimeout(_paceTimer); _paceTimer=null; }
+function cancelVoice(){ try{speechSynthesis.cancel();}catch(_){} clearTimeout(_paceTimer); _paceTimer=null;
+  try{ if(typeof _animCancel==="function") _animCancel(); }catch(_){} }   // ANIM-TTS: also stop the Kokoro element
 function voiceBusy(){ return (("speechSynthesis" in window) && speechSynthesis.speaking) || !!_paceTimer; }
 function speakPaced(text, opts){
   opts=opts||{};
@@ -848,12 +849,50 @@ function speakPaced(text, opts){
     })();
   });
 }
-function narrate(text){
+/* ANIM-TTS (2026-07-31): anim narration goes through the shared Kokoro engine (the same
+   natural voice as card audio) via POST /api/anim_tts — dynamic lines can't be pre-rendered,
+   they interpolate numbers from the running scene. One shared <audio> element, unlocked
+   in-gesture on the Play click (Safari), object-URLs cached per text so a replay is instant.
+   ANY failure (engine down, 503, timeout, decode) falls back to the paced browser voice —
+   the anim must never lose narration because a service is down. */
+let _animAudio=null; const _animTTSUrls=new Map(); let _animCancel=null;
+function unlockAnimAudio(){                       // MUST be called synchronously in-gesture
+  if(!_animAudio){ _animAudio=new Audio(); _animAudio.playsInline=true; _animAudio.preload="auto"; }
+  try{ _animAudio.muted=true; const p=_animAudio.play(); if(p&&p.catch) p.catch(()=>{});
+       _animAudio.pause(); _animAudio.muted=false; }catch(_){}
+}
+async function _animTTSFetch(text){
+  if(_animTTSUrls.has(text)) return _animTTSUrls.get(text);
+  const ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(), 12000);
+  try{
+    const r=await fetch("/api/anim_tts",{method:"POST", signal:ctl.signal,
+      headers:{"Content-Type":"application/json", Authorization:"Bearer "+TOKEN},
+      body:JSON.stringify({text})});
+    if(!r.ok) return null;
+    const url=URL.createObjectURL(await r.blob());
+    _animTTSUrls.set(text,url); return url;
+  }catch(_){ return null; }finally{ clearTimeout(tm); }
+}
+function _animPlay(url){
   return new Promise(res=>{
-    $("#a-cap").textContent=text;
-    if (!AUDIO_ON || !("speechSynthesis" in window)){ setTimeout(res, Math.max(2200, text.length*55)); return; }
-    speakPaced(text, {rate:1.0}).then(res);
+    if(!_animAudio){ res(false); return; }
+    let done=false; const fin=ok=>{ if(done) return; done=true; _animCancel=null; cleanup(); res(ok); };
+    const onEnd=()=>fin(true), onErr=()=>fin(false);
+    const cleanup=()=>{ _animAudio.removeEventListener("ended",onEnd); _animAudio.removeEventListener("error",onErr); };
+    _animAudio.addEventListener("ended",onEnd); _animAudio.addEventListener("error",onErr);
+    _animCancel=()=>{ try{_animAudio.pause();}catch(_){} fin(true); };  // cancelled = spoken enough — don't double-speak via fallback
+    _animAudio.src=url;
+    const p=_animAudio.play();
+    if(p&&p.catch) p.catch(()=>fin(false));                            // blocked (not unlocked) → fallback
   });
+}
+async function narrate(text){
+  $("#a-cap").textContent=text;
+  if (!AUDIO_ON){ await new Promise(r=>setTimeout(r, Math.max(2200, text.length*55))); return; }
+  const url=await _animTTSFetch(text);
+  if(url && await _animPlay(url)) return;                              // the natural voice spoke
+  if("speechSynthesis" in window){ await speakPaced(text, {rate:1.0}); return; }
+  await new Promise(r=>setTimeout(r, Math.max(2200, text.length*55)));
 }
 function mountAnim(kind){
   const cv=$("#cv"), ctx=cv.getContext("2d");
@@ -863,6 +902,7 @@ function mountAnim(kind){
   let running=false;
   playBtn.onclick=async()=>{
     if(running) return; running=true; playBtn.textContent="Playing…";
+    unlockAnimAudio();                       // in-gesture: Safari lets the SAME element replay programmatically later
     cancelVoice();
     try{ await ANIMS[kind](cv,ctx); }finally{ running=false; playBtn.textContent="↻ Replay"; }
   };
