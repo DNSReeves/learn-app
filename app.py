@@ -289,30 +289,63 @@ class PlacementBody(BaseModel):
     skip: bool = False
 
 
-def _placement_search(pack, history):
-    """Binary search over the ladder. Returns (next_concept_index | None, level).
-    level = index of the first concept the learner should study."""
-    n = len(pack["concepts"])
-    lo, hi = 0, n - 1
+def _graded_map(pack, history):
     graded = {}
     for h in history:
         c = next((c for c in pack["concepts"] if c["id"] == h.get("concept_id")), None)
         q = next((q for q in (c or {}).get("questions", []) if q["id"] == h.get("question_id")), None)
         if c and q:
             graded[c["id"]] = (h.get("choice") == q["answer"])
-    # replay the search using graded answers in ladder order of the probes
-    probes = []
+    return graded
+
+
+def _placement_search(pack, history):
+    """Binary search over the ladder. Returns (next_concept_index | None, level).
+    level = index of the first concept the learner should study."""
+    lo, hi = 0, len(pack["concepts"]) - 1
+    graded = _graded_map(pack, history)
     while lo <= hi:
         mid = (lo + hi) // 2
         cid = pack["concepts"][mid]["id"]
         if cid not in graded:
             return mid, None          # next probe needed
-        probes.append(mid)
         if graded[cid]:
             lo = mid + 1
         else:
             hi = mid - 1
     return None, lo                   # search complete; study from index lo
+
+
+# P2.8 (iss_a617455d): placement v2 — gappy-knowledge detection. The binary
+# search assumes monotone ladder knowledge, so everything below the frontier
+# was blanket-trusted; real prior knowledge has holes. Phase 2 sweeps the
+# below-frontier concepts the search never probed (front-to-back, bounded by
+# PLACEMENT_GAP_CAP extra questions). A wrong sweep answer marks a GAP —
+# served via the P2.6 relearn state (cards re-serve, gate re-runs, successors
+# stay open), so a gap never re-locks the ladder the learner placed past.
+# Note the search itself can't produce below-frontier wrongs (a wrong probe
+# drags the frontier below it), so gaps come only from the sweep.
+PLACEMENT_GAP_CAP = 6
+
+
+def _placement_v2(pack, history):
+    """Returns (next_probe_index | None, level | None, gap_indices)."""
+    nxt, level = _placement_search(pack, history)
+    if nxt is not None:
+        return nxt, None, []
+    graded = _graded_map(pack, history)
+    max_q = _placement_max_q(pack)
+    for i in range(level):
+        cid = pack["concepts"][i]["id"]
+        if cid not in graded and len(history) < max_q:
+            return i, None, []        # next sweep probe (budget remaining)
+    gaps = [i for i in range(level)
+            if graded.get(pack["concepts"][i]["id"]) is False]
+    return None, level, gaps
+
+
+def _placement_max_q(pack) -> int:
+    return len(pack["concepts"]).bit_length() + 1 + PLACEMENT_GAP_CAP
 
 
 @app.post("/api/topic/{tid}/placement")
@@ -326,20 +359,23 @@ def placement(tid: str, body: PlacementBody,
         db.set_placement(user["id"], tid, None)
         return {"done": True, "level": 0, "skipped": True}
 
-    nxt, level = _placement_search(pack, body.history)
+    nxt, level, gaps = _placement_v2(pack, body.history)
     if nxt is not None:
         c = pack["concepts"][nxt]
         q = c["questions"][0]
         return {"done": False,
                 "asked": len(body.history) + 1,
-                "max_questions": len(pack["concepts"]).bit_length() + 1,
+                "max_questions": _placement_max_q(pack),
                 "question": {"concept_id": c["id"], "concept_title": c["title"],
                              "id": q["id"], "prompt": q["prompt"], "options": q["options"]}}
 
-    # apply the result
+    # apply the result (P2.8: below-frontier gaps → relearn, not blanket trust)
     now = time.time()
+    gap_set = set(gaps)
     for i, c in enumerate(pack["concepts"]):
-        if i < level:
+        if i in gap_set:
+            db.upsert_state(user["id"], tid, c["id"], p_mastery=0.30, relearn=1)
+        elif i < level:
             # trust but verify: mastered, but due for review immediately
             db.upsert_state(user["id"], tid, c["id"], p_mastery=0.90,
                             mastered_at=now, interval_d=0.5, due_at=now)
@@ -348,7 +384,9 @@ def placement(tid: str, body: PlacementBody,
     db.set_placement(user["id"], tid, level)
     return {"done": True, "level": level, "skipped": False,
             "start_title": pack["concepts"][level]["title"] if level < len(pack["concepts"]) else None,
-            "verified_later": level}
+            "verified_later": max(0, level - len(gaps)),
+            "gaps": [{"index": i, "id": pack["concepts"][i]["id"],
+                      "title": pack["concepts"][i]["title"]} for i in gaps]}
 
 
 # ---------- answering ----------

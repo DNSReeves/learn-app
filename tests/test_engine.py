@@ -160,3 +160,71 @@ def test_expired_session_rejected(dbmod):
     with dbmod.conn() as c:
         c.execute("UPDATE sessions SET expires_at = ? WHERE token = ?", (time.time() - 1, tok))
     assert dbmod.user_for_token(tok) is None
+
+
+# ── P2.8 (iss_a617455d): placement v2 — gappy-knowledge sweep ────────────────
+
+def _drive_v2(appmod, pack, answer_fn):
+    """Run the stateless v2 protocol to completion; returns (level, gaps, hist)."""
+    hist = []
+    while True:
+        nxt, lvl, gaps = appmod._placement_v2(pack, hist)
+        if nxt is None:
+            return lvl, gaps, hist
+        hist.append({"concept_id": f"c{nxt}", "question_id": "q1",
+                     "choice": answer_fn(nxt)})
+
+
+def test_v2_monotone_learner_matches_v1_with_no_gaps(appmod):
+    pack = _pack8()
+    lvl, gaps, hist = _drive_v2(appmod, pack, lambda i: 0)       # all correct
+    assert lvl == 8 and gaps == []
+    # the sweep probed every below-frontier concept the search skipped (≤ cap)
+    assert len(hist) <= appmod._placement_max_q(pack)
+
+
+def test_v2_no_knowledge_has_no_sweep(appmod):
+    pack = _pack8()
+    lvl, gaps, hist = _drive_v2(appmod, pack, lambda i: 1)       # all wrong
+    assert lvl == 0 and gaps == []
+    assert len(hist) == 3                        # pure binary search, no sweep
+
+
+def test_v2_detects_a_below_frontier_gap(appmod):
+    pack = _pack8()
+    # knows everything EXCEPT concept c1 (a hole the binary search never probes
+    # on an all-correct path: probes are 3,5,6,7 then the sweep hits 0,1,2)
+    lvl, gaps, hist = _drive_v2(appmod, pack, lambda i: 1 if i == 1 else 0)
+    assert lvl == 8
+    assert gaps == [1]
+
+
+def test_v2_respects_the_question_budget(appmod):
+    pack = {"concepts": [
+        {"id": f"c{i}", "questions": [{"id": "q1", "answer": 0, "options": ["a", "b"]}]}
+        for i in range(30)]}
+    lvl, gaps, hist = _drive_v2(appmod, pack, lambda i: 0)
+    assert lvl == 30
+    assert len(hist) <= appmod._placement_max_q(pack)            # cap holds
+    # un-swept below-frontier rungs default to trusted (v1 behavior), not gaps
+    assert gaps == []
+
+
+def test_v2_gap_application_uses_relearn_state(appmod, tmp_path):
+    import db as dbmod
+    pack = _pack8()
+    # simulate the endpoint's apply loop for level=8, gaps=[1]
+    with dbmod.conn() as c:
+        c.execute("INSERT INTO users (username, pw_hash, pw_salt, created_at) "
+                  "VALUES ('t', x'00', x'00', 1)")
+        uid = c.execute("SELECT id FROM users").fetchone()[0]
+    now = time.time()
+    for i in range(8):
+        if i == 1:
+            dbmod.upsert_state(uid, "t", f"c{i}", p_mastery=0.30, relearn=1)
+        else:
+            dbmod.upsert_state(uid, "t", f"c{i}", p_mastery=0.90,
+                               mastered_at=now, interval_d=0.5, due_at=now)
+    s = dbmod.get_states(uid, "t")
+    assert s["c1"]["relearn"] == 1 and not s["c1"]["mastered_at"]
+    assert s["c2"]["mastered_at"]                # successors keep their placement
