@@ -504,14 +504,13 @@ async function viewConcept(tid,cid){
   renderCard(tid);
 }
 function renderCard(tid){
-  loadAudioManifest();   // preload so playCard() can start audio synchronously (Safari gesture rule)
+  if(TTS_PRERENDERED) loadAudioManifest();   // preload for synchronous play (only when pre-rendered audio is on)
   const card=C.cards[cardIx], last=cardIx===C.cards.length-1;
   $("#stage").innerHTML = stripHTML(C.p_mastery,C.streak,C.mastered) + `
   <section class="stage">
     <div class="kicker">Concept · ${esc(C.title)} — chunk ${cardIx+1} of ${C.cards.length}</div>
     <h2>${esc(card.h)}</h2>
     <button class="btn ghost" id="cardplay" style="font-size:.82em;padding:3px 10px;margin:0 0 8px" title="Listen to this chunk">🔊 Listen</button>
-    <div id="audiodbg" class="mono" style="font-size:11px;line-height:1.5;color:var(--dim);white-space:pre-line;margin:4px 0 8px;padding:4px 8px;border-left:2px solid var(--line);min-height:1px"></div>
     <div class="card-body">${md(card.md)}</div>
     ${last && C.anim ? animHTML() : ""}
     <div class="pager">
@@ -558,38 +557,44 @@ function cardPlainText(card){
    silently blocks BOTH paths → dead silence. The manifest is preloaded in renderCard
    so it's already in hand here; if it somehow isn't, we narrate now (still in-gesture)
    and warm it for next time. */
-let _playN=0, _audioT0=0;
+/* Pre-rendered m4a is DISABLED (2026-07-30). tts_render.py ran macOS `say` from a
+   headless Background/SSH session, which synthesizes NO audio — all 330 files are empty
+   (0.005s / 12 audio bytes); `say` needs a GUI Aqua session. Until a valid re-render
+   exists, Listen uses the browser's built-in speechSynthesis (the SAME iOS/macOS system
+   voices, client-side). Flip TTS_PRERENDERED back to true once static/audio holds real
+   audio and the m4a path (kept below, dormant) takes over automatically. */
+const TTS_PRERENDERED = false;
+let _ttsVoice;
+function pickVoice(){
+  if(_ttsVoice!==undefined) return _ttsVoice;
+  let vs=[]; try{ vs=speechSynthesis.getVoices()||[]; }catch(_){}
+  if(!vs.length) return undefined;   // not ready yet — default voice this time, cache next
+  _ttsVoice =
+    vs.find(v=>/en[-_]US/i.test(v.lang) && /samantha|siri|enhanced|premium/i.test(v.name)) ||
+    vs.find(v=>/en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+  return _ttsVoice;
+}
+try{ if("speechSynthesis" in window) speechSynthesis.onvoiceschanged=()=>{ _ttsVoice=undefined; pickVoice(); }; }catch(_){}
 function playCard(tid){
   const btn=$("#cardplay");
-  // Persistent, timestamped log — events fire in ms and would otherwise just flash. It only
-  // clears on a FRESH tap, so the full sequence stays on screen to read; timings are relative
-  // to the fresh tap so a double-fire shows up as a gap on the toggle-off line.
-  const dbg=(m)=>{ const d=$("#audiodbg"); if(d) d.textContent += "+"+Math.round(performance.now()-_audioT0)+"ms  "+m+"\n"; try{console.log("[audio]",m);}catch(_){}};
-  const n=++_playN;
-  if((_cardAudio && !_cardAudio.paused) || speechSynthesis.speaking){ dbg("toggle-off (call#"+n+")"); stopCardAudio(); return; }
-  _audioT0=performance.now(); { const d=$("#audiodbg"); if(d) d.textContent=""; }   // fresh tap → reset log
+  if((_cardAudio && !_cardAudio.paused) || speechSynthesis.speaking){ stopCardAudio(); return; }  // toggle off
   const speak=()=>{
-    if(!("speechSynthesis" in window)){ dbg("no speechSynthesis"); if(btn) btn.textContent="🔇 No voice"; return; }
+    if(!("speechSynthesis" in window)){ if(btn) btn.textContent="🔇 No voice"; return; }
     speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(cardPlainText(C.cards[cardIx])); u.rate=1.02;
-    u.onstart=()=>dbg("speech playing");
-    u.onend=u.onerror=(ev)=>{ dbg("speech "+(ev&&ev.type||"done")); if(btn) btn.textContent="🔊 Listen"; };
-    if(btn) btn.textContent="⏸ Pause"; dbg("→ speech fallback"); speechSynthesis.speak(u);
+    const u=new SpeechSynthesisUtterance(cardPlainText(C.cards[cardIx])); u.rate=1.0;
+    const v=pickVoice(); if(v) u.voice=v;
+    u.onend=u.onerror=()=>{ if(btn) btn.textContent="🔊 Listen"; };
+    if(btn) btn.textContent="⏸ Pause"; speechSynthesis.speak(u);   // in-gesture (Safari)
   };
-  const url = _audioManifest ? audioUrlForCard(tid, cardIx) : null;   // read synchronously — no await
-  dbg(url ? ("call#"+n+" ♪ "+url.split("/").pop()) : "call#"+n+" no url"+(_audioManifest?"":" (manifest not loaded)"));
+  const url = (TTS_PRERENDERED && _audioManifest) ? audioUrlForCard(tid, cardIx) : null;
   if(url){
     _cardAudio=new Audio(url);
-    _cardAudio.preload="auto";
-    _cardAudio.addEventListener("loadedmetadata", ()=>dbg("meta dur="+(_cardAudio?_cardAudio.duration.toFixed(1):"?")+"s"));
-    _cardAudio.addEventListener("playing", ()=>dbg("playing ✓"));
-    _cardAudio.onended=()=>{ dbg("ended @"+(_cardAudio?_cardAudio.currentTime.toFixed(1):"?")+"s"); _cardAudio=null; if(btn) btn.textContent="🔊 Listen"; };
-    _cardAudio.onerror=()=>{ const c=(_cardAudio&&_cardAudio.error)?_cardAudio.error.code:"?"; dbg("AUDIO ERROR code="+c+" ("+url.split("/").pop()+")"); _cardAudio=null; speak(); };
+    _cardAudio.onended=()=>{ _cardAudio=null; if(btn) btn.textContent="🔊 Listen"; };
+    _cardAudio.onerror=()=>{ _cardAudio=null; speak(); };            // empty/decode → narrate instead
     if(btn) btn.textContent="⏸ Pause";
-    _cardAudio.play().then(()=>dbg("play() ok")).catch((e)=>{ dbg("play() reject: "+(e&&e.name||e)); _cardAudio=null; speak(); });
+    _cardAudio.play().catch(()=>{ _cardAudio=null; speak(); });      // called in-gesture
     return;
   }
-  if(_audioManifest===undefined) loadAudioManifest();               // warm for next click
   speak();
 }
 function resHTML(){
