@@ -592,7 +592,7 @@ function cardPlainText(card){
    exists, Listen uses the browser's built-in speechSynthesis (the SAME iOS/macOS system
    voices, client-side). Flip TTS_PRERENDERED back to true once static/audio holds real
    audio and the m4a path (kept below, dormant) takes over automatically. */
-const TTS_PRERENDERED = false;
+const TTS_PRERENDERED = true;   // Kokoro-rendered audio in the manifest (PROTOTYPE: only fundamental-analysis/price-vs-value has files; every other concept resolves to null → browser-voice fallback)
 let _ttsVoice;
 function pickVoice(){
   if(_ttsVoice!==undefined) return _ttsVoice;
