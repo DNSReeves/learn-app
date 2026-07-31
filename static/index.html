@@ -573,7 +573,7 @@ function audioUrlForCard(tid, ix){
   return Array.isArray(arr) ? (arr[ix]||null) : null;
 }
 function stopCardAudio(){
-  speechSynthesis.cancel();
+  cancelVoice();
   if(_cardAudio){ _cardAudio.pause(); _cardAudio=null; }
   const b=$("#cardplay"); if(b) b.textContent="🔊 Listen";
 }
@@ -606,14 +606,12 @@ function pickVoice(){
 try{ if("speechSynthesis" in window) speechSynthesis.onvoiceschanged=()=>{ _ttsVoice=undefined; pickVoice(); }; }catch(_){}
 function playCard(tid){
   const btn=$("#cardplay");
-  if((_cardAudio && !_cardAudio.paused) || speechSynthesis.speaking){ stopCardAudio(); return; }  // toggle off
+  if((_cardAudio && !_cardAudio.paused) || voiceBusy()){ stopCardAudio(); return; }  // toggle off
   const speak=()=>{
     if(!("speechSynthesis" in window)){ if(btn) btn.textContent="🔇 No voice"; return; }
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(cardPlainText(C.cards[cardIx])); u.rate=1.0;
-    const v=pickVoice(); if(v) u.voice=v;
-    u.onend=u.onerror=()=>{ if(btn) btn.textContent="🔊 Listen"; };
-    if(btn) btn.textContent="⏸ Pause"; speechSynthesis.speak(u);   // in-gesture (Safari)
+    cancelVoice();
+    if(btn) btn.textContent="⏸ Pause";
+    speakPaced(cardPlainText(C.cards[cardIx]), {rate:1.0}).then(()=>{ if(btn) btn.textContent="🔊 Listen"; });   // in-gesture (Safari); paced at punctuation
   };
   const url = (TTS_PRERENDERED && _audioManifest) ? audioUrlForCard(tid, cardIx) : null;
   if(url){
@@ -815,23 +813,57 @@ function animHTML(){
     </div>
   </div>`;
 }
+/* Voice pacing (2026-07-31): speechSynthesis ignores SSML and runs clauses together, which
+   sounds robotic. Split narration at paragraph / sentence / dash / comma boundaries and speak
+   the pieces in sequence with a punctuation-scaled gap between them. */
+let _paceTimer=null;
+function cancelVoice(){ try{speechSynthesis.cancel();}catch(_){} clearTimeout(_paceTimer); _paceTimer=null; }
+function voiceBusy(){ return (("speechSynthesis" in window) && speechSynthesis.speaking) || !!_paceTimer; }
+function speakPaced(text, opts){
+  opts=opts||{};
+  return new Promise(resolve=>{
+    if(!("speechSynthesis" in window)){ resolve(); return; }
+    const raw=String(text).split(/(\n\n+|[.!?]+|[,;:]|—|\s[-–]\s)/);
+    const segs=[];
+    for(let i=0;i<raw.length;i+=2){
+      let chunk=(raw[i]||"").trim(); const d=raw[i+1]||"";
+      if(!chunk){ if(segs.length && /\n\n/.test(d)) segs[segs.length-1].pause=Math.max(segs[segs.length-1].pause,430); continue; }   // carry a paragraph gap onto the prior sentence
+      let pause=110;
+      if(/\n\n/.test(d)) pause=430;                                  // paragraph
+      else if(/[.!?]/.test(d)){ pause=290; chunk+=d.trim(); }        // sentence — keep . ! ? for intonation
+      else if(/—|\s[-–]\s/.test(d)) pause=210;                       // dash
+      else if(/[,;:]/.test(d)){ pause=150; chunk+=d.trim(); }        // comma / clause
+      segs.push({t:chunk, pause});
+    }
+    if(!segs.length){ resolve(); return; }
+    const v=opts.voice||(typeof pickVoice==="function"?pickVoice():null);
+    let i=0;
+    (function next(){
+      if(i>=segs.length){ _paceTimer=null; resolve(); return; }
+      const s=segs[i++];
+      const u=new SpeechSynthesisUtterance(s.t); u.rate=opts.rate||1.0; if(v) u.voice=v;
+      u.onend=()=>{ _paceTimer=setTimeout(next, s.pause); };
+      u.onerror=()=>{ _paceTimer=setTimeout(next, s.pause); };
+      try{ speechSynthesis.speak(u); }catch(_){ _paceTimer=null; resolve(); }
+    })();
+  });
+}
 function narrate(text){
   return new Promise(res=>{
     $("#a-cap").textContent=text;
     if (!AUDIO_ON || !("speechSynthesis" in window)){ setTimeout(res, Math.max(2200, text.length*55)); return; }
-    const u=new SpeechSynthesisUtterance(text); u.rate=1.02;
-    u.onend=res; u.onerror=res; speechSynthesis.speak(u);
+    speakPaced(text, {rate:1.0}).then(res);
   });
 }
 function mountAnim(kind){
   const cv=$("#cv"), ctx=cv.getContext("2d");
   const playBtn=$("#a-play"), muteBtn=$("#a-mute");
-  muteBtn.onclick=()=>{AUDIO_ON=!AUDIO_ON; speechSynthesis.cancel();
+  muteBtn.onclick=()=>{AUDIO_ON=!AUDIO_ON; cancelVoice();
     muteBtn.setAttribute("aria-pressed",AUDIO_ON); muteBtn.textContent=AUDIO_ON?"🔊 Voice on":"🔇 Voice off";};
   let running=false;
   playBtn.onclick=async()=>{
     if(running) return; running=true; playBtn.textContent="Playing…";
-    speechSynthesis.cancel();
+    cancelVoice();
     try{ await ANIMS[kind](cv,ctx); }finally{ running=false; playBtn.textContent="↻ Replay"; }
   };
   ANIMS[kind+"_static"]?.(cv,ctx); // draw first frame
