@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS concept_state_archive (
     concept_id  TEXT NOT NULL,
     p_mastery   REAL, attempts INTEGER, correct INTEGER, streak INTEGER,
     unlocked    INTEGER, mastered_at REAL, interval_d REAL, ease REAL, due_at REAL,
+    stability   REAL, difficulty REAL,
     archived_at REAL NOT NULL,
     reason      TEXT NOT NULL,     -- concept_removed | rename_collision:<old>-><new>
     from_hash   TEXT,
@@ -117,6 +118,16 @@ def init():
             c.execute("ALTER TABLE concept_state ADD COLUMN relearn INTEGER NOT NULL DEFAULT 0")
         except sqlite3.OperationalError:
             pass          # column already there
+    # P2.7 (iss_d13d1882) additive migration — FSRS memory state. Legacy rows
+    # keep NULL stability; the first FSRS review migrates them (interval_d →
+    # stability, exact at the 0.90 retention target).
+    with conn() as c:
+        for table in ("concept_state", "concept_state_archive"):
+            for col in ("stability REAL", "difficulty REAL"):
+                try:
+                    c.execute(f"ALTER TABLE {table} ADD COLUMN {col}")
+                except sqlite3.OperationalError:
+                    pass
 
 
 def _hash(pw: str, salt: bytes) -> bytes:
@@ -186,7 +197,8 @@ def get_states(user_id: int, topic_id: str) -> dict:
 
 def upsert_state(user_id: int, topic_id: str, concept_id: str, **fields):
     keys = ["p_mastery", "attempts", "correct", "streak", "unlocked",
-            "mastered_at", "interval_d", "ease", "due_at", "relearn"]
+            "mastered_at", "interval_d", "ease", "due_at", "relearn",
+            "stability", "difficulty"]
     vals = {k: fields[k] for k in keys if k in fields}
     with conn() as c:
         c.execute(

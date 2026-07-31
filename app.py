@@ -95,7 +95,8 @@ def progress_export(authorization: str | None = Header(default=None)):
     with db.conn() as c:
         states = [dict(r) for r in c.execute(
             "SELECT topic_id, concept_id, p_mastery, attempts, correct, streak, unlocked, "
-            "mastered_at, interval_d, ease, due_at, relearn FROM concept_state WHERE user_id=?",
+            "mastered_at, interval_d, ease, due_at, relearn, stability, difficulty "
+            "FROM concept_state WHERE user_id=?",
             (user["id"],))]
         placements = [dict(r) for r in c.execute(
             "SELECT topic_id, level, at FROM placements WHERE user_id=?", (user["id"],))]
@@ -118,7 +119,8 @@ def progress_import(body: ProgressImport, authorization: str | None = Header(def
     if body.format != "learn-progress/1":
         raise HTTPException(400, "unknown format (want learn-progress/1)")
     STATE_COLS = {"topic_id", "concept_id", "p_mastery", "attempts", "correct", "streak",
-                  "unlocked", "mastered_at", "interval_d", "ease", "due_at", "relearn"}
+                  "unlocked", "mastered_at", "interval_d", "ease", "due_at", "relearn",
+                  "stability", "difficulty"}
     imported = skipped = 0
     with db.conn() as c:
         for row in body.concept_state:
@@ -411,12 +413,23 @@ def answer(tid: str, cid: str, a: Answer,
         now_mastered = False
         fields.update(mastered_at=None, relearn=1, streak=0,
                       interval_d=0.0, due_at=None)
-    elif was_mastered:  # review mode: reschedule
-        i, e, due = mastery.schedule_review(s.get("interval_d", 0), s.get("ease", 2.5), correct)
-        fields.update(interval_d=i, ease=e, due_at=due)
+    elif was_mastered:  # review mode: reschedule (P2.7: FSRS replaced SM-2-lite)
+        # Legacy rows (stability NULL) migrate by passing interval_d as
+        # stability — exact at the 0.90 retention target where interval == S.
+        prev_s = s.get("stability") or s.get("interval_d") or 0
+        # elapsed since the last review, reconstructed from the old schedule
+        last = (s["due_at"] - (s.get("interval_d") or 0) * 86400) if s.get("due_at") else None
+        elapsed_d = max(0.0, (time.time() - last) / 86400) if last else 0.0
+        s2, d2, iv, due = mastery.fsrs_review(prev_s, s.get("difficulty"), elapsed_d, correct)
+        fields.update(stability=s2, difficulty=d2, interval_d=iv, due_at=due)
     elif now_mastered:  # (re-)mastery: first review lands tomorrow; relearn clears
+        # Pedagogy unchanged (trust-then-verify: quick first check); FSRS state
+        # initialized so the SECOND review schedules from real memory params.
+        # A relearned concept keeps its surviving stability.
         fields.update(interval_d=1.0, due_at=time.time() + 86400, relearn=0,
-                      mastered_at=time.time())
+                      mastered_at=time.time(),
+                      stability=s.get("stability") or mastery.FSRS_W[2],
+                      difficulty=s.get("difficulty") or mastery._fsrs_d0(3))
 
     db.upsert_state(user["id"], tid, cid, **fields)
     db.log_answer(user["id"], tid, cid, a.question_id,

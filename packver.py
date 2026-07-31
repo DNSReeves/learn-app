@@ -63,11 +63,14 @@ def _archive_rows(c, topic_id: str, concept_id: str, reason: str,
             """INSERT INTO concept_state_archive
                (user_id, topic_id, concept_id, p_mastery, attempts, correct,
                 streak, unlocked, mastered_at, interval_d, ease, due_at,
+                stability, difficulty,
                 archived_at, reason, from_hash, to_hash)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (r["user_id"], r["topic_id"], r["concept_id"], r["p_mastery"],
              r["attempts"], r["correct"], r["streak"], r["unlocked"],
              r["mastered_at"], r["interval_d"], r["ease"], r["due_at"],
+             r["stability"] if "stability" in r.keys() else None,
+             r["difficulty"] if "difficulty" in r.keys() else None,
              now, reason, from_hash, to_hash))
     c.execute("DELETE FROM concept_state WHERE topic_id=? AND concept_id=?",
               (topic_id, concept_id))
