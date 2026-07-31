@@ -511,7 +511,7 @@ function renderCard(tid){
     <div class="kicker">Concept · ${esc(C.title)} — chunk ${cardIx+1} of ${C.cards.length}</div>
     <h2>${esc(card.h)}</h2>
     <button class="btn ghost" id="cardplay" style="font-size:.82em;padding:3px 10px;margin:0 0 8px" title="Listen to this chunk">🔊 Listen</button>
-    <span id="audiodbg" class="mono" style="font-size:11px;color:var(--dim);margin-left:8px"></span>
+    <div id="audiodbg" class="mono" style="font-size:11px;line-height:1.5;color:var(--dim);white-space:pre-line;margin:4px 0 8px;padding:4px 8px;border-left:2px solid var(--line);min-height:1px"></div>
     <div class="card-body">${md(card.md)}</div>
     ${last && C.anim ? animHTML() : ""}
     <div class="pager">
@@ -558,12 +558,16 @@ function cardPlainText(card){
    silently blocks BOTH paths → dead silence. The manifest is preloaded in renderCard
    so it's already in hand here; if it somehow isn't, we narrate now (still in-gesture)
    and warm it for next time. */
-let _playN=0;
+let _playN=0, _audioT0=0;
 function playCard(tid){
   const btn=$("#cardplay");
-  const dbg=(m)=>{ const d=$("#audiodbg"); if(d) d.textContent=m; try{console.log("[audio]",m);}catch(_){}};
+  // Persistent, timestamped log — events fire in ms and would otherwise just flash. It only
+  // clears on a FRESH tap, so the full sequence stays on screen to read; timings are relative
+  // to the fresh tap so a double-fire shows up as a gap on the toggle-off line.
+  const dbg=(m)=>{ const d=$("#audiodbg"); if(d) d.textContent += "+"+Math.round(performance.now()-_audioT0)+"ms  "+m+"\n"; try{console.log("[audio]",m);}catch(_){}};
   const n=++_playN;
   if((_cardAudio && !_cardAudio.paused) || speechSynthesis.speaking){ dbg("toggle-off (call#"+n+")"); stopCardAudio(); return; }
+  _audioT0=performance.now(); { const d=$("#audiodbg"); if(d) d.textContent=""; }   // fresh tap → reset log
   const speak=()=>{
     if(!("speechSynthesis" in window)){ dbg("no speechSynthesis"); if(btn) btn.textContent="🔇 No voice"; return; }
     speechSynthesis.cancel();
