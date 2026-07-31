@@ -692,6 +692,124 @@
    "anim": "fa_compounding"
   },
   {
+   "id": "growth-at-a-reasonable-price",
+   "title": "Growth at a Reasonable Price (GARP)",
+   "summary": "Peter Lynch's middle path: buy growing companies, but refuse to overpay — using the PEG ratio as the discipline.",
+   "anim": "fa_peg",
+   "cards": [
+    {
+     "h": "The middle path between value and growth",
+     "md": "Value says *buy it cheap*. Growth says *buy the compounder*. **GARP — growth at a reasonable price** — refuses to choose: buy companies that are genuinely growing, but refuse to pay **any** price for that growth.\n\nIts patron saint is **Peter Lynch**, who ran Fidelity's Magellan fund from 1977 to 1990 and compounded it at about **29% a year** — the best mutual-fund record of its era, turning $1,000 into roughly $28,000. His whole philosophy fits on an index card: buy understandable businesses that are growing, at a price that doesn't already assume the growth.\n\nLynch's first rule was not a ratio at all: **\"Know what you own, and know why you own it.\"** Behind every ticker is a company doing something you can, with a little homework, actually understand. GARP is fundamental analysis with a growth tilt and a price discipline bolted on."
+    },
+    {
+     "h": "The PEG ratio — Lynch's fair-price yardstick",
+     "md": "Lynch popularized one shortcut for a growth stock: the **PEG ratio (Price/Earnings-to-Growth)** — the price-to-earnings multiple divided by the earnings growth rate (in percent).\n\n## PEG = (P/E) ÷ earnings-growth rate\n\nHis rule of thumb: *\"The P/E of any company that's fairly priced will equal its growth rate.\"* In PEG terms:\n\n- **PEG ≈ 1** → fairly priced (P/E matches growth).\n- **PEG < 1** → potentially a bargain: you're paying **less** than the growth rate. Lynch's hunting ground.\n- **PEG > 1.5–2** → getting expensive: you're paying a big premium to the growth.\n\nWorked: a company growing **20%** at a **P/E of 15** has a PEG of `15 ÷ 20 = 0.75` — attractive. One growing **10%** at a **P/E of 30** has a PEG of `3.0` — richly priced, whatever the story. Same idea as the P/E–growth map from the multiples concept, boiled down to a single number."
+    },
+    {
+     "h": "Lynch's playbook — and the gurus around him",
+     "md": "Lynch preached the **amateur's edge: \"invest in what you know.\"** You often meet a great product — in a store, at work — long before Wall Street reprices the stock. Do the homework, and you can catch a **\"tenbagger\"**, his word for a stock that returns **10×**.\n\nHe sorted companies into six buckets — **slow growers, stalwarts, fast growers** (his favorites: small, nimble, 20–25% growers), **cyclicals, turnarounds, and asset plays** — because *how* you value and hold a stock depends on which kind it is.\n\nGARP has a distinguished lineage. **Philip Fisher** (*Common Stocks and Uncommon Profits*) championed \"scuttlebutt\" research and holding quality growers for years. **T. Rowe Price** is called the father of growth investing. And **Warren Buffett**, under Charlie Munger's influence, drifted from deep-value \"cigar butts\" to *\"a wonderful business at a fair price\"* — GARP by another name. The common thread: **quality growth, bought with discipline.**"
+    },
+    {
+     "h": "Where PEG breaks — reasonable, not any, price",
+     "md": "PEG is a **compass, not a valuation.** Lean on it too hard and it misleads:\n\n- It ignores the **durability and quality** of the growth. A moat-protected **15%** grower is worth far more than a fragile **30%** grower the PEG flatters — a low PEG on growth that's about to fade is a **growth trap**.\n- It ignores the **discount rate**. When interest rates rise, the same future growth is worth less; PEG doesn't see it.\n- It **breaks at the extremes**: a PEG of 1 on 50% growth is a heroic bet that hyper-growth persists for years; and it's meaningless for **unprofitable** firms (no real earnings, so no real P/E) or **no-growth** ones.\n\nLynch himself warned against paying up for hot stories with no earnings. The discipline in the name is the whole point: **growth at a *reasonable* price — pay for growth, but demand a margin.** The bars below rank a few archetypes by PEG; green is Lynch's bargain zone, red is priced for perfection."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A stock trades at a P/E of 30 and its earnings are growing 15% a year. Its PEG ratio is:",
+     "options": [
+      "2.0 — the price is twice the growth rate, on the expensive side",
+      "0.5 — a clear bargain by Lynch's rule",
+      "4.5 — multiply P/E by growth",
+      "15 — the PEG equals the growth rate"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — PEG = P/E ÷ growth = 30 ÷ 15 = 2.0, so you're paying twice the growth rate.",
+      "That inverts it — 15 ÷ 30 = 0.5 is growth-over-P/E, not PEG; PEG here is 2.0.",
+      "PEG divides P/E by growth (30 ÷ 15), it does not multiply them.",
+      "The growth rate is 15, but PEG is P/E ÷ growth = 30 ÷ 15 = 2.0, not 15."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "By Peter Lynch's rule of thumb, a fairly-priced growth stock has a PEG of about:",
+     "options": [
+      "1.0 — the P/E roughly equals the growth rate",
+      "0 — a growth stock should trade at no P/E",
+      "10 — a high P/E is the mark of a great company",
+      "0.1 — you should only ever pay a tenth of the growth"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — Lynch's line was that a fairly-priced company's P/E equals its growth rate, i.e. PEG ≈ 1.",
+      "A P/E of zero is impossible for a profitable company; Lynch's fair value is PEG ≈ 1.",
+      "A high P/E signals a rich price or high growth, not quality by itself; fair is PEG ≈ 1.",
+      "PEG below 1 is a bargain, but 0.1 is not a realistic rule; Lynch's fair mark is about 1."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Which best captures the GARP (growth at a reasonable price) approach?",
+     "options": [
+      "Buy companies that are genuinely growing, but refuse to overpay for the growth",
+      "Buy the fastest-growing companies at any price the market asks",
+      "Buy only the statistically cheapest stocks, regardless of whether they grow",
+      "Buy whatever has the strongest recent price momentum"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — GARP pays for growth but demands a reasonable price and a margin, blending both lenses.",
+      "Paying any price for growth is exactly the growth trap GARP is designed to avoid.",
+      "Buying cheapness alone is deep value, not GARP — GARP insists the business also grows.",
+      "Chasing price momentum is a technical, not a fundamental, strategy — GARP values the business."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Why can a stock with a low PEG still be a poor buy?",
+     "options": [
+      "Because PEG ignores the durability and quality of the growth — a fragile or fading growth rate makes a low PEG misleading",
+      "Because a low PEG is proof the company is committing accounting fraud",
+      "Because PEG only applies to bonds, never to stocks",
+      "Because a low PEG mathematically guarantees the share price will fall"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — PEG is a compass, not a valuation: if the growth isn't durable, a low PEG flatters a growth trap.",
+      "A low PEG says nothing about fraud; the real risk is that the growth won't last.",
+      "PEG is a stock metric (P/E over growth); bonds don't have a P/E or an earnings growth rate.",
+      "A low PEG suggests a reasonable price, not a guaranteed decline; the risk is fading growth."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Peter Lynch — One Up on Wall Street",
+     "type": "book",
+     "url": "https://www.google.com/books/edition/One_Up_On_Wall_Street/oL7GJVXTZGkC",
+     "note": "The GARP bible: invest in what you know, the PEG rule, tenbaggers, and the six stock categories."
+    },
+    {
+     "label": "Investopedia — PEG ratio: definition and worked examples",
+     "type": "reading",
+     "url": "https://www.investopedia.com/terms/p/pegratio.asp",
+     "note": "Clear walkthrough of the PEG formula, Lynch's rule, and its limitations."
+    },
+    {
+     "label": "Philip Fisher — Common Stocks and Uncommon Profits",
+     "type": "book",
+     "url": "https://www.google.com/books/edition/Common_Stocks_and_Uncommon_Profits_and_O/lc9DAgN9uZQC",
+     "note": "The quality-growth classic behind the GARP lineage: scuttlebutt research and holding great businesses."
+    }
+   ]
+  },
+  {
    "id": "quality-and-moats",
    "title": "Quality & Moats — Why Some Earnings Last",
    "summary": "An economic moat is the durable competitive advantage that keeps ROIC above WACC for years instead of letting competition compete it away.",

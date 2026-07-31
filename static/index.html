@@ -5352,6 +5352,24 @@ ANIMS.fa_etf_lens=async(cv,ctx)=>{
 };
 ANIMS.fa_etf_lens_static=(cv,ctx)=>{const S=scaler([EL.ey,EL.by,[0]],56,876,40,315);frame(ctx,"ETF compass: earnings yield vs. bond yield");ctx.fillStyle="rgba(95,191,149,.10)";ctx.beginPath();for(let i=0;i<EL.n;i++)ctx.lineTo(S.X(i),S.Y(EL.ey[i]));for(let i=EL.n-1;i>=0;i--)ctx.lineTo(S.X(i),S.Y(EL.by[i]));ctx.fill();line(ctx,S,EL.ey,F.post,1,2.6);line(ctx,S,EL.by,F.ax,1,2.4);};
 
+/* ---- fa_peg: PEG-ratio bars — Peter Lynch's fair-price rule (GARP) ---- */
+const PEGS=[{n:"hidden fast-grower",pe:12,g:24},{n:"steady compounder",pe:18,g:22},{n:"fairly-priced grower",pe:20,g:20},{n:"slow stalwart",pe:14,g:7},{n:"hot story stock",pe:45,g:18},{n:"priced for perfection",pe:60,g:25}].map(s=>Object.assign(s,{peg:s.pe/s.g}));
+ANIMS.fa_peg=async(cv,ctx)=>{
+  const x0=250,xmax=852,pegMax=3,Xp=p=>x0+Math.min(p,pegMax)/pegMax*(xmax-x0),y0=66,rowh=40;
+  const base=(upTo)=>{ frame(ctx,"PEG: Peter Lynch's fair-price rule — P/E ÷ growth");
+    const x1=Xp(1); dashed(ctx,x1,52,x1,y0+PEGS.length*rowh-8,"#8FA1B8"); label(ctx,x1+5,48,"PEG 1 = fair",F.ax);
+    for(let i=0;i<upTo && i<PEGS.length;i++){ const s=PEGS[i],y=y0+i*rowh; const col=s.peg<1?F.ok:s.peg<=1.5?F.post:F.wrong;
+      ctx.fillStyle=col;ctx.globalAlpha=.88;ctx.fillRect(x0,y,Xp(s.peg)-x0,22);ctx.globalAlpha=1;
+      ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="right";ctx.fillText(s.n,x0-10,y+16);
+      ctx.fillStyle=col;label(ctx,Xp(s.peg)+8,y+16,"PEG "+s.peg.toFixed(2)+"  (P/E "+s.pe+" ÷ "+s.g+"%)",col); } };
+  base(0);
+  await narrate("Peter Lynch's shortcut for a growth stock is the PEG ratio: its price-to-earnings divided by its growth rate. His rule — a fairly-priced grower has a PEG near one, where the P/E equals the growth rate.");
+  await tween(1800,k=>base(Math.round(PEGS.length*k)));
+  await narrate("Green sits under one: you're paying less than the growth — Lynch's hunting ground, and the hidden fast-grower at half is the classic tenbagger setup. Amber is fair. Red is dear — the hot story and the stock priced for perfection cost two to three times their growth, the good news already in the price.");
+  await sleep(200);
+  await narrate("Growth at a REASONABLE price: pay for growth, but demand a margin. PEG is a compass, not a verdict — it says nothing about whether the growth will last.");
+};
+ANIMS.fa_peg_static=(cv,ctx)=>{const x0=250,xmax=852,pegMax=3,Xp=p=>x0+Math.min(p,pegMax)/pegMax*(xmax-x0),y0=66,rowh=40;frame(ctx,"PEG bars — Lynch's fair-price rule");const x1=Xp(1);dashed(ctx,x1,52,x1,y0+PEGS.length*rowh-8,"#8FA1B8");for(let i=0;i<PEGS.length;i++){const s=PEGS[i],y=y0+i*rowh,col=s.peg<1?F.ok:s.peg<=1.5?F.post:F.wrong;ctx.fillStyle=col;ctx.globalAlpha=.88;ctx.fillRect(x0,y,Xp(s.peg)-x0,22);ctx.globalAlpha=1;ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="right";ctx.fillText(s.n,x0-10,y+16);}};
 ANIMS._fa_debug={dcfIntrinsic:DC_PV.reduce((s,v)=>s+v,0)+DC_TV, compounderEnd:CO_C[CO_C.length-1], moatEnd:MO_MOAT[MO_MOAT.length-1], noMoatEnd:MO_NO[MO_NO.length-1]};
 })();
 
