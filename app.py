@@ -670,4 +670,12 @@ def service_worker():
                         headers={"Service-Worker-Allowed": "/",
                                  "Cache-Control": "no-cache"})
 
+# .m4a MIME fix (audio "Listen" bug, 2026-07-30): Python's mimetypes maps .m4a to
+# 'audio/mp4a-latm' (a macOS quirk) — the LATM-streaming type, which browsers refuse to
+# decode in <audio>, so pre-rendered narration silently fell back to speechSynthesis. These
+# are standard AAC-in-MP4 files; register the browser-playable type BEFORE StaticFiles mounts.
+import mimetypes
+mimetypes.add_type("audio/mp4", ".m4a")
+mimetypes.add_type("audio/mp4", ".m4b")
+
 app.mount("/static", StaticFiles(directory=os.path.join(BASE, "static")), name="static")

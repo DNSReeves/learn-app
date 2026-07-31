@@ -6,7 +6,7 @@
    name changes if the bytes do, so a stale hit is impossible. POST always network
    (answering, login, upload need a connection). Read-only offline by design.
    Served from "/" (root scope) via the app's /sw.js route + Service-Worker-Allowed: /. */
-const SHELL = "learn-shell-v3";
+const SHELL = "learn-shell-v4";   // v4: purge any .m4a cached under the old bad MIME / range handling
 const DATA  = "learn-data-v1";
 const SHELL_ASSETS = [
   "/", "/static/index.html", "/static/manifest.webmanifest",
@@ -34,6 +34,9 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;                         // POST/PUT/etc never cached
+  if (req.headers.has("range")) return;                     // media Range requests MUST hit the server
+                                                            // directly — <audio> (esp. Safari) needs true
+                                                            // 206s, and cache.put() throws on a 206 anyway.
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;          // leave cross-origin (font CDN) alone
   const p = url.pathname;
