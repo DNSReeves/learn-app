@@ -9,3 +9,6 @@ __pycache__/
 .pytest_cache/
 .venv/
 .DS_Store
+
+# P3.12: generated TTS assets — rebuild with .venv/bin/python tts_render.py
+static/audio/
