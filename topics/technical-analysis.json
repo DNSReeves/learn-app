@@ -83,12 +83,14 @@
     {
      "label": "Investor.gov — Technical analysis (the regulator's sober framing)",
      "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary/technical-analysis",
-     "type": "reading"
+     "type": "reading",
+     "note": "The regulator's two-paragraph framing — usefully unexcited about what TA can claim."
     },
     {
      "label": "StockCharts ChartSchool — Overview of technical analysis",
      "url": "https://school.stockcharts.com/doku.php?id=overview:technical_analysis",
-     "type": "docs"
+     "type": "docs",
+     "note": "The standard free reference for every indicator in this module; start here when a term is fuzzy."
     }
    ]
   },
@@ -171,12 +173,14 @@
     {
      "label": "StockCharts ChartSchool — Moving averages (SMA/EMA mechanics)",
      "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages",
-     "type": "docs"
+     "type": "docs",
+     "note": "SMA vs EMA mechanics with worked examples — the arithmetic behind the smoothing-vs-lag dial."
     },
     {
      "label": "Meb Faber — A Quantitative Approach to Tactical Asset Allocation (the 10-month SMA study)",
      "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461",
-     "type": "paper"
+     "type": "paper",
+     "note": "The 10-month SMA study this module's slow-cadence doctrine descends from; short, readable, replicated."
     }
    ]
   },
@@ -259,12 +263,14 @@
     {
      "label": "StockCharts ChartSchool — Moving averages: SMA vs EMA weighting",
      "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages",
-     "type": "docs"
+     "type": "docs",
+     "note": "SMA vs EMA mechanics with worked examples — the arithmetic behind the smoothing-vs-lag dial."
     },
     {
      "label": "Investopedia — Exponential moving average (EMA), formula and worked examples",
      "url": "https://www.investopedia.com/terms/e/ema.asp",
-     "type": "article"
+     "type": "article",
+     "note": "The EMA formula with the 2/(N+1) constant worked through — good for checking your own arithmetic."
     }
    ]
   },
@@ -346,12 +352,14 @@
     {
      "label": "StockCharts ChartSchool — Average directional index (ADX)",
      "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:average_directional_index_adx",
-     "type": "docs"
+     "type": "docs",
+     "note": "How ADX quantifies trend strength — the filter that keeps crossover signals out of chop."
     },
     {
      "label": "Investopedia — Golden cross: definition and the confirmation-vs-prediction caveat",
      "url": "https://www.investopedia.com/terms/g/goldencross.asp",
-     "type": "article"
+     "type": "article",
+     "note": "Defines the golden cross and, importantly, its confirmation-not-prediction caveat."
     }
    ]
   },
@@ -433,12 +441,14 @@
     {
      "label": "StockCharts ChartSchool — Relative strength index (RSI), including trend-range behavior",
      "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:relative_strength_index_rsi",
-     "type": "docs"
+     "type": "docs",
+     "note": "RSI construction plus the trend-vs-range behavior that the overbought myth ignores."
     },
     {
      "label": "StockCharts ChartSchool — MACD, construction and divergence",
      "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_average_convergence_divergence_macd",
-     "type": "docs"
+     "type": "docs",
+     "note": "MACD assembled from its two EMAs — makes the 'trend tool in oscillator clothing' point visible."
     }
    ]
   },
@@ -520,12 +530,14 @@
     {
      "label": "StockCharts ChartSchool — Bollinger Bands and the squeeze",
      "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:bollinger_bands",
-     "type": "docs"
+     "type": "docs",
+     "note": "Band construction and the squeeze — with the direction-blindness caveat stated plainly."
     },
     {
      "label": "StockCharts ChartSchool — Average true range (ATR) for stops and sizing",
      "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:average_true_range_atr",
-     "type": "docs"
+     "type": "docs",
+     "note": "ATR as the unit of normal motion — the basis for stops and sizing that ignore noise."
     }
    ]
   },
@@ -626,12 +638,14 @@
     {
      "label": "SEC Investor.gov — Day trading: the regulator's evidence on frequent-trading outcomes",
      "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary/day-trading",
-     "type": "reading"
+     "type": "reading",
+     "note": "The regulator's evidence summary on frequent-trading outcomes — blunt and well-sourced."
     },
     {
      "label": "Barber & Odean — Trading Is Hazardous to Your Wealth (the canonical churn study)",
      "url": "https://faculty.haas.berkeley.edu/odean/papers/returns/Individual_Investor_Performance_Final.pdf",
-     "type": "paper"
+     "type": "paper",
+     "note": "Barber & Odean's canonical churn study: the households that traded most earned least, by a wide margin."
     }
    ]
   },
@@ -732,12 +746,14 @@
     {
      "label": "AQR — A Century of Evidence on Trend-Following Investing",
      "url": "https://www.aqr.com/Insights/Research/White-Papers/A-Century-of-Evidence-on-Trend-Following-Investing",
-     "type": "paper"
+     "type": "paper",
+     "note": "AQR's century-scale evidence — the honest version of what trend rules do and don't deliver."
     },
     {
      "label": "Meb Faber — A Quantitative Approach to Tactical Asset Allocation (the 10-month rule)",
      "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461",
-     "type": "paper"
+     "type": "paper",
+     "note": "The 10-month SMA study this module's slow-cadence doctrine descends from; short, readable, replicated."
     }
    ]
   },
@@ -819,12 +835,14 @@
     {
      "label": "AQR — Value and Momentum Everywhere (the cross-sectional momentum evidence)",
      "url": "https://www.aqr.com/Insights/Research/Journal-Article/Value-and-Momentum-Everywhere",
-     "type": "paper"
+     "type": "paper",
+     "note": "The cross-sectional momentum evidence behind relative-strength rotation — AQR's most-cited paper."
     },
     {
      "label": "SEC Investor.gov — Exchange-traded funds: the vehicle-level basics",
      "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-funds-etfs",
-     "type": "reading"
+     "type": "reading",
+     "note": "The vehicle-level ETF basics from the regulator — creation/redemption, costs, tax mechanics."
     }
    ]
   }
