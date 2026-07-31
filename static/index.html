@@ -202,7 +202,7 @@ function signout(){ TOKEN=""; localStorage.removeItem("learn_token"); route(); }
 $("#signout").onclick = async()=>{ try{await api("/logout",{method:"POST"});}catch(e){} signout(); };
 
 /* ================= views ================= */
-function route(){ speechSynthesis.cancel(); TOKEN ? viewDash() : viewAuth(); }
+function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else speechSynthesis.cancel(); TOKEN ? viewDash() : viewAuth(); }
 
 function viewAuth(mode="login"){
   $("#who").textContent=""; $("#signout").hidden=true;
@@ -327,9 +327,9 @@ function renderLadder(curId){
         ${!c.unlocked?'<br><span class="rp">locked</span>':""}
       </span>
     </button>`).join("");
-  $("#back").onclick=()=>{speechSynthesis.cancel(); viewDash();};
+  $("#back").onclick=()=>{stopCardAudio(); viewDash();};
   $("#ladder").querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
-    speechSynthesis.cancel();
+    stopCardAudio();
     renderLadder(b.dataset.c); viewConcept(T.id,b.dataset.c);
   });
 }
@@ -423,6 +423,7 @@ function renderCard(tid){
   <section class="stage">
     <div class="kicker">Concept · ${esc(C.title)} — chunk ${cardIx+1} of ${C.cards.length}</div>
     <h2>${esc(card.h)}</h2>
+    <button class="btn ghost" id="cardplay" style="font-size:.82em;padding:3px 10px;margin:0 0 8px" title="Listen to this chunk">🔊 Listen</button>
     <div class="card-body">${md(card.md)}</div>
     ${last && C.anim ? animHTML() : ""}
     <div class="pager">
@@ -434,8 +435,57 @@ function renderCard(tid){
     ${last ? resHTML() : ""}
   </section>`;
   if (last && C.anim) mountAnim(C.anim);
-  $("#prev").onclick=()=>{speechSynthesis.cancel(); cardIx--; renderCard(tid);};
-  $("#next").onclick=()=>{speechSynthesis.cancel(); last ? startCheckpoint(tid) : (cardIx++, renderCard(tid));};
+  const cp=$("#cardplay"); if(cp) cp.onclick=()=>playCard(tid);
+  $("#prev").onclick=()=>{stopCardAudio(); cardIx--; renderCard(tid);};
+  $("#next").onclick=()=>{stopCardAudio(); last ? startCheckpoint(tid) : (cardIx++, renderCard(tid));};
+}
+/* --- P3.12 per-card audio: Remote's pre-rendered m4a → speechSynthesis fallback.
+   Manifest (static/audio/manifest.json) keyed {topic_id:{concept_id:[url per card idx]}};
+   absence of a file just means we narrate with the browser voice instead. --- */
+let _cardAudio=null, _audioManifest;
+async function loadAudioManifest(){
+  if(_audioManifest!==undefined) return _audioManifest;
+  try{ const r=await fetch("/static/audio/manifest.json",{cache:"no-cache"});
+       _audioManifest = r.ok ? await r.json() : null; }
+  catch{ _audioManifest=null; }
+  return _audioManifest;
+}
+function audioUrlForCard(tid, ix){
+  const m=_audioManifest; if(!m||!C) return null;
+  const pack = m[String(tid)] || m[C.pack] || null;                 // topic → (concept-id fallbacks) → urls
+  const arr  = pack && (pack[String(C.id)] || pack[C.concept]);
+  return Array.isArray(arr) ? (arr[ix]||null) : null;
+}
+function stopCardAudio(){
+  speechSynthesis.cancel();
+  if(_cardAudio){ _cardAudio.pause(); _cardAudio=null; }
+  const b=$("#cardplay"); if(b) b.textContent="🔊 Listen";
+}
+function cardPlainText(card){
+  const d=document.createElement("div"); d.innerHTML=md(card.md||"");
+  return (card.h?card.h+". ":"") + (d.textContent||"").replace(/\s+/g," ").trim();
+}
+async function playCard(tid){
+  const btn=$("#cardplay");
+  if((_cardAudio && !_cardAudio.paused) || speechSynthesis.speaking){ stopCardAudio(); return; }  // toggle off
+  await loadAudioManifest();
+  const url=audioUrlForCard(tid, cardIx);
+  const speak=()=>{
+    if(!("speechSynthesis" in window)){ if(btn) btn.textContent="🔇 No voice"; return; }
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(cardPlainText(C.cards[cardIx])); u.rate=1.02;
+    u.onend=u.onerror=()=>{ if(btn) btn.textContent="🔊 Listen"; };
+    if(btn) btn.textContent="⏸ Pause"; speechSynthesis.speak(u);
+  };
+  if(url){
+    _cardAudio=new Audio(url);
+    _cardAudio.onended=()=>{ _cardAudio=null; if(btn) btn.textContent="🔊 Listen"; };
+    _cardAudio.onerror=()=>{ _cardAudio=null; speak(); };            // file 404 → narrate instead
+    if(btn) btn.textContent="⏸ Pause";
+    _cardAudio.play().catch(()=>{ _cardAudio=null; speak(); });
+    return;
+  }
+  speak();
 }
 function resHTML(){
   if (!C.resources.length) return "";
