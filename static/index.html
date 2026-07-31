@@ -475,7 +475,8 @@ function renderQuestion(tid){
       ${r.newly_mastered?`<div class="mastered-banner">Mastered — the gate is open. The next concept is unlocked, and this one enters spaced review tomorrow.</div>`:""}
       <div class="pager">
         ${!r.correct?`<button class="btn ghost" id="reread">Re-read the cards</button>
-                      <button class="btn ghost" id="helpme">Explain it differently</button>`:""}
+                      <button class="btn ghost" id="helpme">Explain it differently</button>
+                      <button class="btn ghost" id="xpractice" title="AI-generated extra reps — doesn't count toward mastery">🔄 Extra practice</button>`:""}
         <span class="spacer"></span>
         ${r.newly_mastered
           ? `<button class="btn warm" id="go-next">Next concept</button>`
@@ -485,6 +486,7 @@ function renderQuestion(tid){
     const on=$("#go-on"); if(on) on.onclick=()=>{qIx++; renderQuestion(tid);};
     const gn=$("#go-next"); if(gn) gn.onclick=()=>viewTopic(tid);
     const rr=$("#reread"); if(rr) rr.onclick=()=>{cardIx=0; renderCard(tid);};
+    const xp=$("#xpractice"); if(xp) xp.onclick=()=>startPractice(tid, C.id, C.title);
     const hm=$("#helpme"); if(hm) hm.onclick=async()=>{
       hm.disabled=true; hm.textContent="Thinking…";
       const h=await api(`/topic/${tid}/concept/${C.id}/help`,{method:"POST",body:{question_id:q.id}});
@@ -507,6 +509,61 @@ function renderQuestion(tid){
     const r=await api(`/topic/${tid}/concept/${C.id}/answer`,{method:"POST",
       body:{question_id:q.id, choice:i, latency_ms:Date.now()-t0}});
     finish(r,b);
+  });
+}
+
+/* P3.11 (iss_b98c7ee2): AI-generated EXTRA PRACTICE — formative only, never moves mastery.
+   Consumes Remote's POST /topic/{tid}/concept/{cid}/practice (+ /answer). Answer keys stay
+   server-side; a restart honestly expires the set. */
+let _pracQ=[], _pracIx=0, _pracCtx=null;
+async function startPractice(tid,cid,title){
+  _pracCtx={tid,cid,title};
+  $("#stage").innerHTML=`<section class="stage"><div class="kicker">Extra practice · ${esc(title)}</div>
+    <p class="sub">Generating a few extra questions…</p></section>`;
+  let d;
+  try{ d=await api(`/topic/${tid}/concept/${cid}/practice`,{method:"POST"}); }
+  catch(e){ d={available:false,text:"Couldn't reach practice — try again in a moment."}; }
+  if(!d || !d.available){
+    $("#stage").innerHTML=`<section class="stage"><div class="kicker">Extra practice · ${esc(title)}</div>
+      <div class="fb">${esc((d&&d.text)||"Extra practice isn't available right now — the authored checkpoint is the gate either way.")}</div>
+      <div class="pager"><span class="spacer"></span><button class="btn" id="prac-back">Back to the checkpoint</button></div></section>`;
+    $("#prac-back").onclick=()=>renderQuestion(tid);
+    return;
+  }
+  _pracQ=d.questions||[]; _pracIx=0;
+  if(!_pracQ.length){ renderQuestion(tid); return; }
+  renderPractice();
+}
+function renderPractice(){
+  const {tid,cid,title}=_pracCtx, q=_pracQ[_pracIx], t0=Date.now();
+  $("#stage").innerHTML=`<section class="stage">
+    <div class="kicker">Extra practice · ${esc(title)}</div>
+    <div class="fb" style="background:rgba(224,184,74,.12);color:var(--warm,#e0b84a);border:1px solid rgba(224,184,74,.35)">
+      🔄 Extra practice — <b>doesn't count toward mastery</b> · question ${_pracIx+1} of ${_pracQ.length}</div>
+    <p class="qprompt">${esc(q.prompt)}</p>
+    <div id="pracopts">${q.options.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>
+    <div id="pracafter"></div></section>`;
+  document.querySelectorAll("#pracopts .opt").forEach(b=>b.onclick=async()=>{
+    document.querySelectorAll("#pracopts .opt").forEach(x=>x.disabled=true);
+    let r;
+    try{ r=await api(`/topic/${tid}/concept/${cid}/practice/answer`,{method:"POST",
+           body:{question_id:q.id, choice:+b.dataset.i, latency_ms:Date.now()-t0}}); }
+    catch(e){ r={expired:true,text:"Couldn't submit — generate a fresh set."}; }
+    if(r && r.expired){
+      $("#pracafter").innerHTML=`<div class="fb">${esc(r.text)}</div>
+        <div class="pager"><span class="spacer"></span><button class="btn" id="prac-regen">New practice set</button></div>`;
+      $("#prac-regen").onclick=()=>startPractice(tid,cid,title);
+      return;
+    }
+    b.classList.add(r.correct?"right":"wrongpick");
+    const last=_pracIx>=_pracQ.length-1;
+    $("#pracafter").innerHTML=`
+      <div class="fb ${r.correct?"good":"bad"}">${esc(r.feedback)}</div>
+      <div class="pager"><span class="spacer"></span>
+        ${last?`<button class="btn" id="prac-done">Back to the checkpoint</button>`
+              :`<button class="btn" id="prac-next">Next practice question</button>`}</div>`;
+    const nx=$("#prac-next"); if(nx) nx.onclick=()=>{_pracIx++; renderPractice();};
+    const dn=$("#prac-done"); if(dn) dn.onclick=()=>renderQuestion(tid);
   });
 }
 
