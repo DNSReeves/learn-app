@@ -1,0 +1,900 @@
+{
+ "id": "investment-portfolios",
+ "title": "Investment Portfolios",
+ "tagline": "Allocation and discipline decide almost everything; products decide almost nothing",
+ "description": "How portfolios actually work: the diversification free lunch and where it runs out, why asset allocation dominates stock picking (and what the famous 90% really means), the construction workflow, a taxonomy of the risks that matter — drawdown, sequence, inflation, liquidity, behavior — the growth/duration/convexity three-jobs model, bond duration and convexity mechanics, managed futures and trend following, commodities, and the honest case for and against liquid and private alternatives.",
+ "concepts": [
+  {
+   "id": "why-a-portfolio",
+   "title": "Diversification: The Only Free Lunch in Finance",
+   "summary": "A portfolio is a deliberate collection of assets whose imperfect correlations make the whole less risky than the sum of its parts. Expected returns blend as a weighted average, but volatility blends below that average — risk partially cancels while return does not. That asymmetry is why Harry Markowitz called diversification the only free lunch in investing, and why broad exchange-traded funds (ETFs) are its cheapest implementation.",
+   "cards": [
+    {
+     "h": "Returns average. Risk doesn't.",
+     "md": "A **portfolio** is not a pile of tickers — it is a set of positions chosen so their behaviors offset. The math that makes this work is quietly remarkable.\n\nCombine two assets and the portfolio's **expected return** is exactly the weighted average of the two. No surprise there. But the portfolio's **volatility** (the standard deviation of returns) is *less* than the weighted average of the two volatilities whenever the assets are **imperfectly correlated** — whenever their correlation is below +1.0. One zigs while the other zags, at least some of the time, and those offsetting moves cancel part of the noise.\n\nSo you keep the full blended return while shedding part of the blended risk. Return is additive; risk is sub-additive. **Harry Markowitz**, whose 1952 paper *Portfolio Selection* founded modern portfolio theory, is credited with the famous framing: diversification is **the only free lunch** in finance — the one place markets hand you something (lower risk) without charging you something (lower expected return).\n\nThe intuition scales: adding a third, tenth, hundredth imperfectly correlated asset keeps grinding down the noise that is specific to each holding. Which raises the question — what, exactly, is being ground down, and what remains?"
+    },
+    {
+     "h": "Two kinds of risk — only one is refundable",
+     "md": "Every asset's risk splits into two components.\n\n**Idiosyncratic risk** (also called *specific* or *diversifiable* risk) is the part unique to one company or asset: a fraud, a failed drug trial, a factory fire, a chief executive scandal. Because these events are uncorrelated across firms, holding many firms makes them wash out. Diversification can drive this component toward zero.\n\n**Market risk** (also called *systematic* risk) is the part every asset shares: recessions, interest-rate shocks, wars, panics. No number of stocks diversifies it away, because it moves them all together. This is the risk you are actually *paid* to bear — the source of the equity risk premium.\n\nThe practical punchline: since idiosyncratic risk is diversifiable, the market does not compensate you for holding it. Owning three stocks means carrying large uncompensated risk. The cheap fix is a broad **exchange-traded fund (ETF)** — a single fund, traded like a stock, that holds hundreds or thousands of securities. A total-market ETF at a few basis points of annual cost delivers close to the theoretical maximum of the free lunch: idiosyncratic risk near zero, market risk retained and rewarded. Diversification that once required a fortune and an operations desk now costs less than a coffee per $10,000 per year."
+    },
+    {
+     "h": "Where the free lunch runs out",
+     "md": "The free lunch has a catch, and it is worth stating plainly: **correlations are not constants**. They are highest exactly when you most need them to be low.\n\nIn calm markets, stocks, sectors, and countries wander semi-independently, and diversification works as advertised. In a **crisis**, investors sell everything at once — to raise cash, meet margin calls, or simply flee — and correlations among risky assets lurch toward +1.0. In 2008, United States stocks, foreign stocks, real estate, commodities, and low-grade credit all fell together. Diversification *within* risky assets faded precisely when it was most wanted.\n\nWhat held up were assets on the other side of the panic: high-quality government bonds and cash. The lesson is not that diversification is a lie — it is that diversification across *many stocks* solves idiosyncratic risk, while surviving a crisis requires diversification across *asset classes* with genuinely different economics.\n\nThis is the hinge to everything that follows: if crashes compress correlations among risky assets, then the decision that actually governs your crisis experience is **how much you hold in stocks versus bonds and cash at the asset-class level** — the asset allocation decision. That is the next concept."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Two assets each have 20% volatility and the same expected return, with correlation of 0.4. Compared with holding either alone, a 50/50 portfolio of the two offers:",
+     "options": [
+      "The same expected return with volatility below 20%",
+      "A higher expected return with the same 20% volatility",
+      "The same expected return and the same 20% volatility",
+      "A lower expected return in exchange for lower volatility"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — expected returns combine as a simple weighted average (still the same here), but with correlation below +1.0 the volatilities partially cancel, so portfolio volatility lands below 20%. Risk shrinks while return does not: the free lunch.",
+      "Diversification never raises expected return — the portfolio's expected return is exactly the weighted average of its parts. The benefit shows up entirely on the risk side, not the return side.",
+      "Volatility would stay at 20% only if the correlation were a perfect +1.0, meaning the assets move in lockstep. At correlation 0.4, offsetting moves cancel some noise and volatility falls below 20%.",
+      "This describes an ordinary risk-return trade-off, which is precisely what diversification is not. You give up no expected return here — that costlessness is why Markowitz called it a free lunch."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "An investor holds 500 stocks through a broad index ETF. Which risk remains essentially undiminished?",
+     "options": [
+      "The risk of one company's chief executive committing fraud",
+      "The risk that a single holding loses a patent lawsuit",
+      "The risk of a recession dragging down nearly all stocks together",
+      "The risk of one firm's factory burning down"
+     ],
+     "answer": 2,
+     "feedback": [
+      "A single-company fraud is textbook idiosyncratic risk — with 500 holdings, one blowup dents the portfolio by a fraction of a percent. This is exactly the risk diversification eliminates.",
+      "A patent loss hits one firm, not the market. Across 500 uncorrelated firm-level events, these shocks wash out — this is the diversifiable component, not the residue.",
+      "Correct — a recession is market (systematic) risk: it moves virtually all stocks together, so no amount of adding stocks diversifies it away. It is also the risk investors are compensated for bearing.",
+      "A factory fire is a firm-specific event, uncorrelated with fires elsewhere. Spread across hundreds of holdings, its portfolio impact rounds toward zero — the definition of diversifiable risk."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "During the 2008 crisis, an investor diversified across United States stocks, foreign stocks, real estate funds, and commodities was surprised that everything fell together. What best explains this?",
+     "options": [
+      "Their ETFs secretly held overlapping stocks, so they were never diversified",
+      "Correlations among risky assets rise toward +1.0 in a panic, so diversification within risky assets fades exactly when most needed",
+      "Diversification only works for portfolios of individual stocks, not funds",
+      "Market risk had been fully diversified away, leaving only idiosyncratic risk"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Overlap can exist between funds, but it is not the mechanism here — even cleanly distinct risky asset classes (foreign stocks, real estate, commodities) crashed together because panic selling compressed their correlations.",
+      "Right — correlations are not constants. In a crisis, indiscriminate selling pushes risky-asset correlations toward +1.0, so spreading money among risky assets stops helping. Crisis protection has to come from genuinely different asset classes like high-quality bonds and cash.",
+      "Funds versus individual stocks is irrelevant to the mechanism — diversification math applies identically. The failure was that all these holdings shared exposure to the same systemic panic, whatever the wrapper.",
+      "This inverts the two risk types. Diversification removes idiosyncratic risk and cannot remove market risk — and 2008 was market risk expressing itself across every risky asset at once."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Diversification",
+     "url": "https://www.investopedia.com/terms/d/diversification.asp",
+     "type": "reading",
+     "note": "Clean plain-English treatment of the mechanism, the two risk types, and the practical limits — the right first stop after this card set."
+    },
+    {
+     "label": "Markowitz (1952), \"Portfolio Selection,\" Journal of Finance — the founding paper",
+     "url": "https://www.jstor.org/stable/2975974",
+     "type": "paper",
+     "note": "The primary source for the variance math and the free-lunch framing; short, readable, and the origin of modern portfolio theory."
+    }
+   ],
+   "anim": "pf_free_lunch"
+  },
+  {
+   "id": "allocation-beats-picking",
+   "title": "Asset Allocation Beats Stock Picking — and the Evidence Is Not Close",
+   "summary": "The policy mix — which asset classes you hold and in what proportions — dominates the behavior of a portfolio over time, while security selection and market timing add noise and cost. Brinson, Hood, and Beebower found policy explains roughly 90% of the variability of returns over time (a precise claim that is routinely misquoted), and S&P's SPIVA scorecards show most active funds trail their index over long horizons. The honest conclusion: get the allocation right, implement with cheap index exchange-traded funds (ETFs), and treat stock picking as a hobby budget.",
+   "cards": [
+    {
+     "h": "Three decisions, one that matters most",
+     "md": "Every portfolio outcome is produced by three distinct decisions, usually blurred together:\n\n1. **Policy mix (asset allocation)** — what fraction of the portfolio sits in each **asset class**: stocks, bonds, cash, real assets. Example: 60% stocks / 40% bonds, held steadily.\n2. **Security selection** — which particular stocks or bonds you own *within* each class. Picking Apple over Exxon.\n3. **Market timing** — moving between classes based on forecasts. Lightening up on stocks because a crash \"feels\" near.\n\nIn 1986, **Gary Brinson, Randolph Hood, and Gilbert Beebower** published *Determinants of Portfolio Performance*, studying large United States pension funds. Their famous result: the policy mix explained, on average, roughly **90% of the variability of a portfolio's returns over time**. Later work (notably Ibbotson and Kaplan, 2000) confirmed and sharpened the picture: timing and selection mostly added noise — and, net of costs, often subtracted value.\n\nRead that finding carefully; the next card is about how it gets mangled. But the plain-language core survives every re-examination: **whether you held 60% stocks matters vastly more than which stocks the 60% contained.** The decision investors spend the least time on — the class mix — is the one doing almost all the work."
+    },
+    {
+     "h": "The 90% misquote — variability, not return level",
+     "md": "The Brinson result may be the most misquoted statistic in finance, so pin down what it does and does not say.\n\n**What it says:** the policy mix explains about 90% of the **variability of a portfolio's returns over time** — the quarter-to-quarter ups and downs. When a 60/40 fund has a bad quarter, it is almost always because stock and bond *markets* had a bad quarter, not because the manager picked the wrong stocks. Allocation drives the ride.\n\n**What it does not say:** that allocation determines 90% of your **return level** — how much money you end up with. Two funds with identical policy can end at different wealth because of fees, execution, and selection. Ibbotson and Kaplan's 2000 paper, *Does Asset Allocation Policy Explain 40, 90, or 100 Percent of Performance?*, untangled this: policy explains ~90% of time-series variability, roughly 40% of the variation *among* funds, and — for the average fund — about **100% of the return level**, because timing and selection net out to zero *minus costs*.\n\nThat last figure is the quiet indictment: the average active effort returned the policy benchmark before fees, and less after. The misquote (\"90% of your returns come from allocation\") is wrong in the letter yet accidentally right in spirit — but a careful investor should be able to state the real claim, because the difference between *variability* and *level* is exactly where the fee argument lives."
+    },
+    {
+     "h": "SPIVA, compounding costs, and the hobby budget",
+     "md": "If allocation drives the ride, could skilled stock picking still add a layer of return on top? The scorecard evidence says: for the overwhelming majority, no.\n\n**SPIVA** (S&P Indices Versus Active), a long-running scorecard from S&P Dow Jones Indices, compares active funds against their benchmark indexes — for example, United States large-cap funds against the **S&P 500** (Standard & Poor's 500, the index of roughly 500 leading United States companies). The pattern has held for two decades: over **10-to-15-year horizons, the large majority of active funds — commonly 85–90% in large-cap categories — trail their index**. Short-run winners exist, but persistence studies show they rarely stay winners.\n\nThe main culprit is arithmetic, not incompetence. Active management is a zero-sum game before costs — every overweight is someone's underweight — so after costs it is negative-sum. And **costs compound**: a 1% annual fee versus 0.05% for a broad index ETF, on a 7% market, consumes roughly a quarter of your ending wealth over 30 years. The fee is certain; the skill is not.\n\nThe honest conclusion, in order:\n1. **Get the allocation right first.** It governs both your risk and, per Ibbotson-Kaplan, essentially your expected return level.\n2. **Implement with cheap, broad index ETFs.** Capture each asset class at near-zero cost.\n3. **If picking stocks is fun, give it a hobby budget** — a small, capped sleeve whose losses cannot dent the plan. A hobby, not a strategy."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A commentator says: \"Studies prove 90% of your investment returns come from asset allocation.\" What did Brinson, Hood, and Beebower's 1986 study actually find?",
+     "options": [
+      "Policy mix explains about 90% of the variability of a portfolio's returns over time",
+      "Asset allocation generates 90% of the dollars an investor ends up with",
+      "90% of pension funds beat their benchmarks using allocation alone",
+      "Allocation explains 90% of the differences in returns between one fund and another"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Exactly — the 90% figure describes time-series variability: the quarter-to-quarter movement of a fund's returns is almost entirely explained by its policy mix. It is a claim about what drives the ride, not about the level of ending wealth.",
+      "This is the classic misquote. The study measured variability over time, not the return level. Ibbotson and Kaplan later showed policy explains about 100% of the average fund's return level — but only because timing and selection net to zero minus costs, a different and sharper claim.",
+      "The study made no such claim about beating benchmarks — in fact its implication runs the other way: the funds' active decisions (timing and selection) on average subtracted value relative to their policy benchmarks.",
+      "Cross-sectional variation — why fund A differs from fund B — is a different question, and Ibbotson-Kaplan pegged policy's share of that at roughly 40%, not 90%. The 90% figure is strictly about one fund's variability through time."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "According to S&P's SPIVA scorecards, what fraction of actively managed United States large-cap funds typically trail the S&P 500 over 10-to-15-year horizons?",
+     "options": [
+      "Around half — active and passive are roughly a coin flip",
+      "A small minority — most managers earn back their fees",
+      "The large majority — commonly 85–90%",
+      "Effectively none — long horizons let skilled managers pull ahead"
+     ],
+     "answer": 2,
+     "feedback": [
+      "A coin flip is roughly the picture before costs, since active management is zero-sum against the market. After fees and trading costs the coin is heavily weighted, and long horizons compound the disadvantage well past 50%.",
+      "This reverses the finding. The fee hurdle is certain and skill persistence is rare, so the minority who win a given decade are largely different funds from the prior decade's winners.",
+      "Correct — SPIVA has shown for two decades that the large majority of active large-cap funds, commonly 85–90% over 10-to-15 years, trail the S&P 500. The pattern repeats across categories and countries.",
+      "Longer horizons make things worse for active funds, not better, because the annual fee drag compounds while luck-driven winning streaks mean-revert. The 15-year SPIVA numbers are typically the ugliest."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Given the Brinson and SPIVA evidence, which sequence of effort matches the data?",
+     "options": [
+      "Screen for winning stocks first, then fit an allocation around your best picks",
+      "Set the asset-class mix first, implement with low-cost index ETFs, and cap any stock picking at a small hobby sleeve",
+      "Focus on timing entries and exits, since avoiding crashes matters more than the mix",
+      "Split effort equally across allocation, selection, and timing for balance"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Building around picks puts the least reliable decision in charge of the most important one — the class mix would become an accident of whatever tickers survived your screen, inverting what the evidence says drives outcomes.",
+      "Right — allocation governs both your risk and, on average, your return level; cheap broad index exchange-traded funds capture it at near-zero cost; and a capped hobby sleeve lets picking scratch the itch without letting a negative-sum game touch the plan.",
+      "Timing is the weakest leg in the data — Brinson's funds lost value to it on average, and it requires being right twice (exit and re-entry). Crash protection belongs in the allocation itself, not in forecasts.",
+      "Equal effort is a category error when the decisions are wildly unequal in impact. The mix explains ~90% of return variability; selection and timing are negative-sum after costs. Effort should follow impact."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "SPIVA Scorecards — S&P Dow Jones Indices",
+     "url": "https://www.spglobal.com/spdji/en/research-insights/spiva/",
+     "type": "docs",
+     "note": "The primary, continuously updated dataset on active funds versus their benchmarks, including the persistence scorecards — go to the source, not summaries."
+    },
+    {
+     "label": "Investopedia — Asset Allocation",
+     "url": "https://www.investopedia.com/terms/a/assetallocation.asp",
+     "type": "reading",
+     "note": "Solid definitional grounding on the policy-mix decision itself, useful before wading into the Brinson and Ibbotson-Kaplan literature."
+    }
+   ],
+   "anim": "pf_allocation"
+  },
+  {
+   "id": "portfolio-construction",
+   "title": "From Policy to Positions: Building a Portfolio That Survives Contact with Markets",
+   "summary": "Construction is a workflow, not a shopping trip: write the Investment Policy Statement (IPS) before markets test you, set target weights by sleeve, implement with cheap broad exchange-traded funds (ETFs), place assets in the right account types for taxes, and rebalance with drift bands rather than the calendar alone. Each step exists to make the plan executable by a future, stressed version of you.",
+   "cards": [
+    {
+     "h": "Write the policy before the market tests you",
+     "md": "Portfolio construction starts with a document, not a trade ticket.\n\nAn **Investment Policy Statement (IPS)** is a short written contract with yourself covering: your **objectives** (what the money is for, and when), your **target allocation** (the asset-class weights from the policy-mix decision), your **rebalancing bands and rules**, and your **change conditions** — the only circumstances (a changed life, not a scary headline) under which the policy itself may be edited.\n\nWhy written, and why *before*? Because the moment you will most want to abandon the plan is the moment you will be least capable of judging it. A 30% drawdown produces a persuasive internal voice arguing that this time is different. The IPS is a message from calm-you to panicked-you: *we decided this in advance, with a clear head, and here is what we do now.* Institutions have used this device for decades for exactly this reason — it converts a behavioral problem into a clerical one.\n\nWith the policy written, define the **sleeves** (buckets) that carry it: for example, United States stocks, international stocks, bonds, real assets, cash — each with a **target weight** that sums to the policy mix. Then **implement cheaply**: one broad, low-cost **exchange-traded fund (ETF)** per sleeve is usually enough. Expense ratios compound against you every year with certainty — a 0.9% difference in fees, compounded over 30 years, consumes roughly a quarter of ending wealth — so cost is a construction decision, not a footnote."
+    },
+    {
+     "h": "Asset location: same portfolio, different accounts, more money",
+     "md": "**Asset allocation** decides *what* you own. **Asset location** decides *which account type* each asset lives in — and doing it well adds after-tax return without changing the portfolio at all.\n\nThe key fact: account types tax income differently.\n\n- **Tax-deferred accounts** — a traditional Individual Retirement Account (IRA) or 401(k) — shelter interest as it accrues; everything is taxed as ordinary income on withdrawal.\n- **Taxable accounts** tax interest annually at ordinary-income rates, but reward patience: stocks held over a year pay lower **long-term capital-gains rates**, unrealized gains compound untaxed until sold, and under current United States law heirs receive a **step-up in basis** — embedded gains can escape income tax entirely at death.\n\nThe matching rule follows directly:\n\n- **Bonds and TIPS (Treasury Inflation-Protected Securities) → tax-deferred.** Their return arrives as ordinary-income interest — the exact income the deferred wrapper shelters best. (TIPS have the extra nuisance of taxable \"phantom income\" on inflation adjustments in taxable accounts.)\n- **Broad equity ETFs → taxable.** Their return arrives mostly as lightly-taxed long-term gains, they distribute few taxable gains along the way, and they are the asset most likely to carry a large embedded gain to the step-up.\n\nPut it backwards — bonds in taxable, stocks locked in the deferred account — and you convert cheap capital-gains income into expensive ordinary income twice over. Same holdings, same risk, thinner after-tax result. Location is the rare free improvement left after allocation and costs."
+    },
+    {
+     "h": "Rebalance on drift, review on schedule",
+     "md": "Markets immediately start un-building your portfolio: stocks rally, and your 60/40 quietly becomes 70/30 — a riskier book than you chose, adopted by inattention.\n\n**Rebalancing** — selling the overweight sleeve and buying the underweight one back to targets — is the maintenance loop. The design question is the *trigger*.\n\n- **Calendar-only** (say, every December) is simple but blind: it can rebalance when nothing moved (pointless trades, taxes) and sit idle through a mid-year crash that pushed weights far off target.\n- **Bands** act on the portfolio's actual state: define a tolerance around each target — for example **±5 percentage points (pp)** — and act only when a sleeve drifts outside it. A 60% stock target with 55/65 bands means: do nothing between 55 and 65; trade back to target on a breach.\n\nBands earn their keep twice. They are mechanically **contrarian** — a breach of the upper band means stocks have run, so you trim high; a lower breach means they've fallen, so you buy low. No forecast, no nerve required; the rule fires precisely when panic or euphoria would argue loudest against it. And bands **prevent churn**: inside the tolerance zone you trade nothing, which suppresses costs and taxable realizations that calendar-only rebalancing generates on quiet years. A sensible hybrid: *check* on a calendar (quarterly), *act* only on band breaches.\n\nFinally, the **review cadence**: scheduled — annually, or on true life changes — and never headline-driven. A review triggered by a scary market is not a review; it is capitulation wearing a process costume. The IPS names the schedule; the schedule, not the news, opens the document."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "What is the primary reason to write an Investment Policy Statement (IPS) before markets get turbulent, rather than during?",
+     "options": [
+      "Regulators require individual investors to file one before trading",
+      "Decisions made calmly in advance protect the plan from the panicked judgment a drawdown produces",
+      "An IPS locks in allocations permanently so they can never be changed",
+      "It guarantees higher returns by documenting the strategy"
+     ],
+     "answer": 1,
+     "feedback": [
+      "No regulator requires a personal IPS — it is a self-imposed institution-style discipline. Its force is behavioral, a contract with yourself, not legal or regulatory.",
+      "Correct — the moment you most want to abandon a plan (deep in a drawdown) is the moment you judge worst. A policy written in calm converts a behavioral crisis into a clerical act: open the document, follow the rule you already chose.",
+      "An IPS is binding against moods, not against life. It should name its own change conditions — retirement, inheritance, changed goals — and be editable on schedule with a clear head. Permanence is not the point; premeditation is.",
+      "No document changes expected returns. The IPS improves the odds you actually capture the returns of the plan by preventing panic selling and headline-driven tinkering — a behavioral edge, not a market edge."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "An investor holds broad stock ETFs and a taxable bond fund, split across a traditional IRA and a taxable brokerage account. Which placement is most tax-efficient?",
+     "options": [
+      "Bonds in the taxable account, stocks in the IRA — keep the volatile asset sheltered",
+      "Split every asset 50/50 across both accounts for balance",
+      "Bonds in the IRA, stock ETFs in the taxable account",
+      "Placement is irrelevant — total taxes depend only on what you own, not where"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Sheltering volatility is the intuitive trap: the IRA shelters *income*, not risk, and it converts everything inside it into ordinary income at withdrawal. Stocks in the IRA forfeit long-term capital-gains rates and the step-up; bonds in taxable pay ordinary rates annually. Worst of both.",
+      "Mirroring assets across accounts feels tidy but ignores the tax asymmetry entirely — half the bond interest gets taxed annually at ordinary rates, and half the equity gains lose their preferential treatment. Balance is a property of the whole portfolio, not each account.",
+      "Right — bond interest is ordinary income, exactly what the tax-deferred wrapper shelters best, while equity ETFs in taxable enjoy long-term capital-gains rates, minimal ongoing distributions, and the step-up in basis at death. Same portfolio, materially more after-tax wealth.",
+      "Location changes the tax character and timing of every dollar of return — ordinary income versus long-term gains, annual taxation versus deferral, step-up versus none. Identical holdings arranged differently can differ meaningfully in after-tax outcome over decades."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why do rebalancing bands (e.g., trade only when a sleeve drifts more than ±5 percentage points from target) beat a calendar-only rule?",
+     "options": [
+      "Bands respond to actual drift — trimming after run-ups and buying after declines — while skipping trades when nothing has moved",
+      "Bands let you time the market by predicting when stocks will fall",
+      "Bands mean the portfolio never needs to be checked at all",
+      "Calendar rebalancing is wrong because portfolios should never be rebalanced"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Exactly — bands key trades to the portfolio's state, not the date. A breach only happens after a big relative move, so the rule mechanically sells what ran and buys what fell, while inside the bands it stays silent, suppressing churn, costs, and needless taxable sales that calendar-only trading generates in quiet years.",
+      "Bands are the opposite of prediction — they are purely reactive, firing only after drift has already occurred. Their contrarian sell-high/buy-low character comes from arithmetic, not forecasting; no view about the future is required or used.",
+      "Bands still require monitoring to detect a breach — the practical pattern is calendar-checking (say quarterly) with band-triggered action. What bands remove is unnecessary *trading*, not oversight.",
+      "Unrebalanced portfolios drift into risk postures nobody chose — a 60/40 left alone through a bull market becomes 75/25 on the eve of the next bear. Calendar rebalancing is merely blunter than bands, not the concept in error."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Investment Policy Statement (IPS)",
+     "url": "https://www.investopedia.com/terms/i/ips.asp",
+     "type": "reading",
+     "note": "Concrete breakdown of what a personal IPS contains, bridging the institutional practice to an individual investor's one-page version."
+    },
+    {
+     "label": "Investopedia — Rebalancing",
+     "url": "https://www.investopedia.com/terms/r/rebalancing.asp",
+     "type": "reading",
+     "note": "Covers the mechanics and trade-offs of rebalancing approaches, including threshold (band) versus calendar triggers and their cost implications."
+    }
+   ]
+  },
+  {
+   "id": "kinds-of-risk",
+   "title": "A Taxonomy of Risk: Volatility Is Not the Only One",
+   "summary": "Volatility is the risk that is easiest to measure, not the one that does the most damage. This concept builds a working taxonomy — market vs. idiosyncratic, inflation, liquidity, drawdown, sequence-of-returns, and behavioral risk — and shows why the risks that matter depend on who you are and when you need the money.",
+   "cards": [
+    {
+     "h": "Market vs. idiosyncratic — and the quiet risks",
+     "md": "**Market (systematic) risk** is the risk of the whole market moving; you cannot diversify it away, and it is the risk you are *paid* to bear. **Idiosyncratic (diversifiable) risk** is specific to one company or asset — a single stock blowing up. Diversification removes it nearly for free, which is why concentrated bets carry risk the market does not compensate.\n\nTwo quieter risks hide behind \"safe\" labels:\n\n- **Inflation risk.** A portfolio of nominal government bonds held to maturity is certain in *dollars* and uncertain in *purchasing power*. If your liability is real spending — groceries, healthcare, property taxes — a nominal-safe portfolio can lose steadily in the units that matter. Always ask: is this number **real** (inflation-adjusted) or **nominal**?\n- **Liquidity risk.** Can you sell at a fair price *when you must*? An asset that only trades well in calm markets offers liquidity precisely when you don't need it. Forced sales into stressed markets convert a temporary discount into a permanent loss."
+    },
+    {
+     "h": "Drawdown: losses compound asymmetrically",
+     "md": "**Drawdown** is the peak-to-trough decline of your portfolio — the risk investors actually *feel*, especially retirees spending from the portfolio.\n\nThe arithmetic is asymmetric: a loss of *x*% requires a gain of *x*/(1−*x*) to recover.\n\n| Loss | Gain needed to break even |\n|------|--------------------------|\n| −10% | +11% |\n| −25% | +33% |\n| −45% | **+82%** |\n| −60% | +150% |\n\nA −45% loss does not need +45% to heal — it needs +82%, because the gain is earned on a smaller base. Two portfolios with the same average return but different drawdown profiles are not equally risky: the deep-drawdown one spends more of its life climbing out of holes. This is why drawdown control, not volatility control, is the binding constraint for anyone withdrawing money."
+    },
+    {
+     "h": "Sequence-of-returns risk and behavioral risk",
+     "md": "**Sequence-of-returns risk**: the same set of annual returns, in a different *order*, produces different outcomes for anyone adding or withdrawing money. For a withdrawing retiree, bad years early are devastating — each fixed withdrawal is sold from a depressed portfolio, permanently shrinking the base that later good years compound on. Reverse the order (good years first) and the identical average return leaves far more wealth. For a young accumulator making contributions, early bad years are actually *helpful* (buying cheap); for a retiree they can be ruinous. Same returns, same average — opposite verdicts, because cash flows interact with the path.\n\n**Behavioral risk** is the risk of *you*: capitulating at the bottom converts a paper loss into a permanent one, and the recovery arithmetic above shows how expensive that conversion is. A portfolio you cannot hold through its worst drawdown is riskier than its statistics suggest — the right risk budget is the one you will actually stay invested through."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Two retirees experience the identical set of 20 annual returns, but in reverse order. Both withdraw a fixed dollar amount every year. What is the most accurate statement?",
+     "options": [
+      "They end with identical wealth, since the average and compound return of the sequence are the same",
+      "The retiree who suffers the bad years early may permanently deplete the portfolio, because withdrawals are sold from a depressed base",
+      "Return order only matters for accumulators making contributions, not for retirees making withdrawals",
+      "Annual rebalancing neutralizes any difference the ordering creates"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Matching averages only guarantee matching outcomes when there are no cash flows. Fixed withdrawals interact with the path: selling from a depressed portfolio early shrinks the base that later gains compound on, so ordering changes ending wealth dramatically.",
+      "Correct. This is sequence-of-returns risk: each fixed withdrawal taken during early bad years liquidates a larger fraction of the portfolio, and the later good years arrive too late to compound on a base that has been permanently reduced.",
+      "It is the reverse — order matters *most* for withdrawers. An accumulator buying through early bad years purchases assets cheaply; a retiree selling through them locks in losses. Sequence risk is decisive precisely in the withdrawal phase.",
+      "Rebalancing manages the mix between assets; it cannot undo the arithmetic of selling shares from a depressed portfolio to fund fixed withdrawals. The damage comes from the cash-flow path, which rebalancing does not change."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A portfolio falls 45% from its peak. Approximately what gain is required just to return to the prior peak?",
+     "options": [
+      "+45%",
+      "+55%",
+      "+82%",
+      "+100%"
+     ],
+     "answer": 2,
+     "feedback": [
+      "A symmetric-looking answer, but the recovery gain is earned on the *smaller* post-loss base. Gaining 45% on 55 cents on the dollar only gets you back to about 80 cents — well short of the peak.",
+      "This is the remaining fraction of the portfolio (55%), not the required recovery. The needed gain is loss/(1−loss): 0.45/0.55 ≈ 82%, always larger than the loss itself.",
+      "Correct. After a 45% loss you hold 0.55 of peak value, and 1/0.55 ≈ 1.82 — an 82% gain is required to break even. Losses and gains compound asymmetrically, which is why deep drawdowns are so expensive in time and return.",
+      "A 100% gain is what a −50% loss requires, not −45%. The exact formula is loss/(1−loss): for a 45% loss that is 0.45/0.55 ≈ 82%. The asymmetry grows explosively as losses deepen."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A retiree holds a portfolio consisting entirely of nominal U.S. Treasury bonds, all held to maturity. Which risk remains essentially untouched?",
+     "options": [
+      "Default risk, since Treasuries can be restructured in a downturn",
+      "Inflation risk — the portfolio is certain in dollars but not in purchasing power",
+      "Idiosyncratic risk, since Treasuries are single-issuer securities",
+      "Interest-rate price risk, since held-to-maturity bonds are marked to market at sale"
+     ],
+     "answer": 1,
+     "feedback": [
+      "U.S. Treasuries are the market's benchmark for negligible default risk; that is precisely why they are used as the 'risk-free' nominal asset. The risk that remains is denominated in purchasing power, not creditworthiness.",
+      "Correct. Nominal bonds promise fixed dollar amounts, so the retiree's real spending power depends entirely on realized inflation. A 'safe' nominal portfolio can lose purchasing power for years — this is the quiet risk hiding behind the safe label.",
+      "Single-issuer exposure matters when the issuer can idiosyncratically fail; for Treasuries the issuer risk is the systemic backdrop itself. The exposure that persists here is to the price level, not to one issuer's fortunes.",
+      "Holding to maturity removes the price risk of interim rate moves — the investor receives the promised nominal cash flows regardless. What holding to maturity cannot fix is what those dollars will buy when they arrive."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Sequence Risk",
+     "url": "https://www.investopedia.com/terms/s/sequence-risk.asp",
+     "type": "article",
+     "note": "Clear reference definition of sequence-of-returns risk with retiree-focused examples; stable, well-maintained glossary entry."
+    },
+    {
+     "label": "Investor.gov (SEC) — What Is Risk?",
+     "url": "https://www.investor.gov/introduction-investing/investing-basics/what-risk",
+     "type": "docs",
+     "note": "The SEC's investor-education taxonomy of risk types (market, inflation, liquidity, and more) from a neutral regulatory source."
+    }
+   ],
+   "anim": "pf_sequence"
+  },
+  {
+   "id": "growth-duration-convexity",
+   "title": "Three Jobs, Three Buckets: Growth, Duration, Convexity",
+   "summary": "A working investor's model: every dollar in the portfolio should hold one of three jobs — compounding wealth, defending known real spending, or reshaping bad outcomes. The test for any holding is not its asset-class label but which job the dollar does; a dollar doing none of the three is a candidate to leave.",
+   "cards": [
+    {
+     "h": "The three jobs",
+     "md": "Assign every dollar a **job**, not a label:\n\n- **Growth** — equities, the compounding engine. This bucket sets the long-run trajectory of wealth. It is volatile by design; its job is not to be smooth, it is to compound.\n- **Duration** — bonds, TIPS (Treasury Inflation-Protected Securities), cash ladders. The name comes from the bond property, but the *job* is defending known real spending through time: matching liabilities so that near-term and dated obligations are funded regardless of what markets do. If the liability is real (spending), the instruments should be real too.\n- **Convexity** — assets that **reshape bad outcomes**: trend-following, long-volatility strategies, tail hedges. They earn their seat by changing the *shape* of the portfolio's return distribution, not its average — a small drag in calm markets in exchange for a large payoff in crashes, exactly when the growth bucket is bleeding and spending must continue.\n\nThe buckets answer different questions. Growth: *how much wealth in 20 years?* Duration: *is next decade's spending safe?* Convexity: *what happens to the whole structure in the worst 5% of paths?*"
+    },
+    {
+     "h": "Why \"alternatives\" is not a job",
+     "md": "\"Alternatives\" is a label about what something *isn't* (not a stock, not a bond), and labels don't defend spending or reshape drawdowns. The discipline of the model is a single question asked of every holding: **which job does this dollar do?**\n\n- A private real estate fund might be growth (equity-like compounding), or it might be doing *no* job — illiquid, opaque, and correlated with equities exactly when correlation hurts.\n- A commodity fund might be convexity if it reliably pays off in inflationary crashes, or merely diluted growth if it doesn't.\n- Gold, hedge funds, collectibles — same interrogation. The label never answers the question; the behavior in bad states does.\n\nA holding that cannot articulate its job — that neither compounds, defends dated spending, nor reshapes the left tail — is a **candidate to leave**. This is not a rule against unconventional assets; it is a rule against unemployed dollars."
+    },
+    {
+     "h": "The brake is the model: a convexity attribution result",
+     "md": "A long attribution study of a portfolio built on this model asked: when the convexity sleeve is switched off, what is lost?\n\nThe answer: the convexity sleeve carried roughly **two-thirds of the downside-risk improvement** (measured by the Sortino ratio, which penalizes only downside volatility) and **three-quarters of the drawdown improvement** — for **under one percentage point** of CAGR (compound annual growth rate) cost. With everything switched off, the portfolio recovered its full CAGR — at roughly three times the drawdown.\n\nRead that carefully: the sleeve is not a return enhancer that happens to hedge. It is a *brake*, and **the brake is the model**. Its measured contribution is almost entirely in the shape of outcomes — smaller holes, shallower worst cases — purchased with a small, known drag. Given the recovery arithmetic of drawdowns (a −45% loss needs +82% to heal), paying ~1pp of average return to cut the depth of the worst outcomes is often the best trade a withdrawing investor can make. Judging the convexity bucket by its standalone return misses its job entirely."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Under the three-jobs model, what job does a trend-following allocation most plausibly hold, and why?",
+     "options": [
+      "Growth, because trend strategies have historically produced positive average returns",
+      "Duration, because trend strategies are less volatile than equities",
+      "Convexity, because its value comes from changing the shape of the return distribution — paying off in sustained crises",
+      "No job, because it is neither a stock nor a bond"
+     ],
+     "answer": 2,
+     "feedback": [
+      "A positive average return is welcome but is not the seat-earning property. Trend's average return is modest and debated; what is distinctive is its historical tendency to profit in sustained drawdowns — a shape property, not an average property.",
+      "Lower volatility does not defend dated real spending, which is the duration bucket's actual job. Trend strategies carry meaningful volatility of their own and match no liability schedule; smoothness alone is not liability defense.",
+      "Correct. Trend-following earns its seat by reshaping outcomes — small drag or noise in calm markets, historically large payoffs in extended crises. It changes the distribution's left tail rather than its mean, which is precisely the convexity job description.",
+      "The model explicitly rejects classifying by label. 'Not a stock, not a bond' describes what it isn't; the job test asks what the dollar *does* in bad states, and trend has a well-documented answer to that question."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "An attribution study finds the convexity sleeve contributed roughly two-thirds of the Sortino improvement and three-quarters of the drawdown improvement, at a cost of under one percentage point of CAGR. What is the best interpretation?",
+     "options": [
+      "The sleeve is a return enhancer and should be sized up until it dominates the portfolio",
+      "The CAGR drag proves the sleeve is dead weight and should be cut in strong markets",
+      "The sleeve earns its seat by changing the shape of outcomes, not the average — the brake is the model",
+      "The result implies the portfolio should be levered until CAGR is fully recovered"
+     ],
+     "answer": 2,
+     "feedback": [
+      "The sleeve *costs* return on average — that is the finding, not a contradiction of it. Sizing it up to chase return misreads its function; its measured contribution is concentrated in downside shape, and its drag scales with its size.",
+      "Cutting the brake in calm markets is exactly the error the attribution warns against: the drag is the *premium paid* for the drawdown protection, and crashes are not announced in advance. Judging the sleeve by calm-market performance misses its job.",
+      "Correct. The sleeve's contribution is overwhelmingly in the distribution's shape — most of the downside-risk and drawdown improvement for under a point of CAGR. That trade is the design: accept a small known drag to shrink the worst outcomes, which drawdown arithmetic makes disproportionately valuable.",
+      "Leverage restores average return by re-amplifying the very tail exposures the sleeve was bought to compress, and it introduces path-dependence and financing risk of its own. The study's lesson is about shape, not about gearing the book back up."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A fund in the portfolio is labeled \"alternatives.\" On examination it does not reliably compound, does not defend any dated spending, and does not pay off in bad states. Under the three-jobs model, what is it?",
+     "options": [
+      "A diversifier that should be kept, since its label implies low correlation",
+      "A candidate to leave the portfolio, because the dollar holds no job",
+      "Automatically a convexity holding, since alternatives hedge by definition",
+      "Effectively duration, provided its volatility is lower than equities'"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A label cannot deliver diversification; only measured behavior in bad states can. Many 'alternatives' correlate with equities precisely in crises, which is when diversification is supposed to show up and often doesn't.",
+      "Correct. The model's discipline is that every dollar must do one of the three jobs — compound, defend dated spending, or reshape bad outcomes. A holding doing none of them is unemployed capital, and the label on the wrapper does not save it.",
+      "No asset class hedges by definition — convexity status is earned by demonstrated payoff structure in bad states. Assuming it from the label inverts the model's entire point, which is to interrogate behavior rather than trust categories.",
+      "Duration's job is matching liabilities — funding known real spending on a schedule — not merely being calmer than stocks. Low volatility without liability-matching is just a milder form of not doing the job."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "AQR — It Was the Worst of Times: Diversification During a Century of Drawdowns",
+     "url": "https://www.aqr.com/Insights/Research/White-Papers/It-Was-the-Worst-of-Times-Diversification-During-a-Century-of-Drawdowns",
+     "type": "paper",
+     "note": "AQR's century-scale study of what actually diversifies equity drawdowns — direct evidence on which assets do the convexity job in bad states."
+    },
+    {
+     "label": "Investopedia — Tail Risk",
+     "url": "https://www.investopedia.com/terms/t/tailrisk.asp",
+     "type": "article",
+     "note": "Reference definition of tail risk and distribution shape, the vocabulary the convexity bucket is built on; stable glossary entry."
+    }
+   ],
+   "anim": "pf_three_jobs"
+  },
+  {
+   "id": "bonds-and-duration",
+   "title": "Bonds: The Duration Bucket's Mechanics",
+   "summary": "Duration is a bond's price sensitivity to interest rates — the single number that explains why long bonds are volatile and bills are not. This concept covers the duration arithmetic, bond convexity's mild tailwind, why real liabilities call for TIPS rather than nominal bonds, and 2022's caution that duration defends against growth shocks, not inflation shocks.",
+   "cards": [
+    {
+     "h": "Duration: the sensitivity number",
+     "md": "A bond's **duration** is, to first order, its price sensitivity to interest rates: approximately the **percent price change per one-percentage-point (1pp) move in yields**. A fund with a 7-year duration falls roughly **7%** when rates rise 1pp, and gains roughly 7% when they fall 1pp.\n\n```\nΔprice ≈ −duration × Δyield\n```\n\nThis is why the yield curve's segments behave so differently as holdings:\n\n- **Treasury bills** (duration ≈ 0.1–0.5): a 1pp rate shock moves the price a few tenths of a percent. Effectively cash.\n- **Intermediate bonds** (duration ≈ 5–7): meaningful rate exposure — the workhorse of most bond funds.\n- **Long bonds** (duration ≈ 15–20): a 1pp rise costs 15–20% of price. These are *volatile* instruments dressed in a safe-sounding wrapper — powerful when rates fall in a growth scare, punishing when rates rise.\n\nDuration is also the origin of the bucket's name in the three-jobs model: the property that lets a bond's dated cash flows be matched against dated spending."
+    },
+    {
+     "h": "Convexity: the curvature, and a mild tailwind",
+     "md": "The duration formula is a straight-line approximation, but the true price-vs-yield relationship is **curved** — that curvature is the bond's **convexity**. Because the curve bows toward the holder, prices **rise more when rates fall than they drop when rates rise** for the same size move. Duration understates gains and overstates losses.\n\nLong-maturity and low-coupon bonds (zero-coupon bonds most of all) have the most convexity. For a holder this is a mild structural tailwind: in a world of symmetric rate shocks, the convex bond outperforms the straight-line estimate on both sides.\n\nNote the family resemblance and the difference: bond convexity is a *local curvature* in price-vs-yield — a small, technical benefit. The **convexity bucket** in the three-jobs model borrows the same geometric idea (payoffs that curve in your favor in extremes) but applies it to the whole portfolio's return distribution. Same word, same shape intuition, very different magnitudes."
+    },
+    {
+     "h": "Nominal vs. TIPS, 2022's caution, and ladders vs. funds",
+     "md": "**Match the instrument to the liability.** If the duration bucket exists to defend **real** spending — groceries, healthcare, property taxes — then nominal bonds carry *exactly the risk the bucket exists to remove*: inflation. A nominal bond is certain in dollars and uncertain in purchasing power. **TIPS** (Treasury Inflation-Protected Securities) adjust principal with the Consumer Price Index, so a **TIPS ladder** — bonds maturing on the schedule of planned spending — delivers known *real* dollars on known dates. That is liability matching in its purest retail form.\n\n**2022 is the caution.** Stocks fell ~18% and aggregate bonds fell ~13% *together*, because the shock was **inflation**: rates rose to fight it, and duration turned from defense into exposure. Duration defends against **growth shocks** (recessions, where rates fall and bonds rally) — not **inflation shocks** (where rates rise and nominal bonds lose in both price and purchasing power). A duration bucket built entirely of long nominal bonds is defending against only one of the two ways the world goes bad.\n\n**Ladders vs. funds.** A ladder held to maturity converts rate moves into irrelevance for the dated liability — you receive the face value on schedule. A constant-duration fund perpetually rolls its holdings, so it never \"matures\"; it is a permanent bet on the level of rates rather than a match to any date. Both are legitimate; they are different jobs."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A bond fund has a duration of 7 years. Interest rates rise by one percentage point. Approximately what happens to the fund's price?",
+     "options": [
+      "It falls about 1%",
+      "It falls about 7%",
+      "It rises about 7%",
+      "It falls about 14%"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This would be the answer for a fund with a duration near 1 year, like short-term notes. Duration scales the response: the approximate price change is −duration × rate change, so a 7-year duration means a 7% move per point.",
+      "Correct. Δprice ≈ −duration × Δyield = −7 × 1pp ≈ −7%. This first-order rule is the core of bond risk: the duration number *is* the percentage price sensitivity per point of rate movement.",
+      "Direction matters: bond prices and yields move inversely. When rates rise, existing bonds' fixed coupons become less attractive, so their prices *fall*. A 7-duration fund gains ~7% only when rates *fall* 1pp.",
+      "This doubles the correct sensitivity — it would fit a 14-year-duration long-bond fund, not a 7. The linear approximation is Δprice ≈ −duration × Δyield, so 7 × 1pp ≈ 7%, with convexity trimming the loss slightly."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A retiree's duration bucket exists to fund the next 15 years of real (inflation-adjusted) spending. Why are TIPS ladders a better match than nominal Treasury ladders?",
+     "options": [
+      "TIPS have higher expected returns than nominal Treasuries of the same maturity",
+      "Nominal bonds carry exactly the risk the bucket exists to remove — inflation — while TIPS deliver known real dollars on known dates",
+      "TIPS are more liquid than nominal Treasuries, so they can be sold at fair prices in a crisis",
+      "TIPS eliminate interest-rate risk entirely, even when sold before maturity"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Expected return is not the criterion for this bucket — liability matching is. In fact TIPS typically yield *less* than nominals by roughly the expected-inflation premium; what they buy with that spread is certainty in real terms, which is the point.",
+      "Correct. The liability is real spending, so a nominal ladder is certain in dollars but uncertain in purchasing power — it retains the one risk the bucket was built to remove. A TIPS ladder maturing on the spending schedule delivers known real amounts on known dates.",
+      "It is actually the nominal Treasury market that is the deepest and most liquid in the world; TIPS trade well but are not the liquidity champion. The case for TIPS here rests on inflation matching, not tradability.",
+      "TIPS prices still move with *real* interest rates, as 2022 demonstrated when real yields rose sharply. What a TIPS ladder removes is inflation risk for cash flows held to maturity — not mark-to-market rate risk on early sales."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "In 2022, stocks and aggregate bonds fell together — bonds dropped roughly 13% while stocks dropped roughly 18%. What is the right lesson for the duration bucket?",
+     "options": [
+      "Bonds no longer diversify stocks and should be removed from portfolios",
+      "The bond selloff was a random anomaly with no structural explanation",
+      "Duration defends against growth shocks, where rates fall — not inflation shocks, where rates rise and nominal bonds lose twice",
+      "Longer-duration bonds would have defended better, since they have more convexity"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Overgeneralized: in growth-shock bear markets (2000–02, 2008, 2020) Treasuries rallied hard and diversified exactly as designed. The 2022 lesson is conditional — *which shock* is hitting determines whether duration helps — not that bonds are broken.",
+      "There is a clean structural explanation: the shock was inflation, central banks raised rates to fight it, and by the duration arithmetic rising rates mechanically repriced every nominal bond downward. Nothing about 2022's bond losses was random.",
+      "Correct. Duration is a defense against growth shocks — recessions where rates fall and bond prices rally. When the shock is inflation, rates rise instead, and nominal bonds lose in both price and purchasing power. A bucket of long nominal bonds defends against only one of the two ways the world goes bad.",
+      "Longer duration would have *amplified* 2022's losses — long Treasuries fell close to 30%, far worse than the aggregate index. Convexity is a second-order curvature benefit; it cannot offset a first-order duration loss when rates rise several points."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Duration",
+     "url": "https://www.investopedia.com/terms/d/duration.asp",
+     "type": "article",
+     "note": "Reference treatment of Macaulay and modified duration with worked price-sensitivity examples; stable glossary entry matching the card's arithmetic."
+    },
+    {
+     "label": "Investopedia — Treasury Inflation-Protected Securities (TIPS)",
+     "url": "https://www.investopedia.com/terms/t/tips.asp",
+     "type": "article",
+     "note": "Covers the CPI principal-adjustment mechanics and the nominal-vs-real tradeoff that motivates TIPS ladders for real liabilities."
+    }
+   ],
+   "anim": "pf_duration"
+  },
+  {
+   "id": "trend-and-managed-futures",
+   "title": "Managed Futures & Trend Following: Buying Crisis Behavior",
+   "summary": "Managed futures funds go long and short futures across equities, bonds, currencies, and commodities based on recent price trends. A century of evidence shows roughly market-like long-run returns with low correlation to stocks — and, critically, a tendency to profit during prolonged crises. The cost is whipsaw losses in choppy markets and long stretches of boring underperformance between crises.",
+   "cards": [
+    {
+     "h": "What managed futures actually do",
+     "md": "A **managed futures** strategy trades futures contracts — standardized exchange-listed agreements to buy or sell an asset at a future date — across four major asset classes: equity indexes, government bonds, currencies, and commodities. The defining feature: positions can be **long or short**, and the signal that sets them is **trend** — the recent direction of price.\n\nThe rule is disarmingly simple. If an asset has been rising over the past several months, hold it long; if it has been falling, hold it short. Run that rule across 50–100 markets simultaneously, size positions by volatility, and you have the core of what the industry calls trend following (historically run by Commodity Trading Advisors, or CTAs).\n\nWhy would something that simple work? Trends exist because markets digest information slowly — investors underreact at first, then herd. Crashes in particular do not happen in a day; 2008 was a *months-long* downtrend. A strategy that follows direction can rotate onto the right side of a slow-motion disaster.\n\n**The evidence:** AQR's *\"A Century of Evidence on Trend-Following Investing\"* reconstructs the strategy back to 1880 and finds roughly market-like long-run returns with **low correlation to stocks and bonds** in every decade examined. This is not a backtest of one lucky period — it is the longest-dated evidence base behind almost any liquid alternative strategy.\n\nImplementation no longer requires a hedge fund: liquid mutual funds and exchange-traded funds (ETFs) now run diversified trend programs at retail minimums, though fees remain well above index-fund levels."
+    },
+    {
+     "h": "Crisis alpha: positive in 2008 and 2022",
+     "md": "The headline property of trend following is what practitioners call **crisis alpha** — the tendency to deliver *positive* returns precisely when equity portfolios are suffering their worst losses.\n\nThe mechanism is not magic and not prediction. Severe bear markets unfold over months, which is exactly the horizon trend signals operate on. As prices fall week after week, the strategy flips short — and then *profits from the continuation* of the decline it never had to forecast.\n\n**Two case studies:**\n\n- **2008:** As equities ground down through the global financial crisis, trend strategies went short stock indexes and long government bonds, finishing the year strongly positive while the S&P 500 lost ~37%.\n- **2022:** The harder test. Inflation broke stocks **and** bonds *simultaneously* — the year the classic 60/40 stock/bond mix failed, because its diversifier (bonds) fell alongside equities. Trend strategies were short bonds and long commodities and energy, posting one of their best years on record.\n\n2022 is the deeper lesson. Stock/bond diversification rests on the assumption that bonds rally when stocks fall — true in deflationary recessions, false in inflationary shocks. Trend following does not depend on that correlation assumption at all; it depends only on bad regimes *persisting long enough to be followed*. That makes it a diversifier against the specific scenario where conventional diversification breaks."
+    },
+    {
+     "h": "The honest costs and the job assignment",
+     "md": "Nothing with crisis-hedging properties comes free. The costs of trend following are behavioral more than financial, and they are exactly why the premium may persist:\n\n- **Whipsaw:** In trendless, choppy markets, the strategy repeatedly buys after rallies that immediately reverse and sells after dips that immediately recover — a steady drip of small losses. A signal that needs months of persistent direction gets chopped to pieces when direction keeps flipping.\n- **Boredom risk:** Between crises, expect years of flat-to-mediocre performance while stock indexes march upward. The 2010s were a long, quiet stretch for trend. The hardest part of owning this strategy is not analysis — it is **holding it through the boring years** so it is still in the portfolio when the crisis arrives. Investors who capitulate in year six of dullness sell their insurance the year before the fire.\n- **Fees:** Liquid trend funds typically charge far more than index funds. That is the price of an actively traded, 100-market long/short program; judge it against the portfolio-level benefit, not against a passive equity fund.\n\n**Job assignment:** in a portfolio organized by function, managed futures belong in the **convexity bucket** — assets whose job is to *reshape bad outcomes*, cutting the depth of drawdowns — not in the growth engine. Sized as a satellite, its mandate is to show up in months-long crises. Expecting it to compound like equities misreads the job; expecting equities to defend like trend misreads theirs."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Why can a trend-following managed futures strategy actually profit during a prolonged equity crash like 2008, rather than merely losing less?",
+     "options": [
+      "It forecasts the crash in advance and exits to cash before prices fall",
+      "It can go short: as the downtrend persists for months, the strategy flips to short positions and earns the continued decline",
+      "It holds only government bonds, which always rally when stocks fall",
+      "Futures contracts are legally protected from losses during declared market crises"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Trend following makes no forecast at all — it reacts to price direction already underway. It is often losing at the very start of a reversal; the profit comes from riding the trend after it forms, not from anticipating it.",
+      "Correct. Crashes unfold over months, which matches the trend signal's horizon. The strategy flips short as the downtrend establishes itself, then profits from continuation — no prediction required, only persistence of the move.",
+      "Bonds are only one of four asset classes traded, and 2022 proved the flaw in this idea: bonds fell alongside stocks, yet trend profited — by being SHORT bonds. The engine is directional flexibility, not a permanent bond allocation.",
+      "No such protection exists anywhere in futures markets. Futures are symmetric, marked-to-market instruments; a wrong-way position loses money in a crisis just as fast as a right-way one gains."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A diversified trend fund posts small losses for three straight years while equities rally. Markets have been range-bound and choppy. What is the most accurate diagnosis?",
+     "options": [
+      "The strategy is broken and its century-long evidence base has stopped applying",
+      "This is whipsaw — the known cost of trend following in trendless markets — and the behavioral challenge is holding through it",
+      "The fund's managers are secretly running a short-only equity bet",
+      "Trend following only ever works in commodities, so the equity sleeve is dragging it down"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Three flat-to-down years in a choppy market is squarely inside the strategy's documented historical behavior, not evidence of breakage. The century-long record includes many such stretches between crisis paydays.",
+      "Right. Choppy, direction-flipping markets force the strategy to buy reversals and sell recoveries — a drip of small whipsaw losses. This boredom-and-whipsaw cost is precisely why the hardest part of owning trend is holding it until the next crisis.",
+      "A trend program's equity positioning follows equity trends — in a rallying equity market it is typically LONG stocks, not short. Range-bound chop across many markets, not a hidden directional bet, explains the losses.",
+      "The evidence base covers equities, bonds, currencies, and commodities alike; no single asset class is the sole source of returns. Diversification across markets is central to the strategy's design, not a flaw in it."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "In a portfolio organized by job assignment, what role should a managed futures allocation be hired for?",
+     "options": [
+      "The growth engine: it should out-compound equities over a full cycle",
+      "A cash substitute: stable value with daily liquidity and near-zero volatility",
+      "The convexity bucket: reshaping bad outcomes by tending to profit in prolonged crises, at the cost of dull stretches between them",
+      "A yield sleeve: harvesting futures roll income as a bond-coupon replacement"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Long-run trend returns are roughly market-like, not equity-beating, and expecting growth-engine performance guarantees disappointment during the boring years. Equities remain the compounding engine; trend is hired for a different job.",
+      "Trend funds are volatile, frequently posting multi-percent monthly moves and multi-year drawdowns. Nothing about a 100-market long/short futures program resembles cash; sizing it as a cash substitute misprices its risk.",
+      "Exactly. Its job is to reshape the portfolio's worst outcomes — showing up positive in months-long crises like 2008 and 2022 when conventional diversification can fail — which is convexity work, purchased with whipsaw and boredom between crises.",
+      "Roll dynamics are an incidental component of futures returns, not a dependable income stream, and trend positions flip long and short with price direction. It generates no coupon-like cash flow and cannot substitute for a bond yield sleeve."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "AQR — A Century of Evidence on Trend-Following Investing",
+     "url": "https://www.aqr.com/Insights/Research/Journal-Article/A-Century-of-Evidence-on-Trend-Following-Investing",
+     "type": "paper",
+     "note": "The canonical long-horizon study (data back to 1880) behind the concept's central claims: market-like returns, low stock/bond correlation in every decade, and performance in historical crises."
+    },
+    {
+     "label": "Investopedia — Managed Futures",
+     "url": "https://www.investopedia.com/terms/m/managed-futures.asp",
+     "type": "reading",
+     "note": "Accessible practitioner-reviewed definition of the vehicle itself — what CTAs and managed futures funds trade and how the long/short futures structure works — as a plain-English complement to the AQR paper."
+    }
+   ],
+   "anim": "pf_crisis_alpha"
+  },
+  {
+   "id": "commodities-and-real-assets",
+   "title": "Commodities: Inflation's Insurance, Honestly Priced",
+   "summary": "Commodity funds hold futures, not warehouses of copper, and over long horizons spot commodities roughly track inflation with near-zero real return — they are insurance, not a compounding engine. Their seat in a portfolio comes from inflation shocks like the 1970s and 2021–22, which hit stocks and nominal bonds together while commodities rose. The roll-yield mechanics of futures-based funds, and gold's bursty crisis behavior, both demand honest handling.",
+   "cards": [
+    {
+     "h": "What you actually own — and the honest long-run record",
+     "md": "A commodity fund does not operate warehouses of copper or tank farms of crude. Practical commodity exposure comes through **futures contracts** — exchange-listed agreements to buy or sell a commodity at a set future date — typically wrapped in an exchange-traded fund (ETF) or mutual fund that holds a diversified basket (energy, metals, agriculture) plus collateral in Treasury bills.\n\nNow the honest record. Over long horizons, **spot commodity prices roughly track inflation** — which means their **real** (inflation-adjusted) return is close to zero. A barrel of oil or a bushel of wheat does not grow earnings, pay a coupon, or compound; a commodity in 2020 is the same physical stuff it was in 1970. Whatever return futures-based investors have historically earned above spot came from collateral yield and roll dynamics (the subject of the classic Gorton–Rouwenhorst study), not from the commodities themselves compounding.\n\nThis sets the job description immediately: commodities are **not a growth engine**. An investor who moves 30% of a portfolio into commodities expecting equity-like compounding has bought an insurance policy and mistaken it for a business.\n\nWhat commodities *are* is one of the few liquid assets whose price is mechanically tied to the goods whose prices define inflation itself. When the price level lurches upward, commodities are not merely correlated with the shock — they are, in large part, the shock."
+    },
+    {
+     "h": "The roll-yield trap: losing money while spot rises",
+     "md": "The single most misunderstood mechanic in commodity investing is **roll yield**. Because futures contracts expire, a fund must perpetually sell its expiring contract and buy a later-dated one — \"rolling\" the position. The return from this process is the gap between the futures price and the spot price, and it can be a headwind or a tailwind:\n\n- **Contango** — futures priced **above** spot. Each roll sells cheap (the near contract converging to spot) and buys expensive (the higher later-dated contract). Rolling *costs money*, month after month.\n- **Backwardation** — futures priced **below** spot. Rolling *earns* the convergence: buy low, watch it pull up toward spot.\n\nHere is the trap in one sentence: **in persistent contango, a futures-based fund can lose money over a period when the spot price of the commodity actually rose**, because the negative roll yield ate more than the spot appreciation delivered.\n\nThe canonical case: crude-oil ETFs in steep contango (2009, and brutally in 2020) bled double-digit annual roll costs while headline oil prices recovered — investors watched the news say \"oil is up\" while their fund was down. The chart on the financial news is the *spot* price; the fund's return is spot **plus roll yield plus collateral yield**, and the middle term can dominate.\n\nPractical consequence: never evaluate a commodity fund against the spot price chart. Check the shape of the futures curve, and understand that broad diversified baskets and roll-optimized funds mitigate — but cannot repeal — this arithmetic."
+    },
+    {
+     "h": "When commodities earn their seat — and how big the seat is",
+     "md": "The scenario that justifies commodities is the one that breaks everything else: an **inflation shock**.\n\nThe classic stock/bond portfolio is implicitly a bet that inflation stays tame. In deflationary recessions (2008), bonds rally as stocks fall — diversification works. But when inflation surprises upward, the correlation flips: nominal bonds lose to rising rates **and** equities de-rate at the same time. In **1973–74** and again in **2021–22**, stocks and nominal bonds fell together — while commodities (energy above all) posted large gains, because rising raw-materials prices *were* the inflation. Commodities defend against precisely the regime in which stock/bond diversification fails.\n\n**Gold** deserves its own honest paragraph. It has functioned as a store of value for millennia, which is real information. But it pays **zero yield** — no coupon, no earnings — so its long-run real return is modest, delivered in **bursts** (1970s, 2000s, 2020s) separated by **decade-long dead zones**: roughly 1980–2000, gold lost value in real terms for twenty years. It works as a crisis and inflation hedge in episodes, not as a steady earner, and it demands the patience that pattern implies.\n\n**Sizing honesty:** because the expected long-run real return is near zero, commodities are a **defensive satellite — roughly 5–10%** — never a core holding. Large enough that an inflation shock produces a visible offset to stock-and-bond losses; small enough that the insurance premium (roll costs, dead decades) does not sink the portfolio's compounding.\n\n**Job assignment:** within a framework that thinks in duration and convexity, commodities are **inflation defense** — a hedge against the specific tail where the price level breaks both traditional assets at once. Not growth. Insurance, honestly priced."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Over a 12-month stretch, spot crude oil rises 10%, yet a futures-based oil ETF loses 8%. The most likely explanation is:",
+     "options": [
+      "The fund manager failed to buy enough oil to match the index",
+      "The futures curve was in persistent contango, so negative roll yield exceeded the spot price gain as contracts were rolled",
+      "The ETF secretly holds energy stocks, which fell over the period",
+      "Backwardation forced the fund to sell contracts below spot at every roll"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Tracking error from position sizing is measured in fractions of a percent for a rules-based futures fund, not an 18-point gap versus spot. The divergence here is structural to the futures curve, not a management execution failure.",
+      "Correct. In contango each roll sells the expiring contract low and buys the later-dated contract high, bleeding return month after month. When that roll cost outruns spot appreciation, the fund loses while the headline spot price rises — the classic trap of 2009 and 2020 oil ETFs.",
+      "A futures-based commodity ETF holds futures contracts plus Treasury-bill collateral, not equities. Confusing commodity funds with commodity-producer stock funds is a real mistake, but it is not what drives the spot-versus-fund gap described here.",
+      "This inverts the definition. Backwardation means futures trade BELOW spot, so rolling buys contracts cheap and earns the convergence upward — a tailwind, not a cost. The scenario described is the signature of contango, backwardation's opposite."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "What specific portfolio scenario justifies giving commodities a seat, despite their near-zero long-run real return?",
+     "options": [
+      "Deflationary recessions, when commodities reliably outperform government bonds",
+      "Long calm expansions, when commodities quietly out-compound equities",
+      "Inflation shocks like 1973–74 and 2021–22, when stocks and nominal bonds fall together while commodities rise",
+      "Periods of falling interest rates, when zero-yield assets become relatively attractive"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Deflationary recessions are the scenario where you do NOT need commodities: demand collapses, commodity prices typically fall hard (oil in 2008), and rallying government bonds already do the defensive work. That regime is bonds' job, not commodities'.",
+      "The long-run record says the opposite — spot commodities roughly track inflation with near-zero real return, and calm expansions are when equities compound and commodity insurance quietly costs its premium. Nobody holds commodities for the quiet years.",
+      "Exactly. An inflation shock is the regime that breaks stock/bond diversification — nominal bonds lose to rising rates while equities de-rate simultaneously — and it is precisely when commodities surge, because rising raw-materials prices largely ARE the inflation.",
+      "Falling rates modestly flatter zero-yield assets like gold, but that is a second-order effect, not the case for the asset class. The core justification is the inflation-shock tail, which typically arrives with RISING rates — the opposite of this scenario."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Which statement about gold reflects its honest historical record?",
+     "options": [
+      "It works as a crisis and inflation hedge in bursts, but has endured decade-long stretches — roughly 1980–2000 — of negative real returns",
+      "Its yield advantage over Treasury bonds explains its long-run appeal",
+      "It has compounded at equity-like real rates for a century, making it a legitimate core growth holding",
+      "Its millennia-long history means its price is essentially stable in real terms year to year"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Right. Gold's protection arrives in episodes — the 1970s, 2000s, and 2020s — separated by dead zones like the twenty years after 1980 when it lost real value. Owning it means accepting bursty payoffs and zero yield in exchange for crisis and inflation defense.",
+      "Gold pays no yield at all — no coupon, no dividend, no earnings — which is the central cost of holding it. Treasuries pay interest; gold's appeal must rest entirely on price behavior in crisis and inflation episodes, never on income.",
+      "Gold's long-run real return is far below equities' — a lump of metal generates no earnings to compound. Framing it as a core growth holding misassigns its job; it is episodic insurance, and sizing it like a growth engine invites decades of drag.",
+      "A long history as a store of value says nothing about short-run stability, and gold's is poor: double-digit annual swings and multi-decade real drawdowns are normal. Millennia-long relevance and year-to-year price stability are entirely different claims."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Gorton & Rouwenhorst — Facts and Fantasies about Commodity Futures (SSRN)",
+     "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=560042",
+     "type": "paper",
+     "note": "The foundational academic study of collateralized commodity futures returns (1959–2004): documents the inflation correlation, the equity/bond diversification properties, and the decomposition of returns into spot, roll, and collateral components."
+    },
+    {
+     "label": "Investopedia — Contango",
+     "url": "https://www.investopedia.com/terms/c/contango.asp",
+     "type": "reading",
+     "note": "Clear practitioner-reviewed explanation of contango versus backwardation and why rolling futures in contango erodes fund returns — directly supports the roll-yield trap card and its question."
+    }
+   ]
+  },
+  {
+   "id": "alternatives-liquid-and-private",
+   "title": "Alternatives: Liquid Funds, Private Equity, Private Credit",
+   "summary": "Alternatives span daily-liquidity funds running hedge-fund-style strategies through locked-up private equity and private credit vehicles. The recurring theme: diversification benefits are real but must be measured after fees, and reported smoothness in private assets is an artifact of appraisal-based pricing, not lower risk. Access questions — minimums, accreditation, lockups — matter as much as the strategies themselves.",
+   "cards": [
+    {
+     "h": "Liquid alternatives: hedge-fund strategies you can exit",
+     "md": "**Liquid alternatives** are mutual funds and exchange-traded funds (ETFs) that run hedge-fund-style strategies — long/short equity, style premia (systematic value, momentum, carry, defensive), and managed futures (trend-following across asset classes) — with **daily liquidity** and moderate fees.\n\nWhat they offer:\n\n- **Real diversification.** Managed futures, in particular, have historically delivered positive returns in extended equity drawdowns (2008, 2022) because trend-following can go short falling markets. Style premia harvest return sources with low correlation to the equity risk premium.\n- **Transparency and daily pricing.** You see the volatility. It is not hidden by quarterly appraisals.\n- **The exit option.** Liquidity means you can leave — a strategy that disappoints, a fee that creeps, a manager that drifts. That option has value, and it disciplines managers.\n\nThe costs are honest and visible: fees higher than index funds (though far below classic 2-and-20 hedge fund terms), tracking discomfort in equity bull markets, and strategies that require patience through multi-year flat stretches. But for most investors seeking diversification beyond stocks and bonds, the liquid form delivers most of the benefit with none of the lockup."
+    },
+    {
+     "h": "Private equity: the J-curve and the smoothed-marks problem",
+     "md": "**Private equity (PE)** buys whole companies, typically with substantial leverage, restructures or grows them, and exits years later. Commitments come with **10+ year lockups** and capital calls on the manager's schedule.\n\n**The J-curve.** Early years of a PE fund typically show *losses*: management fees bite immediately, capital deploys slowly, and exits — the source of gains — come late. Plotted over time, fund value dips then (hopefully) rises: a J shape. An investor who panics at year-3 marks misreads the structure.\n\n**The smoothed-marks problem — a.k.a. volatility laundering.** Private assets are **appraised quarterly, not priced daily**. Appraisals anchor on prior marks and lag public-market moves, so *reported* volatility and drawdowns look far milder than reality. But the underlying businesses are as cyclical as public companies — often more so, given the leverage. In 2022, public equity fell ~20% while many PE portfolios reported marks near flat. The economic exposure didn't differ that much; the *measurement* did.\n\nWhy it matters:\n\n- Smoothed marks **understate risk** in any mean-variance or drawdown analysis, making PE look artificially attractive in optimizers.\n- Some allocators knowingly pay for this smoothness — it keeps committees calm. That is buying the *appearance* of low risk, not the substance.\n- Honest comparison requires de-smoothing reported returns or benchmarking against leveraged small-cap public equity — after which the historical net-of-fee edge is much debated."
+    },
+    {
+     "h": "Private credit, and who actually needs privates",
+     "md": "**Private credit** is direct lending — funds making floating-rate loans to mid-sized companies that banks stepped away from. The pitch: genuine yield pickup over public bonds, floating rates that protect against rising rates, and lender-friendly covenants.\n\nThe caveats:\n\n- **The illiquidity premium must be earned, not assumed.** Gross yields look generous; management and incentive fees consume a large share. The *net* premium over comparable public high-yield or leveraged loans is the number that matters, and it is often thin.\n- **Credit losses arrive exactly when you cannot exit.** Defaults cluster in recessions — precisely when lockups and gating provisions bind. An asset that pays you 2% extra in calm years and traps you in the bad one has a risk profile the yield alone doesn't show.\n- Like PE, quarterly marks smooth the ride on paper.\n\n**Access and suitability.** Private funds typically require **accredited investor** or **qualified purchaser** status (income/net-worth thresholds set by the U.S. Securities and Exchange Commission, SEC), six-to-seven-figure minimums, and genuine tolerance for capital calls and decade-long lockups.\n\n**The honest question.** A diversified liquid portfolio — global equity, duration, and liquid alternatives — already captures most of what most investors need. Privates earn a seat only when two conditions hold: the illiquidity premium **after fees** is demonstrably real for the specific fund and vintage, and the lockup is **genuinely affordable** — money you will not need, under any scenario, for a decade."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A private equity fund reports annualized volatility of 9% while a comparable leveraged small-cap public equity portfolio shows 25%. What is the most accurate interpretation?",
+     "options": [
+      "Private ownership genuinely reduces business risk through active control and longer horizons",
+      "The reported volatility is an artifact of quarterly appraisal-based pricing; the underlying economic risk is similar to comparable public equities",
+      "Private equity managers hedge market exposure, which lowers true volatility",
+      "The public portfolio's volatility is overstated because daily prices contain noise"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Active control can add operational value, but it does not make a leveraged cyclical business less cyclical. The gap here is a measurement artifact — appraisals lag and anchor on prior marks — not a genuine risk reduction from ownership structure.",
+      "Correct. Private assets are appraised quarterly rather than priced daily, so reported returns are smoothed and volatility is understated — the 'volatility laundering' problem. The businesses are as cyclical as public ones; the statement just doesn't show it.",
+      "Typical buyout funds are unhedged, leveraged long positions in operating companies. If anything, the leverage makes true economic volatility higher than an unlevered public index, not lower.",
+      "Daily prices do contain some noise, but that explains only a small fraction of a 9%-versus-25% gap. The dominant driver is appraisal smoothing on the private side, which suppresses reported volatility far below economic reality."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A private equity fund shows negative returns in its first three years. What is the most likely explanation?",
+     "options": [
+      "The manager is underperforming and the commitment should be exited if possible",
+      "This is the J-curve: fees are charged immediately while capital deploys slowly and exits — the source of gains — come years later",
+      "Private equity funds always lose money early because they buy distressed companies",
+      "The appraisal process systematically understates value in early years to reduce taxes"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Early negative marks are the expected structural pattern, not evidence of skill or its absence. Judging a PE fund at year three misreads the return profile — and secondary-market exits at that stage typically come at meaningful discounts.",
+      "Right. The J-curve describes exactly this shape: management fees bite from day one, committed capital deploys over several years, and realized gains arrive only when portfolio companies are sold — so early marks dip before the curve turns upward.",
+      "Buyout funds mostly acquire healthy, cash-flowing companies, not distressed ones. The early dip comes from fee drag and slow deployment, not from the character of the acquisitions themselves.",
+      "Appraisals in early years typically hold investments near cost; there is no systematic tax-motivated markdown mechanism. The negative early returns come from fees outrunning unrealized gains, which is the J-curve."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Private credit funds advertise yields several points above public high-yield bonds. What is the strongest reason for caution before allocating?",
+     "options": [
+      "Floating-rate loans always underperform fixed-rate bonds when interest rates fall",
+      "Direct lending is illegal for individual investors regardless of wealth",
+      "Fees consume much of the gross yield pickup, and credit losses cluster in recessions — exactly when lockups prevent exit",
+      "Private credit returns are fully correlated with equities, so they add no diversification whatsoever"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Falling rates do reduce floating-rate coupons, but that is a manageable, symmetric rate exposure — not the core problem. The structural concern is net-of-fee compensation for illiquidity and recession-clustered default risk.",
+      "Private credit funds are legal and widely offered to accredited investors and qualified purchasers under SEC exemptions. Access is restricted by wealth thresholds, not prohibited outright.",
+      "Correct. The illiquidity premium must be earned, not assumed: management and incentive fees eat a large share of the gross spread, and defaults arrive in downturns precisely when gates and lockups bind — the yield alone doesn't show that trapped-in-the-bad-state risk.",
+      "Private credit does carry meaningful economic correlation to the credit cycle, but 'fully correlated with equities, no diversification whatsoever' overstates it. The real issue is whether the after-fee premium compensates for illiquidity and recession-timed losses."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "AQR — The Illiquidity Discount",
+     "url": "https://www.aqr.com/Insights/Perspectives/The-Illiquidity-Discount",
+     "type": "article",
+     "note": "Cliff Asness's canonical treatment of smoothed private-asset marks — the argument that investors may knowingly accept lower returns for the appearance of low volatility; the origin of the 'volatility laundering' critique."
+    },
+    {
+     "label": "SEC Investor.gov — Private Placements and Accredited Investors",
+     "url": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/accredited",
+     "type": "docs",
+     "note": "The regulator's plain-language explanation of accreditation thresholds and the reduced disclosure protections in private offerings — the access and suitability side of the privates decision."
+    }
+   ]
+  },
+  {
+   "id": "the-portfolio-playbook",
+   "title": "Putting It Together: The Portfolio Playbook",
+   "summary": "The module assembles into an ordered playbook: write the policy first, give every dollar a job, implement cheap and liquid, locate for taxes, rebalance by bands, manage the risks appropriate to your stage, and pre-commit crash responses before markets test you. The order matters — policy precedes products. Allocation and discipline decide almost everything; products decide almost nothing.",
+   "cards": [
+    {
+     "h": "Steps 1–4: Policy, jobs, implementation, location",
+     "md": "**1. Policy first.** Before any product decision, write an **Investment Policy Statement (IPS)**: target allocation, rebalancing bands, and the conditions under which you will act. It is written in calm weather precisely because it will be read in a storm. A portfolio without a written policy is a collection of impulses.\n\n**2. Assign every dollar a job.** Apply the three-bucket test from earlier in this module: every holding is there for **growth** (equity risk premium), **duration** (deflationary-recession ballast), or **convexity** (payoff that grows in a crash). A position that cannot name its job — the legacy stock, the themed fund bought on a headline — is a candidate to leave. Overlap is fine; unemployment is not.\n\n**3. Implement cheap and liquid by default.** Broad-market ETFs are the default implementation for every job. Complexity — active funds, alternatives, structured products — must buy something *measurable*: diversification you can see in drawdowns, an after-fee return premium you can document. 'Sophisticated' is not a benefit; it is a cost that must justify itself.\n\n**4. Locate for taxes.** Asset *location* is a free lunch once allocation is set: income-heavy assets (bonds, real estate investment trusts) belong in tax-deferred accounts; tax-efficient equity index funds belong in taxable accounts, where qualified dividends, deferred gains, and the step-up at death are favored. Same portfolio, materially higher after-tax return."
+    },
+    {
+     "h": "Steps 5–8: Bands, stage-appropriate risk, pre-commitment, cadence",
+     "md": "**5. Rebalance by bands, mechanically.** Set tolerance bands around each target (e.g., ±20% relative). Check on a schedule; trade only when a band is breached. This makes rebalancing systematic selling-high and buying-low, with no forecast required — and removes the decision from the moment of maximum emotion.\n\n**6. Manage the right risks for your stage.**\n- **Accumulators** — decades of contributions ahead — should fear a *lost decade of growth*, not volatility. Their human capital is bond-like; crashes are, mechanically, cheap purchases. Overcaution is their expensive mistake.\n- **Retirees and near-retirees** should fear **sequence-of-returns risk**: a deep drawdown early in withdrawals forces selling depressed assets, permanently impairing the portfolio even if markets later recover. Drawdown control, spending flexibility, and a duration/convexity allocation earn their keep here.\n\nSame market, opposite dangers. A stage-inappropriate portfolio is wrong even when its holdings are individually fine.\n\n**7. Pre-commit crash responses.** Decide *before* the crash what you will do in one — rebalance into the decline at specified bands, harvest tax losses, leave spending rules intact. Write it in the IPS. Mid-crash improvisation is where portfolios die: the moment of maximum fear is the worst possible time to be designing policy.\n\n**8. Review on a calendar, not on headlines.** Annual or semiannual review of allocation, location, and policy — triggered by the date, never by the news. Headlines are engineered to provoke action; your process is engineered to prevent it.\n\n**The module in one sentence: allocation and discipline decide almost everything; products decide almost nothing.**"
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "An investor with new money to deploy starts by researching which funds and ETFs to buy. According to the playbook's order of operations, what is the error?",
+     "options": [
+      "Nothing — product selection is the highest-impact decision and should come first",
+      "They should first write the policy: target allocation with bands, and a job for every dollar — products are chosen last, to implement the policy",
+      "They should first maximize tax-loss harvesting opportunities across accounts",
+      "They should wait for a market correction before deploying any capital"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Product selection is close to the *lowest*-impact decision in the sequence. Two portfolios with identical allocations and discipline but different (reasonable) fund choices end up nearly identical; two with different allocations diverge enormously.",
+      "Correct. Policy comes first: a written allocation with rebalancing bands, set before markets test you, and a named job — growth, duration, or convexity — for every dollar. Products exist only to implement that policy cheaply and liquidly.",
+      "Tax location and harvesting are step four — real money, but they optimize an allocation that must already exist. Locating and harvesting around an unwritten policy is arranging furniture in a house with no floor plan.",
+      "Waiting for a correction is market timing, which the playbook deliberately excludes. The evidence favors deploying on receipt under a written policy; the pre-commitment exists precisely so you need not guess at entry points."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A 30-year-old with 30 years of contributions ahead and a 68-year-old beginning withdrawals both face a 35% equity crash. How do the stakes differ?",
+     "options": [
+      "The crash harms both equally, since percentage losses are the same for any holder",
+      "The 30-year-old is harmed more because they have less accumulated wealth to fall back on",
+      "The retiree faces sequence-of-returns risk — withdrawals during the drawdown lock in losses permanently — while the accumulator is mechanically buying equities cheap with decades to recover",
+      "Neither is harmed if they both hold index funds, since index funds always recover"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Percentage losses are equal but consequences are not: one investor is a net buyer for decades, the other a net seller now. Direction of cash flows during the drawdown determines whether the crash is an opportunity or a permanent impairment.",
+      "It is the opposite. The 30-year-old's largest asset is decades of future contributions — bond-like human capital untouched by the crash — and their ongoing purchases now buy at depressed prices. Overcaution, not volatility, is the accumulator's expensive mistake.",
+      "Right. Sequence-of-returns risk means withdrawals forced during an early-retirement drawdown sell depressed assets that never participate in the recovery — permanent impairment even if the index round-trips. The accumulator faces the mirror image: contributions buy the same assets cheap. Same market, opposite dangers.",
+      "Index funds carry full market risk and offer no recovery guarantee on any particular horizon — and even a full index recovery does not restore a retiree's portfolio if withdrawals were taken at the lows. The vehicle doesn't neutralize sequence risk."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why does the playbook insist that crash responses be written into the policy statement in advance?",
+     "options": [
+      "Because written plans are legally binding and prevent brokers from unauthorized trades",
+      "Because mid-crash improvisation happens at the moment of maximum fear — pre-committed rules (rebalance at bands, harvest losses, hold spending policy) replace panic decisions with mechanical ones",
+      "Because crashes are predictable enough that responses can be precisely timed in advance",
+      "Because regulators require retail investors to document trading intentions before volatility events"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A personal investment policy statement is a self-governance document, not a contract with legal force over your broker. Its power is behavioral: it was written by a calm version of you to instruct a frightened one.",
+      "Exactly. Decisions made mid-crash are made under maximum fear, which is when portfolios die — panic selling at lows, abandoning the allocation. Pre-commitment converts the crash response into mechanical execution of rules set in calm weather.",
+      "Crash *timing* is precisely what cannot be predicted — which is why the plan is conditional ('when bands breach, rebalance'), not calendar-based ('sell in October'). Pre-commitment works because it needs no forecast at all.",
+      "No such regulatory requirement exists for retail investors. The rationale is entirely behavioral self-defense: removing discretion from the moment when discretion is most dangerous."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Investopedia — Investment Policy Statement (IPS)",
+     "url": "https://www.investopedia.com/terms/i/ips.asp",
+     "type": "reading",
+     "note": "Standard reference defining the written policy document — objectives, target allocation, and rebalancing rules — that step one of the playbook requires before any product decision."
+    },
+    {
+     "label": "SEC Investor.gov — Asset Allocation",
+     "url": "https://www.investor.gov/introduction-investing/getting-started/asset-allocation",
+     "type": "docs",
+     "note": "The regulator's plain-language guidance on allocation, diversification, and rebalancing — a neutral, stable grounding for the claim that allocation and discipline dominate product selection."
+    }
+   ]
+  }
+ ]
+}

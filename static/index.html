@@ -5323,6 +5323,250 @@ ANIMS.fa_etf_lens_static=(cv,ctx)=>{const S=scaler([EL.ey,EL.by,[0]],56,876,40,3
 ANIMS._fa_debug={dcfIntrinsic:DC_PV.reduce((s,v)=>s+v,0)+DC_TV, compounderEnd:CO_C[CO_C.length-1], moatEnd:MO_MOAT[MO_MOAT.length-1], noMoatEnd:MO_NO[MO_NO.length-1]};
 })();
 
+/* ================= Investment Portfolios module (2026-07-31, pf_*) =================
+   Six deterministic canvas lessons. Harness-tuned (pf_tune.js) so every narrated
+   number is TRUE of the pixels; ANIMS._pf_debug exposes the computed values.
+   Self-contained append-only block — no changes to existing code. */
+(function(){
+const W=900,H=380;
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const nrmOf=r=>()=>(r()+r()+r()-1.5)*2;
+function sdv(a){const m=a.reduce((s,v)=>s+v,0)/a.length;return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/a.length);}
+function mdd(a){let p=a[0],d=0;for(const v of a){p=Math.max(p,v);d=Math.min(d,v/p-1);}return d;}
+function scl(arrs,x0,x1,y0,y1){
+  const flat=arrs.flat().filter(v=>v!=null);
+  const lo=Math.min(...flat),hi=Math.max(...flat),n=Math.max(...arrs.map(a=>a.length));
+  return{X:i=>x0+(x1-x0)*i/(n-1),Y:v=>y1-(v-lo)/(hi-lo)*(y1-y0)};
+}
+function frm(ctx,title){
+  clear(ctx,{width:W,height:H});
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(56,20);ctx.lineTo(56,330);ctx.lineTo(876,330);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText(title,60,36);
+}
+function ser(ctx,S,arr,color,frac,w){
+  ctx.strokeStyle=color;ctx.lineWidth=w||2;ctx.beginPath();let st=false;
+  const upTo=Math.max(2,Math.floor(arr.length*(frac==null?1:frac)));
+  for(let i=0;i<upTo;i++){const v=arr[i];if(v==null)continue;
+    const x=S.X(i),y=S.Y(v);st?ctx.lineTo(x,y):(ctx.moveTo(x,y),st=true);}
+  ctx.stroke();
+}
+function lgd(ctx,y,c,txt){ctx.fillStyle=c;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";ctx.fillText(txt,64,y);}
+
+/* ---- pf_free_lunch: correlation is the whole game ---- */
+function flPaths(rho){
+  const r=rng(7),z=nrmOf(r),n=200,ra=[],rb=[];
+  for(let i=0;i<n;i++){const z1=z(),z2=rho*z1+Math.sqrt(1-rho*rho)*z();
+    ra.push(0.0007+0.012*z1);rb.push(0.0007+0.012*z2);}
+  const cum=rr=>{const p=[100];for(const x of rr)p.push(p[p.length-1]*(1+x));return p;};
+  const rm=ra.map((v,i)=>(v+rb[i])/2);
+  return{A:cum(ra),B:cum(rb),M:cum(rm),ratio:sdv(rm)/((sdv(ra)+sdv(rb))/2)};
+}
+const FL={hi:flPaths(0.9),mid:flPaths(0.3),lo:flPaths(-0.3)};
+ANIMS.pf_free_lunch=async(cv,ctx)=>{
+  const draw=(d,label)=>{const S=scl([d.A,d.B,d.M],56,876,40,330);
+    frm(ctx,"two assets, one mix — "+label);
+    ser(ctx,S,d.A,"#5A6E8C",1,1.4);ser(ctx,S,d.B,"#7C8DA5",1,1.4);ser(ctx,S,d.M,F.ok,1,2.6);
+    lgd(ctx,60,F.ok,"50/50 mix — volatility "+Math.round(d.ratio*100)+"% of the average asset's");};
+  draw(FL.hi,"correlation +0.9");
+  await narrate("Two risky assets and their fifty fifty mix. When the assets move together — correlation point nine — the mix is barely calmer than either alone: ninety-eight percent of their average volatility. Diversification in name only.");
+  await sleep(600);
+  draw(FL.mid,"correlation +0.3");
+  await narrate("Lower the correlation to point three — typical for assets from different classes — and the same mix now carries only eighty-three percent of the volatility. Nothing about the assets changed. Only their relationship did.");
+  await sleep(600);
+  draw(FL.lo,"correlation −0.3");
+  await narrate("At negative correlation the mix smooths dramatically — sixty-four percent. This is the only free lunch in finance: risk partially cancels, return does not. And the fine print: correlations RISE in crises, which is why the later lessons exist.");
+};
+ANIMS.pf_free_lunch_static=(cv,ctx)=>{
+  const d=FL.mid,S=scl([d.A,d.B,d.M],56,876,40,330);
+  frm(ctx,"two assets + the 50/50 mix (ρ=0.3)");
+  ser(ctx,S,d.A,"#5A6E8C",1,1.4);ser(ctx,S,d.B,"#7C8DA5",1,1.4);ser(ctx,S,d.M,F.ok,1,2.6);
+};
+
+/* ---- pf_sequence: same returns, opposite order, withdrawing retiree ---- */
+const SEQ_RETS=[22,18,15,12,10,8,-5,-12,-38,25];
+function seqRun(order,wd){const eq=[100];let x=100;
+  for(const rr of order){x=x*(1+rr/100)-wd;eq.push(Math.max(0,x));if(x<=0)break;}
+  return eq;}
+const SEQ_BAD=seqRun([...SEQ_RETS].sort((a,b)=>a-b).concat([...SEQ_RETS],[...SEQ_RETS]).slice(0,30),5);
+const SEQ_GOOD=seqRun([...SEQ_RETS].sort((a,b)=>b-a).concat([...SEQ_RETS],[...SEQ_RETS]).slice(0,30),5);
+ANIMS.pf_sequence=async(cv,ctx)=>{
+  const S=scl([SEQ_GOOD,SEQ_BAD,[0]],56,876,40,330);
+  const base=(k1,k2)=>{frm(ctx,"the same returns, in opposite order — a retiree withdrawing 5%/yr");
+    if(k1)ser(ctx,S,SEQ_GOOD,F.ok,k1,2.2);
+    if(k2)ser(ctx,S,SEQ_BAD,F.wrong,k2,2.2);};
+  base(0,0);
+  await narrate("A retiree withdraws five percent of the starting portfolio every year. Two futures share the IDENTICAL set of annual returns — same average, same total. Only the order differs.");
+  await tween(1600,k=>base(k,0));
+  lgd(ctx,60,F.ok,"good years first — ends at "+SEQ_GOOD[SEQ_GOOD.length-1].toFixed(0)+" after 30 years");
+  await narrate("Good years first: the portfolio compounds ahead of the withdrawals, absorbs the bear market from strength, and ends thirty years later above where it began.");
+  await tween(1600,k=>{base(1,k);lgd(ctx,60,F.ok,"good years first — survives 30 years");});
+  lgd(ctx,78,F.wrong,"bad years first — RUINED in year "+(SEQ_BAD.length-1));
+  await narrate("Bad years first: the same returns, reversed. Withdrawals during the early crash sell depressed assets that never see the recovery — and the portfolio hits ZERO in year "+(SEQ_BAD.length-1)+". Identical returns. Opposite lives. This is sequence risk: for a withdrawing retiree, WHEN returns arrive matters as much as WHAT they average. It is the single risk the growth-duration-convexity design exists to manage.");
+};
+ANIMS.pf_sequence_static=(cv,ctx)=>{
+  const S=scl([SEQ_GOOD,SEQ_BAD,[0]],56,876,40,330);
+  frm(ctx,"sequence risk: same returns, opposite order");
+  ser(ctx,S,SEQ_GOOD,F.ok,1,2.2);ser(ctx,S,SEQ_BAD,F.wrong,1,2.2);
+};
+
+/* ---- pf_three_jobs: growth / duration / convexity through a crash ---- */
+const TJ=(()=>{const r=rng(11),z=nrmOf(r),n=320,c0=140,c1=190;
+  const g=[100],d=[100],cx=[100];
+  for(let i=1;i<n;i++){const inC=i>=c0&&i<c1;
+    g.push(g[i-1]*(1+(inC?-0.010:0.0011)+0.010*z()));
+    d.push(d[i-1]*(1+(inC?0.0006:0.00022)+0.0016*z()));
+    cx.push(cx[i-1]*(1+(inC?0.0068:-0.00028)+0.0028*z()));}
+  const port=g.map((_,i)=>100*(0.55*g[i]/g[0]+0.30*d[i]/d[0]+0.15*cx[i]/cx[0]));
+  return{g,d,cx,port,c0,c1};})();
+ANIMS.pf_three_jobs=async(cv,ctx)=>{
+  const S=scl([TJ.g,TJ.d,TJ.cx,TJ.port],56,876,40,330);
+  const base=(k1,k2,k3,k4)=>{frm(ctx,"three jobs, one crash");
+    if(k1)ser(ctx,S,TJ.g,"#5A6E8C",k1,1.6);
+    if(k2)ser(ctx,S,TJ.d,F.post,k2,1.6);
+    if(k3)ser(ctx,S,TJ.cx,F.ok,k3,1.6);
+    if(k4)ser(ctx,S,TJ.port,"#6fd0ff",k4,2.8);};
+  base(0,0,0,0);
+  await narrate("A portfolio built by job: fifty-five percent growth, thirty duration, fifteen convexity. Then a real crash arrives in the middle of the window.");
+  await tween(1300,k=>base(k,0,0,0));
+  lgd(ctx,60,"#5A6E8C","GROWTH — the engine: max drawdown "+Math.round(Math.abs(mdd(TJ.g))*100)+"%");
+  await narrate("Growth does what growth does: compounds beautifully, then loses "+Math.round(Math.abs(mdd(TJ.g))*100)+" percent in the crash. Alone, this is the whole portfolio's fate.");
+  await tween(1100,k=>{base(1,k,0,0);lgd(ctx,60,"#5A6E8C","GROWTH — max DD "+Math.round(Math.abs(mdd(TJ.g))*100)+"%");});
+  lgd(ctx,78,F.post,"DURATION — holds its ground, rises slightly in the flight to safety");
+  await narrate("Duration — the bonds defending the spending — barely notices, and firms slightly as money flees to safety.");
+  await tween(1100,k=>{base(1,1,k,0);lgd(ctx,60,"#5A6E8C","GROWTH");lgd(ctx,78,F.post,"DURATION");});
+  lgd(ctx,96,F.ok,"CONVEXITY — bleeds quietly, then +"+Math.round((TJ.cx[TJ.c1]/TJ.cx[TJ.c0]-1)*100)+"% THROUGH the crash");
+  await narrate("And convexity — the brake — bleeds a little through the calm, which is its premium, then pays out "+Math.round((TJ.cx[TJ.c1]/TJ.cx[TJ.c0]-1)*100)+" percent through the crash itself. It is the only line that WANTS the disaster.");
+  await tween(1400,k=>{base(1,1,1,k);lgd(ctx,60,"#5A6E8C","GROWTH");lgd(ctx,78,F.post,"DURATION");lgd(ctx,96,F.ok,"CONVEXITY");});
+  lgd(ctx,114,"#6fd0ff","THE PORTFOLIO — max DD "+Math.round(Math.abs(mdd(TJ.port))*100)+"% vs growth's "+Math.round(Math.abs(mdd(TJ.g))*100)+"%");
+  await narrate("Sum the three jobs and the portfolio's drawdown is "+Math.round(Math.abs(mdd(TJ.port))*100)+" percent — less than half of growth's "+Math.round(Math.abs(mdd(TJ.g))*100)+". Nobody predicted the crash. The SHAPE of the portfolio absorbed it. That is the three-bucket doctrine in one picture: growth compounds, duration defends, convexity reshapes the worst day.");
+};
+ANIMS.pf_three_jobs_static=(cv,ctx)=>{
+  const S=scl([TJ.g,TJ.d,TJ.cx,TJ.port],56,876,40,330);
+  frm(ctx,"growth / duration / convexity + the portfolio");
+  ser(ctx,S,TJ.g,"#5A6E8C",1,1.6);ser(ctx,S,TJ.d,F.post,1,1.6);
+  ser(ctx,S,TJ.cx,F.ok,1,1.6);ser(ctx,S,TJ.port,"#6fd0ff",1,2.8);
+};
+
+/* ---- pf_duration: the price-vs-yield curve, duration + convexity ---- */
+function bondP(y,c,T){let p=0;for(let t=1;t<=T;t++)p+=c/Math.pow(1+y,t);return p+100/Math.pow(1+y,T);}
+const BY0=0.04,BC=3,BT=10,BP0=bondP(BY0,BC,BT);
+const BUP=bondP(BY0+0.02,BC,BT),BDN=bondP(BY0-0.02,BC,BT);
+ANIMS.pf_duration=async(cv,ctx)=>{
+  const ys=[];for(let y=0.005;y<=0.095;y+=0.002)ys.push(y);
+  const ps=ys.map(y=>bondP(y,BC,BT));
+  const S={X:y=>56+(y-0.005)/0.09*820,Y:p=>330-(p-70)/(135-70)*290};
+  const base=(tang)=>{
+    frm(ctx,"a 10-year bond: price vs yield — the curve IS the risk");
+    ctx.strokeStyle=F.ok;ctx.lineWidth=2.6;ctx.beginPath();
+    ys.forEach((y,i)=>i?ctx.lineTo(S.X(y),S.Y(ps[i])):ctx.moveTo(S.X(y),S.Y(ps[i])));ctx.stroke();
+    ctx.fillStyle=F.txt;ctx.font="12.5px 'IBM Plex Mono'";ctx.textAlign="center";
+    ctx.fillText("yield →",466,352);
+    ctx.fillStyle="#6fd0ff";ctx.beginPath();ctx.arc(S.X(BY0),S.Y(BP0),5,0,7);ctx.fill();
+    if(tang){ // duration tangent at y0
+      const slope=(bondP(BY0+0.001,BC,BT)-bondP(BY0-0.001,BC,BT))/0.002;
+      ctx.strokeStyle=F.post;ctx.lineWidth=1.6;ctx.setLineDash([5,4]);ctx.beginPath();
+      ctx.moveTo(S.X(BY0-0.03),S.Y(BP0-0.03*slope));ctx.lineTo(S.X(BY0+0.03),S.Y(BP0+0.03*slope));
+      ctx.stroke();ctx.setLineDash([]);
+    }
+  };
+  base(false);
+  await narrate("Every bond is this curve: its price at every possible yield. Today's position is the dot — a ten-year bond at four percent.");
+  base(true);
+  await narrate("The slope at the dot is DURATION: roughly eight here, meaning a one-point rate rise costs about eight percent of price. Duration is not jargon — it is literally how steep your hill is.");
+  ctx.fillStyle=F.wrong;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText("rates +2pp → "+(BUP-BP0).toFixed(1),S.X(BY0+0.02)+8,S.Y(BUP)+4);
+  ctx.fillStyle=F.ok;ctx.fillText("rates −2pp → +"+(BDN-BP0).toFixed(1),S.X(BY0-0.02)-150,S.Y(BDN)+4);
+  await narrate("Now look closely at the asymmetry. Rates up two points: the price falls "+Math.abs(BUP-BP0).toFixed(0)+". Rates DOWN two points: it gains "+(BDN-BP0).toFixed(0)+" — more than it lost the other way. That curvature is bond CONVEXITY: the curve bends in the holder's favor, gaining more on rallies than it loses on selloffs. Long bonds have more of both — more slope, more curve. Which is the whole duration bucket in one sentence: powerful medicine, dosed by maturity.");
+};
+ANIMS.pf_duration_static=(cv,ctx)=>{
+  const ys=[];for(let y=0.005;y<=0.095;y+=0.002)ys.push(y);
+  const ps=ys.map(y=>bondP(y,BC,BT));
+  const S={X:y=>56+(y-0.005)/0.09*820,Y:p=>330-(p-70)/(135-70)*290};
+  frm(ctx,"price vs yield: duration = slope, convexity = curvature");
+  ctx.strokeStyle=F.ok;ctx.lineWidth=2.6;ctx.beginPath();
+  ys.forEach((y,i)=>i?ctx.lineTo(S.X(y),S.Y(ps[i])):ctx.moveTo(S.X(y),S.Y(ps[i])));ctx.stroke();
+  ctx.fillStyle="#6fd0ff";ctx.beginPath();ctx.arc(S.X(BY0),S.Y(BP0),5,0,7);ctx.fill();
+};
+
+/* ---- pf_crisis_alpha: trend long-short through a crash, honestly ---- */
+const CA=(()=>{const r=rng(13),z=nrmOf(r),n=360;
+  const eq=[100];
+  for(let i=1;i<n;i++){
+    let d=(i>=210?0.0016:0.0010),v=0.010;
+    if(i>=60&&i<95){d=0.0002;v=0.013;}
+    if(i>=150&&i<210){d=-0.0085;v=0.014;}
+    eq.push(Math.max(10,eq[i-1]*(1+d+v*z())));}
+  const mf=[100];let pos=0;
+  for(let i=1;i<n;i++){
+    if(i>=8)pos=Math.sign(eq[i-1]/eq[i-8]-1);
+    mf.push(mf[i-1]*(1+0.8*pos*(eq[i]/eq[i-1]-1)+0.0001));}
+  return{eq,mf,chop0:60,chop1:95,c0:150,c1:210};})();
+ANIMS.pf_crisis_alpha=async(cv,ctx)=>{
+  const S=scl([CA.eq,CA.mf],56,876,40,330);
+  const base=(k1,k2)=>{frm(ctx,"equities vs a trend-follower — same market, opposite crisis");
+    if(k1)ser(ctx,S,CA.eq,"#5A6E8C",k1,1.8);
+    if(k2)ser(ctx,S,CA.mf,F.ok,k2,2.2);};
+  base(0,0);
+  await narrate("An equity market: a choppy stretch, a long grind up, then a months-long crash, then recovery. Now run a trend-follower on the same market — long when the trend is up, SHORT when it is down.");
+  await tween(1500,k=>base(k,0));
+  await tween(1500,k=>base(1,k));
+  lgd(ctx,60,F.ok,"trend: −"+Math.round(Math.abs(CA.mf[CA.chop1]/CA.mf[CA.chop0]-1)*100)+"% in the chop (whipsaw) · +"+Math.round((CA.mf[CA.c1]/CA.mf[CA.c0]-1)*100)+"% THROUGH the crash");
+  lgd(ctx,78,"#5A6E8C","equities: −"+Math.round(Math.abs(CA.eq[CA.c1]/CA.eq[CA.c0]-1)*100)+"% in the same crash");
+  await narrate("Two honest observations. In the trendless chop the trend-follower bleeds "+Math.round(Math.abs(CA.mf[CA.chop1]/CA.mf[CA.chop0]-1)*100)+" percent — whipsaw is the permanent tax on this strategy, and between crises it is boring at best. But through the crash, while equities lose "+Math.round(Math.abs(CA.eq[CA.c1]/CA.eq[CA.c0]-1)*100)+" percent, it flips short and GAINS "+Math.round((CA.mf[CA.c1]/CA.mf[CA.c0]-1)*100)+" percent — because a months-long decline is itself a trend, and this strategy does not care which direction the trend points.");
+  await narrate("One caution before the chart oversells it: this window was built crash-heavy to show the mechanism. Across a full century, trend-following's total return is roughly market-like. What you are buying is not extra return — it is WHEN the returns arrive: in the exact months everything else is failing. That is why it lives in the convexity bucket.");
+};
+ANIMS.pf_crisis_alpha_static=(cv,ctx)=>{
+  const S=scl([CA.eq,CA.mf],56,876,40,330);
+  frm(ctx,"crisis alpha: trend goes short through the crash");
+  ser(ctx,S,CA.eq,"#5A6E8C",1,1.8);ser(ctx,S,CA.mf,F.ok,1,2.2);
+};
+
+/* ---- pf_allocation: policy explains the shape ---- */
+const AL=(()=>{const r=rng(19),z=nrmOf(r),n=200;
+  const pol=[100];const act=[100];
+  for(let i=1;i<n;i++){
+    const mret=0.0009+0.011*z();
+    pol.push(pol[i-1]*(1+mret));
+    act.push(act[i-1]*(1+mret+0.004*z()));   // same policy + selection noise
+  }
+  // R² of active on policy (log returns)
+  const lr=a=>a.slice(1).map((v,i)=>Math.log(v/a[i]));
+  const x=lr(pol),y=lr(act);
+  const mx=x.reduce((s,v)=>s+v,0)/x.length,my=y.reduce((s,v)=>s+v,0)/y.length;
+  let sxy=0,sxx=0,syy=0;
+  for(let i=0;i<x.length;i++){sxy+=(x[i]-mx)*(y[i]-my);sxx+=(x[i]-mx)**2;syy+=(y[i]-my)**2;}
+  return{pol,act,r2:(sxy*sxy)/(sxx*syy)};})();
+ANIMS.pf_allocation=async(cv,ctx)=>{
+  const S=scl([AL.pol,AL.act],56,876,40,330);
+  const base=(k1,k2)=>{frm(ctx,"the policy mix vs the actual fund — who drew this chart?");
+    if(k1)ser(ctx,S,AL.pol,F.post,k1,2.6);
+    if(k2)ser(ctx,S,AL.act,"#6fd0ff",k2,1.6);};
+  base(0,0);
+  await narrate("Take a portfolio's POLICY — its asset-class mix, held passively — and plot it.");
+  await tween(1400,k=>base(k,0));
+  await narrate("Now plot the ACTUAL portfolio: same policy, plus all the stock picking and tactical adjustments layered on top.");
+  await tween(1400,k=>base(1,k));
+  lgd(ctx,60,F.post,"policy alone");
+  lgd(ctx,78,"#6fd0ff","policy + selection/timing — R² = "+(AL.r2*100).toFixed(0)+"%");
+  await narrate("The two lines are nearly the same drawing. In this rendering, "+(AL.r2*100).toFixed(0)+" percent of the actual portfolio's movement is explained by the policy alone — which is what Brinson and successors found in real pension data: roughly ninety percent of a portfolio's return VARIABILITY over time traces to the asset-class mix. Note the precise wording — variability, not the return level. The picking decides the wiggle. The allocation decides the life.");
+};
+ANIMS.pf_allocation_static=(cv,ctx)=>{
+  const S=scl([AL.pol,AL.act],56,876,40,330);
+  frm(ctx,"policy vs actual — the mix explains ~"+(AL.r2*100).toFixed(0)+"% of the variability");
+  ser(ctx,S,AL.pol,F.post,1,2.6);ser(ctx,S,AL.act,"#6fd0ff",1,1.6);
+};
+
+// deterministic-math handle (harness/tests assert the narration's numbers)
+ANIMS._pf_debug={flRatioHi:FL.hi.ratio,flRatioMid:FL.mid.ratio,flRatioLo:FL.lo.ratio,
+  seqBadRuinYear:SEQ_BAD.length-1,seqGoodEnd:SEQ_GOOD[SEQ_GOOD.length-1],
+  tjGrowthDD:mdd(TJ.g),tjPortDD:mdd(TJ.port),tjCxCrash:TJ.cx[TJ.c1]/TJ.cx[TJ.c0]-1,
+  bondP0:BP0,bondUp2:BUP-BP0,bondDn2:BDN-BP0,
+  caMfChop:CA.mf[CA.chop1]/CA.mf[CA.chop0]-1,caMfCrash:CA.mf[CA.c1]/CA.mf[CA.c0]-1,
+  caEqCrash:CA.eq[CA.c1]/CA.eq[CA.c0]-1,alR2:AL.r2};
+})();
+
 </script>
 </body>
 </html>
