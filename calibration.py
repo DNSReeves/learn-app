@@ -49,8 +49,11 @@ def item_stats(db_path: str | None = None) -> dict[tuple[str, str, str], dict[st
     """Per-item classical stats from the answers table. Pure read; cheap enough to
     compute per request at this log's scale (recompute > stale cache)."""
     with _conn(db_path) as c:
+        # P3.11: 'gen:' rows are AI-generated formative practice — analytics-only
+        # attempts that must not enter item stats or contaminate rest-scores.
         rows = [dict(r) for r in c.execute(
-            "SELECT user_id, topic_id, concept_id, question_id, is_correct FROM answers")]
+            "SELECT user_id, topic_id, concept_id, question_id, is_correct "
+            "FROM answers WHERE question_id NOT LIKE 'gen:%'")]
 
     by_item: dict[tuple[str, str, str], list[dict]] = {}
     by_user_topic: dict[tuple[int, str], list[dict]] = {}

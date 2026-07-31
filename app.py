@@ -530,6 +530,60 @@ def help_me(tid: str, cid: str, body: Stuck,
             "text": "Re-read the cards with this in mind: " + c["summary"]}
 
 
+# ---------- P3.11 (iss_b98c7ee2): AI-generated supplementary practice ----------
+# Extra formative reps, ephemeral by design: generated items live in a
+# process-local cache (a restart honestly expires them), answer keys never
+# reach the client, and grading NEVER touches BKT/streak/gate — an
+# unvalidated AI item must not move mastery evidence in either direction.
+
+_practice_cache: dict[tuple, dict] = {}   # (user_id, tid, cid) -> {qid: item}
+
+
+class PracticeAnswer(BaseModel):
+    question_id: str
+    choice: int
+    latency_ms: int | None = None
+
+
+@app.post("/api/topic/{tid}/concept/{cid}/practice")
+def gen_practice(tid: str, cid: str,
+                 authorization: str | None = Header(default=None)):
+    user = require_user(authorization)
+    pack = load_topics().get(tid)
+    c = next((c for c in (pack or {}).get("concepts", []) if c["id"] == cid), None)
+    if not c:
+        raise HTTPException(404, "No such concept.")
+    misses = db.recent_misses(user["id"], tid, cid)
+    items = ai.generate_practice(c, misses, [q["prompt"] for q in c["questions"]])
+    if not items:
+        return {"available": False,
+                "text": "AI practice isn't available right now — the authored "
+                        "checkpoint questions are the gate either way."}
+    _practice_cache[(user["id"], tid, cid)] = {it["id"]: it for it in items}
+    return {"available": True, "formative_only": True,
+            "questions": [{"id": it["id"], "type": "mcq", "prompt": it["prompt"],
+                           "options": it["options"]} for it in items]}
+
+
+@app.post("/api/topic/{tid}/concept/{cid}/practice/answer")
+def practice_answer(tid: str, cid: str, body: PracticeAnswer,
+                    authorization: str | None = Header(default=None)):
+    user = require_user(authorization)
+    it = _practice_cache.get((user["id"], tid, cid), {}).get(body.question_id)
+    if not it:
+        return {"expired": True,
+                "text": "That practice set expired — generate a fresh one."}
+    if not 0 <= body.choice <= 3:
+        raise HTTPException(400, "choice out of range")
+    correct = body.choice == it["answer"]
+    # analytics only — a "gen:" id keeps generated items out of calibration
+    # (calibration.py keys on authored question ids) and no state is upserted
+    db.log_answer(user["id"], tid, cid, f"gen:{body.question_id}",
+                  body.choice, correct, body.latency_ms)
+    return {"correct": correct, "answer": it["answer"],
+            "feedback": it["feedback"][body.choice], "formative_only": True}
+
+
 # ---------- static ----------
 
 @app.get("/")
