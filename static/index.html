@@ -193,6 +193,8 @@ const esc = s => s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"'
 function md(src){
   const blocks = src.split(/\n\n+/).map(b=>{
     b=b.trim();
+    /* FE-9: fenced code block ```…``` (single block, no internal blank line) */
+    if (b.startsWith("```")) return `<pre class="mono" style="background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px;overflow-x:auto;font-size:12.5px;line-height:1.45;margin:0 0 12px"><code>${esc(b.replace(/^```[^\n]*\n?/,"").replace(/\n?```\s*$/,""))}</code></pre>`;
     if (b.startsWith("## ")) return `<div class="big">${inline(b.slice(3))}</div>`;
     if (b.startsWith("### ")) return `<h3>${inline(b.slice(4))}</h3>`;
     if (/^(\d+\.|-)\s/m.test(b)){
@@ -202,7 +204,7 @@ function md(src){
     return `<p>${inline(b).replace(/\n/g,"<br>")}</p>`;
   });
   return blocks.join("");
-  function inline(t){return esc(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>");}
+  function inline(t){return esc(t).replace(/`([^`]+)`/g,'<code class="mono" style="background:var(--line);padding:1px 5px;border-radius:4px;font-size:.9em">$1</code>').replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>");}   /* FE-9: inline `code` */
 }
 function signout(){ TOKEN=""; ROLE="learner"; localStorage.removeItem("learn_token"); localStorage.removeItem("learn_role"); route(); }
 $("#signout").onclick = async()=>{ try{await api("/logout",{method:"POST"});}catch(e){} signout(); };
@@ -381,7 +383,7 @@ async function viewDash(){
     const f = $("#prog-file").files[0]; if(!f) return;
     try{
       const body = JSON.parse(await f.text());
-      const r = await api("/progress/import", {method:"POST", body:JSON.stringify(body)});
+      const r = await api("/progress/import", {method:"POST", body});   /* FE-1: api() stringifies — don't double-encode */
       $("#prog-msg").textContent = `imported ${r.imported}, kept-local ${r.skipped}`;
       setTimeout(viewDash, 1400);
     }catch(err){ $("#prog-msg").textContent = "import failed: "+(err.message||err); } };
@@ -391,6 +393,7 @@ let T=null; // current topic payload
 const SESH={moves:{},mastered:[]};   // P4.14: this visit's posterior moves
 async function viewTopic(tid, focus){
   T = await api("/topic/"+tid);
+  if(!(T.concepts && T.concepts.length)){ main.innerHTML=`<div class="topic"><p class="sub">This topic has no concepts yet.</p></div>`; return; }   /* FE-7 */
   const cur = focus || (T.concepts.find(c=>c.unlocked && !c.mastered) || T.concepts[T.concepts.length-1]).id;
   main.innerHTML = `<div class="topic">
     <nav class="ladder" id="ladder"></nav>
@@ -601,14 +604,18 @@ function resHTML(){
   if (!C.resources.length) return "";
   return `<div class="res"><h3>Vetted resources for this concept</h3>
     ${C.resources.map(r=>`<div class="item">
-      <span class="badge">${r.type}</span>
-      <span><a href="${r.url}" target="_blank" rel="noopener">${esc(r.label)}</a><br>
+      <span class="badge">${esc(r.type)}</span>
+      <span><a href="${/^https?:\/\//i.test(r.url)?esc(r.url):"#"}" target="_blank" rel="noopener">${esc(r.label)}</a><br>
       <span class="note">${esc(r.note)}</span></span></div>`).join("")}</div>`;
 }
 
 let qIx=0;
 function startCheckpoint(tid){ qIx=0; renderQuestion(tid); }
 function renderQuestion(tid){
+  if(!(C.questions && C.questions.length)){   /* FE-5: no-questions guard (don't crash the checkpoint) */
+    $("#stage").innerHTML=`<section class="stage"><div class="kicker">Checkpoint · ${esc(C.title)}</div><p class="sub">No questions authored for this concept yet.</p><div class="pager"><button class="btn" id="noq-back">Back to topic</button></div></section>`;
+    const nb=$("#noq-back"); if(nb) nb.onclick=()=>viewTopic(tid); return;
+  }
   const q=C.questions[qIx % C.questions.length];
   const t0=Date.now();
   /* P2.9: free-response questions render a textarea instead of options; numeric/regex
@@ -634,11 +641,18 @@ function renderQuestion(tid){
       if(r.newly_mastered) SESH.mastered.push(C.title);
     }
     if(r.ungraded){
+      /* FE-3: ungraded (AI grader down) never advances mastery — so it MUST still offer an
+         exit, else a mastered/free-response concept loops with the posterior frozen. */
       $("#after").innerHTML = `
         <div class="fb">${esc(r.feedback)}</div>
         <div class="fb good"><b>Model answer:</b> ${esc(r.model_answer||"")}</div>
-        <div class="pager"><span class="spacer"></span>
+        <div class="pager">
+          <button class="btn ghost" id="ug-back">Back to ladder</button>
+          <span class="spacer"></span>
+          ${C.mastered?`<button class="btn warm" id="go-next">Next concept</button>`:""}
           <button class="btn" id="go-on">Next question</button></div>`;
+      const ub=$("#ug-back"); if(ub) ub.onclick=()=>viewTopic(tid);
+      const un=$("#go-next"); if(un) un.onclick=()=>viewTopic(tid);
       $("#go-on").onclick=()=>{qIx++; renderQuestion(tid);};
       return;
     }
@@ -669,26 +683,42 @@ function renderQuestion(tid){
     const xp=$("#xpractice"); if(xp) xp.onclick=()=>startPractice(tid, C.id, C.title);
     const hm=$("#helpme"); if(hm) hm.onclick=async()=>{
       hm.disabled=true; hm.textContent="Thinking…";
-      const h=await api(`/topic/${tid}/concept/${C.id}/help`,{method:"POST",body:{question_id:q.id}});
-      $("#aihelp").innerHTML=`<div class="fb">${esc(h.text)}${h.source==="ai"?' <span class="mono" style="font-size:11px;color:var(--dim)">— AI tutor</span>':""}</div>`;
+      try{
+        const h=await api(`/topic/${tid}/concept/${C.id}/help`,{method:"POST",body:{question_id:q.id}});
+        $("#aihelp").innerHTML=`<div class="fb">${esc(h.text)}${h.source==="ai"?' <span class="mono" style="font-size:11px;color:var(--dim)">— AI tutor</span>':""}</div>`;
+      }catch(e){ $("#aihelp").innerHTML=`<div class="fb bad">Couldn't fetch an explanation — ${esc(e.message||"try again")}.</div>`; }
+      finally{ hm.disabled=false; hm.textContent="Explain it differently"; }   /* FE-6: restore on failure */
     };
   };
   if(isFree){
     $("#free-go").onclick=async()=>{
       const txt=($("#free-in").value||"").trim(); if(!txt) return;
+      const myC=C;   // guard: ignore the result if the learner navigates away mid-grade
       $("#free-go").disabled=true; $("#free-go").textContent="Grading…";
-      const r=await api(`/topic/${tid}/concept/${C.id}/answer`,{method:"POST",
-        body:{question_id:q.id, text:txt, latency_ms:Date.now()-t0}});
-      finish(r,null);
+      try{
+        const r=await api(`/topic/${tid}/concept/${myC.id}/answer`,{method:"POST",
+          body:{question_id:q.id, text:txt, latency_ms:Date.now()-t0}});
+        if(C!==myC) return;
+        finish(r,null);
+      }catch(err){
+        $("#free-go").disabled=false; $("#free-go").textContent="Submit";
+        $("#after").innerHTML=`<div class="fb bad">Couldn't submit — ${esc(err.message||"try again")}.</div>`;
+      }
     };
     return;
   }
   document.querySelectorAll(".opt").forEach(b=>b.onclick=async()=>{
     document.querySelectorAll(".opt").forEach(x=>x.disabled=true);
-    const i=+b.dataset.i;
-    const r=await api(`/topic/${tid}/concept/${C.id}/answer`,{method:"POST",
-      body:{question_id:q.id, choice:i, latency_ms:Date.now()-t0}});
-    finish(r,b);
+    const i=+b.dataset.i, myC=C;
+    try{
+      const r=await api(`/topic/${tid}/concept/${myC.id}/answer`,{method:"POST",
+        body:{question_id:q.id, choice:i, latency_ms:Date.now()-t0}});
+      if(C!==myC) return;   // navigated away mid-answer — don't stamp onto the new concept
+      finish(r,b);
+    }catch(err){
+      document.querySelectorAll(".opt").forEach(x=>x.disabled=false);
+      $("#after").innerHTML=`<div class="fb bad">Couldn't submit — ${esc(err.message||"try again")}. Tap your answer to retry.</div>`;
+    }
   });
 }
 
@@ -4772,6 +4802,254 @@ ANIMS.etf_twr_mwr=async(cv,ctx)=>{
 ANIMS.etf_twr_mwr_static=(cv,ctx)=>{
   render(ctx,cv,{pathFrac:1,markerProg:1,twrDraw:1,mwrProg:1,takeawayA:1});
 };
+})();
+
+/* ================= Technical Analysis module (2026-07-31, ta_*) =================
+   Five deterministic canvas lessons. Seeded PRNG — every viewer sees the same
+   markets, so the narration always matches the pixels. Append-only block. */
+(function(){
+const W=900,H=380;
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function genPath(seed,n,drift,vol){ // geometric walk, seeded
+  const r=rng(seed),out=[100];let x=100;
+  for(let i=1;i<n;i++){
+    const z=(r()+r()+r()-1.5)*2;          // ~normal-ish
+    x=Math.max(20,x*(1+drift+vol*z));out.push(x);
+  }
+  return out;
+}
+function sma(a,n){return a.map((_,i)=>i<n-1?null:a.slice(i-n+1,i+1).reduce((s,v)=>s+v,0)/n);}
+function ema(a,n){const k=2/(n+1);const out=[a[0]];for(let i=1;i<a.length;i++)out.push(a[i]*k+out[i-1]*(1-k));return out;}
+function scaler(arrs,x0,x1,y0,y1){
+  const flat=arrs.flat().filter(v=>v!=null);
+  const lo=Math.min(...flat),hi=Math.max(...flat),n=Math.max(...arrs.map(a=>a.length));
+  return{X:i=>x0+(x1-x0)*i/(n-1),Y:v=>y1-(v-lo)/(hi-lo)*(y1-y0)};
+}
+function frame(ctx,title){
+  clear(ctx,{width:W,height:H});
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(56,20);ctx.lineTo(56,330);ctx.lineTo(876,330);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText(title,60,36);
+}
+function drawSeries(ctx,S,arr,color,frac,w){
+  ctx.strokeStyle=color;ctx.lineWidth=w||2;ctx.beginPath();let started=false;
+  const upTo=Math.max(2,Math.floor(arr.length*(frac==null?1:frac)));
+  for(let i=0;i<upTo;i++){const v=arr[i];if(v==null)continue;
+    const x=S.X(i),y=S.Y(v);started?ctx.lineTo(x,y):(ctx.moveTo(x,y),started=true);}
+  ctx.stroke();
+}
+function tag(ctx,S,arr,i,text,color,dy){
+  ctx.fillStyle=color;ctx.font="12.5px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText(text,S.X(i)+6,S.Y(arr[i])+(dy||-8));
+}
+
+/* ---- ta_noise_vs_trend: one company's story vs five hundred stories averaged ---- */
+const STK=(()=>{const p=genPath(11,250,0.0009,0.022);for(let i=150;i<250;i++)p[i]*=0.82;return p;})(); // earnings gap −18%
+const ETF=genPath(12,250,0.0009,0.009);
+ANIMS.ta_noise_vs_trend=async(cv,ctx)=>{
+  const S=scaler([STK,ETF],56,876,40,330);
+  frame(ctx,"one stock vs one ETF — same underlying trend");
+  await narrate("Two assets, the same underlying uptrend. The jagged line is a single stock: every headline, every earnings call, every analyst note lands on one company.");
+  await tween(1600,k=>{frame(ctx,"one stock vs one ETF — same underlying trend");drawSeries(ctx,S,STK,F.wrong,k);});
+  tag(ctx,S,STK,150,"⇐ one bad earnings night: −18% overnight gap",F.wrong,-12);
+  await narrate("At bar one hundred fifty it gaps down eighteen percent overnight on one earnings miss. No chart pattern saw that coming — the information arrived while markets were closed.");
+  await sleep(300);
+  await narrate("The smooth line is an exchange traded fund holding five hundred such stories. The idiosyncratic shocks average away and what survives is the shared trend.");
+  await tween(1600,k=>{frame(ctx,"one stock vs one ETF — same underlying trend");drawSeries(ctx,S,STK,F.wrong,1);tag(ctx,S,STK,150,"⇐ one bad earnings night: −18% overnight gap",F.wrong,-12);drawSeries(ctx,S,ETF,F.ok,k,2.5);});
+  await narrate("This is why technical analysis is a cleaner instrument on ETFs: the signal you are reading is the trend itself, not one company's news flow. Same tools — much better signal to noise.");
+};
+ANIMS.ta_noise_vs_trend_static=(cv,ctx)=>{
+  const S=scaler([STK,ETF],56,876,40,330);
+  frame(ctx,"one stock vs one ETF — same underlying trend");
+  drawSeries(ctx,S,STK,F.wrong,1);drawSeries(ctx,S,ETF,F.ok,1,2.5);
+  tag(ctx,S,STK,150,"⇐ −18% overnight gap",F.wrong,-12);
+};
+
+/* ---- ta_sma: smoothing vs lag, 10/50/200 ---- */
+const PX=genPath(21,250,0.0007,0.013);
+const S10=sma(PX,10),S50=sma(PX,50),S200=sma(PX,200);
+ANIMS.ta_sma=async(cv,ctx)=>{
+  const S=scaler([PX],56,876,40,330);
+  const base=()=>{frame(ctx,"simple moving averages — smoothing buys clarity, paid for in lag");drawSeries(ctx,S,PX,"#5A6E8C",1,1.4);};
+  base();
+  await narrate("Raw daily prices. A simple moving average replaces each day with the average of the last N closes — a sliding window that irons out the noise.");
+  await tween(1300,k=>{base();drawSeries(ctx,S,S10,F.post,k,2.2);});
+  tag(ctx,S,S10,246,"SMA-10",F.post,-6);
+  await narrate("Ten days: hugs the price, still twitchy. Every wiggle you smooth away costs you one thing — time.");
+  await tween(1300,k=>{base();drawSeries(ctx,S,S10,F.post,1,2.2);tag(ctx,S,S10,246,"SMA-10",F.post,-6);drawSeries(ctx,S,S50,F.ok,k,2.2);});
+  tag(ctx,S,S50,246,"SMA-50",F.ok,10);
+  await narrate("Fifty days: the classic intermediate trend line. Smoother, and noticeably late at every turn.");
+  await tween(1300,k=>{base();drawSeries(ctx,S,S10,F.post,1,2.2);drawSeries(ctx,S,S50,F.ok,1,2.2);tag(ctx,S,S10,246,"SMA-10",F.post,-6);tag(ctx,S,S50,246,"SMA-50",F.ok,10);drawSeries(ctx,S,S200,F.wrong,k,2.2);});
+  tag(ctx,S,S200,246,"SMA-200",F.wrong,24);
+  await narrate("Two hundred days: the regime line — the one the long studies use. It barely notices weeks of noise, and it turns months after the market does. There is no free lunch here: every moving average is a dial between noise and lag. Choosing the period IS the strategy decision.");
+};
+ANIMS.ta_sma_static=(cv,ctx)=>{
+  const S=scaler([PX],56,876,40,330);
+  frame(ctx,"SMA 10 / 50 / 200 — smoothing vs lag");
+  drawSeries(ctx,S,PX,"#5A6E8C",1,1.4);drawSeries(ctx,S,S10,F.post,1,2.2);
+  drawSeries(ctx,S,S50,F.ok,1,2.2);drawSeries(ctx,S,S200,F.wrong,1,2.2);
+  tag(ctx,S,S10,246,"10",F.post,-6);tag(ctx,S,S50,246,"50",F.ok,10);tag(ctx,S,S200,246,"200",F.wrong,24);
+};
+
+/* ---- ta_ema: exponential weighting — faster response, same length ---- */
+const STEP=(()=>{const p=[];for(let i=0;i<120;i++)p.push(100);for(let i=120;i<250;i++)p.push(118);return p;})();
+const SE_S=sma(STEP,40),SE_E=ema(STEP,40);
+ANIMS.ta_ema=async(cv,ctx)=>{
+  const S=scaler([STEP,[95],[122]],56,620,40,330);
+  const weights=(k)=>{ // inset: equal vs exponential weights
+    ctx.fillStyle="#16213A";ctx.fillRect(650,60,220,240);
+    ctx.strokeStyle="#3A4C68";ctx.strokeRect(650,60,220,240);
+    ctx.fillStyle=F.txt;ctx.font="12.5px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillText("weight on each past day",656,78);
+    for(let i=0;i<20;i++){
+      const x=656+i*10.4;
+      ctx.fillStyle=F.ok;ctx.globalAlpha=0.85;
+      ctx.fillRect(x,290-40,8,40);                       // SMA: equal
+      ctx.fillStyle=F.post;
+      const w=Math.pow(1-2/41,i);ctx.globalAlpha=0.95;
+      ctx.fillRect(x,180-110*w*k,8,110*w*k);             // EMA: decaying
+      ctx.globalAlpha=1;
+    }
+    ctx.fillStyle=F.ok;ctx.fillText("SMA: equal, then cliff",656,318);
+    ctx.fillStyle=F.post;ctx.fillText("EMA: newest counts most",656,96);
+  };
+  const base=()=>{frame(ctx,"EMA vs SMA — same 40-day length, different memory");drawSeries(ctx,S,STEP,"#5A6E8C",1,1.4);weights(1);};
+  frame(ctx,"EMA vs SMA — same 40-day length, different memory");drawSeries(ctx,S,STEP,"#5A6E8C",1,1.4);
+  await narrate("A clean experiment: price sits flat, then steps up eighteen percent and holds. Watch how two forty-day averages digest the same news.");
+  await tween(900,k=>{frame(ctx,"EMA vs SMA — same 40-day length, different memory");drawSeries(ctx,S,STEP,"#5A6E8C",1,1.4);weights(k);});
+  await narrate("The simple average weights all forty days equally — then forgets each one off a cliff. The exponential moving average weights the newest day most, with weights decaying by a constant factor: two divided by N plus one.");
+  await tween(1500,k=>{base();drawSeries(ctx,S,SE_S,F.ok,k,2.4);});
+  await narrate("The simple average takes forty full days to absorb the step.");
+  await tween(1500,k=>{base();drawSeries(ctx,S,SE_S,F.ok,1,2.4);drawSeries(ctx,S,SE_E,F.post,k,2.4);});
+  await narrate("The exponential average covers most of the same ground in a third of the time — same nominal length, faster response. The cost is symmetry: it reacts faster to noise too. Faster is not better; faster is a choice.");
+};
+ANIMS.ta_ema_static=(cv,ctx)=>{
+  const S=scaler([STEP,[95],[122]],56,620,40,330);
+  frame(ctx,"EMA vs SMA — same length, different memory");
+  drawSeries(ctx,S,STEP,"#5A6E8C",1,1.4);drawSeries(ctx,S,SE_S,F.ok,1,2.4);drawSeries(ctx,S,SE_E,F.post,1,2.4);
+};
+
+/* ---- ta_whipsaw: HOW MONEY IS LOST — fast crossover on a sideways market ----
+   Tuned deterministic geometry (harness-verified): market ends +0.3%, the
+   crossover trades 10 times and the account ends −21.5%. */
+const CHOP=(()=>{const r=rng(1);
+  return Array.from({length:238},(_,i)=>100+9*Math.sin(i/7.5)+4*Math.sin(i/2.9)+3*(r()-0.5));})();
+const C10=ema(CHOP,10),C30=ema(CHOP,30);
+function crossTrades(fast,slow){const t=[];let inPos=false;
+  for(let i=1;i<fast.length;i++){
+    if(fast[i-1]<=slow[i-1]&&fast[i]>slow[i]&&!inPos){t.push({i,side:"B"});inPos=true;}
+    else if(fast[i-1]>=slow[i-1]&&fast[i]<slow[i]&&inPos){t.push({i,side:"S"});inPos=false;}
+  }return t;}
+const TRADES=crossTrades(C10,C30);
+const EQ=(()=>{ // equity of the crossover trader, 25bps round-trip friction each way
+  const eq=[100];let inPos=false,ti=0;
+  for(let i=1;i<CHOP.length;i++){
+    let e=eq[i-1];
+    if(inPos)e*=CHOP[i]/CHOP[i-1];
+    if(ti<TRADES.length&&TRADES[ti].i===i){e*=0.9975;inPos=TRADES[ti].side==="B";ti++;}
+    eq.push(e);
+  }return eq;})();
+ANIMS.ta_whipsaw=async(cv,ctx)=>{
+  const S=scaler([CHOP],56,876,40,200);
+  const SE=scaler([EQ,[88]],56,876,225,325);
+  const base=(k1,k2,k3)=>{
+    frame(ctx,"how money is lost: a fast crossover system in a sideways market");
+    drawSeries(ctx,S,CHOP,"#5A6E8C",1,1.3);
+    if(k1)drawSeries(ctx,S,C10,F.post,k1,1.8),drawSeries(ctx,S,C30,F.ok,k1,1.8);
+    if(k2)for(const t of TRADES.slice(0,Math.floor(TRADES.length*k2))){
+      ctx.fillStyle=t.side==="B"?F.ok:F.wrong;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="center";
+      ctx.fillText(t.side==="B"?"▲":"▼",S.X(t.i),S.Y(CHOP[t.i])+(t.side==="B"?16:-10));}
+    if(k3){ctx.fillStyle="#8FA1B8";ctx.font="12.5px 'IBM Plex Mono'";ctx.textAlign="left";
+      ctx.fillText("the trader's account (after 25bps per trade)",60,240);
+      drawSeries(ctx,SE,EQ,F.wrong,k3,2.2);}
+  };
+  base(0,0,0);
+  await narrate("A market going nowhere: two hundred fifty days of pure chop, ending where it began. Now hand it to a popular system — buy when the fast average crosses above the slow, sell when it crosses below.");
+  await tween(1200,k=>base(k,0,0));
+  await narrate("Every triangle is a trade the crossover demanded.");
+  await tween(1800,k=>base(1,k,0));
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="right";
+  ctx.fillText(TRADES.length+" trades — price went NOWHERE",872,56);
+  await narrate(TRADES.length+" trades in a year, each one paying spread, commission drag and, in a taxable account, short term capital gains. The price ended flat. Watch the account.");
+  await tween(2000,k=>{base(1,1,k);ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="right";ctx.fillText(TRADES.length+" trades — price went NOWHERE",872,56);});
+  ctx.fillStyle=F.wrong;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="right";
+  ctx.fillText("account: "+(EQ[EQ.length-1]-100).toFixed(1)+"% · market: 0%",872,320);
+  await narrate("Down "+Math.abs(EQ[EQ.length-1]-100).toFixed(0)+" percent while the market lost nothing. Every whipsaw was the system working exactly as designed — in the wrong regime. This is the base rate of naive technical trading: the signal was real, the discipline about WHEN to use it was missing. Our own ninety-nine-year study measured the same tax: a fast trend rule traded sixty-nine round trips and fifty percent annual turnover for its protection.");
+};
+ANIMS.ta_whipsaw_static=(cv,ctx)=>{
+  const S=scaler([CHOP],56,876,40,200);
+  const SE=scaler([EQ,[88]],56,876,225,325);
+  frame(ctx,"fast crossovers in chop: "+TRADES.length+" trades, market flat, account down");
+  drawSeries(ctx,S,CHOP,"#5A6E8C",1,1.3);drawSeries(ctx,S,C10,F.post,1,1.8);drawSeries(ctx,S,C30,F.ok,1,1.8);
+  for(const t of TRADES){ctx.fillStyle=t.side==="B"?F.ok:F.wrong;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText(t.side==="B"?"▲":"▼",S.X(t.i),S.Y(CHOP[t.i])+(t.side==="B"?16:-10));}
+  drawSeries(ctx,SE,EQ,F.wrong,1,2.2);
+};
+
+/* ---- ta_discipline: HOW IT IS USED WELL — slow rule + regime filter vs the alternatives ----
+   Tuned deterministic market (harness-verified): BH ends 156 at −41% MaxDD;
+   naive daily 10/30 ends 156 at −30% with 24 trades (protection bought, the
+   whole return edge churned away); disciplined monthly 200d+band ends 172 at
+   −21% with 4 trades. */
+const MKT=(()=>{const r=rng(102),n=750,out=[100];let x=100;
+  for(let i=1;i<n;i++){const inBear=i>n*0.40&&i<n*0.52;
+    const d=inBear?-0.0045:0.0014,v=inBear?0.014:0.010;
+    const z=(r()+r()+r()-1.5)*2;x=Math.max(20,x*(1+d+v*z));out.push(x);}
+  return out;})();
+const M200=sma(MKT,200);
+function runStrat(px,kind){ // returns equity curve
+  const eq=[100];let inPos=true,trades=0;
+  const f=kind==="naive"?ema(px,10):null,s=kind==="naive"?ema(px,30):null;
+  for(let i=1;i<px.length;i++){
+    let e=eq[i-1];
+    if(inPos)e*=px[i]/px[i-1];
+    let want=inPos;
+    if(kind==="naive"){want=f[i]>s[i];}
+    if(kind==="disc"){ // monthly check (every 21 bars), 200-day regime line, 1% band
+      if(i%21===0&&M200[i]!=null)want=px[i]>M200[i]*0.99?true:(px[i]<M200[i]*0.97?false:want);
+    }
+    if(want!==inPos){e*=0.9975;trades++;inPos=want;}
+    eq.push(e);
+  }
+  return{eq,trades};
+}
+function maxdd(a){let peak=a[0],dd=0;for(const v of a){peak=Math.max(peak,v);dd=Math.min(dd,v/peak-1);}return dd;}
+const BH={eq:MKT.map(v=>100*v/MKT[0]),trades:0};
+const NAI=runStrat(MKT,"naive"),DIS=runStrat(MKT,"disc");
+ANIMS.ta_discipline=async(cv,ctx)=>{
+  const all=[BH.eq,NAI.eq,DIS.eq];
+  const S=scaler(all,56,876,40,330);
+  const leg=(y,c,txt)=>{ctx.fillStyle=c;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";ctx.fillText(txt,64,y);};
+  const base=(k1,k2,k3)=>{
+    frame(ctx,"the same market, three temperaments");
+    if(k1)drawSeries(ctx,S,BH.eq,"#5A6E8C",k1,1.8);
+    if(k2)drawSeries(ctx,S,NAI.eq,F.wrong,k2,1.8);
+    if(k3)drawSeries(ctx,S,DIS.eq,F.ok,k3,2.4);
+  };
+  base(0,0,0);
+  await narrate("Five hundred days: a genuine uptrend with a real bear market buried in the middle. Three investors, one market.");
+  await tween(1400,k=>base(k,0,0));
+  leg(60,"#5A6E8C","buy & hold — rides the full drawdown: "+(maxdd(BH.eq)*100).toFixed(0)+"%");
+  await narrate("Buy and hold earns the trend and eats the entire bear: a "+Math.abs(maxdd(BH.eq)*100).toFixed(0)+" percent drawdown, held all the way down.");
+  await tween(1400,k=>{base(1,k,0);leg(60,"#5A6E8C","buy & hold — max drawdown "+(maxdd(BH.eq)*100).toFixed(0)+"%");});
+  leg(78,F.wrong,"naive daily crossover — "+NAI.trades+" trades, edge churned away");
+  await narrate("The naive daily crossover trader trades "+NAI.trades+" times. The rule genuinely cuts the bear — drawdown "+Math.abs(maxdd(NAI.eq)*100).toFixed(0)+" percent instead of "+Math.abs(maxdd(BH.eq)*100).toFixed(0)+" — but look where the account ENDS: dead even with buy and hold. Twenty-four whipsaws and their costs churned away every dollar the protection earned.");
+  await tween(1600,k=>{base(1,1,k);leg(60,"#5A6E8C","buy & hold — max drawdown "+(maxdd(BH.eq)*100).toFixed(0)+"%");leg(78,F.wrong,"naive daily crossover — "+NAI.trades+" trades");});
+  leg(96,F.ok,"disciplined: monthly check · 200-day line · band — "+DIS.trades+" trades, max DD "+(maxdd(DIS.eq)*100).toFixed(0)+"%");
+  await narrate("The disciplined rule checks once a month against the two-hundred-day line, with a band so borderline readings don't churn. "+DIS.trades+" trades total. It gives up a little of the top and sidesteps the heart of the bear: max drawdown "+Math.abs(maxdd(DIS.eq)*100).toFixed(0)+" percent versus "+Math.abs(maxdd(BH.eq)*100).toFixed(0)+".");
+  await narrate("Same tools, opposite outcomes. The edge was never the indicator — it was the cadence, the confirmation band, and committing to the rule before the market tested it. Slow, boring, and pre-registered beats fast, clever, and improvised.");
+};
+ANIMS.ta_discipline_static=(cv,ctx)=>{
+  const all=[BH.eq,NAI.eq,DIS.eq];
+  const S=scaler(all,56,876,40,330);
+  frame(ctx,"buy&hold vs naive crossover vs disciplined trend");
+  drawSeries(ctx,S,BH.eq,"#5A6E8C",1,1.8);drawSeries(ctx,S,NAI.eq,F.wrong,1,1.8);drawSeries(ctx,S,DIS.eq,F.ok,1,2.4);
+};
+// deterministic-math handle (harness/tests assert the narration's numbers)
+ANIMS._ta_debug={whipsawTrades:TRADES.length,whipsawEq:EQ[EQ.length-1],
+  naiTrades:NAI.trades,discTrades:DIS.trades,
+  ddBH:maxdd(BH.eq),ddNai:maxdd(NAI.eq),ddDisc:maxdd(DIS.eq),
+  bhEnd:BH.eq[BH.eq.length-1],naiEnd:NAI.eq[NAI.eq.length-1],discEnd:DIS.eq[DIS.eq.length-1]};
 })();
 </script>
 </body>
