@@ -173,6 +173,7 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 const $ = s => document.querySelector(s);
 const main = $("#main");
 let TOKEN = localStorage.getItem("learn_token") || "";
+let ROLE = localStorage.getItem("learn_role") || "learner";   // P5.20 author-UI gate (server 403 is the real gate)
 const api = async (path, opts={}) => {
   const r = await fetch("/api"+path, {...opts,
     headers:{"Content-Type":"application/json", Authorization:"Bearer "+TOKEN, ...(opts.headers||{})},
@@ -198,7 +199,7 @@ function md(src){
   return blocks.join("");
   function inline(t){return esc(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>");}
 }
-function signout(){ TOKEN=""; localStorage.removeItem("learn_token"); route(); }
+function signout(){ TOKEN=""; ROLE="learner"; localStorage.removeItem("learn_token"); localStorage.removeItem("learn_role"); route(); }
 $("#signout").onclick = async()=>{ try{await api("/logout",{method:"POST"});}catch(e){} signout(); };
 
 /* ================= views ================= */
@@ -223,13 +224,91 @@ function viewAuth(mode="login"){
     e.preventDefault();
     try{
       const d=await api("/"+mode,{method:"POST",body:{username:$("#u").value,password:$("#p").value}});
-      TOKEN=d.token; localStorage.setItem("learn_token",TOKEN); route();
+      TOKEN=d.token; ROLE=d.role||"learner";
+      localStorage.setItem("learn_token",TOKEN); localStorage.setItem("learn_role",ROLE); route();
     }catch(err){ $("#err").textContent=err.message; }
   };
 }
 
+/* P5.20 (iss_e8b3bfb8): author UI — paste/load a draft pack, validate against the
+   real checker, then STAGE it. The server writes topics_staged/ only; promotion to
+   live topics/ stays the operator's deploy step, so a bad draft can never break the
+   serving app. Shown only when ROLE==='author'; the server 403 is the real gate. */
+const SAMPLE_PACK = {
+  id: "sample-pack", title: "Sample pack",
+  tagline: "one-line description shown on the topic card",
+  description: "A longer description of what this pack teaches.",
+  prereqs: [],
+  concepts: [{
+    id: "c01", title: "First concept",
+    summary: "one sentence on what this concept covers",
+    cards: [{ h: "A chunk heading",
+      md: "Body text. Use **bold**, short paragraphs, and\n\n- bullet\n- lists\n\nKeep each chunk focused (2200 chars max)." }],
+    questions: [
+      { id: "q1", type: "mcq", prompt: "A question that tests the concept?",
+        options: ["The correct answer", "A plausible distractor", "Another distractor"], answer: 0,
+        feedback: ["Right — reinforce why this is the idea.", "Wrong — name the misconception this reveals.", "Wrong — name the misconception this reveals."] },
+      { id: "q2", type: "mcq", prompt: "A second, different question?",
+        options: ["The correct answer", "A distractor", "Another distractor"], answer: 0,
+        feedback: ["Correct — explain the reasoning here.", "Incorrect — explain the specific error.", "Incorrect — explain the specific error."] },
+      { id: "q3", type: "mcq", prompt: "A third question (need at least 3)?",
+        options: ["The correct answer", "A distractor", "Another distractor"], answer: 0,
+        feedback: ["Correct — explain the reasoning here.", "Incorrect — explain the specific error.", "Incorrect — explain the specific error."] }
+    ],
+    resources: []
+  }]
+};
+function viewAuthor(){
+  main.innerHTML = `<div class="dash">
+    <h1>Author a pack</h1>
+    <p class="sub">Paste or load a pack JSON, validate it, then stage it. Staged drafts land in
+      <span class="mono">topics_staged/</span> — promotion to live is the operator's deploy step,
+      so a bad draft can never break the app.</p>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0">
+      <button class="btn ghost" id="pk-load">⬆ Load .json</button>
+      <input type="file" id="pk-file" accept=".json,application/json" hidden>
+      <button class="btn ghost" id="pk-skel">Insert skeleton</button>
+      <span class="spacer"></span>
+      <button class="btn" id="pk-validate">Validate</button>
+      <button class="btn warm" id="pk-stage" disabled>Stage upload</button>
+    </div>
+    <textarea id="pk-src" spellcheck="false" placeholder='{ "id": "my-pack", "title": "…", "concepts": [ … ] }'
+      style="width:100%;height:44vh;font:13px/1.5 'IBM Plex Mono',monospace;padding:12px;
+      border:1px solid var(--line);border-radius:var(--r);background:var(--panel);color:var(--ink);resize:vertical"></textarea>
+    <div id="pk-report" style="margin-top:12px"></div>
+    <p class="sub" style="margin-top:14px"><a href="#" id="pk-back">← back to topics</a></p>
+  </div>`;
+  const src=$("#pk-src"), report=$("#pk-report"), stageBtn=$("#pk-stage");
+  const errList=(errs)=>`<ul style="font-size:13px">${errs.map(x=>`<li class="mono">${esc(x)}</li>`).join("")}</ul>`;
+  const bad=(html)=>{ report.innerHTML=html; stageBtn.disabled=true; };
+  const parse=()=>{ try{ return {pack:JSON.parse(src.value)}; }
+    catch(e){ bad(`<div class="tag" style="color:var(--wrong)">✗ Not valid JSON — ${esc(e.message)}</div>`); return null; } };
+  $("#pk-back").onclick=e=>{e.preventDefault(); viewDash();};
+  $("#pk-load").onclick=()=>$("#pk-file").click();
+  $("#pk-file").onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
+    rd.onload=()=>{ src.value=rd.result; bad(""); }; rd.readAsText(f); };
+  $("#pk-skel").onclick=()=>{ src.value=JSON.stringify(SAMPLE_PACK,null,1); bad(""); };
+  src.oninput=()=>{ stageBtn.disabled=true; };
+  $("#pk-validate").onclick=async()=>{
+    const body=parse(); if(!body) return;
+    try{ const r=await api("/author/pack/validate",{method:"POST",body});
+      if(r.ok){ report.innerHTML=`<div class="tag" style="color:var(--ok)">✓ Valid — ${r.concepts} concept${r.concepts===1?"":"s"}. Ready to stage.</div>`; stageBtn.disabled=false; }
+      else bad(`<div class="tag" style="color:var(--wrong)">✗ ${r.errors.length} problem${r.errors.length===1?"":"s"}:</div>`+errList(r.errors));
+    }catch(e){ bad(`<div class="tag" style="color:var(--wrong)">${esc(e.message)}</div>`); }
+  };
+  stageBtn.onclick=async()=>{
+    const body=parse(); if(!body) return;
+    try{ const r=await api("/author/pack/upload",{method:"POST",body});
+      if(!r.ok){ bad(`<div class="tag" style="color:var(--wrong)">✗ ${r.errors.length} problem${r.errors.length===1?"":"s"}:</div>`+errList(r.errors)); return; }
+      report.innerHTML=`<div class="tag" style="color:var(--ok)">✓ Staged → <span class="mono">${esc(r.staged)}</span>${r.overwrites_live?' · <b style="color:var(--post-deep)">overwrites a live pack on next deploy</b>':""}</div>`
+        + `<p class="sub" style="margin-top:6px">${esc(r.note||"")}</p>`;
+      stageBtn.disabled=true;
+    }catch(e){ bad(`<div class="tag" style="color:var(--wrong)">${esc(e.message)}</div>`); }
+  };
+}
 async function viewDash(){
   const d = await api("/topics");
+  if(d.role){ ROLE=d.role; localStorage.setItem("learn_role",ROLE); }   // server-fresh author gate when provided
   $("#who").textContent=d.user; $("#signout").hidden=false;
   const _mv=Object.entries(SESH.moves);
   const sessionCard = _mv.length ? `
@@ -254,11 +333,13 @@ async function viewDash(){
     <p class="sub" style="margin-top:18px;font-size:13px">
       <a href="#" id="an-open">📈 my analytics</a> ·
       <a href="#" id="prog-export">⬇ export progress</a> ·
-      <a href="#" id="prog-import">⬆ import progress</a>
+      <a href="#" id="prog-import">⬆ import progress</a>${ROLE==="author"?` ·
+      <a href="#" id="author-open">✍️ author a pack</a>`:""}
       <input type="file" id="prog-file" accept=".json,application/json" hidden>
       <span id="prog-msg" class="mono" style="margin-left:8px"></span></p>
   </div>`;
   main.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
+  { const ao=$("#author-open"); if(ao) ao.onclick=e=>{e.preventDefault(); viewAuthor();}; }
   /* P4.16: move progress between deployments. Export = download the JSON; import =
      server-side MERGE that never regresses local progress (stronger evidence wins). */
   /* P4.13: per-user analytics — sparse-data cases SAY so instead of charting noise. */
