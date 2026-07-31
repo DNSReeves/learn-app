@@ -649,14 +649,17 @@ function renderQuestion(tid){
     $("#after").innerHTML = `
       <div class="delta mono">posterior ${r.p_before.toFixed(3)} → <b>${r.p_after.toFixed(3)}</b> ${dir}</div>
       <div class="fb ${r.correct?"good":"bad"}">${esc(r.feedback)}</div>
-      ${r.newly_mastered?`<div class="mastered-banner">Mastered — the gate is open. The next concept is unlocked, and this one enters spaced review tomorrow.</div>`:""}
+      ${r.newly_mastered
+        ? `<div class="mastered-banner">Mastered — the gate is open. The next concept is unlocked, and this one enters spaced review tomorrow.</div>`
+        : (r.mastered ? `<div class="mastered-banner">Already mastered ✓ — keep reviewing, or move on.</div>` : "")}
       <div class="pager">
         ${!r.correct?`<button class="btn ghost" id="reread">Re-read the cards</button>
                       <button class="btn ghost" id="helpme">Explain it differently</button>
                       <button class="btn ghost" id="xpractice" title="AI-generated extra reps — doesn't count toward mastery">🔄 Extra practice</button>`:""}
         <span class="spacer"></span>
-        ${r.newly_mastered
-          ? `<button class="btn warm" id="go-next">Next concept</button>`
+        ${r.mastered
+          ? `<button class="btn ghost" id="go-on">Next question</button>
+             <button class="btn warm" id="go-next">Next concept</button>`
           : `<button class="btn" id="go-on">${r.correct?"Next question":"Try another"}</button>`}
       </div>
       <div id="aihelp"></div>`;
