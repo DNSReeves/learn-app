@@ -658,4 +658,16 @@ def index():
     return FileResponse(os.path.join(BASE, "static", "index.html"),
                         headers={"Cache-Control": "no-cache, must-revalidate"})
 
+
+@app.get("/sw.js", include_in_schema=False)
+def service_worker():
+    # P4.15 (iss_a0cef670): serve the service worker from ROOT so it may claim
+    # scope '/' (a /static/-served SW could only scope /static/ and could never
+    # cache the app-shell navigation or /api). Service-Worker-Allowed makes the
+    # broad scope explicit; no-cache so SW updates deploy on refresh.
+    return FileResponse(os.path.join(BASE, "static", "sw.js"),
+                        media_type="application/javascript",
+                        headers={"Service-Worker-Allowed": "/",
+                                 "Cache-Control": "no-cache"})
+
 app.mount("/static", StaticFiles(directory=os.path.join(BASE, "static")), name="static")
