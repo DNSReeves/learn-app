@@ -4839,8 +4839,12 @@ function drawSeries(ctx,S,arr,color,frac,w){
   ctx.stroke();
 }
 function tag(ctx,S,arr,i,text,color,dy){
-  ctx.fillStyle=color;ctx.font="12.5px 'IBM Plex Mono'";ctx.textAlign="left";
-  ctx.fillText(text,S.X(i)+6,S.Y(arr[i])+(dy||-8));
+  ctx.fillStyle=color;ctx.font="12.5px 'IBM Plex Mono'";
+  const tw=((ctx.measureText(text)||{}).width)||text.length*7.2;   // auto-flip to right-align if the label would clip the 900px canvas
+  let x=S.X(i)+6, align="left";
+  if(x+tw>894){ x=S.X(i)-6; align="right"; }
+  ctx.textAlign=align;
+  ctx.fillText(text,x,S.Y(arr[i])+(dy||-8));
 }
 
 /* ---- ta_noise_vs_trend: one company's story vs five hundred stories averaged ---- */
@@ -5026,7 +5030,7 @@ ANIMS.ta_discipline=async(cv,ctx)=>{
     if(k3)drawSeries(ctx,S,DIS.eq,F.ok,k3,2.4);
   };
   base(0,0,0);
-  await narrate("Five hundred days: a genuine uptrend with a real bear market buried in the middle. Three investors, one market.");
+  await narrate("About three years of price: a genuine uptrend with a real bear market buried in the middle. Three investors, one market.");
   await tween(1400,k=>base(k,0,0));
   leg(60,"#5A6E8C","buy & hold — rides the full drawdown: "+(maxdd(BH.eq)*100).toFixed(0)+"%");
   await narrate("Buy and hold earns the trend and eats the entire bear: a "+Math.abs(maxdd(BH.eq)*100).toFixed(0)+" percent drawdown, held all the way down.");
