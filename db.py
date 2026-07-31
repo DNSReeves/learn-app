@@ -5,6 +5,7 @@ no telemetry, no external calls from this module.
 """
 import hashlib
 import hmac
+import re
 import json
 import os
 import secrets
@@ -212,10 +213,18 @@ def user_for_token(token: str):
         return dict(row) if row else None
 
 
+_TEST_NAME = re.compile(r"^(smoke[_-]|deploy-|e2e[_-]|test[_-])|_\d{9,}$")
+
+
 def list_usernames() -> list[str]:
-    """Phase A profile chooser — usernames ONLY (no ids, no roles)."""
+    """Phase A profile chooser — usernames ONLY (no ids, no roles).
+    Filters test-pattern accounts (smoke_*/deploy-*/e2e_*/…_<epoch>) so a
+    stray smoke run can never re-pollute the family chooser (2026-07-31:
+    four junk profiles reached the operator's login screen). Convention
+    stays: smokes should tear their users down — this is the backstop."""
     with conn() as c:
-        return [r[0] for r in c.execute("SELECT username FROM users ORDER BY username")]
+        return [r[0] for r in c.execute("SELECT username FROM users ORDER BY username")
+                if not _TEST_NAME.search(r[0])]
 
 
 def user_count() -> int:

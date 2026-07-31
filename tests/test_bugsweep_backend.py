@@ -410,3 +410,14 @@ def test_phase_a_users_chooser_lan_only(client, monkeypatch):
         client = FakeClient()
     with pytest.raises(Exception):
         amod.users_chooser(FakeReq())
+
+
+def test_chooser_filters_test_pattern_accounts(tmp_path, monkeypatch):
+    monkeypatch.setenv("LEARN_DB", str(tmp_path / "learn.db"))
+    import db as dbmod
+    importlib.reload(dbmod)
+    dbmod.init()
+    for u in ("bubba", "kate", "smoke_1784986989", "deploy-smoke",
+              "e2e_run", "fr_1784987196"):
+        dbmod.create_user(u, "pw-secret-1")
+    assert dbmod.list_usernames() == ["bubba", "kate"]
