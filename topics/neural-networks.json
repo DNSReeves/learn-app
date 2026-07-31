@@ -14,7 +14,7 @@
       "cards": [
         {
           "h": "Three moving parts",
-          "md": "Strip the biology away and a neuron is a small formula:\n\n## output = activation(w₁x₁ + w₂x₂ + … + b)\n\n- **Weights (w)**: how much each input matters — positive amplifies, negative opposes\n- **Bias (b)**: the neuron's default inclination before seeing any input\n- **Activation**: a nonlinear squash applied to the sum — ReLU (max(0, x)) is the modern default; sigmoid squashes into (0,1)\n\nA spam-detector neuron might weight *contains 'free money'* at +3.0, *sender in contacts* at −4.0, bias −1.0: evidence for and against, summed, squashed into a verdict."
+          "md": "Strip the biology away and a neuron is a small formula:\n\n## output = activation(w₁x₁ + w₂x₂ + … + b)\n\n- **Weights (w)**: how much each input matters — positive amplifies, negative opposes\n- **Bias (b)**: the neuron's default inclination before seeing any input\n- **Activation**: a nonlinear squash applied to the sum — ReLU (Rectified Linear Unit — max(0, x)) is the modern default; sigmoid squashes into (0,1)\n\nA spam-detector neuron might weight *contains 'free money'* at +3.0, *sender in contacts* at −4.0, bias −1.0: evidence for and against, summed, squashed into a verdict."
         },
         {
           "h": "Why the nonlinearity is non-negotiable",
@@ -179,7 +179,7 @@
       "cards": [
         {
           "h": "One number to rule the training",
-          "md": "Training needs a target, and the target is a single scalar: the **loss** — a function scoring how wrong the network's outputs are against the true answers, averaged over data.\n\n- **Mean squared error** (regression): average of (prediction − truth)² — large misses punished quadratically\n- **Cross-entropy** (classification): punishes confident wrong answers brutally — being 99% sure of the wrong class costs vastly more than being unsure\n\nLow loss = good fit. Training is nothing but: *make this number smaller.*"
+          "md": "Training needs a target, and the target is a single scalar: the **loss** — a function scoring how wrong the network's outputs are against the true answers, averaged over data.\n\n- **Mean squared error** (regression — predicting a number): average of (prediction − truth)² — large misses punished quadratically\n- **Cross-entropy** (classification — picking a category): punishes confident wrong answers brutally — being 99% sure of the wrong class costs vastly more than being unsure\n\nLow loss = good fit. Training is nothing but: *make this number smaller.*"
         },
         {
           "h": "You get what you measure",
@@ -339,7 +339,7 @@
       "cards": [
         {
           "h": "The chain rule, industrialized",
-          "md": "Gradient descent needs ∂L/∂w for *every* weight. A network is a giant nested function — loss(layerN(…(layer1(x)))) — and derivatives of nested functions are the **chain rule**: multiply the local rates along the path from weight to loss.\n\nBackprop's insight is bookkeeping: paths from different weights to the loss share most of their segments. So sweep **backward** once — from the loss toward the input — computing each layer's contribution and reusing it for everything upstream. Every gradient in the network, for roughly the cost of two forward passes. Without this reuse, training modern networks would be computationally absurd."
+          "md": "Gradient descent needs ∂L/∂w for *every* weight. A network is a giant nested function — loss(layerN(…(layer1(x)))) — and derivatives of nested functions are the **chain rule**: multiply the local rates along the path from weight to loss.\n\nBackprop (backpropagation) — its insight is bookkeeping: paths from different weights to the loss share most of their segments. So sweep **backward** once — from the loss toward the input — computing each layer's contribution and reusing it for everything upstream. Every gradient in the network, for roughly the cost of two forward passes. Without this reuse, training modern networks would be computationally absurd."
         },
         {
           "h": "Credit assignment, mechanically",
@@ -429,7 +429,7 @@
         },
         {
           "h": "The countermeasures",
-          "md": "- **More data** — the cure that always works when available; memorizing a million examples is harder than learning the pattern\n- **Early stopping** — halt at the validation-loss minimum\n- **Regularization** — penalize large weights (weight decay) so the model prefers simple explanations\n- **Dropout** — randomly silence neurons during training, forcing redundant, robust features\n\nOne domain-specific trap deserves its own line: in time-series and trading work, validation data must come from *after* the training period. Random shuffling leaks the future into training, and the backtest lies to you at full precision."
+          "md": "- **More data** — the cure that always works when available; memorizing a million examples is harder than learning the pattern\n- **Early stopping** — halt at the validation-loss minimum\n- **Regularization** — penalize large weights (weight decay) so the model prefers simple explanations\n- **Dropout** — randomly silence neurons during training, forcing redundant, robust features\n\nOne domain-specific trap deserves its own line: in time-series and trading work, validation data must come from *after* the training period. Random shuffling leaks the future into training, and the backtest (a simulated run over historical data) lies to you at full precision."
         }
       ],
       "questions": [
@@ -505,7 +505,7 @@
       "cards": [
         {
           "h": "Why one shape doesn't fit all",
-          "md": "A plain fully-connected network treats input dimensions as unrelated — pixel (0,0) and pixel (0,1) are strangers. Architectures fix this by **building the data's known structure into the wiring**:\n\n- **CNNs** (images): small filters slide across the image — a cat detector shouldn't care *where* the cat is (translation invariance), and nearby pixels matter to each other (locality). Massive weight-sharing falls out for free.\n- **Sequence models** (text, time series): consume tokens in order, carrying state — because order *is* information."
+          "md": "A plain fully-connected network (every neuron wired to all inputs) treats input dimensions as unrelated — pixel (0,0) and pixel (0,1) are strangers. Architectures fix this by **building the data's known structure into the wiring**:\n\n- **CNNs** (Convolutional Neural Networks — for images): small filters slide across the image — a cat detector shouldn't care *where* the cat is (translation invariance), and nearby pixels matter to each other (locality). Massive weight-sharing (reusing one filter everywhere) falls out for free.\n- **Sequence models** (text, time series): consume tokens (pieces of input, e.g. words) in order, carrying state — because order *is* information."
         },
         {
           "h": "Attention",
@@ -585,11 +585,11 @@
       "cards": [
         {
           "h": "The loop nobody skips",
-          "md": "Real training is an empirical loop:\n\n1. **Data**: clean, label, normalize inputs to comparable scales (wildly different scales distort the loss landscape into a canyon that's miserable to descend)\n2. **Initialize**: small random weights, scaled per layer — all-zeros makes every neuron identical forever (symmetry never breaks)\n3. **Tune the learning rate first** — it's the highest-leverage hyperparameter; sweep powers of ten\n4. **Watch both curves**: train AND validation loss, from concept 6\n5. **Diagnose, adjust, repeat**"
+          "md": "Real training is an empirical loop:\n\n1. **Data**: clean, label, normalize inputs to comparable scales (wildly different scales distort the loss landscape into a canyon that's miserable to descend)\n2. **Initialize**: small random weights, scaled per layer — all-zeros makes every neuron identical forever (symmetry never breaks)\n3. **Tune the learning rate first** — it's the highest-leverage hyperparameter (a setting you choose, not one the network learns); sweep powers of ten\n4. **Watch both curves**: train AND validation loss, from concept 6\n5. **Diagnose, adjust, repeat**"
         },
         {
           "h": "Reading the curves like an operator",
-          "md": "- Both losses high and flat → underfitting: bigger model, longer training, or better features\n- Train low, validation rising → overfitting: regularize, stop earlier, get data\n- Loss exploding or NaN → learning rate too high, or bad data (a single mislabeled outlier with huge values can do it)\n- Loss stuck at exactly the 'predict the average' value → the network found the lazy baseline; check for bugs before celebrating structure in your data that isn't there\n\nThe skill of deep learning in practice is mostly this: reading curves, forming a hypothesis, changing one thing, rerunning. Science at the speed of GPUs. You're now equipped for the next rungs of the chain: LLMs (this machinery scaled to language) and AI Agents (models wrapped in tools and goals)."
+          "md": "- Both losses high and flat → underfitting: bigger model, longer training, or better features\n- Train low, validation rising → overfitting: regularize, stop earlier, get data\n- Loss exploding or NaN (Not a Number) → learning rate too high, or bad data (a single mislabeled outlier with huge values can do it)\n- Loss stuck at exactly the 'predict the average' value → the network found the lazy baseline; check for bugs before celebrating structure in your data that isn't there\n\nThe skill of deep learning in practice is mostly this: reading curves, forming a hypothesis, changing one thing, rerunning. Science at the speed of GPUs (Graphics Processing Units). You're now equipped for the next rungs of the chain: LLMs (this machinery scaled to language) and AI Agents (models wrapped in tools and goals)."
         }
       ],
       "questions": [

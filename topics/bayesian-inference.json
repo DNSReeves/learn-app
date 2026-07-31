@@ -104,7 +104,7 @@
         },
         {
           "h": "The product rule",
-          "md": "The joint probability that two things are both true factors cleanly:\n\n**P(A and B) = P(A | B) × P(B)**\n\nRead it as a story: for both to hold, first B happens (P(B)), then A happens *in a world where B is true* (P(A|B)).\n\nIt factors the other way too: P(A and B) = P(B | A) × P(A).\n\nThose two factorizations describe the same joint quantity — hold that thought; setting them equal is where Bayes' theorem comes from."
+          "md": "The joint probability that two things are both true factors cleanly:\n\n**P(A and B) = P(A | B) × P(B)**\n\nRead it as a story: for both to hold, first B happens (P(B)), then A happens *in a world where B is true* (P(A|B)).\n\nIt factors the other way too: P(A and B) = P(B | A) × P(A).\n\nThose two factorizations describe the same joint quantity — hold that thought; setting them equal is where Bayes' theorem (the rule for reversing a conditional) comes from."
         },
         {
           "h": "The classic trap",
@@ -197,7 +197,7 @@
         },
         {
           "h": "The denominator",
-          "md": "P(E) — the total probability of the evidence — is computed by summing over all the ways E could happen:\n\nP(E) = P(E|H)·P(H) + P(E|not H)·P(not H)\n\nIt's the *normalizer*: it makes the posteriors across all hypotheses sum to 1. A useful instinct: evidence that is likely under many hypotheses (big P(E)) moves you little; evidence that is *only* likely under one hypothesis moves you a lot."
+          "md": "P(E) — the total probability of the evidence — is computed by summing over all the ways E could happen:\n\nP(E) = P(E|H)·P(H) + P(E|not H)·P(not H)\n\nIt's the *normalizer*: it makes the posteriors (the updated beliefs after evidence) across all hypotheses sum to 1. A useful instinct: evidence that is likely under many hypotheses (big P(E)) moves you little; evidence that is *only* likely under one hypothesis moves you a lot."
         }
       ],
       "questions": [
@@ -371,7 +371,7 @@
         },
         {
           "h": "The general lesson",
-          "md": "This is base-rate neglect, and it's the single most consequential Bayesian error in the wild — medicine, fraud detection, security alerts, trading signals.\n\nThe pattern: **when the prior is extreme, moderate evidence cannot overcome it.** A 20:1 likelihood ratio applied to a 1-in-1000 prior still leaves you overwhelmingly likely healthy.\n\nCorollary for any alert system: if the condition you're screening for is rare, most alerts are false — no matter how good the detector looks on paper. The fix is either a stronger detector or a second, independent test (next concept)."
+          "md": "This is base-rate neglect, and it's the single most consequential Bayesian error in the wild — medicine, fraud detection, security alerts, trading signals.\n\nThe pattern: **when the prior is extreme, moderate evidence cannot overcome it.** A 20:1 likelihood ratio (how strongly evidence favors one side) applied to a 1-in-1000 prior still leaves you overwhelmingly likely healthy.\n\nCorollary for any alert system: if the condition you're screening for is rare, most alerts are false — no matter how good the detector looks on paper. The fix is either a stronger detector or a second, independent test (next concept)."
         }
       ],
       "questions": [
@@ -535,7 +535,7 @@
         },
         {
           "h": "One number for the evidence",
-          "md": "The Bayes factor is the cleanest possible answer to *'what does this evidence actually say?'* — fully separated from your prior.\n\n- LR = 20 — strong evidence for H\n- LR = 1 — the evidence says nothing\n- LR = 0.05 — strong evidence against H\n\nRedo the diagnostic test instantly: prior odds 1:999, LR = 0.99/0.05 ≈ 20. Posterior odds = 20:999 ≈ 1:50 → about 2%. Same answer as the town-counting, three seconds of arithmetic."
+          "md": "The Bayes factor is the cleanest possible answer to *'what does this evidence actually say?'* — fully separated from your prior.\n\n- LR (likelihood ratio) = 20 — strong evidence for H\n- LR = 1 — the evidence says nothing\n- LR = 0.05 — strong evidence against H\n\nRedo the diagnostic test instantly: prior odds 1:999, LR = 0.99/0.05 ≈ 20. Posterior odds = 20:999 ≈ 1:50 → about 2%. Same answer as the town-counting, three seconds of arithmetic."
         },
         {
           "h": "Log-odds: evidence adds",
@@ -624,7 +624,7 @@
         },
         {
           "h": "The update is addition",
-          "md": "Here's the payoff. If your prior is Beta(a, b) and you observe h heads and t tails:\n\n## posterior = Beta(a + h, b + t)\n\nThat's it. The full Bayes machinery — likelihood times prior, normalize the curve — collapses to *incrementing two counters*. This happy algebra is called **conjugacy** (the Beta is conjugate to the Binomial), and it's why Beta-Binomial models run in production everywhere: A/B tests, click-through rates, win rates."
+          "md": "Here's the payoff. If your prior is Beta(a, b) and you observe h heads and t tails:\n\n## posterior = Beta(a + h, b + t)\n\nThat's it. The full Bayes machinery — likelihood times prior, normalize the curve — collapses to *incrementing two counters*. This happy algebra is called **conjugacy** (the Beta is conjugate to the Binomial — the distribution of heads in n flips), and it's why Beta-Binomial models run in production everywhere: A/B tests, click-through rates, win rates."
         }
       ],
       "questions": [
@@ -793,7 +793,7 @@
         },
         {
           "h": "Decision: probability × consequences",
-          "md": "A posterior alone never tells you what to do — you also need what each outcome *costs*. The rule: **choose the action with the best expected utility under the posterior.**\n\nA 2% posterior of disease sounds dismissible — until the follow-up test costs $50 and the missed disease is fatal; then 2% commands action. A 60% posterior of trading edge sounds actionable — until the downside is ruin. Same posteriors, opposite decisions, because the payoffs differ. Probabilities and payoffs are separate inputs; Bayes owns the first, you must supply the second."
+          "md": "A posterior alone never tells you what to do — you also need what each outcome *costs*. The rule: **choose the action with the best expected utility (probability-weighted value) under the posterior.**\n\nA 2% posterior of disease sounds dismissible — until the follow-up test costs $50 and the missed disease is fatal; then 2% commands action. A 60% posterior of trading edge sounds actionable — until the downside is ruin. Same posteriors, opposite decisions, because the payoffs differ. Probabilities and payoffs are separate inputs; Bayes owns the first, you must supply the second."
         },
         {
           "h": "The whole method on one card",

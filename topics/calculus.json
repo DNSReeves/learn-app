@@ -427,7 +427,7 @@
         },
         {
           "h": "Why it's true, in one breath",
-          "md": "Let A(x) = area under f from a to x. Nudge x by a sliver dx: the area grows by a strip ≈ f(x)·dx tall-times-wide. So dA/dx = f(x) — **the rate at which area accumulates IS the height of the curve.** Accumulation and rate are two views of one relationship; that's the theorem.\n\nPractical consequence: the hunt for integrals becomes the hunt for antiderivatives — reading the derivative rules right-to-left. Power rule reversed: ∫xⁿ dx = xⁿ⁺¹/(n+1) + C. The +C matters: derivatives erase constants, so antiderivatives recover them only up to an unknown one. Pinning down that C from side conditions is precisely what solving a differential equation is — the next topic in this chain."
+          "md": "Let A(x) = area under f from a to x. Nudge x by a sliver dx: the area grows by a strip ≈ f(x)·dx tall-times-wide. So dA/dx = f(x) — **the rate at which area accumulates IS the height of the curve.** Accumulation and rate are two views of one relationship; that's the theorem.\n\nPractical consequence: the hunt for integrals becomes the hunt for antiderivatives — reading the derivative rules right-to-left. Power rule reversed: ∫xⁿ dx = xⁿ⁺¹/(n+1) + C. The +C matters: derivatives erase constants, so antiderivatives recover them only up to an unknown one. Pinning down that C from side conditions is precisely what solving a differential equation (an equation involving derivatives) is — the next topic in this chain."
         }
       ],
       "questions": [
@@ -509,7 +509,7 @@
       "cards": [
         {
           "h": "Substitution: the chain rule backwards",
-          "md": "Differentiation is mechanical; antidifferentiation is pattern recognition. The main pattern: an integrand that looks like a chain-rule *output* — some f(g(x)) times g′(x) hanging around.\n\n∫ 2x·cos(x²) dx: spot the inner function u = x², note du = 2x dx is present, rewrite as ∫ cos u du = sin u + C = **sin(x²) + C**.\n\nSubstitution is bookkeeping for 'this used to be a chain rule.' If the inner function's derivative isn't in the integrand (up to a constant), substitution won't fire — pick a different u or a different technique."
+          "md": "Differentiation is mechanical; antidifferentiation is pattern recognition. The main pattern: an integrand (the function being integrated) that looks like a chain-rule *output* — some f(g(x)) times g′(x) hanging around.\n\n∫ 2x·cos(x²) dx: spot the inner function u = x², note du = 2x dx is present, rewrite as ∫ cos u du = sin u + C = **sin(x²) + C**.\n\nSubstitution is bookkeeping for 'this used to be a chain rule.' If the inner function's derivative isn't in the integrand (up to a constant), substitution won't fire — pick a different u or a different technique."
         },
         {
           "h": "Integration by parts: the product rule backwards",
