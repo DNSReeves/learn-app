@@ -6102,8 +6102,13 @@ const GEN = (()=>{
   const TAILN = SCORES.filter(s=>s>=TOPDEC).length;
   const TAILPCT = Math.round(100*TAILN/SCORES.length);
   const MEAN = SCORES.reduce((a,b)=>a+b,0)/SCORES.length;
-  const SCREEN = bayes(0.001, 0.99, 0.99, 100000);     // population screening, low prior
-  const DIAG   = bayes(0.50,  0.99, 0.99, 100000);     // strong family history, high prior
+  /* These mirror the worked example in the concept's own card, deliberately: a student
+     who watches the animation and then reads the card must not meet two different sets of
+     numbers for the same scenario. Screening = BRCA1 carrier frequency 1/2,000, assay
+     sensitivity 99%, per-variant false-positive rate 1/1,000. Diagnostic = same variant,
+     prior 10% from family history, confirmed by a second method (specificity 99.99%). */
+  const SCREEN = bayes(1/2000, 0.99, 0.999,  100000);
+  const DIAG   = bayes(0.10,   0.99, 0.9999, 10000);
   return {P,SCORES,H,TOPDEC,TAILN,TAILPCT,MEAN,SCREEN,DIAG};
 })();
 
@@ -6251,10 +6256,12 @@ ANIMS.gen_polygenic=async(cv,ctx)=>{
 function drawBayesTest(ctx,cv,{which="screen",stage=0,title}={}){
   const B = which==="screen" ? GEN.SCREEN : GEN.DIAG;
   genFrame(ctx,title||"What a positive result actually means");
-  const lab = which==="screen" ? "Population screening — 1 in 1,000 carry it"
-                               : "Strong family history — 1 in 2 carry it";
+  const lab = which==="screen" ? "Population screening — no family history, 1 in 2,000 carry it"
+                               : "Strong family history — a risk model puts the prior at 10%";
+  const sub = which==="screen" ? "99% sensitivity, false positives 1 in 1,000. "
+                               : "99% sensitivity, confirmed by a second method (99.99% specificity). ";
   genText(ctx,lab,20,60,F.txt,13);
-  genText(ctx,"Test: 99% sensitivity, 99% specificity. "+B.N.toLocaleString()+" people tested.",20,80,"rgba(215,223,234,.7)",12);
+  genText(ctx,sub+B.N.toLocaleString()+" women tested.",20,80,"rgba(215,223,234,.7)",12);
   if(stage>=1){
     genText(ctx,"truly have the variant",60,124,F.txt,12);
     genText(ctx,B.dis.toLocaleString(),330,124,F.post,14,"right");
@@ -6274,7 +6281,7 @@ function drawBayesTest(ctx,cv,{which="screen",stage=0,title}={}){
     ctx.fillStyle="rgba(232,161,60,.10)"; ctx.fillRect(420,180,440,120);
     genText(ctx,"If your result says POSITIVE:",440,210,F.txt,13);
     ctx.fillStyle=F.post; ctx.font="700 34px system-ui,sans-serif"; ctx.textAlign="left";
-    ctx.fillText(ppv.toFixed(ppv<10?1:0)+"%",440,258);
+    ctx.fillText(ppv.toFixed((ppv<10||ppv>99)?1:0)+"%",440,258);
     genText(ctx,"chance you actually carry it",530,256,F.txt,13);
     genText(ctx,B.tp.toLocaleString()+" true ÷ ("+B.tp.toLocaleString()+" + "+B.fp.toLocaleString()+" false)",440,286,"rgba(215,223,234,.75)",12);
   }
@@ -6284,14 +6291,14 @@ ANIMS.gen_bayes_test=async(cv,ctx)=>{
   drawBayesTest(ctx,cv,{which:"screen",stage:0});
   await narrate("A genetic test comes back positive. The obvious question is what that means. The answer depends almost entirely on something the report does not print: how likely you were to carry it before you tested.");
   drawBayesTest(ctx,cv,{which:"screen",stage:1});
-  await narrate("Screen a hundred thousand people for a variant that one in a thousand carries. A hundred people truly have it. Ninety-nine thousand nine hundred do not.");
+  await narrate("Screen a hundred thousand women for a BRCA1 variant that one in two thousand carries. About "+GEN.SCREEN.dis+" of them truly have it. The other "+GEN.SCREEN.well.toLocaleString()+" do not.");
   drawBayesTest(ctx,cv,{which:"screen",stage:2});
-  await narrate("The test is excellent — ninety-nine percent both ways. It correctly flags "+GEN.SCREEN.tp+" of the hundred carriers. But one percent of that enormous healthy group is "+GEN.SCREEN.fp.toLocaleString()+" people, and they are flagged too.");
+  await narrate("The assay is excellent. It correctly flags "+GEN.SCREEN.tp+" of the "+GEN.SCREEN.dis+" real carriers. But even a false-positive rate of one in a thousand, applied to that enormous healthy group, produces "+GEN.SCREEN.fp.toLocaleString()+" more flags — and those women get the same letter.");
   drawBayesTest(ctx,cv,{which:"screen",stage:3});
   const s=(GEN.SCREEN.ppv*100), d=(GEN.DIAG.ppv*100);
-  await narrate("So a positive result in this setting means about a "+s.toFixed(0)+" percent chance you actually carry it. A ninety-nine percent accurate test, and the positive is wrong most of the time. Nothing is broken — the false positives are drawn from a far larger pool.");
+  await narrate("So a positive here means about a "+s.toFixed(0)+" percent chance she actually carries it. Two of every three positives are wrong, from an excellent test. Nothing is broken — the false positives are simply drawn from a vastly larger pool.");
   drawBayesTest(ctx,cv,{which:"diag",stage:3});
-  await narrate("Now change one thing. Same test, but the person has a strong family history, so the odds before testing are one in two. The same positive result now means about "+d.toFixed(0)+" percent. The test did not change. The prior did. That is why who gets tested matters as much as the test.");
+  await narrate("Now change one thing. Same variant, same letter — but her mother and aunt had breast cancer before fifty, so the prior is ten percent, and the lab confirmed the call by a second method. That positive now means about "+d.toFixed(1)+" percent. The DNA did not change. The prior and the assay did. Which is why who gets tested matters as much as the test itself.");
 };
 
 /* deterministic-math handle — the harness asserts the narration's numbers */
