@@ -10,7 +10,7 @@
    "id": "what-is-a-gene",
    "title": "What Is a Gene? — 3.1 billion letters, ~19,400 genes",
    "summary": "The human genome is enormous, the protein-coding parts list is startlingly small, and the fight over what the rest does is not as settled as either side claims.",
-   "anim": null,
+   "anim": "gen_genome_scale",
    "cards": [
     {
      "h": "3.1 billion letters, packed into 46 chromosomes",
@@ -238,7 +238,7 @@
    "id": "how-genomes-differ",
    "title": "How Two Genomes Differ — the variation inventory",
    "summary": "Any two people differ at 4–5 million sites; almost none of it is coding, the structural-variant count depends on your sequencing platform, and roughly 70 differences per person are brand new.",
-   "anim": null,
+   "anim": "gen_variation",
    "cards": [
     {
      "h": "The inventory: 4–5 million differences, and what kind they are",
@@ -580,7 +580,7 @@
    "id": "gwas-and-effect-sizes",
    "title": "GWAS: What a Million Regressions Can and Cannot Tell You",
    "summary": "A genome-wide association study runs one regression per variant across the genome, which forces a significance threshold of 5×10⁻⁸ and yields thousands of hits with odds ratios near 1.1 — associations that are usually tags for something nearby, and almost never a 'gene for' anything.",
-   "anim": null,
+   "anim": "gen_gwas",
    "cards": [
     {
      "h": "One regression per variant — and the price of that many tests",
@@ -694,7 +694,7 @@
    "id": "polygenic-risk-scores",
    "title": "Polygenic Risk Scores: Real Signal, Small Print",
    "summary": "A polygenic risk score is a weighted sum of risk alleles read as a percentile; it genuinely stratifies populations — a top-decile coronary score carries risk comparable to familial hypercholesterolemia — but it loses roughly fivefold accuracy outside European ancestry, ranks individuals barely better than a coin flip, and reports relative risks that usually mean small absolute changes.",
-   "anim": null,
+   "anim": "gen_prs",
    "cards": [
     {
      "h": "How the score is built, and what the number is",
@@ -922,7 +922,7 @@
    "id": "pharmacogenomics",
    "title": "Pharmacogenomics — the genetics that changes a prescription today",
    "summary": "A handful of gene–drug pairs already carry enough evidence to change the dose or the drug at the bedside, and the direction of the effect flips depending on whether the enzyme clears the drug or activates it.",
-   "anim": null,
+   "anim": "gen_pgx_ladder",
    "cards": [
     {
      "h": "What pharmacogenomics is — star alleles and the metaboliser ladder",
@@ -1052,7 +1052,7 @@
    "id": "pharmacogenomics-safety",
    "title": "Pharmacogenomics II — the tests that exist to prevent a catastrophe",
    "summary": "DPYD, HLA-B*57:01 and TPMT/NUDT15 are the pairs where a genotype prevents a life-threatening reaction rather than fine-tuning a dose — and they are also where the field's ancestry gap and its evidence limits show most clearly.",
-   "anim": null,
+   "anim": "gen_pgx_safety",
    "cards": [
     {
      "h": "DPYD and the fluoropyrimidines — when a standard dose is an overdose",
@@ -1200,7 +1200,7 @@
    "id": "cancer-genetics-germline",
    "title": "Cancer Genetics I — germline predisposition and the question it answers",
    "summary": "A germline test asks who else in the family is at risk; Knudson's two-hit model explains why carriers present earlier, and BRCA and Lynch show why the answer is a gene-specific range rather than a single number.",
-   "anim": null,
+   "anim": "gen_two_hit",
    "cards": [
     {
      "h": "Two words, two different questions",
@@ -1336,7 +1336,7 @@
    "id": "cancer-genetics-somatic",
    "title": "Cancer Genetics II — tumour sequencing, liquid biopsy and the CHIP trap",
    "summary": "A tumour test asks which drug might work — but the same mutation behaves differently by tissue lineage, a negative liquid biopsy proves nothing, and blood-derived clonal mutations routinely masquerade as tumour findings.",
-   "anim": null,
+   "anim": "gen_somatic",
    "cards": [
     {
      "h": "What tumour sequencing is for — and why lineage still decides",
@@ -1466,7 +1466,7 @@
    "id": "crispr-mechanism",
    "title": "CRISPR I — how the editors work, and why delivery is the hard part",
    "summary": "Cas9 makes a programmable break and lets the cell improvise; base and prime editing rewrite sequence without breaking it — and getting any of them into the right tissue, then proving what else they hit, is the real work.",
-   "anim": null,
+   "anim": "gen_crispr",
    "cards": [
     {
      "h": "Cas9 — a programmable break, and the PAM that licenses it",
@@ -1596,7 +1596,7 @@
    "id": "crispr-in-the-clinic",
    "title": "CRISPR II — the approved reality and the germline line",
    "summary": "Two sickle cell therapies were approved on the same day in 2023 and only one is gene editing; what limits who benefits is cost, conditioning and access rather than editing chemistry — and the heritable-editing line sits where it does for reasons that are shifting.",
-   "anim": null,
+   "anim": "gen_crispr_clinic",
    "cards": [
     {
      "h": "What is actually approved — Casgevy, Lyfgenia, and the difference",

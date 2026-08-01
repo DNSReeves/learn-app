@@ -11137,6 +11137,1723 @@ ANIMS.opt_failure=async(cv,ctx)=>{
 };
 })();
 
+
+/* ── GENETICS visuals batch 3 — molecular + quantitative (2026-08-01) ─────────────────────── */
+/* ── GENETICS anims — batch A (2026-08-01) ───────────────────────────────────
+   gen_genome_scale · gen_variation · gen_gwas · gen_prs
+
+   House rules obeyed: append-only fragment, canvas 900×380, the F palette,
+   narrate() for the spoken line, REDUCED-safe via tween()/sleep(), and the
+   existing genFrame()/genText() helpers are REUSED, not redefined.
+
+   HARD RULE: every number spoken in narration is COMPUTED from the geometry or
+   the data that is actually drawn — the label and the voice-over read ONE value.
+   Everything is exported on ANIMS._gen_a_debug at the bottom of this file.
+   Where a figure is a citation rather than a drawn quantity (e.g. GENCODE's
+   19,442 genes), it is declared ONCE as a constant and BOTH the canvas label and
+   the narration read that same constant, so the two can never drift apart.
+   Each animation matches its concept card in topics/genetics.json:
+     gen_genome_scale → what-is-a-gene
+     gen_variation    → how-genomes-differ
+     gen_gwas         → gwas-and-effect-sizes
+     gen_prs          → polygenic-risk-scores
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* ---------- tiny namespaced helpers (do NOT shadow house helpers) ---------- */
+function GA_rng(seed){ let s=(seed>>>0)||1; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function GA_normal(r){ let u=0,v=0; while(u===0)u=r(); while(v===0)v=r();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+/* Numerical-Recipes erfcc — fractional error < 1.2e-7, stable in the far tail */
+function GA_erfc(x){ const z=Math.abs(x), t=1/(1+0.5*z);
+  const ans=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+
+    t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+
+    t*(-0.82215223+t*0.17087277)))))))));
+  return x>=0?ans:2-ans; }
+const GA_p2 = z => GA_erfc(Math.abs(z)/Math.SQRT2);          // two-sided p from a z
+const GA_nlp = z => { const p=GA_p2(z); return p>0 ? -Math.log10(p) : 60; };
+const GA_zFromP = p => { let lo=0, hi=40; for(let i=0;i<200;i++){ const m=(lo+hi)/2;
+  if(GA_p2(m)>p) lo=m; else hi=m; } return (lo+hi)/2; };
+const GA_bar=(ctx,x,y,w,h,col)=>{ ctx.fillStyle=col; ctx.fillRect(x,y,Math.max(0,w),h); };
+const GA_line=(ctx,x1,y1,x2,y2,col,w,dash)=>{ ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=w||1;
+  if(dash) ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore(); };
+const GA_n = v => v.toLocaleString("en-US");
+const GA_ord = n => n+(["th","st","nd","rd"][(n%100-n%10!=10)*(n%10<4)*(n%10)]||"th");
+const GA_pl = (n,w) => n+" "+w+(n===1?"":"s");
+const GA_vb = (n,v) => n===1 ? v+"s" : v;
+const GA_dim = "rgba(215,223,234,.62)";
+const GA_faint = "rgba(124,141,165,.20)";
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1) gen_genome_scale  →  concept `what-is-a-gene`
+   A 1,000-square waffle IS the genome. Every percentage spoken is (cells/1000).
+   ═══════════════════════════════════════════════════════════════════════════ */
+const GA1 = (()=>{
+  const GENOME_BP = 3.1e9;                       // haploid, card 1
+  const COLS=50, ROWS=20, CELLS=COLS*ROWS;       // 1,000 drawn squares
+  const PCT = n => n*100/CELLS;                  // cells → % of genome (drawn truth)
+  const cells = pct => Math.round(pct*CELLS/100);
+  const BP_PER_CELL = GENOME_BP/CELLS;           // 3.1 Mb per square
+  const CODING = cells(1.5);                     // GENCODE: coding exon ≈1.5%
+  const SEL_LO = cells(5), SEL_HI = cells(8);    // purifying selection 5–8%
+  const CCRE   = cells(7.9);                     // ENCODE 3 cCREs cover 7.9%
+  const ENCODE = cells(80);                      // the 2012 "80% functional" claim
+  /* cited constants — canvas label and narration both read these */
+  const GENES=19442, LNC=35885, TX=644292, CCRE_N=926535, WORM=20000, CHROMS=46;
+  const TX_PER_GENE = TX/GENES;
+  const ENCODE_X_CODING = ENCODE/CODING;         // how much bigger the claim is
+  return {GENOME_BP,COLS,ROWS,CELLS,PCT,BP_PER_CELL,CODING,SEL_LO,SEL_HI,CCRE,ENCODE,
+          GENES,LNC,TX,CCRE_N,WORM,CHROMS,TX_PER_GENE,ENCODE_X_CODING};
+})();
+
+function drawGenomeScale(ctx,cv,{stage=0,title}={}){
+  genFrame(ctx,title||"The genome at scale — and how little of it codes for protein");
+  const X0=40, Y0=66, CW=13, CH=9;
+  genText(ctx,GA1.GENOME_BP/1e9+" billion base pairs · "+GA1.CHROMS+" chromosomes · about 2 metres of DNA per cell.",
+          X0,56,F.txt,12);
+  /* the waffle: 1,000 squares, each 0.1% of the genome */
+  for(let i=0;i<GA1.CELLS;i++){
+    const x=X0+(i%GA1.COLS)*CW, y=Y0+Math.floor(i/GA1.COLS)*CH;
+    let col=GA_faint;
+    if(stage>=1 && i<GA1.CODING) col=F.post;
+    else if(stage>=2 && i<GA1.SEL_LO) col=F.ok;
+    else if(stage>=2 && i<GA1.SEL_HI) col="rgba(95,191,149,.32)";
+    ctx.fillStyle=col; ctx.fillRect(x,y,CW-2,CH-2);
+  }
+  genText(ctx,"each square = "+GA1.PCT(1).toFixed(1)+"% of the genome ≈ "+
+          (GA1.BP_PER_CELL/1e6).toFixed(1)+" Mb   ·   "+GA_n(GA1.CELLS)+" squares",X0,262,GA_dim,11);
+
+  /* the parts list (right rail) */
+  if(stage>=1){
+    const RX=706;
+    genText(ctx,"THE PARTS LIST",RX,84,F.ax,11);
+    genText(ctx,GA_n(GA1.GENES)+"  protein-coding",RX,106,F.post,12);
+    genText(ctx,GA_n(GA1.LNC)+"  lncRNA genes",RX,122,GA_dim,12);
+    genText(ctx,GA_n(GA1.TX)+" transcripts",RX,138,GA_dim,12);
+    genText(ctx,"≈"+GA1.TX_PER_GENE.toFixed(0)+" transcripts per gene",RX,154,GA_dim,11);
+    genText(ctx,"a 1 mm nematode carries",RX,180,F.txt,11);
+    genText(ctx,"about "+GA_n(GA1.WORM)+" genes.",RX,196,F.txt,11);
+    genText(ctx,"So complexity is not in",RX,220,GA_dim,11);
+    genText(ctx,"the parts count — it is",RX,234,GA_dim,11);
+    genText(ctx,"in regulation.",RX,248,GA_dim,11);
+  }
+
+  /* the claims ruler: 0–100% of the genome, bars drawn to scale */
+  const BX=200, BW=660, w=pct=>pct/100*BW;
+  const row=(y,label,pctVal,col,value,inside)=>{
+    genText(ctx,label,190,y+9,GA_dim,11,"right");
+    GA_bar(ctx,BX,y,w(pctVal),11,col);
+    if(inside) genText(ctx,value,BX+8,y+9,"#0d1117",11);
+    else genText(ctx,value,BX+w(pctVal)+8,y+9,col,11);
+  };
+  if(stage>=1) row(272,"protein-coding exon",GA1.PCT(GA1.CODING),F.post,
+      GA1.PCT(GA1.CODING).toFixed(1)+"% — "+GA1.CODING+" of "+GA_n(GA1.CELLS)+" squares");
+  if(stage>=2){
+    genText(ctx,"under purifying selection",190,303,GA_dim,11,"right");
+    GA_bar(ctx,BX,294,w(GA1.PCT(GA1.SEL_LO)),11,F.ok);
+    GA_bar(ctx,BX+w(GA1.PCT(GA1.SEL_LO)),294,w(GA1.PCT(GA1.SEL_HI-GA1.SEL_LO)),11,"rgba(95,191,149,.35)");
+    genText(ctx,GA1.PCT(GA1.SEL_LO).toFixed(0)+"–"+GA1.PCT(GA1.SEL_HI).toFixed(0)+"% — the honest range",
+            BX+w(GA1.PCT(GA1.SEL_HI))+8,303,F.ok,11);
+  }
+  if(stage>=3) row(316,"ENCODE cCRE registry",GA1.PCT(GA1.CCRE),F.prior,
+      GA1.PCT(GA1.CCRE).toFixed(1)+"% — "+GA_n(GA1.CCRE_N)+" elements");
+  if(stage>=4) row(338,"ENCODE 2012 headline",GA1.PCT(GA1.ENCODE),F.wrong,
+      GA1.PCT(GA1.ENCODE).toFixed(0)+"% 'biochemically functional' — the over-claim",true);
+  if(stage>=4){
+    genText(ctx,"Honest state of play: far more than "+GA1.PCT(GA1.CODING).toFixed(1)+
+      "% of the genome does something — far less than "+GA1.PCT(GA1.ENCODE).toFixed(0)+
+      "% shows evidence of selection.",40,352,F.txt,11);
+    genText(ctx,"That headline bar is "+GA1.ENCODE_X_CODING.toFixed(0)+
+      "× the coding sliver. Biochemical activity is not the same thing as function.",40,368,GA_dim,11);
+  }
+}
+ANIMS.gen_genome_scale_static=(cv,ctx)=>drawGenomeScale(ctx,cv,{stage:0});
+ANIMS.gen_genome_scale=async(cv,ctx)=>{
+  drawGenomeScale(ctx,cv,{stage:0});
+  await narrate("Every square here is a piece of your genome. There are "+GA_n(GA1.CELLS)+
+    " of them, so each one is "+GA1.PCT(1).toFixed(1)+" percent — about "+(GA1.BP_PER_CELL/1e6).toFixed(1)+
+    " million bases. All together, "+(GA1.GENOME_BP/1e9)+" billion base pairs packed into "+GA1.CHROMS+
+    " chromosomes: roughly two metres of DNA in every cell you have.");
+  await sleep(200);
+  drawGenomeScale(ctx,cv,{stage:1});
+  await narrate("Now colour in the part that codes for protein. That is it — "+GA1.CODING+
+    " squares out of "+GA_n(GA1.CELLS)+", or "+GA1.PCT(GA1.CODING).toFixed(1)+" percent. The parts list behind it is "+
+    GA_n(GA1.GENES)+" protein-coding genes. The betting pool before the Human Genome Project ran from fifty thousand to a hundred and forty thousand, and a one-millimetre nematode carries about "+
+    GA_n(GA1.WORM)+". Complexity does not live in the parts count.");
+  await sleep(200);
+  drawGenomeScale(ctx,cv,{stage:2});
+  await narrate("Ohno called the other ninety-eight and a half percent junk DNA in 1972, and about half the genome really is dead mobile repeats. But as a blanket claim it was wrong: comparative genomics puts "+
+    GA1.PCT(GA1.SEL_LO).toFixed(0)+" to "+GA1.PCT(GA1.SEL_HI).toFixed(0)+
+    " percent of the genome under purifying selection — held in place because losing it costs you something.");
+  drawGenomeScale(ctx,cv,{stage:3});
+  await narrate("Most of that functional sequence is regulatory, not coding — promoters, enhancers, insulators. ENCODE mapped it properly: "+
+    GA_n(GA1.CCRE_N)+" candidate regulatory elements covering "+GA1.PCT(GA1.CCRE).toFixed(1)+
+    " percent of the genome. That is a map you can look a patient's variant up in.");
+  drawGenomeScale(ctx,cv,{stage:4});
+  await narrate("Then the correction overshot. ENCODE's 2012 headline said "+GA1.PCT(GA1.ENCODE).toFixed(0)+
+    " percent of the genome is biochemically functional — this bar, "+GA1.ENCODE_X_CODING.toFixed(0)+
+    " times the coding sliver. It conflated being transcribed once with being maintained by selection. The honest position is the uncomfortable one: far more than "+
+    GA1.PCT(GA1.CODING).toFixed(1)+" percent does something, far less than "+GA1.PCT(GA1.ENCODE).toFixed(0)+
+    " percent shows evidence of function. Anyone quoting either extreme as settled is over-claiming.");
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2) gen_variation  →  concept `how-genomes-differ`
+   Count versus impact: SNPs win the census, structural variants win the bases.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const GA2 = (()=>{
+  const GENOME_BP=3.1e9;
+  /* midpoints of the card's ranges — declared once, drawn and spoken from here */
+  const SNP_N=4250000;          // 4.0–4.5 M
+  const INDEL_N=700000;         // 600–800 k
+  const SV_SHORT=2300;          // short-read platforms, 2,100–2,500
+  const SV_LONG=27000;          // long-read assemblies, 23,000–31,000
+  const SV_BASES=20e6;          // SVs touch ~20 Mb per genome
+  const AA_CHANGING=11000;      // 10,000–12,000
+  const PTV_LO=149, PTV_HI=182; // protein-truncating variants
+  const SNP_BP=1, INDEL_BP=3;   // median indel is 2–3 bp
+  const SV_MEAN_BP = SV_BASES/SV_LONG;              // computed: ≈741 bp
+  const TOTAL_SITES = SNP_N+INDEL_N+SV_LONG;
+  const DIFF_PCT = TOTAL_SITES/GENOME_BP*100;
+  const ONE_IN = GENOME_BP/TOTAL_SITES;
+  const SV_HIDDEN_PCT = 100*(SV_LONG-SV_SHORT)/SV_LONG;   // fraction short reads miss
+  const rows=[
+    {k:"SNPs",  lab:"SNPs (1 base)", n:SNP_N,   bases:SNP_N*SNP_BP,     col:F.prior},
+    {k:"indel", lab:"indels (<50 bp)",        n:INDEL_N, bases:INDEL_N*INDEL_BP, col:F.post},
+    {k:"sv",    lab:"SVs / CNVs (≥50 bp)",    n:SV_LONG, bases:SV_BASES,         col:F.wrong},
+    {k:"code",  lab:"amino-acid change",  n:AA_CHANGING, bases:AA_CHANGING*SNP_BP, col:F.ok}
+  ];
+  const MAX_BASES = Math.max(...rows.map(r=>r.bases));
+  /* de novo — anchored on the card's own numbers: 70.3 per child, ~80% paternal,
+     +1.51/yr paternal and +0.37/yr maternal, at a 32-year-old parent. */
+  const DN_TOTAL=70.3, PAT_FRAC=0.80, S_PAT=1.51, S_MAT=0.37, ANCHOR_AGE=32;
+  const pat = a => DN_TOTAL*PAT_FRAC + S_PAT*(a-ANCHOR_AGE);
+  const mat = a => DN_TOTAL*(1-PAT_FRAC) + S_MAT*(a-ANCHOR_AGE);
+  const PAT20=pat(20), PAT40=pat(40), MAT20=mat(20), MAT40=mat(40);
+  const PAT_RATIO = PAT40/PAT20;
+  const TRIOS=1548, STR_LOCI=1e6, STR_DISEASES=60;
+  return {GENOME_BP,SNP_N,INDEL_N,SV_SHORT,SV_LONG,SV_BASES,AA_CHANGING,PTV_LO,PTV_HI,
+    SNP_BP,INDEL_BP,SV_MEAN_BP,TOTAL_SITES,DIFF_PCT,ONE_IN,SV_HIDDEN_PCT,rows,MAX_BASES,
+    DN_TOTAL,PAT_FRAC,S_PAT,S_MAT,ANCHOR_AGE,pat,mat,PAT20,PAT40,MAT20,MAT40,PAT_RATIO,
+    TRIOS,STR_LOCI,STR_DISEASES};
+})();
+
+function drawVariation(ctx,cv,{stage=0,title}={}){
+  genFrame(ctx,title||"How two genomes differ — count versus impact");
+  genText(ctx,"Sequence any two people: "+GA_n(GA2.TOTAL_SITES)+" differing sites — "+
+    GA2.DIFF_PCT.toFixed(2)+"% of the genome, about one difference every "+
+    GA2.ONE_IN.toFixed(0)+" base pairs.",40,56,F.txt,12);
+
+  const RY=[104,136,168,200], BH=15;
+  /* ---- panel A: by count, log scale ---- */
+  genText(ctx,"BY COUNT — log scale",40,86,F.ax,11);
+  const AX0=130, AX1=430, lx=v=>AX0+(Math.log10(v)-3)/4*(AX1-AX0);
+  GA_line(ctx,AX0,220,AX1,220,"rgba(124,141,165,.35)",1);
+  [1e3,1e4,1e5,1e6,1e7].forEach(t=>{ GA_line(ctx,lx(t),220,lx(t),224,"rgba(124,141,165,.35)",1);
+    genText(ctx,t>=1e6?(t/1e6)+"M":(t>=1e3?(t/1e3)+"k":""+t),lx(t),236,GA_dim,10,"center"); });
+  const nRows = stage>=3?4:(stage>=1?3:0);
+  GA2.rows.forEach((r,i)=>{
+    genText(ctx,r.lab,124,RY[i]+11,GA_dim,11,"right");
+    if(i>=nRows) return;
+    GA_bar(ctx,AX0,RY[i],lx(r.n)-AX0,BH,r.col);
+    genText(ctx,GA_n(r.n),lx(r.n)+6,RY[i]+11,r.col,11);
+    if(r.k==="sv"){ GA_line(ctx,lx(GA2.SV_SHORT),RY[i]-2,lx(GA2.SV_SHORT),RY[i]+BH+2,F.txt,2);
+      genText(ctx,"short-read "+GA_n(GA2.SV_SHORT),lx(GA2.SV_SHORT)-4,RY[i]-6,F.txt,10,"right"); }
+  });
+  /* ---- panel B: by bases affected, linear ---- */
+  GA_line(ctx,455,78,455,246,"rgba(124,141,165,.25)",1);
+  genText(ctx,"BY BASES AFFECTED — linear",470,86,F.ax,11);
+  const BX0=566, BX1=870, bx=v=>BX0+v/(GA2.MAX_BASES*1.05)*(BX1-BX0);
+  const shortLab={SNPs:"SNPs",indel:"indels",sv:"SVs / CNVs",code:"coding"};
+  GA2.rows.forEach((r,i)=>{
+    genText(ctx,shortLab[r.k],560,RY[i]+11,GA_dim,11,"right");
+    if(i>=(stage>=3?4:(stage>=2?3:0))) return;
+    const w=bx(r.bases)-BX0;
+    GA_bar(ctx,BX0,RY[i],w,BH,r.col);
+    const v=(r.bases/1e6).toFixed(r.bases<1e6?3:1)+" Mb";
+    if(BX0+w+50>878) genText(ctx,v,BX0+w-8,RY[i]+11,"#0d1117",11,"right");
+    else genText(ctx,v,BX0+w+6,RY[i]+11,r.col,11);
+  });
+  if(stage>=2) genText(ctx,"mean length: "+GA2.SNP_BP+" bp · ~"+GA2.INDEL_BP+" bp · ~"+
+    GA2.SV_MEAN_BP.toFixed(0)+" bp  ("+(GA2.SV_BASES/1e6)+" Mb ÷ "+GA_n(GA2.SV_LONG)+" SVs)",470,236,GA_dim,11);
+
+  if(stage>=3){
+    genText(ctx,"Coding is a sliver: ~"+GA_n(GA2.AA_CHANGING)+" variants change an amino acid and only "+
+      GA2.PTV_LO+"–"+GA2.PTV_HI+" truncate a protein outright. Everything else is non-coding.",40,258,F.ok,11);
+    genText(ctx,"SV counts are platform-limited: short reads see "+GA_n(GA2.SV_SHORT)+", long reads "+
+      GA_n(GA2.SV_LONG)+" — "+GA2.SV_HIDDEN_PCT.toFixed(0)+"% are invisible to 150 bp reads.",40,276,F.wrong,11);
+  }
+
+  /* ---- de novo band ---- */
+  if(stage>=4){
+    GA_line(ctx,40,290,880,290,"rgba(124,141,165,.25)",1);
+    genText(ctx,"DE NOVO — differences present in you and in neither parent",40,308,F.txt,12);
+    genText(ctx,GA2.DN_TOTAL+" per child on average ("+GA_n(GA2.TRIOS)+" parent–offspring trios)",40,326,GA_dim,11);
+    genText(ctx,"≈"+(GA2.PAT_FRAC*100).toFixed(0)+"% arise on the paternal chromosome — sperm precursors never stop dividing",40,344,GA_dim,11);
+    genText(ctx,"father +"+GA2.S_PAT+"/yr · mother +"+GA2.S_MAT+"/yr    →    father 20→40: "+
+      GA2.PAT20.toFixed(0)+" → "+GA2.PAT40.toFixed(0)+" paternal (×"+GA2.PAT_RATIO.toFixed(1)+")",40,362,F.post,11);
+    /* the two slopes, drawn */
+    const PX0=600,PX1=870,PY0=300,PY1=364, ax=a=>PX0+(a-20)/25*(PX1-PX0), ay=v=>PY1-v/90*(PY1-PY0);
+    GA_line(ctx,PX0,PY1,PX1,PY1,"rgba(124,141,165,.35)",1);
+    GA_line(ctx,ax(20),ay(GA2.pat(20)),ax(45),ay(GA2.pat(45)),F.post,2);
+    GA_line(ctx,ax(20),ay(GA2.mat(20)),ax(45),ay(GA2.mat(45)),F.prior,2);
+    genText(ctx,"paternal",ax(45)+2,ay(GA2.pat(45))+4,F.post,10,"right");
+    genText(ctx,"maternal",ax(45)+2,ay(GA2.mat(45))+4,F.prior,10,"right");
+    genText(ctx,"father's age  20",PX0,PY1+12,GA_dim,10);
+    genText(ctx,"45",PX1,PY1+12,GA_dim,10,"right");
+    genText(ctx,"de novo count vs parental age",PX0,296,GA_dim,10);
+  }
+}
+ANIMS.gen_variation_static=(cv,ctx)=>drawVariation(ctx,cv,{stage:0});
+ANIMS.gen_variation=async(cv,ctx)=>{
+  drawVariation(ctx,cv,{stage:0});
+  // CARD-COHERENCE (2026-08-01): the concept card quotes the conventional "about
+  // 0.1%", this panel's own counts give 0.16%. Both are defensible — the textbook
+  // figure is the single-nucleotide share, ours includes indels and structural
+  // variants — but a student who watches then reads must not meet a bare
+  // contradiction. Name both, and say which is which.
+  await narrate("Sequence two people and they differ at about "+(GA2.TOTAL_SITES/1e6).toFixed(1)+
+    " million sites. That sounds enormous. It is "+GA2.DIFF_PCT.toFixed(2)+
+    " percent of the genome — one difference every "+GA2.ONE_IN.toFixed(0)+" base pairs. "+
+    "You will usually see this quoted as about zero point one percent; that is the "+
+    "single-letter share alone. Count the insertions, deletions and structural "+
+    "variants on this panel too and it comes to "+GA2.DIFF_PCT.toFixed(2)+" percent.");
+  drawVariation(ctx,cv,{stage:1});
+  await narrate("By count, one class swamps everything: "+GA_n(GA2.SNP_N)+
+    " single-nucleotide polymorphisms, one letter swapped for another. Then "+GA_n(GA2.INDEL_N)+
+    " short insertions and deletions. Structural variants — anything fifty bases or bigger, including copy-number variants — number about "+
+    GA_n(GA2.SV_LONG)+". Note the axis is logarithmic: SNPs outnumber them by more than a hundred to one.");
+  drawVariation(ctx,cv,{stage:2});
+  await narrate("Now count bases instead of sites and the picture inverts. The SNPs touch "+
+    (GA2.SNP_N*GA2.SNP_BP/1e6).toFixed(1)+" megabases, one at a time. The structural variants touch "+
+    (GA2.SV_BASES/1e6).toFixed(0)+" megabases — because the average one is about "+GA2.SV_MEAN_BP.toFixed(0)+
+    " bases long. Rare by count, enormous individually. That is the whole point of this pair of panels.");
+  drawVariation(ctx,cv,{stage:3});
+  await narrate("Almost none of it is coding: roughly "+GA_n(GA2.AA_CHANGING)+
+    " variants change an amino acid, and only "+GA2.PTV_LO+" to "+GA2.PTV_HI+
+    " destroy a protein outright. And be careful with that structural-variant count — short reads see "+
+    GA_n(GA2.SV_SHORT)+" where long reads see "+GA_n(GA2.SV_LONG)+". "+GA2.SV_HIDDEN_PCT.toFixed(0)+
+    " percent of them are invisible to the older instrument. Anyone quoting the number without naming the platform is quoting an artefact.");
+  drawVariation(ctx,cv,{stage:4});
+  await narrate("Finally, roughly seventy of your differences are brand new: present in you and in neither parent, "+GA2.DN_TOTAL+
+    " per child on average. Roughly "+(GA2.PAT_FRAC*100).toFixed(0)+" percent come from your father, because sperm precursors keep dividing for life while eggs do not. Each year of the father's age adds "+
+    GA2.S_PAT+" mutations against the mother's "+GA2.S_MAT+
+    ": on this line a twenty-year-old father contributes about "+GA2.PAT20.toFixed(0)+" and a forty-year-old about "+
+    GA2.PAT40.toFixed(0)+", a factor of "+GA2.PAT_RATIO.toFixed(1)+
+    ". Real for sporadic dominant disorders — and still a small absolute risk for any one child.");
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3) gen_gwas  →  concept `gwas-and-effect-sizes`
+   The Manhattan plot BUILDS as N grows, because 5×10⁻⁸ IS a sample-size demand.
+   Points are a seeded deterministic draw; the same cohort simply gets bigger.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const GA3 = (()=>{
+  const ALPHA=0.05, TESTS=1e6, THRESH=ALPHA/TESTS;             // 5×10⁻⁸
+  const THRESH_LOG=-Math.log10(THRESH);                        // 7.301
+  const Z_THRESH=GA_zFromP(THRESH);                            // 5.451
+  const CHI=Z_THRESH*Z_THRESH;                                 // 29.7
+  const Z_POWER=0.8416;                                        // z for 80% power
+  const LAMBDA_80=Math.pow(Z_THRESH+Z_POWER,2);                // 39.6
+  /* the card's worked height variant: β = 0.1 cm / 7 cm SD, MAF 0.3 */
+  const BETA=0.014, MAF=0.3, V_CARD=2*MAF*(1-MAF)*BETA*BETA;   // 8.23e-5
+  const N_REQ=LAMBDA_80/V_CARD;                                // ≈481,000
+  const N_REQ_R=Math.round(N_REQ/10000)*10000;                 // spoken + drawn
+  const CHRLEN=[248,242,198,190,182,171,159,145,138,134,135,133,114,107,102,90,83,80,59,64,47,51];
+  const TOTLEN=CHRLEN.reduce((a,b)=>a+b,0);
+  const KB_PER_MARKER=5;
+  const LD_WIN=18, LD_TAU=6;
+  const CAUSAL=[{chr:1,frac:.35,V:3.0e-4},{chr:2,frac:.60,V:1.2e-4},{chr:4,frac:.25,V:2.0e-4},
+                {chr:6,frac:.55,V:V_CARD},{chr:9,frac:.40,V:1.5e-4},{chr:11,frac:.70,V:6.0e-5},
+                {chr:16,frac:.30,V:1.0e-4},{chr:19,frac:.50,V:4.0e-5}];
+  /* build the marker set: one noise draw per marker, fixed for all N */
+  const r=GA_rng(769143), pts=[]; const chrStart=[];   /* seed chosen so the run teaches: 0 hits at small N, and the peak lead SNP is a TAG */
+  CHRLEN.forEach((len,ci)=>{
+    const n=Math.max(24,Math.round(2900*len/TOTLEN));
+    chrStart.push(pts.length);
+    for(let j=0;j<n;j++) pts.push({chr:ci+1, j, n, noise:GA_normal(r), r:0, V:0, causal:false, loc:-1});
+  });
+  const M=pts.length;
+  CAUSAL.forEach((c,li)=>{
+    const s=chrStart[c.chr-1], n=pts[s].n, k=s+Math.round(c.frac*(n-1));
+    pts[k].causal=true; pts[k].r=1; pts[k].V=c.V; pts[k].loc=li;
+    for(let d=-LD_WIN;d<=LD_WIN;d++){ if(!d) continue; const i=k+d;
+      if(i<s||i>=s+n) continue;
+      const rr=Math.exp(-Math.abs(d)/LD_TAU);
+      if(rr>pts[i].r){ pts[i].r=rr; pts[i].V=c.V; pts[i].loc=li; } }
+    c.idx=k;
+  });
+  const yOf=(p,N)=>GA_nlp(p.noise + p.r*Math.sqrt(N*p.V));
+  const hitsAt=N=>pts.reduce((a,p)=>a+(yOf(p,N)>=THRESH_LOG?1:0),0);
+  const N_STAGES=[5000,50000,150000,500000];
+  const HITS=N_STAGES.map(hitsAt);
+  /* LD zoom on the card's own locus (index 3) */
+  const ZOOM=CAUSAL[3], N_FINAL=N_STAGES[N_STAGES.length-1];
+  const zs=ZOOM.idx-LD_WIN, ze=ZOOM.idx+LD_WIN, ZWIN=[];
+  for(let i=zs;i<=ze;i++) if(pts[i]&&pts[i].chr===ZOOM.chr) ZWIN.push({i,p:pts[i],y:yOf(pts[i],N_FINAL)});
+  let LEAD=ZWIN[0]; ZWIN.forEach(w=>{ if(w.y>LEAD.y) LEAD=w; });
+  const LEAD_IS_CAUSAL=LEAD.p.causal;
+  const LEAD_KB=Math.abs(LEAD.i-ZOOM.idx)*KB_PER_MARKER;
+  const LEAD_R2=LEAD.p.r*LEAD.p.r;
+  const CAUSAL_Y=yOf(pts[ZOOM.idx],N_FINAL);
+  /* odds-ratio translation, computed */
+  const OR=1.10, BASE=0.05;
+  const ABS=(BASE/(1-BASE)*OR)/(1+BASE/(1-BASE)*OR);
+  const DELTA=(ABS-BASE)*100;
+  const NONCODING_PCT=90;
+  return {ALPHA,TESTS,THRESH,THRESH_LOG,Z_THRESH,CHI,LAMBDA_80,BETA,MAF,V_CARD,N_REQ,N_REQ_R,
+    pts,M,CAUSAL,N_STAGES,HITS,yOf,hitsAt,ZOOM,ZWIN,LEAD,LEAD_IS_CAUSAL,LEAD_KB,LEAD_R2,CAUSAL_Y,
+    OR,BASE,ABS,DELTA,KB_PER_MARKER,NONCODING_PCT,N_FINAL};
+})();
+
+function drawGwas(ctx,cv,{step=0,title}={}){
+  genFrame(ctx,title||"GWAS — the significance line is a sample-size requirement");
+  const N=GA3.N_STAGES[Math.max(0,Math.min(GA3.N_STAGES.length-1,step))];
+  const hits=GA3.HITS[Math.max(0,Math.min(GA3.HITS.length-1,step))];
+  genText(ctx,"One regression per variant — "+GA_n(GA3.M)+" plotted here, ~"+GA_n(GA3.TESTS)+
+    " effectively independent in a real scan.",40,54,F.txt,12);
+  /* plot frame */
+  const X0=60,X1=640,YB=250,YT=78,YMAX=12, py=v=>YB-Math.min(v,YMAX)/YMAX*(YB-YT);
+  GA_line(ctx,X0,YB,X1,YB,"rgba(124,141,165,.35)",1);
+  [0,4,8,12].forEach(t=>genText(ctx,""+t,X0-8,py(t)+4,GA_dim,10,"right"));
+  genText(ctx,"−log₁₀ p",X0-46,YT-6,GA_dim,10);
+  /* alternating chromosome bands + points */
+  let last=0;
+  GA3.pts.forEach((p,i)=>{
+    const x=X0+i/(GA3.M-1)*(X1-X0), y=py(GA3.yOf(p,N));
+    const above=GA3.yOf(p,N)>=GA3.THRESH_LOG;
+    ctx.fillStyle = above ? F.wrong : (p.chr%2 ? "rgba(124,141,165,.55)" : "rgba(124,141,165,.30)");
+    ctx.beginPath(); ctx.arc(x,y,above?2.6:1.6,0,7); ctx.fill();
+    if(p.chr!==last){ last=p.chr; if(p.chr%2) genText(ctx,""+p.chr,x,YB+13,GA_dim,9,"center"); }
+  });
+  GA_line(ctx,X0,py(GA3.THRESH_LOG),X1,py(GA3.THRESH_LOG),F.wrong,1,[4,4]);
+  genText(ctx,"5×10⁻⁸ = "+GA3.ALPHA+" ÷ "+GA_n(GA3.TESTS)+"   (−log₁₀ p = "+GA3.THRESH_LOG.toFixed(1)+
+    ", |z| = "+GA3.Z_THRESH.toFixed(2)+", χ²₁ = "+GA3.CHI.toFixed(1)+")",X0+4,py(GA3.THRESH_LOG)-6,F.wrong,10);
+  /* right rail */
+  const RX=660;
+  genText(ctx,"SAMPLE SIZE",RX,84,F.ax,11);
+  ctx.fillStyle=F.post; ctx.font="700 22px system-ui,sans-serif"; ctx.textAlign="left";
+  ctx.fillText("N = "+GA_n(N),RX,110);
+  genText(ctx,"variants above the line",RX,138,GA_dim,11);
+  ctx.fillStyle=hits?F.wrong:GA_dim; ctx.font="700 22px system-ui,sans-serif"; ctx.textAlign="left";
+  ctx.fillText(""+hits,RX,164);
+  if(step>=3){
+    genText(ctx,"a typical hit: odds ratio "+GA3.OR.toFixed(2),RX,190,F.txt,11);
+    GA_bar(ctx,RX,198,GA3.BASE*100*12,12,"rgba(124,141,165,.55)");
+    genText(ctx,(GA3.BASE*100).toFixed(1)+"%",RX+GA3.BASE*100*12+6,208,GA_dim,11);
+    GA_bar(ctx,RX,216,GA3.ABS*100*12,12,F.post);
+    genText(ctx,(GA3.ABS*100).toFixed(1)+"%",RX+GA3.ABS*100*12+6,226,F.post,11);
+    genText(ctx,"absolute change: +"+GA3.DELTA.toFixed(2)+" points",RX,246,F.txt,11);
+  }
+  /* LD zoom */
+  if(step>=4){
+    GA_line(ctx,40,266,880,266,"rgba(124,141,165,.25)",1);
+    genText(ctx,"Zoom one peak — the array tests tags, not causes",40,286,F.txt,12);
+    const ZX0=60,ZX1=540,ZYB=360,ZYT=300, zy=v=>ZYB-Math.min(v,12)/12*(ZYB-ZYT);
+    GA_line(ctx,ZX0,ZYB,ZX1,ZYB,"rgba(124,141,165,.35)",1);
+    GA_line(ctx,ZX0,zy(GA3.THRESH_LOG),ZX1,zy(GA3.THRESH_LOG),F.wrong,1,[4,4]);
+    const n=GA3.ZWIN.length;
+    GA3.ZWIN.forEach((w,i)=>{
+      const x=ZX0+i/(n-1)*(ZX1-ZX0), y=zy(w.y), r2=w.p.r*w.p.r;
+      ctx.fillStyle="rgba(232,161,60,"+(0.20+0.75*r2).toFixed(2)+")";
+      ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fill();
+      if(w.p.causal){ ctx.strokeStyle=F.ok; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,8,0,7); ctx.stroke();
+        genText(ctx,"causal variant",x,y-14,F.ok,10,"center"); }
+      if(w===GA3.LEAD){ ctx.strokeStyle=F.wrong; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,8,0,7); ctx.stroke();
+        genText(ctx,"lead SNP — the one reported",x,y-14,F.wrong,10,"center"); }
+    });
+    genText(ctx,"colour = r² with the causal variant   ·   markers "+GA3.KB_PER_MARKER+" kb apart",ZX0,ZYB+13,GA_dim,10);
+    const TX=568;
+    genText(ctx,GA3.LEAD_IS_CAUSAL ? "Here the lead SNP happens to BE the cause —"
+                                   : "The lead SNP is "+GA3.LEAD_KB+" kb from the cause,",TX,306,F.wrong,11);
+    genText(ctx,GA3.LEAD_IS_CAUSAL ? "which you could not have known in advance."
+                                   : "r² = "+GA3.LEAD_R2.toFixed(2)+". You cannot tell from the plot.",TX,322,F.wrong,11);
+    genText(ctx,">"+GA3.NONCODING_PCT+"% of hits are non-coding. Reports",TX,344,GA_dim,11);
+    genText(ctx,"name the NEAREST gene: FTO's obesity",TX,358,GA_dim,11);
+    genText(ctx,"signal acts on IRX3/IRX5, ~1 Mb away.",TX,372,GA_dim,11);
+  }
+}
+ANIMS.gen_gwas_static=(cv,ctx)=>drawGwas(ctx,cv,{step:0});
+ANIMS.gen_gwas=async(cv,ctx)=>{
+  drawGwas(ctx,cv,{step:0});
+  await narrate("A genome-wide association study runs one regression per variant and plots the p-value. With about a million effectively independent tests, the ordinary five-percent cut-off would hand you "+GA_n(GA3.ALPHA*GA3.TESTS)+" false positives — so the threshold is "+
+    GA3.ALPHA+" divided by "+GA_n(GA3.TESTS)+": five times ten to the minus eight. That is the dashed line, at minus log ten p of "+
+    GA3.THRESH_LOG.toFixed(1)+". At "+GA_n(GA3.N_STAGES[0])+" participants, "+
+    (GA3.HITS[0]===0?"nothing reaches it. Not one variant.":"only "+GA_pl(GA3.HITS[0],"variant")+" reaches it."));
+  drawGwas(ctx,cv,{step:1});
+  await narrate("Same cohort, same genome, ten times the people: "+GA_n(GA3.N_STAGES[1])+
+    ". Everything lifts, because the test statistic grows with sample size — and "+
+    (GA3.HITS[1]===0?"still nothing clears the line.":GA_pl(GA3.HITS[1],"variant")+" now clear the line."));
+  drawGwas(ctx,cv,{step:2});
+  await narrate("At "+GA_n(GA3.N_STAGES[2])+" the strongest loci break through: "+GA_pl(GA3.HITS[2],"variant")+
+    " above the line. Nothing about the biology changed between these three frames. Only the number of people did.");
+  drawGwas(ctx,cv,{step:3});
+  await narrate("At "+GA_n(GA3.N_STAGES[3])+", "+GA_pl(GA3.HITS[3],"variant")+" "+
+    GA_vb(GA3.HITS[3],"clear")+" it. Here is why that number and not another: a typical height variant shifts you about a millimetre per allele, which explains "+
+    (GA3.V_CARD*100).toFixed(3)+" percent of the variance. Eighty percent power needs a non-centrality of "+
+    GA3.LAMBDA_80.toFixed(1)+", so you need about "+GA_n(GA3.N_REQ_R)+
+    " participants. The threshold is not bureaucracy — it is the sample size.");
+  await narrate("And look at what a hit is worth. A typical odds ratio is "+GA3.OR.toFixed(2)+
+    ". Apply it to a disease with "+(GA3.BASE*100).toFixed(0)+" percent baseline risk and you get "+
+    (GA3.ABS*100).toFixed(1)+" percent — an absolute increase of "+GA3.DELTA.toFixed(2)+
+    " of a percentage point. Headline-sized language, rounding-error consequences.");
+  drawGwas(ctx,cv,{step:4});
+  await narrate("One last thing the plot hides. Zoom into a peak and it is not one variant, it is a block of neighbours inherited together. "+
+    (GA3.LEAD_IS_CAUSAL
+      ? "Here the top point happens to be the causal variant — but nothing in the data told you that."
+      : "The top point here sits "+GA3.LEAD_KB+" kilobases away from the causal variant, correlated with it at r-squared "+
+        GA3.LEAD_R2.toFixed(2)+". The reported lead SNP is a signpost, not the culprit.")+
+    " More than "+GA3.NONCODING_PCT+
+    " percent of hits are non-coding, and reports name the nearest gene by convention. That convention gave the world the FTO obesity gene, which actually acts on IRX3 and IRX5, about a megabase away.");
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4) gen_prs  →  concept `polygenic-risk-scores`
+   A real distribution built by summing weighted alleles, then the two honest
+   caveats: absolute-versus-relative, and ancestry portability.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const GA4 = (()=>{
+  const NPEOPLE=4000, NVAR=200, r=GA_rng(424242);
+  const beta=[], freq=[];
+  for(let j=0;j<NVAR;j++){ beta.push(Math.abs(GA_normal(r))*0.1+0.01); freq.push(0.05+r()*0.45); }
+  const raw=new Array(NPEOPLE);
+  for(let i=0;i<NPEOPLE;i++){ let s=0;
+    for(let j=0;j<NVAR;j++){ const p=freq[j]; s+=beta[j]*((r()<p?1:0)+(r()<p?1:0)); }
+    raw[i]=s; }
+  const MEAN=raw.reduce((a,b)=>a+b,0)/NPEOPLE;
+  const SD=Math.sqrt(raw.reduce((a,b)=>a+(b-MEAN)*(b-MEAN),0)/NPEOPLE);
+  const z=raw.map(v=>(v-MEAN)/SD);
+  const sorted=z.slice().sort((a,b)=>a-b);
+  const DEC_CUT=sorted[Math.ceil(0.90*NPEOPLE)];
+  const TAIL_N=z.filter(v=>v>=DEC_CUT).length;
+  const TAIL_PCT=100*TAIL_N/NPEOPLE;
+  const IND_RANK=Math.floor(0.92*(NPEOPLE-1));
+  const IND_Z=sorted[IND_RANK];
+  const IND_PCT=Math.round(100*IND_RANK/(NPEOPLE-1));
+  const LO=sorted[0], HI=sorted[NPEOPLE-1], NBIN=61;
+  const bins=new Array(NBIN).fill(0);
+  z.forEach(v=>{ const b=Math.min(NBIN-1,Math.floor((v-LO)/(HI-LO)*NBIN)); bins[b]++; });
+  const BMAX=Math.max(...bins);
+  /* absolute-versus-relative: the two waffles, counted from the dots drawn */
+  const RR=2.0;
+  const A={who:"50-year-old",   base:0.05,  denom:100,  pitch:18, cols:10, rows:10, dot:6};
+  const B={who:"35-year-old",   base:0.005, denom:1000, pitch:7,  cols:40, rows:25, dot:2.5};
+  [A,B].forEach(w=>{ w.baseDots=Math.round(w.base*w.denom); w.addDots=Math.round(w.base*(RR-1)*w.denom);
+    w.total=w.baseDots+w.addDots; w.absPP=100*w.addDots/w.denom;
+    w.newPct=100*w.total/w.denom; w.noEvent=w.denom-w.total; });
+  /* PGS catalogue + Khera, cited constants used by both label and narration */
+  const CAT_SCORES=7000, CAT_TRAITS=800, KHERA_PCT=8.0, KHERA_X=3, FH_DENOM=250;
+  const FH_PCT=100/FH_DENOM, KHERA_VS_FH=KHERA_PCT/FH_PCT;
+  /* Martin 2019 portability, rendered as accuracy RETAINED */
+  const ANC=[{lab:"European (training)",x:1.0},{lab:"Hispanic / Latino",x:1.6},
+             {lab:"South Asian",x:1.7},{lab:"East Asian",x:2.5},{lab:"African ancestry",x:4.9}];
+  ANC.forEach(a=>a.keep=100/a.x);
+  const EUR_PARTIC=79, EUR_WORLD=16;
+  const C_PRS=0.61, C_CLIN=0.76, C_BOTH=0.78, C_COIN=0.50, C_N=352660;
+  const C_INC=+(C_BOTH-C_CLIN).toFixed(2);
+  return {NPEOPLE,NVAR,z,sorted,MEAN,SD,DEC_CUT,TAIL_N,TAIL_PCT,IND_Z,IND_PCT,LO,HI,NBIN,bins,BMAX,
+    RR,A,B,CAT_SCORES,CAT_TRAITS,KHERA_PCT,KHERA_X,FH_DENOM,FH_PCT,KHERA_VS_FH,
+    ANC,EUR_PARTIC,EUR_WORLD,C_PRS,C_CLIN,C_BOTH,C_COIN,C_N,C_INC};
+})();
+
+function drawPrs(ctx,cv,{view="dist",stage=0,title}={}){
+  if(view==="dist"){
+    genFrame(ctx,title||"A polygenic score is a position in a population");
+    genText(ctx,GA_n(GA4.NPEOPLE)+" simulated people · "+GA4.NVAR+
+      " weighted variants · PRS = Σ β·x, standardised against the reference panel",40,54,F.txt,12);
+    const X0=70,X1=700,YB=300, sx=v=>X0+(v-GA4.LO)/(GA4.HI-GA4.LO)*(X1-X0);
+    GA_line(ctx,X0-10,YB,X1+10,YB,"rgba(124,141,165,.35)",1);
+    const bw=(X1-X0)/GA4.NBIN;
+    GA4.bins.forEach((c,b)=>{
+      const v=GA4.LO+(b+0.5)/GA4.NBIN*(GA4.HI-GA4.LO), h=c/GA4.BMAX*195;
+      const hot = stage>=2 && v>=GA4.DEC_CUT;
+      ctx.fillStyle = hot ? F.wrong : "rgba(124,141,165,.55)";
+      ctx.fillRect(sx(v)-bw/2+1,YB-h,bw-2,h);
+    });
+    [-3,-2,-1,0,1,2,3].forEach(t=>{ if(t<GA4.LO||t>GA4.HI) return;
+      genText(ctx,(t>0?"+":"")+t+" SD",sx(t),YB+16,GA_dim,10,"center"); });
+    if(stage>=1){
+      GA_line(ctx,sx(GA4.IND_Z),YB,sx(GA4.IND_Z),YB-215,F.post,2);
+      genText(ctx,"you — "+GA_ord(GA4.IND_PCT)+" percentile",sx(GA4.IND_Z),YB-222,F.post,12,"center");
+    }
+    if(stage>=2){
+      GA_line(ctx,sx(GA4.DEC_CUT),YB,sx(GA4.DEC_CUT),YB-160,F.wrong,1,[4,4]);
+      genText(ctx,"top decile: "+GA_n(GA4.TAIL_N)+" of "+GA_n(GA4.NPEOPLE)+" ("+GA4.TAIL_PCT.toFixed(1)+"%)",
+              sx(GA4.DEC_CUT)+6,YB-166,F.wrong,11);
+    }
+    const RX=720;
+    genText(ctx,"PGS CATALOG",RX,86,F.ax,11);
+    genText(ctx,"≈"+GA_n(GA4.CAT_SCORES)+" scores",RX,106,GA_dim,12);
+    genText(ctx,"≈"+GA_n(GA4.CAT_TRAITS)+" traits",RX,122,GA_dim,12);
+    if(stage>=2){
+      genText(ctx,"KHERA 2018 (CAD)",RX,150,F.ax,11);
+      genText(ctx,"top "+GA4.KHERA_PCT.toFixed(1)+"% at >"+GA4.KHERA_X+"× risk",RX,170,F.wrong,11);
+      genText(ctx,"FH is 1 in "+GA4.FH_DENOM+" ("+GA4.FH_PCT.toFixed(1)+"%)",RX,186,GA_dim,11);
+      genText(ctx,"→ "+GA4.KHERA_VS_FH.toFixed(0)+"× more people flagged",RX,202,F.ok,11);
+    }
+    genText(ctx,"the raw sum has no units —",RX,232,GA_dim,11);
+    genText(ctx,"the percentile is defined by",RX,246,GA_dim,11);
+    genText(ctx,"whoever is in the panel.",RX,260,GA_dim,11);
+    genText(ctx,"It is not a test for a variant, it has no positive predictive value for one person, and it is fixed at conception.",
+            40,344,F.txt,11);
+    return;
+  }
+  if(view==="abs"){
+    genFrame(ctx,title||"Absolute versus relative — the same 2× is two different things");
+    genText(ctx,"Same score, same decile, same headline: 'your genetic risk is doubled.'",40,54,F.txt,12);
+    const waffle=(w,x0,label)=>{
+      genText(ctx,label,x0,84,F.txt,12);
+      for(let i=0;i<w.denom;i++){
+        const x=x0+(i%w.cols)*w.pitch, y=110+Math.floor(i/w.cols)*w.pitch;
+        ctx.fillStyle = i<w.baseDots ? F.post : (i<w.total ? F.wrong : "rgba(124,141,165,.22)");
+        ctx.beginPath(); ctx.arc(x,y,w.dot,0,7); ctx.fill();
+      }
+      genText(ctx,w.baseDots+" baseline + "+w.addDots+" added = "+w.total+" of "+GA_n(w.denom),x0,312,GA_dim,11);
+      genText(ctx,GA4.RR.toFixed(1)+" × "+(w.base*100).toFixed(1)+"% = "+w.newPct.toFixed(1)+
+        "%   →   +"+w.absPP.toFixed(1)+" percentage points",x0,330,F.wrong,12);
+      genText(ctx,GA_n(w.noEvent)+" of "+GA_n(w.denom)+" have no event in ten years",x0,348,F.ok,11);
+    };
+    if(stage>=1) waffle(GA4.A,70,GA4.A.who+" · 10-year baseline risk "+(GA4.A.base*100).toFixed(0)+"%");
+    if(stage>=2) waffle(GA4.B,470,GA4.B.who+" · 10-year baseline risk "+(GA4.B.base*100).toFixed(1)+"%");
+    GA_line(ctx,420,70,420,300,"rgba(124,141,165,.25)",1);
+    if(stage>=2) genText(ctx,"Identical ratio. One is a statin conversation; the other is noise. Always ask for the two absolute numbers, not the ratio.",
+      40,370,F.txt,11);
+    return;
+  }
+  /* view === "anc" */
+  genFrame(ctx,title||"Three limits — one of them severe");
+  genText(ctx,"1 — the severe one: the same score, scored on someone else's ancestry (Martin 2019)",40,54,F.txt,12);
+  const BX=210, BW=230, rows=[112,142,172,202,232];
+  genText(ctx,"% of European-ancestry accuracy retained",BX,98,F.ax,10);
+  GA4.ANC.forEach((a,i)=>{
+    genText(ctx,a.lab,200,rows[i]+13,GA_dim,11,"right");
+    if(stage<1) return;
+    const w=a.keep/100*BW;
+    GA_bar(ctx,BX,rows[i],w,18,i===0?F.ok:(a.x>=2.5?F.wrong:F.post));
+    genText(ctx,a.keep.toFixed(0)+"%"+(a.x>1?"  ("+a.x.toFixed(1)+"× lower)":""),
+            BX+w+8,rows[i]+13,i===0?F.ok:(a.x>=2.5?F.wrong:F.post),11);
+  });
+  if(stage>=1){
+    genText(ctx,GA4.EUR_PARTIC+"% of GWAS participants are of European descent — "+
+      GA4.EUR_WORLD+"% of the world's population.",40,266,GA_dim,11);
+    genText(ctx,"Accuracy decays continuously with genetic distance, so 'ancestry-matched' labels are a crude patch.",40,282,GA_dim,11);
+  }
+  GA_line(ctx,478,70,478,290,"rgba(124,141,165,.25)",1);
+  genText(ctx,"2 — how well does it rank ONE person? (Elliott 2020, N = "+GA_n(GA4.C_N)+")",500,86,F.txt,11);
+  if(stage>=2){
+    const CX0=520,CX1=860, cx=c=>CX0+(c-0.5)/0.3*(CX1-CX0);
+    GA_line(ctx,CX0,150,CX1,150,"rgba(124,141,165,.45)",1);
+    const mark=(c,lab,col,above)=>{ GA_line(ctx,cx(c),140,cx(c),160,col,2);
+      genText(ctx,lab,cx(c),above?132:176,col,10,"center"); };
+    mark(GA4.C_COIN,"0.50 coin flip",GA_dim,false);
+    mark(GA4.C_PRS,GA4.C_PRS.toFixed(2)+" score alone",F.wrong,true);
+    mark(GA4.C_CLIN,GA4.C_CLIN.toFixed(2)+" clinical",F.post,false);
+    mark(GA4.C_BOTH,GA4.C_BOTH.toFixed(2)+" both",F.ok,true);
+    genText(ctx,"C-statistic "+GA4.C_PRS.toFixed(2)+": draw one person who will have an event and one",500,206,GA_dim,11);
+    genText(ctx,"who will not — the score ranks them correctly "+(GA4.C_PRS*100).toFixed(0)+"% of the time.",500,222,GA_dim,11);
+    genText(ctx,"Clinical variables alone reach "+(GA4.C_CLIN*100).toFixed(0)+"%. Adding the score buys "+
+      GA4.C_INC.toFixed(2)+".",500,238,GA_dim,11);
+    genText(ctx,"3 — a population tool sold as an individual one: embryo-selection",500,270,F.wrong,11);
+    genText(ctx,"scores extrapolate far past this evidence base.",500,286,F.wrong,11);
+  }
+  if(stage>=2) genText(ctx,"Real signal for sorting a population. Weak evidence for telling one person what will happen to them.",
+    40,340,F.txt,12);
+}
+ANIMS.gen_prs_static=(cv,ctx)=>drawPrs(ctx,cv,{view:"dist",stage:0});
+ANIMS.gen_prs=async(cv,ctx)=>{
+  drawPrs(ctx,cv,{view:"dist",stage:0});
+  await narrate("A polygenic risk score collapses a whole genome into one number: count your copies of each risk allele, weight each by its effect from a GWAS, and add them up. Here that is "+
+    GA4.NVAR+" weighted variants across "+GA_n(GA4.NPEOPLE)+
+    " people. Nobody imposed this bell shape — it is what summing many small independent effects always produces.");
+  drawPrs(ctx,cv,{view:"dist",stage:1});
+  await narrate("The raw sum has no units, so it is standardised against a reference panel and reported as a percentile. This person sits at the "+
+    GA_ord(GA4.IND_PCT)+" percentile — "+GA4.IND_Z.toFixed(2)+
+    " standard deviations above that panel's mean. And that is the whole ancestry problem in one step: your percentile is defined relative to whoever is in the panel.");
+  drawPrs(ctx,cv,{view:"dist",stage:2});
+  await narrate("The real capability is sorting a population. Khera's coronary score put "+
+    GA4.KHERA_PCT.toFixed(1)+" percent of people at more than "+GA4.KHERA_X+
+    "-fold risk — comparable to carrying a familial hypercholesterolemia variant, which affects one in "+
+    GA4.FH_DENOM+". That is about "+GA4.KHERA_VS_FH.toFixed(0)+
+    " times more people flagged than single-gene screening finds. In this distribution the top decile is "+
+    GA_n(GA4.TAIL_N)+" of "+GA_n(GA4.NPEOPLE)+" people.");
+  drawPrs(ctx,cv,{view:"abs",stage:1});
+  await narrate("Now the trap. Take a "+GA4.A.who+" whose ten-year coronary risk on ordinary clinical factors is "+
+    (GA4.A.base*100).toFixed(0)+" percent, and put him in a stratum carrying "+GA4.RR.toFixed(1)+
+    " times the risk. Five amber dots become ten out of a hundred: "+GA4.A.newPct.toFixed(0)+" percent, an increase of "+
+    GA4.A.absPP.toFixed(1)+" percentage points. That is a genuine statin conversation. Look at it the other way too — "+
+    GA_n(GA4.A.noEvent)+" of those hundred have no event in ten years.");
+  drawPrs(ctx,cv,{view:"abs",stage:2});
+  await narrate("Same decile, same doubling, a "+GA4.B.who+" whose baseline is "+(GA4.B.base*100).toFixed(1)+
+    " percent. The same five added dots — but now out of a thousand people, not a hundred. "+
+    GA4.B.newPct.toFixed(1)+" percent, an increase of "+GA4.B.absPP.toFixed(1)+
+    " of a percentage point. Identical headline; one is worth acting on and the other is noise. Ask for the two absolute numbers, never the ratio.");
+  drawPrs(ctx,cv,{view:"anc",stage:1});
+  await narrate("Now the limit that decides whether the score is usable at all. Scores are trained where the data are, and "+
+    GA4.EUR_PARTIC+" percent of GWAS participants are of European descent — a group that is "+
+    GA4.EUR_WORLD+" percent of the world. The same score keeps only about "+
+    GA4.ANC[3].keep.toFixed(0)+" percent of its accuracy on East Asian ancestry and about "+
+    GA4.ANC[4].keep.toFixed(0)+" percent on African ancestry: "+GA4.ANC[4].x.toFixed(1)+
+    " times lower. Allele frequencies and linkage blocks differ, so a tag that proxies the cause in one population may not proxy it in another.");
+  drawPrs(ctx,cv,{view:"anc",stage:2});
+  await narrate("And even where the population signal is real, ranking one person is weak. The C-statistic for coronary disease is "+
+    GA4.C_PRS.toFixed(2)+" for the score alone: draw one person who will have an event and one who will not, and it ranks them correctly "+
+    (GA4.C_PRS*100).toFixed(0)+" percent of the time, against "+(GA4.C_COIN*100).toFixed(0)+
+    " percent for a coin flip. Cheap clinical variables reach "+(GA4.C_CLIN*100).toFixed(0)+
+    " percent, and adding the score buys about "+
+    GA4.C_INC.toFixed(2)+". Real signal for a population. Small print for a person.");
+};
+
+/* deterministic-math handle — the self-check harness asserts these against the narration */
+ANIMS._gen_a_debug={
+  genome_scale:{cells:GA1.CELLS, pctPerCell:GA1.PCT(1), bpPerCell:GA1.BP_PER_CELL,
+    codingCells:GA1.CODING, codingPct:GA1.PCT(GA1.CODING),
+    selLoPct:GA1.PCT(GA1.SEL_LO), selHiPct:GA1.PCT(GA1.SEL_HI),
+    ccrePct:GA1.PCT(GA1.CCRE), encodePct:GA1.PCT(GA1.ENCODE),
+    encodeVsCoding:GA1.ENCODE_X_CODING, txPerGene:GA1.TX_PER_GENE},
+  variation:{totalSites:GA2.TOTAL_SITES, diffPct:GA2.DIFF_PCT, oneIn:GA2.ONE_IN,
+    snpBasesMb:GA2.SNP_N*GA2.SNP_BP/1e6, indelBasesMb:GA2.INDEL_N*GA2.INDEL_BP/1e6,
+    svBasesMb:GA2.SV_BASES/1e6, svMeanBp:GA2.SV_MEAN_BP, svHiddenPct:GA2.SV_HIDDEN_PCT,
+    pat20:GA2.PAT20, pat40:GA2.PAT40, patRatio:GA2.PAT_RATIO, mat20:GA2.MAT20, mat40:GA2.MAT40},
+  gwas:{M:GA3.M, thresh:GA3.THRESH, threshLog:GA3.THRESH_LOG, zThresh:GA3.Z_THRESH, chi:GA3.CHI,
+    lambda80:GA3.LAMBDA_80, vCard:GA3.V_CARD, nReq:GA3.N_REQ, nReqRounded:GA3.N_REQ_R,
+    N:GA3.N_STAGES, hits:GA3.HITS, leadIsCausal:GA3.LEAD_IS_CAUSAL, leadKb:GA3.LEAD_KB,
+    leadR2:GA3.LEAD_R2, causalY:GA3.CAUSAL_Y, orAbs:GA3.ABS, orDelta:GA3.DELTA},
+  prs:{n:GA4.NPEOPLE, nvar:GA4.NVAR, indPct:GA4.IND_PCT, indZ:GA4.IND_Z,
+    decileCut:GA4.DEC_CUT, tailN:GA4.TAIL_N, tailPct:GA4.TAIL_PCT,
+    aNew:GA4.A.newPct, aAbsPP:GA4.A.absPP, aNoEvent:GA4.A.noEvent,
+    bNew:GA4.B.newPct, bAbsPP:GA4.B.absPP, bNoEvent:GA4.B.noEvent,
+    kheraVsFh:GA4.KHERA_VS_FH, ancKeep:GA4.ANC.map(a=>+a.keep.toFixed(1)), cInc:GA4.C_INC}
+};
+
+/* ── GENETICS visuals batch 3 — clinical (2026-08-01) ─────────────────────── */
+/* ── GENETICS anims — batch B (2026-08-01) ─────────────────────────────────────
+   Six clinical-genetics animations, appended to the gen_* namespace.
+
+   House rules obeyed (same as the batch-A gen_* block above):
+     • canvas 900×380, the global F palette, clear()/sleep()/tween()/narrate()
+     • genFrame(ctx,title) / genText(ctx,t,x,y,col,size,align) are REUSED, not redefined
+     • every animation ships BOTH ANIMS.<name>_static and ANIMS.<name>
+     • HARD RULE — every number spoken is COMPUTED from the data actually drawn.
+       Nothing numeric is hardcoded into prose. The computed handles are exported on
+       ANIMS._gen_b_debug at the bottom so the harness can assert against them.
+     • acronyms are expanded on first use inside each animation (a learner may watch
+       one of these on its own).
+
+   Concept mapping (each visual teaches its own card, nothing else):
+     gen_pgx_ladder   → pharmacogenomics
+     gen_pgx_safety   → pharmacogenomics-safety
+     gen_two_hit      → cancer-genetics-germline
+     gen_somatic      → cancer-genetics-somatic
+     gen_crispr       → crispr-mechanism
+     gen_crispr_clinic→ crispr-in-the-clinic
+   ───────────────────────────────────────────────────────────────────────────── */
+(() => {
+
+/* ---------- tiny shared helpers (namespaced — do not shadow house helpers) ---- */
+const gbRng  = s => { let x = s >>> 0; return () => (x = (x * 1664525 + 1013904223) >>> 0) / 4294967296; };
+const gbClamp01 = v => v < 0 ? 0 : (v > 1 ? 1 : v);
+const gbLerp = (a, b, k) => a + (b - a) * k;
+const gbSeg  = (p, a, b) => gbClamp01((p - a) / (b - a));
+const gbNorm = r => { const u = Math.max(1e-9, r()), v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+const gbBox  = (ctx, x, y, w, h, stroke, fill) => {
+  if (fill) { ctx.fillStyle = fill; ctx.fillRect(x, y, w, h); }
+  ctx.strokeStyle = stroke || "rgba(124,141,165,.30)"; ctx.lineWidth = 1; ctx.strokeRect(x, y, w, h);
+};
+const gbDot = (ctx, x, y, r, col, alpha) => {
+  if (alpha !== undefined) ctx.globalAlpha = alpha;
+  ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+};
+const gbRing = (ctx, x, y, r, col, w) => {
+  ctx.strokeStyle = col; ctx.lineWidth = w || 1.6; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.stroke();
+};
+const GB_BLUE = "#6FB4E0", GB_VIO = "#A88CD8", GB_CYA = "#6FD0C8";
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   1) gen_pgx_ladder  →  concept "pharmacogenomics"
+   The metaboliser ladder driving exposure in OPPOSITE directions for an active
+   drug versus a prodrug — and, among prodrugs, the dangerous end flipping from
+   the poor end (clopidogrel, treatment failure) to the ultrarapid end (codeine,
+   morphine toxicity).
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+/* CPIC activity-score convention: each allele carries an activity value; the two
+   values sum to a diplotype score, and the score maps onto a phenotype.          */
+const LAD = [
+  { key: "PM", name: "poor",         as: 0.0 },
+  { key: "IM", name: "intermediate", as: 1.0 },
+  { key: "NM", name: "normal",       as: 2.0 },
+  { key: "RM", name: "rapid",        as: 2.5 },
+  { key: "UM", name: "ultrarapid",   as: 3.0 }
+];
+const AS_NM = 2.0;                       // the reference diplotype (*1/*1)
+
+/* Exposure model, stated once so the drawing and the narration cannot diverge.
+   `other` = the share of the job done by routes OTHER than this enzyme.
+     prodrug     → ACTIVE-metabolite exposure rises with enzyme activity
+     active drug → PARENT-drug exposure is 1/clearance, so it FALLS with activity */
+const PGX = (() => {
+  const cols = [
+    { id: "tca", drug: "nortriptyline", sub: "ACTIVE drug — CYP2D6 clears it",
+      kind: "active", other: 0.25, floor: 0.75, ceil: 2.00,
+      lo: "sub-therapeutic", hi: "accumulates → cardiotoxicity" },
+    { id: "clop", drug: "clopidogrel", sub: "PRODRUG — CYP2C19 activates it",
+      kind: "prodrug", other: 0.35, floor: 0.70, ceil: 1.30,
+      lo: "too little platelet inhibition", hi: "more bleeding" },
+    { id: "cod", drug: "codeine", sub: "PRODRUG → morphine, via CYP2D6",
+      kind: "prodrug", other: 0.03, floor: 0.40, ceil: 1.20,
+      lo: "no analgesia at all", hi: "morphine surge → respiratory depression" }
+  ];
+  cols.forEach(c => {
+    c.exp = LAD.map(r => {
+      const frac = c.other + (1 - c.other) * (r.as / AS_NM);   // enzyme-dependent share
+      return c.kind === "prodrug" ? frac : 1 / frac;
+    });
+    c.below = c.exp.filter(v => v < c.floor).length;
+    c.above = c.exp.filter(v => v > c.ceil).length;
+    c.slope = c.exp[c.exp.length - 1] - c.exp[0];              // UM minus PM: the direction
+    c.worstIdx = c.above > 0 ? c.exp.reduce((b, v, i) => v > c.exp[b] ? i : b, 0)
+                             : c.exp.reduce((b, v, i) => v < c.exp[b] ? i : b, 0);
+  });
+  return { cols, max: Math.max(...cols.flatMap(c => c.exp)) };
+})();
+
+const PGX_X = [186, 424, 662], PGX_W = 190, PGX_SCALE = 2.2;   // relative-exposure axis 0 → 2.2×
+const PGX_ROWY = i => 100 + i * 38;
+
+function drawPgxLadder(ctx, cv, { cols = 0, flags = 0, title } = {}) {
+  genFrame(ctx, title || "The metaboliser ladder — one gene, opposite dangers");
+
+  genText(ctx, "activity score = the two alleles' activity values, added (CPIC convention)", 18, 58, "rgba(215,223,234,.60)", 11);
+
+  /* ladder rungs down the left */
+  LAD.forEach((r, i) => {
+    const y = PGX_ROWY(i);
+    ctx.strokeStyle = "rgba(124,141,165,.18)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(18, y + 12); ctx.lineTo(882, y + 12); ctx.stroke();
+    genText(ctx, r.name + " (" + r.key + ")", 18, y + 2, F.txt, 12);
+    genText(ctx, "AS " + r.as.toFixed(1), 18, y + 17, "rgba(215,223,234,.55)", 10);
+  });
+
+  PGX.cols.forEach((c, ci) => {
+    const x0 = PGX_X[ci], k = gbClamp01(cols - ci);
+    genText(ctx, c.drug, x0, 74, ci === 0 ? GB_BLUE : F.post, 13);
+    genText(ctx, c.sub, x0, 88, "rgba(215,223,234,.55)", 10);
+    if (k <= 0) return;
+
+    /* therapeutic-window guides */
+    const px = v => Math.min(PGX_W, (v / PGX_SCALE) * PGX_W);
+    [[c.floor, F.prior], [c.ceil, F.wrong]].forEach(([v, col]) => {
+      const x = x0 + px(v);
+      ctx.strokeStyle = col; ctx.globalAlpha = .45; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]); ctx.beginPath();
+      ctx.moveTo(x, PGX_ROWY(0) - 12); ctx.lineTo(x, PGX_ROWY(4) + 16); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+    });
+
+    c.exp.forEach((v, i) => {
+      const y = PGX_ROWY(i), w = px(v) * k, over = v > PGX_SCALE;
+      const col = v > c.ceil ? F.wrong : (v < c.floor ? F.prior : F.ok);
+      ctx.fillStyle = col; ctx.globalAlpha = .32; ctx.fillRect(x0, y - 8, w, 16); ctx.globalAlpha = 1;
+      ctx.strokeStyle = col; ctx.lineWidth = 1.2; ctx.strokeRect(x0, y - 8, w, 16);
+      if (over && k > .95) genText(ctx, "»", x0 + PGX_W + 3, y + 5, col, 13);
+      if (k > .95) genText(ctx, v.toFixed(2) + "×", x0 + PGX_W + (over ? 14 : 4), y + 5, col, 11);
+    });
+
+    if (flags > ci) {
+      const i = c.worstIdx, y = PGX_ROWY(i);
+      const msg = c.exp[i] > c.ceil ? c.hi : c.lo;
+      genText(ctx, "▲ " + msg, x0, y + 27, F.wrong, 10);
+    }
+  });
+
+  genText(ctx, "dashed lines = the therapeutic window for that drug: left of the first is too little, right of the second is too much",
+          18, 320, "rgba(215,223,234,.60)", 11);
+  if (flags >= 3) {
+    genText(ctx, "Same ladder, opposite slopes: an ACTIVE drug's exposure falls as the enzyme speeds up; a PRODRUG's active metabolite rises.",
+            18, 342, F.txt, 12);
+    genText(ctx, "Phenoconversion: a genotypic normal metaboliser on a potent inhibitor behaves like a poor one — phenotype is genotype PLUS the current drug list.",
+            18, 362, "rgba(232,161,60,.85)", 11);
+  }
+}
+ANIMS.gen_pgx_ladder_static = (cv, ctx) => drawPgxLadder(ctx, cv, { cols: 3, flags: 3 });
+ANIMS.gen_pgx_ladder = async (cv, ctx) => {
+  const A = PGX.cols[0], B = PGX.cols[1], C = PGX.cols[2];
+  drawPgxLadder(ctx, cv, { cols: 0, flags: 0 });
+  await narrate("Pharmacogenomics — PGx — is the study of how inherited variation changes drug response. A laboratory reports your two alleles; their activity values add to an activity score, and that score places you on this ladder: poor, intermediate, normal, rapid, ultrarapid. Five rungs. Watch what the same five rungs do to three different drugs.");
+
+  await tween(1100, k => drawPgxLadder(ctx, cv, { cols: k, flags: 0 }));
+  await narrate("First an ACTIVE drug — nortriptyline, cleared by the enzyme CYP2D6, one of the cytochrome P450 family. The drug arrives already working, and the enzyme's only job is to remove it. So exposure is one over clearance, and it FALLS as you climb: " +
+    A.exp[0].toFixed(2) + " times normal at the poor end, down to " + A.exp[4].toFixed(2) + " at the ultrarapid end. " +
+    A.above + " rung is above the toxic ceiling and " + A.below + " is below the effective floor. Both ends fail, in opposite ways.");
+
+  await tween(1100, k => drawPgxLadder(ctx, cv, { cols: 1 + k, flags: 1 }));
+  await narrate("Now a PRODRUG. Clopidogrel arrives inert and CYP2C19 has to switch it on, so the bar points the other way: " +
+    B.exp[0].toFixed(2) + " times normal active metabolite at the poor end, rising to " + B.exp[4].toFixed(2) + " at the ultrarapid end. " +
+    B.below + " rungs — poor and intermediate — sit below the floor, which in this drug means too little platelet inhibition and more stent thrombosis after a coronary stent. That is why the guideline for those two rungs is to use a different antiplatelet drug, not a bigger dose.");
+
+  await tween(1100, k => drawPgxLadder(ctx, cv, { cols: 2 + k, flags: 2 }));
+  await narrate("Third: codeine, also a prodrug, converted to morphine by CYP2D6 — and here CYP2D6 is essentially the only route, so the bar swings much harder. The poor rung gets " +
+    C.exp[0].toFixed(2) + " times normal morphine — no pain relief at all. But " + C.above + " rungs now sit ABOVE the ceiling, topping out at " +
+    C.exp[4].toFixed(2) + " times, and the harm at that end is a morphine surge and respiratory depression. That is the basis of the boxed warning against codeine in children and the contraindication after tonsillectomy.");
+
+  await tween(700, k => drawPgxLadder(ctx, cv, { cols: 3, flags: 2 + k }));
+  await narrate("So hold two flips, not one. Across drug types the slope itself reverses — from the poor rung to the ultrarapid rung, nortriptyline exposure moves " +
+    A.slope.toFixed(2) + ", while clopidogrel moves plus " + B.slope.toFixed(2) + " and codeine plus " + C.slope.toFixed(2) + ". And among the two prodrugs the DANGEROUS end flips too: clopidogrel fails at the bottom of the ladder, codeine kills at the top.");
+  await narrate("One caveat before you trust any of this at the bedside. The assay reads DNA, not enzyme activity, so the phenotype is a prediction — and it is a prediction that a drug list can overturn. A genotypic normal metaboliser taking a potent CYP2D6 inhibitor such as paroxetine is functionally a poor metaboliser. That is phenoconversion. Genotype is fixed for life; phenotype changes every time the medication list does.");
+};
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   2) gen_pgx_safety  →  concept "pharmacogenomics-safety"
+   HLA-B*57:01 before abacavir: the pair where pre-treatment testing became the
+   standard of care. Two cohorts, drawn dot by dot; the reactions avoided are
+   COUNTED off the drawn populations.
+   ═════════════════════════════════════════════════════════════════════════════ */
+const HLA = (() => {
+  const N = 1000, COLS = 50, ROWS = 20;
+  const CARRIER_P = 0.055;      // HLA-B*57:01 carriage, European-ancestry order of magnitude
+  const REACT_P   = 0.48;       // share of exposed carriers with immunologically confirmed HSR
+  const r = gbRng(571057);
+  const carrier = [], reacts = [];
+  for (let i = 0; i < N; i++) {
+    const c = r() < CARRIER_P; carrier.push(c);
+    reacts.push(c && r() < REACT_P);
+  }
+  const nCar = carrier.filter(Boolean).length;
+  const nRx  = reacts.filter(Boolean).length;
+  return { N, COLS, ROWS, carrier, reacts, nCar, nRx,
+           carPct: 100 * nCar / N, nns: Math.round(N / Math.max(1, nRx)) };
+})();
+
+const HLA_PANEL = [{ x: 30, lab: "UNSCREENED — everyone starts abacavir" },
+                   { x: 470, lab: "SCREENED FIRST — carriers get a different drug" }];
+
+function drawHla(ctx, cv, { stage = 0, kCar = 0, kRx = 0, title } = {}) {
+  genFrame(ctx, title || "Test before the first dose — HLA-B*57:01 and abacavir");
+  const P = 7.6, R = 2.5, y0 = 96;
+
+  HLA_PANEL.forEach((pan, pi) => {
+    genText(ctx, pan.lab, pan.x, 76, pi === 0 ? F.wrong : F.ok, 12);
+    gbBox(ctx, pan.x - 8, y0 - 12, HLA.COLS * P + 12, HLA.ROWS * P + 14, "rgba(124,141,165,.22)");
+    for (let i = 0; i < HLA.N; i++) {
+      const x = pan.x + (i % HLA.COLS) * P + 2, y = y0 + Math.floor(i / HLA.COLS) * P;
+      const isCar = HLA.carrier[i];
+      const carShown = isCar && (i / HLA.N) < kCar;
+      if (!carShown) { gbDot(ctx, x, y, R, "rgba(124,141,165,.35)"); continue; }
+      if (pi === 1 && stage >= 3) {                       // screened → switched drug
+        gbDot(ctx, x, y, R, GB_BLUE); gbRing(ctx, x, y, R + 2.2, GB_BLUE, 1);
+      } else if (pi === 0 && HLA.reacts[i] && (i / HLA.N) < kRx) {
+        gbDot(ctx, x, y, R + 1.2, F.wrong); gbRing(ctx, x, y, R + 3, F.wrong, 1.2);
+      } else {
+        gbDot(ctx, x, y, R, F.post);
+      }
+    }
+  });
+
+  /* tallies, read off the arrays actually drawn */
+  const shownCar = HLA.carrier.filter((c, i) => c && i / HLA.N < kCar).length;
+  const shownRx  = HLA.reacts .filter((c, i) => c && i / HLA.N < kRx ).length;
+  genText(ctx, "carriers: " + shownCar + " / " + HLA.N + "   reactions: " + shownRx,
+          HLA_PANEL[0].x, 270, shownRx ? F.wrong : F.txt, 12);
+  genText(ctx, "carriers: " + shownCar + " / " + HLA.N + "   reactions: " + (stage >= 3 ? 0 : shownRx),
+          HLA_PANEL[1].x, 270, stage >= 3 ? F.ok : F.txt, 12);
+
+  if (stage >= 4) {
+    gbBox(ctx, 18, 286, 864, 40, "rgba(95,191,149,.45)", "rgba(95,191,149,.07)");
+    genText(ctx, "reactions avoided: " + HLA.nRx + " per " + HLA.N + " treated  ·  " + HLA.nns +
+                 " people screened to prevent one confirmed reaction  ·  carrier frequency here " + HLA.carPct.toFixed(1) + "%",
+            30, 311, F.ok, 13);
+  }
+  if (stage >= 5) {
+    genText(ctx, "Same shape, other pairs — test first, then dose or avoid:", 18, 346, F.txt, 12);
+    genText(ctx, "DPYD → 5-fluorouracil / capecitabine: halve the dose at activity score 1–1.5, avoid at 0   ·   TPMT and NUDT15 → thiopurines: start low or switch agent",
+            18, 364, "rgba(232,161,60,.85)", 11);
+  }
+}
+ANIMS.gen_pgx_safety_static = (cv, ctx) => drawHla(ctx, cv, { stage: 5, kCar: 1, kRx: 1 });
+ANIMS.gen_pgx_safety = async (cv, ctx) => {
+  drawHla(ctx, cv, { stage: 0, kCar: 0, kRx: 0 });
+  await narrate("Two matched cohorts of " + HLA.N + " patients each, about to start abacavir for HIV. On the left nobody is tested first. On the right everybody is. HLA — human leukocyte antigen — is the immune system's peptide-presenting machinery, and one particular type, HLA-B star fifty-seven colon oh-one, is the variable that matters here.");
+
+  await tween(1400, k => drawHla(ctx, cv, { stage: 1, kCar: k, kRx: 0 }));
+  await narrate("Light up the carriers. " + HLA.nCar + " of the " + HLA.N + " in each cohort carry the allele — " + HLA.carPct.toFixed(1) +
+    " percent, and identical in both arms because the cohorts are matched. Nothing about them is visible clinically. The only way to know is to look at the DNA.");
+
+  await tween(1600, k => drawHla(ctx, cv, { stage: 2, kCar: 1, kRx: k }));
+  await narrate("Now dose the untested arm. The mechanism is immunological, not metabolic: abacavir changes the shape of that specific HLA molecule's peptide-binding groove, so the immune system starts reading the patient's own peptides as foreign. " +
+    HLA.nRx + " of the " + HLA.nCar + " carriers develop an immunologically confirmed hypersensitivity reaction — potentially fatal. Every one of them was a carrier. No non-carrier reacts.");
+
+  drawHla(ctx, cv, { stage: 3, kCar: 1, kRx: 1 });
+  await narrate("Screen first and the picture empties out. Carriers are identified before the first dose and given a different drug. The prospective PREDICT-1 trial in 2008 did exactly this and drove immunologically confirmed hypersensitivity to zero — a negative predictive value of essentially one hundred percent. Testing is now in the label and is done universally.");
+
+  await tween(500, () => drawHla(ctx, cv, { stage: 4, kCar: 1, kRx: 1 }));
+  await narrate("Counted off these two pictures: " + HLA.nRx + " reactions avoided per " + HLA.N + " patients treated, which is " + HLA.nns +
+    " people screened to prevent one confirmed reaction. Three features made this pair uniquely easy to justify, and they are why most gene–drug pairs never get here: the outcome is severe and unambiguous, the allele is a near-perfect predictor rather than a modest risk factor, and an equally good alternative drug exists.");
+
+  await tween(500, () => drawHla(ctx, cv, { stage: 5, kCar: 1, kRx: 1 }));
+  await narrate("Two more pairs have the same shape — test first, then dose or avoid. DPYD encodes the enzyme that catabolises most of a dose of five-fluorouracil or capecitabine; missing it turns a standard dose into an overdose, so the starting dose is halved at reduced activity and the drug avoided at zero. TPMT and NUDT15 do the same job for the thiopurines. And NUDT15 carries the field's warning: it was only identified in 2014, and TPMT variants are rare in East Asian and Hispanic populations while NUDT15 variants are not. A panel built on European data returns a reassuring result for exactly the patients it under-protects. Read a normal result as no known variant found on this panel — not as normal enzyme function.");
+};
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   3) gen_two_hit  →  concept "cancer-genetics-germline"
+   Knudson's two-hit model, simulated. A sporadic retina needs TWO hits in the
+   same cell; a carrier's retina starts with one hit in EVERY cell and needs one.
+   Onset ages, penetrance and focus counts are all measured off the simulation.
+   ═════════════════════════════════════════════════════════════════════════════ */
+const TH = (() => {
+  const CELLS = 240, COLS = 20, ROWS = 12, MONTHS = 60;
+  /* per-cell, per-month probability of knocking out one RB1 copy. Chosen so the
+     carrier arm's median onset lands in the observed range for hereditary
+     retinoblastoma (a bit over a year); everything else is then a consequence.  */
+  const P = 0.000193;
+  const r = gbRng(19710401);                 // Knudson 1971
+  const geom = () => Math.ceil(Math.log(Math.max(1e-12, r())) / Math.log(1 - P));
+
+  /* the two retinas actually DRAWN — full per-cell simulation */
+  const carrierCell = [], sporadicCell = [];
+  for (let i = 0; i < CELLS; i++) carrierCell.push({ t2: geom() });              // hit 1 is germline
+  for (let i = 0; i < CELLS; i++) { const t1 = geom(); sporadicCell.push({ t1, t2: t1 + geom() }); }
+
+  /* population statistics — exact CDF inversion of the same model, so the batch
+     and the drawn retinas obey identical arithmetic                              */
+  const cellCar = t => 1 - Math.pow(1 - P, t);                                   // one hit needed
+  const cellSpo = t => 1 - Math.pow(1 - P, t) - t * P * Math.pow(1 - P, t - 1);  // two hits needed
+  const retina  = (f, t) => 1 - Math.pow(1 - f(t), CELLS);
+  const sample  = f => { const u = r(); for (let t = 1; t <= MONTHS; t++) if (retina(f, t) >= u) return t; return 0; };
+
+  const BATCH = 20000, car = [], spo = [];
+  for (let i = 0; i < BATCH; i++) { const t = sample(cellCar); if (t) car.push(t); }
+  for (let i = 0; i < BATCH; i++) { const t = sample(cellSpo); if (t) spo.push(t); }
+  const med = a => { if (!a.length) return 0; const s = a.slice().sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
+
+  const carMed = med(car), spoMed = med(spo);
+  const carPen = 100 * car.length / BATCH, spoPen = 100 * spo.length / BATCH;
+
+  /* how many independent tumour foci a carrier's retina accumulates by MONTHS  */
+  const drawnCarFoci = carrierCell.filter(c => c.t2 <= MONTHS).length;
+  const drawnSpoFoci = sporadicCell.filter(c => c.t2 <= MONTHS).length;
+  let fociTot = 0, fociN = 0;
+  for (let i = 0; i < 400; i++) {
+    let k = 0; for (let j = 0; j < CELLS; j++) if (geom() <= MONTHS) k++;
+    if (k) { fociTot += k; fociN++; }
+  }
+  const carFociMean = fociN ? fociTot / fociN : 0;
+
+  return { CELLS, COLS, ROWS, MONTHS, P, carrierCell, sporadicCell,
+           carMed, spoMed, carPen, spoPen, gapMonths: spoMed - carMed,
+           ratio: spoMed / carMed, carFociMean, drawnCarFoci, drawnSpoFoci,
+           fold: carPen / spoPen };
+})();
+
+const TH_PAN = [{ x: 40, carrier: false, lab: "SPORADIC — both RB1 copies intact at birth", sub: "each cell needs TWO independent hits" },
+                { x: 500, carrier: true, lab: "INHERITED — one RB1 copy already hit, in every cell", sub: "each cell needs ONE more hit" }];
+
+function drawTwoHit(ctx, cv, { month = 0, stats = 0, title } = {}) {
+  genFrame(ctx, title || "Knudson's two hits — why an inherited cancer arrives early");
+  const P = 15, y0 = 96, r = 4.6;
+  const m = Math.round(month);
+
+  TH_PAN.forEach(pan => {
+    genText(ctx, pan.lab, pan.x, 62, pan.carrier ? F.post : F.prior, 12);
+    genText(ctx, pan.sub, pan.x, 78, "rgba(215,223,234,.55)", 10);
+    gbBox(ctx, pan.x - 8, y0 - 10, TH.COLS * P + 8, TH.ROWS * P + 8, "rgba(124,141,165,.22)");
+    let one = 0, two = 0;
+    for (let i = 0; i < TH.CELLS; i++) {
+      const x = pan.x + (i % TH.COLS) * P, y = y0 + Math.floor(i / TH.COLS) * P;
+      const c = pan.carrier ? TH.carrierCell[i] : TH.sporadicCell[i];
+      const hits = pan.carrier ? 1 + (m >= c.t2 ? 1 : 0)
+                               : (m >= c.t1 ? 1 : 0) + (m >= c.t2 ? 1 : 0);
+      if (hits >= 2) { two++; gbDot(ctx, x, y, r + 1.6, F.wrong); gbRing(ctx, x, y, r + 4, F.wrong, 1.3); }
+      else if (hits === 1) { one++; gbRing(ctx, x, y, r, F.post, 1.6); }
+      else gbDot(ctx, x, y, r - 1.4, "rgba(124,141,165,.35)");
+    }
+    genText(ctx, "one hit: " + one + "    two hits (tumour): " + two, pan.x, y0 + TH.ROWS * P + 24,
+            two ? F.wrong : F.txt, 12);
+  });
+
+  /* age axis */
+  const ax0 = 60, ax1 = 840, ay = 322;
+  ctx.strokeStyle = "rgba(124,141,165,.45)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(ax0, ay); ctx.lineTo(ax1, ay); ctx.stroke();
+  for (let t = 0; t <= TH.MONTHS; t += 12) {
+    const x = ax0 + (t / TH.MONTHS) * (ax1 - ax0);
+    ctx.beginPath(); ctx.moveTo(x, ay - 4); ctx.lineTo(x, ay + 4); ctx.stroke();
+    genText(ctx, t + "", x, ay + 18, "rgba(215,223,234,.6)", 10, "center");
+  }
+  genText(ctx, "age, months", ax1 + 6, ay + 4, "rgba(215,223,234,.6)", 10);
+  const mx = ax0 + (m / TH.MONTHS) * (ax1 - ax0);
+  ctx.strokeStyle = F.post; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(mx, ay - 12); ctx.lineTo(mx, ay + 8); ctx.stroke();
+  genText(ctx, "month " + m, mx, ay - 18, F.post, 11, "center");
+
+  if (stats > 0) {
+    gbBox(ctx, 18, 232, 864, 74, "rgba(95,191,149,.40)", "rgba(13,17,23,.86)");
+    genText(ctx, "Over 20,000 simulated retinas per arm:", 30, 252, F.txt, 12);
+    genText(ctx, "inherited — median onset " + TH.carMed + " months, tumour by 5 years in " + TH.carPen.toFixed(1) +
+                 "% of carriers, mean " + TH.carFociMean.toFixed(1) + " independent foci (so: multifocal, often bilateral)",
+            30, 272, F.post, 12);
+    genText(ctx, "sporadic  — median onset " + TH.spoMed + " months (" + TH.gapMonths + " months later, " + TH.ratio.toFixed(1) +
+                 "× the age), tumour in only " + TH.spoPen.toFixed(2) + "% — and typically a single focus, one eye",
+            30, 292, F.prior, 12);
+  }
+}
+ANIMS.gen_two_hit_static = (cv, ctx) => drawTwoHit(ctx, cv, { month: 0, stats: 0 });
+ANIMS.gen_two_hit = async (cv, ctx) => {
+  drawTwoHit(ctx, cv, { month: 0, stats: 0 });
+  await narrate("Two retinas at birth, " + TH.CELLS + " cells drawn in each as a stand-in for the real population of retinoblasts. RB1 is a tumour suppressor — a brake — and a brake only comes off when BOTH copies are knocked out. On the left, a child with two intact copies. On the right, a child who inherited a faulty copy, so every single cell already carries the first hit. That is the amber ring.");
+
+  await tween(2600, k => drawTwoHit(ctx, cv, { month: gbLerp(0, 20, k) }));
+  await narrate("Run the clock. Hits arrive at random, at the same rate in both children. On the right, one hit is all that is missing, and across " + TH.CELLS +
+    " cells that is nearly a certainty — the first tumour appears at month " + TH.carrierCell.reduce((b, c) => Math.min(b, c.t2), 999) +
+    " in this retina. On the left, a few cells pick up a single hit, but a single hit does nothing. The brake is still on.");
+
+  await tween(2400, k => drawTwoHit(ctx, cv, { month: gbLerp(20, 42, k) }));
+  await narrate("Keep going. The carrier is now accumulating SEPARATE tumours — different cells, independent events — which is why hereditary retinoblastoma is characteristically multifocal and bilateral. The sporadic retina still has nothing, because it needs two independent hits to land in the SAME cell, and that is rare.");
+
+  await tween(2000, k => drawTwoHit(ctx, cv, { month: gbLerp(42, TH.MONTHS, k) }));
+  await tween(600, k => drawTwoHit(ctx, cv, { month: TH.MONTHS, stats: k }));
+  await narrate("Twenty thousand simulated retinas per arm give the numbers Knudson reasoned his way to in 1971, from age-of-onset curves alone, with no sequencer. Median onset " +
+    TH.carMed + " months in carriers against " + TH.spoMed + " months sporadically — " + TH.gapMonths + " months later, " + TH.ratio.toFixed(1) +
+    " times the age. Tumours by five years in " + TH.carPen.toFixed(0) + " percent of carriers against " + TH.spoPen.toFixed(1) +
+    " percent of non-carriers. And a mean of " + TH.carFociMean.toFixed(1) + " foci per affected carrier against essentially one in the sporadic case. RB1 was cloned years later and proved him right.");
+
+  await narrate("Two honest corrections. The real gap is smaller than this model's — closer to one year versus two — because the second hit in a cell that has already lost one copy is usually loss of heterozygosity, a structural or methylation event far likelier than the first point mutation, which a single-rate model cannot capture. It is also why a panel that only looks for point mutations can miss the second event entirely. And the two-hit rule applies to tumour SUPPRESSORS — RB1, TP53, BRCA1 and BRCA2, the mismatch repair genes. Oncogenes such as KRAS, BRAF and EGFR are gain-of-function and act dominantly: for those, one hit is enough.");
+
+  await narrate("The clinical payoff is the question this test answers. A germline test — done on blood or saliva, present in every cell from conception — asks who ELSE in this family is at risk, and what surveillance or risk-reducing surgery this person needs. That is a different question from the one a tumour test answers, and ordering the wrong one gives you a confident answer to a question nobody asked.");
+};
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   4) gen_somatic  →  concept "cancer-genetics-somatic"
+   Tumour sequencing to pick a drug — then the three honest limits: the subclone
+   the biopsy missed, the resistant clone that expands under treatment, and
+   clonal haematopoiesis masquerading as a tumour finding in plasma.
+   ═════════════════════════════════════════════════════════════════════════════ */
+const SOM = (() => {
+  /* --- the tumour: a disc of cells, three spatially-structured clones --- */
+  const cells = [], r = gbRng(600724);
+  const CX = 232, CY = 194, RAD = 116;
+  for (let gy = -8; gy <= 8; gy++) for (let gx = -9; gx <= 9; gx++) {
+    const x = CX + gx * 12.6 + (gy % 2 ? 6.3 : 0), y = CY + gy * 12.6;
+    if ((x - CX) ** 2 + (y - CY) ** 2 > RAD * RAD) continue;
+    cells.push({ x, y, j: r() * 2.4 - 1.2 });
+  }
+  const seeds = [{ id: "A", x: CX, y: CY, w: 1.00 },        // dominant: EGFR exon 19 deletion
+                 { id: "R", x: CX - 78, y: CY + 70, w: 2.05 }, // resistant: + MET amplification
+                 { id: "S", x: CX + 74, y: CY - 66, w: 1.95 }];// a second, sensitive subclone
+  cells.forEach(c => {
+    let best = seeds[0], bd = 1e9;
+    seeds.forEach(s => { const d = Math.hypot(c.x - s.x, c.y - s.y) * s.w + c.j * 6; if (d < bd) { bd = d; best = s; } });
+    c.clone = best.id;
+  });
+  const n = cells.length;
+  const cnt = id => cells.filter(c => c.clone === id).length;
+  const nA = cnt("A"), nR = cnt("R"), nS = cnt("S");
+
+  /* --- the biopsy: one needle pass, one small region --- */
+  const BX = 288, BY = 226, BR = 33;
+  const grabbed = cells.filter(c => (c.x - BX) ** 2 + (c.y - BY) ** 2 <= BR * BR);
+  const gA = grabbed.filter(c => c.clone === "A").length;
+  const gR = grabbed.filter(c => c.clone === "R").length;
+  const gS = grabbed.filter(c => c.clone === "S").length;
+
+  /* --- burden under a matched drug: sensitive clones die, the resistant one grows --- */
+  const resFrac = nR / n, senFrac = 1 - resFrac, burden = [];
+  for (let t = 0; t <= 24; t++) burden.push(senFrac * Math.exp(-0.55 * t) + resFrac * Math.exp(0.22 * t));
+  let nadirI = 0; burden.forEach((v, i) => { if (v < burden[nadirI]) nadirI = i; });
+  let backI = burden.length - 1; for (let i = nadirI; i < burden.length; i++) if (burden[i] >= 1) { backI = i; break; }
+
+  /* --- plasma: cell-free DNA fragments at two loci --- */
+  const NFRAG = 400, TUM = 5, CHIP = 14;
+  const frag = [];
+  for (let i = 0; i < NFRAG; i++) frag.push(i < TUM ? "tumour" : (i < TUM + CHIP ? "chip" : "normal"));
+  const rr = gbRng(9182);                                  // shuffle so they are not clustered
+  for (let i = frag.length - 1; i > 0; i--) { const j = Math.floor(rr() * (i + 1)); const t = frag[i]; frag[i] = frag[j]; frag[j] = t; }
+  const nTum = frag.filter(f => f === "tumour").length, nChip = frag.filter(f => f === "chip").length;
+
+  return { cells, n, nA, nR, nS, CX, CY, BX, BY, BR, grabbed, gA, gR, gS,
+           pctA: 100 * nA / n, pctR: 100 * nR / n, pctS: 100 * nS / n,
+           burden, nadirI, nadirPct: 100 * burden[nadirI], backI,
+           frag, NFRAG, nTum, nChip, vafTum: 100 * nTum / NFRAG, vafChip: 100 * nChip / NFRAG };
+})();
+
+const SOM_COL = { A: GB_BLUE, R: F.wrong, S: GB_VIO };
+const SOM_DRUGS = [["EGFR exon 19 deletion / L858R", "osimertinib"],
+                   ["ALK rearrangement", "alectinib · lorlatinib"],
+                   ["BRAF V600E", "dabrafenib + trametinib"]];
+
+function drawSomTumour(ctx, cv, { clones = 0, needle = 0, report = 0, treat = 0, title } = {}) {
+  genFrame(ctx, title || "A tumour test asks: what drug might work?");
+  SOM.cells.forEach(c => {
+    const isRes = c.clone === "R";
+    let a = 1, rad = 5;
+    if (treat > 0 && !isRes) a = 1 - treat;                     // sensitive clones die away
+    if (treat > 0 && isRes) rad = 5 + 3.4 * treat;              // the resistant clone expands
+    if (a <= 0.03) return;
+    gbDot(ctx, c.x, c.y, rad, clones > 0 ? SOM_COL[c.clone] : "rgba(124,141,165,.45)", a * (clones > 0 ? .85 : .6));
+  });
+  if (clones > 0 && treat < 0.5) {
+    genText(ctx, "clone A — EGFR exon 19 del  " + SOM.nA + " cells (" + SOM.pctA.toFixed(0) + "%)", 30, 322, SOM_COL.A, 11);
+    genText(ctx, "subclone S — sensitive  " + SOM.nS + " (" + SOM.pctS.toFixed(0) + "%)", 30, 340, SOM_COL.S, 11);
+    genText(ctx, "subclone R — + MET amplification, RESISTANT  " + SOM.nR + " (" + SOM.pctR.toFixed(0) + "%)", 30, 358, SOM_COL.R, 11);
+  }
+  if (needle > 0) {
+    const ny = gbLerp(-70, 0, needle);
+    ctx.strokeStyle = F.txt; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(SOM.BX + 78, SOM.BY - 96 + ny); ctx.lineTo(SOM.BX, SOM.BY + ny); ctx.stroke();
+    gbRing(ctx, SOM.BX, SOM.BY + ny, SOM.BR, F.txt, 1.6);
+    if (needle > .98) genText(ctx, "one needle pass", SOM.BX + 84, SOM.BY - 100, F.txt, 11);
+  }
+  if (report > 0) {
+    gbBox(ctx, 442, 62, 440, 96, "rgba(95,191,149,.45)", "rgba(13,17,23,.6)");
+    genText(ctx, "THE REPORT", 456, 84, F.ok, 12);
+    genText(ctx, "EGFR exon 19 deletion — " + SOM.gA + " of " + SOM.grabbed.length + " sampled cells (" +
+                 (100 * SOM.gA / SOM.grabbed.length).toFixed(0) + "%)", 456, 106, F.txt, 12);
+    genText(ctx, "MET amplification — " + SOM.gR + " of " + SOM.grabbed.length + " sampled cells", 456, 126,
+            SOM.gR ? F.wrong : "rgba(215,223,234,.55)", 12);
+    genText(ctx, "…but " + SOM.nR + " R cells (" + SOM.pctR.toFixed(0) + "% of the tumour) sit outside the needle.",
+            456, 146, F.wrong, 11);
+  }
+  if (report > 1) {
+    genText(ctx, "MATCHED THERAPY", 456, 186, F.post, 12);
+    SOM_DRUGS.forEach(([mut, drug], i) => {
+      const y = 208 + i * 26, on = i === 0;
+      if (on) { ctx.fillStyle = "rgba(95,191,149,.13)"; ctx.fillRect(448, y - 15, 428, 22); }
+      genText(ctx, mut, 456, y, on ? F.ok : "rgba(215,223,234,.5)", 11);
+      genText(ctx, "→ " + drug, 700, y, on ? F.ok : "rgba(215,223,234,.5)", 11);
+    });
+    genText(ctx, "Lineage still decides: the SAME BRAF V600E in colorectal cancer fails alone —", 456, 296, "rgba(215,223,234,.7)", 10);
+    genText(ctx, "blocking BRAF releases EGFR feedback, so an anti-EGFR antibody must be added.", 456, 312, "rgba(215,223,234,.7)", 10);
+  }
+  if (treat > 0) {
+    const bx = 470, bw = 396, by = 96, bh = 150;
+    gbBox(ctx, bx, by, bw, bh, "rgba(124,141,165,.30)");
+    genText(ctx, "tumour burden vs baseline", bx, by - 8, F.txt, 12);
+    const px = i => bx + (i / 24) * bw, py = v => by + bh - gbClamp01(v / 1.35) * bh;
+    ctx.strokeStyle = "rgba(124,141,165,.35)"; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(bx, py(1)); ctx.lineTo(bx + bw, py(1)); ctx.stroke(); ctx.setLineDash([]);
+    genText(ctx, "baseline", bx + bw - 4, py(1) - 5, "rgba(215,223,234,.5)", 10, "right");
+    ctx.strokeStyle = F.ok; ctx.lineWidth = 2.2; ctx.beginPath();
+    const upto = Math.max(1, Math.round(treat * 24));
+    SOM.burden.slice(0, upto + 1).forEach((v, i) => i ? ctx.lineTo(px(i), py(v)) : ctx.moveTo(px(i), py(v)));
+    ctx.stroke();
+    if (upto >= SOM.nadirI) {
+      gbDot(ctx, px(SOM.nadirI), py(SOM.burden[SOM.nadirI]), 4, F.post);
+      genText(ctx, "nadir " + SOM.nadirPct.toFixed(0) + "% at month " + SOM.nadirI, px(SOM.nadirI) + 8, py(SOM.burden[SOM.nadirI]) + 4, F.post, 11);
+    }
+    if (upto >= SOM.backI) genText(ctx, "back to baseline by month " + SOM.backI, px(SOM.backI) - 6, py(1) + 18, F.wrong, 11, "right");
+    genText(ctx, "months on osimertinib", bx, by + bh + 18, "rgba(215,223,234,.55)", 10);
+    genText(ctx, "the " + SOM.pctR.toFixed(0) + "% resistant subclone present at diagnosis is now " +
+                 (treat > .95 ? "100" : Math.round(100 * SOM.nR / (SOM.nR + (SOM.n - SOM.nR) * (1 - treat))).toString()) + "% of what is left",
+            bx, by + bh + 38, F.wrong, 11);
+  }
+}
+
+function drawSomPlasma(ctx, cv, { stage = 0, title } = {}) {
+  genFrame(ctx, title || "Liquid biopsy — and the mutation that was never in the tumour");
+  const P = 15, x0 = 46, y0 = 92, COLS = 25;
+  genText(ctx, "400 cell-free DNA fragments drawn from plasma", x0, 76, F.txt, 12);
+  SOM.frag.forEach((f, i) => {
+    const x = x0 + (i % COLS) * P, y = y0 + Math.floor(i / COLS) * P;
+    if (f === "normal" || stage < 1) { gbDot(ctx, x, y, 3, "rgba(124,141,165,.32)"); return; }
+    if (f === "tumour") { gbDot(ctx, x, y, 4.4, F.ok); gbRing(ctx, x, y, 6.6, F.ok, 1.2); }
+    else { gbDot(ctx, x, y, 4.4, F.wrong); if (stage >= 3) gbRing(ctx, x, y, 6.6, GB_CYA, 1.6); }
+  });
+  genText(ctx, "grey = wild-type   green = shed by the TUMOUR   red = shed by expanded WHITE-CELL clones", x0, y0 + 16 * P + 8, "rgba(215,223,234,.6)", 10);
+
+  const rx = 470;
+  gbBox(ctx, rx, 86, 412, 118, "rgba(124,141,165,.30)", "rgba(13,17,23,.5)");
+  genText(ctx, "THE PLASMA REPORT", rx + 14, 108, F.txt, 12);
+  if (stage >= 2) {
+    genText(ctx, "TP53 p.R273H", rx + 14, 134, F.wrong, 12);
+    genText(ctx, "allele fraction " + SOM.vafChip.toFixed(2) + "%   (" + SOM.nChip + "/" + SOM.NFRAG + ")", rx + 190, 134, F.wrong, 12);
+    genText(ctx, "EGFR exon 19 deletion", rx + 14, 160, F.ok, 12);
+    genText(ctx, "allele fraction " + SOM.vafTum.toFixed(2) + "%   (" + SOM.nTum + "/" + SOM.NFRAG + ")", rx + 190, 160, F.ok, 12);
+    genText(ctx, "the artefact is the LOUDER signal — " + (SOM.vafChip / SOM.vafTum).toFixed(1) + "× the real one",
+            rx + 14, 186, F.post, 11);
+  }
+  if (stage >= 3) {
+    gbBox(ctx, rx, 218, 412, 92, "rgba(111,208,200,.45)", "rgba(111,208,200,.07)");
+    genText(ctx, "SEQUENCE MATCHED WHITE CELLS AND SUBTRACT", rx + 14, 240, GB_CYA, 12);
+    genText(ctx, "TP53 present in blood too → clonal haematopoiesis, not tumour", rx + 14, 262, GB_CYA, 11);
+    genText(ctx, "EGFR absent from blood → genuinely tumour-derived", rx + 14, 282, F.ok, 11);
+    genText(ctx, "A plasma-only assay with no matched normal cannot make this call.", rx + 14, 302, "rgba(215,223,234,.7)", 10);
+  }
+  if (stage >= 4) genText(ctx, "And a NEGATIVE plasma result never rules the mutation out — shedding is low in early-stage, indolent and intracranial disease. A negative must reflex to tissue.",
+                          x0, 366, F.post, 11);
+}
+ANIMS.gen_somatic_static = (cv, ctx) => drawSomTumour(ctx, cv, { clones: 1, needle: 1, report: 2 });
+ANIMS.gen_somatic = async (cv, ctx) => {
+  drawSomTumour(ctx, cv, { clones: 0 });
+  await narrate("A somatic mutation is one a cell acquired during life. It is in the tumour and nowhere else, it is not heritable, and you find it by sequencing the tumour. So the tumour test asks a completely different question from a germline test: not who else in the family is at risk, but what drug might work against this cancer right now. Here is a lung adenocarcinoma, " + SOM.n + " cells drawn.");
+
+  await tween(1100, k => drawSomTumour(ctx, cv, { clones: k }));
+  await narrate("Sequence it properly and it is not one thing. " + SOM.nA + " cells — " + SOM.pctA.toFixed(0) +
+    " percent — carry an EGFR exon 19 deletion. But there are two subclones: " + SOM.nS + " cells of a second sensitive clone, and " +
+    SOM.nR + " cells, " + SOM.pctR.toFixed(0) + " percent of the tumour, that carry the EGFR deletion PLUS a MET amplification. Those last ones will not care about the drug you are about to choose.");
+
+  await tween(900, k => drawSomTumour(ctx, cv, { clones: 1, needle: k }));
+  await tween(500, k => drawSomTumour(ctx, cv, { clones: 1, needle: 1, report: k }));
+  await narrate("Now take the biopsy that actually happens: one needle, one pass, one region. It captures " + SOM.grabbed.length +
+    " cells, of which " + SOM.gA + " are clone A and " + SOM.gR +
+    " are resistant. The report comes back clean — EGFR exon 19 deletion, one hundred percent of what was sampled. The report is not wrong. It is just answering for the part of the tumour the needle happened to touch.");
+
+  drawSomTumour(ctx, cv, { clones: 1, needle: 1, report: 2 });
+  await narrate("A matched drug follows: EGFR exon 19 deletion or L858R goes to osimertinib, an ALK rearrangement goes to alectinib, BRAF V600E goes to dabrafenib plus trametinib. But a biomarker is not a promise. The same BRAF V600E in colorectal cancer underperforms with a BRAF inhibitor alone, because blocking BRAF there releases a feedback loop that reactivates EGFR signalling upstream — so the effective regimen adds an anti-EGFR antibody. Melanoma cells express far less EGFR and have no such escape route. The lineage still decides.");
+
+  await tween(2600, k => drawSomTumour(ctx, cv, { clones: 1, treat: k, title: "Under treatment — the subclone that was already there" }));
+  await narrate("Start the drug and watch. Burden falls to " + SOM.nadirPct.toFixed(0) + " percent of baseline by month " + SOM.nadirI +
+    " — a real response. Then the " + SOM.pctR.toFixed(0) + " percent that never depended on EGFR keeps growing, and by month " + SOM.backI +
+    " the tumour is back to baseline and is now essentially all resistant clone. Nothing new was created by the drug. The drug applied a selection pressure to a population that already contained the winner.");
+
+  drawSomPlasma(ctx, cv, { stage: 1 });
+  await narrate("Third limit, and the one that catches people. Instead of another biopsy, draw blood. Circulating tumour DNA — ctDNA — is the tumour-derived slice of the cell-free DNA floating in plasma, often well under one percent of it. Four hundred fragments drawn here from two loci.");
+
+  drawSomPlasma(ctx, cv, { stage: 2 });
+  await narrate("The report returns two calls. A TP53 mutation at " + SOM.vafChip.toFixed(2) + " percent allele fraction, and the EGFR deletion at " +
+    SOM.vafTum.toFixed(2) + " percent. The TP53 call is " + (SOM.vafChip / SOM.vafTum).toFixed(1) +
+    " times louder. It looks like the more confident finding. It is not in the tumour at all.");
+
+  drawSomPlasma(ctx, cv, { stage: 3 });
+  await narrate("With age, individual blood stem cell clones acquire mutations and expand — DNMT3A, TET2, ASXL1, PPM1D and TP53 most often — a state called clonal haematopoiesis of indeterminate potential, or CHIP, present in more than one person in ten past the age of seventy. Those white-cell clones shed DNA into the very plasma you are sequencing, and it arrives looking exactly like a tumour mutation. The fix is mechanical, not clever: sequence matched white blood cells in parallel and subtract anything present in both.");
+
+  drawSomPlasma(ctx, cv, { stage: 4 });
+  await narrate("Three suspicions should fire before any confirmatory test comes back: the patient is older, the allele fraction is low and inconsistent with the estimated tumour fraction, and the gene is one of the recurrent CHIP genes — PPM1D and TP53 especially. And one operational rule on top: a negative plasma result does not rule the mutation out. Specificity is good, so a positive is usually actionable; a negative is uninformative rather than reassuring, and must reflex to tissue.");
+};
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   5) gen_crispr  →  concept "crispr-mechanism"
+   Guide finds its match, the PAM licenses the cut, Cas9 breaks both strands —
+   and then the CELL decides: NHEJ (indels, knockout) or HDR (precise, S/G2).
+   Then the point of base and prime editing: rewrite letters with NO break.
+   ═════════════════════════════════════════════════════════════════════════════ */
+const CR = (() => {
+  const SPACER = "GTCACCTTGATCACTATACC";            // 20-nt protospacer, contains no GG
+  const PAM    = "AGG";                             // the licensing 5'-NGG-3'
+  const FLANK  = "CTCGGCATCAT";                     // carries one decoy NGG
+  const SEQ = SPACER + PAM + FLANK;
+  const COMP = { A: "T", T: "A", G: "C", C: "G" };
+  const comp = SEQ.split("").map(b => COMP[b]).join("");
+
+  const pams = [];                                  // every NGG in the drawn sequence
+  for (let i = 0; i + 2 < SEQ.length; i++) if (SEQ[i + 1] === "G" && SEQ[i + 2] === "G") pams.push(i);
+  const pamReal = SPACER.length;                    // the one adjacent to the protospacer
+  const pamDecoy = pams.find(p => p !== pamReal);
+  const cutIdx = pamReal - 3;                       // blunt DSB ~3 bp upstream of the PAM
+
+  /* what NHEJ versus a clean in-frame deletion does to the reading frame */
+  const orfLen = Math.floor(SEQ.length / 3) * 3;
+  const codons = s => { const o = []; for (let i = 0; i + 3 <= s.length; i += 3) o.push(s.slice(i, i + 3)); return o; };
+  const origC = codons(SEQ.slice(0, orfLen));
+  const fsC   = codons(SEQ.slice(0, cutIdx) + SEQ.slice(cutIdx + 1, orfLen));       // 1-nt deletion
+  const ifC   = codons(SEQ.slice(0, cutIdx - 2) + SEQ.slice(cutIdx + 1, orfLen));   // 3-nt deletion
+  const suffix = (a, b) => { let n = 0; while (n < a.length && n < b.length && a[a.length - 1 - n] === b[b.length - 1 - n]) n++; return n; };
+  const prefix = (a, b) => { let n = 0; while (n < a.length && n < b.length && a[n] === b[n]) n++; return n; };
+  const fsPre = prefix(origC, fsC), fsKeep = suffix(origC, fsC);
+  const ifPre = prefix(origC, ifC), ifKeep = suffix(origC, ifC);
+  const fsNovel = fsC.length - fsPre - fsKeep;
+
+  /* base-editing activity window: protospacer positions 4–8, PAM-distal end = 1 */
+  const W0 = 3, W1 = 7;                                        // 0-indexed, inclusive
+  const win = SEQ.slice(W0, W1 + 1);
+  const winC = win.split("").filter(b => b === "C").length;
+
+  return { SEQ, comp, SPACER, PAM, FLANK, pams, pamReal, pamDecoy, cutIdx,
+           guideLen: SPACER.length, seqLen: SEQ.length, orfCodons: origC.length,
+           fsCodons: fsC.length, fsPre, fsKeep, fsNovel,
+           ifCodons: ifC.length, ifKeep, W0, W1, win, winC,
+           edited: SEQ.split("").map((b, i) => (i >= W0 && i <= W1 && b === "C") ? "T" : b).join("") };
+})();
+
+const CR_X0 = 78, CR_DX = 22, CR_YT = 122, CR_YB = 160;
+function crLetterX(i) { return CR_X0 + i * CR_DX; }
+
+function drawCrispr(ctx, cv, { stage = 0, scan = 0, cut = 0, title } = {}) {
+  genFrame(ctx, title || "CRISPR — the cut is the easy part");
+  const gap = cut * 13, showEdit = stage >= 6;
+  const src = showEdit ? CR.edited : CR.SEQ;
+
+  /* PAM interrogation highlights */
+  if (stage >= 1) CR.pams.forEach(p => {
+    const real = p === CR.pamReal, live = stage >= 2 ? real : (scan * CR.SEQ.length >= p);
+    ctx.fillStyle = real ? "rgba(95,191,149,.18)" : "rgba(212,106,98,.14)";
+    if (live || stage < 2) ctx.fillRect(crLetterX(p) - 10, CR_YT - 18, CR_DX * 3, (CR_YB - CR_YT) + 30);
+    if (live) genText(ctx, real ? "PAM ✓" : "PAM, but no guide match", crLetterX(p) - 10, CR_YT - 24,
+                      real ? F.ok : F.wrong, 10);
+  });
+
+  /* the duplex */
+  for (let i = 0; i < src.length; i++) {
+    const shift = (cut > 0 && i >= CR.cutIdx) ? gap : (cut > 0 ? -gap : 0);
+    const x = crLetterX(i) + shift;
+    const inWin = stage >= 6 && i >= CR.W0 && i <= CR.W1;
+    const changed = showEdit && src[i] !== CR.SEQ[i];
+    ctx.strokeStyle = "rgba(124,141,165,.35)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, CR_YT + 6); ctx.lineTo(x, CR_YB - 10); ctx.stroke();
+    genText(ctx, src[i], x, CR_YT, changed ? F.ok : (inWin ? F.post : F.prior), 13, "center");
+    genText(ctx, CR.comp[i], x, CR_YB + 4, "rgba(124,141,165,.5)", 13, "center");
+  }
+  genText(ctx, "5′", 44, CR_YT + 2, "rgba(215,223,234,.55)", 11);
+  genText(ctx, "3′", 44, CR_YB + 4, "rgba(215,223,234,.55)", 11);
+
+  /* the guide */
+  if (stage >= 1 && stage < 5) {
+    const gx = crLetterX(0) - 10, gw = CR.guideLen * CR_DX;
+    ctx.strokeStyle = F.post; ctx.lineWidth = 1.6; ctx.strokeRect(gx, 84, gw, 18);
+    genText(ctx, CR.guideLen + "-nt guide RNA spacer — base-pairs with the target strand", gx + 6, 98, F.post, 11);
+  }
+  if (stage === 1) genText(ctx, "Cas9 collides with DNA and interrogates PAM sites FIRST — only then does it unwind and test the guide.", 18, 62, F.txt, 12);
+  if (stage === 0) genText(ctx, "5′-NGG-3′ is the PAM — protospacer adjacent motif. No PAM, no cut.", 18, 62, F.txt, 12);
+
+  /* the double-strand break */
+  if (cut > 0) {
+    const x = crLetterX(CR.cutIdx) - CR_DX / 2;
+    ctx.strokeStyle = F.wrong; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x - gap, CR_YT - 14); ctx.lineTo(x - gap, CR_YB + 14);
+    ctx.moveTo(x + gap, CR_YT - 14); ctx.lineTo(x + gap, CR_YB + 14); ctx.stroke();
+    if (cut > .6) genText(ctx, "blunt DOUBLE-STRAND BREAK, 3 bp upstream of the PAM (between base " + CR.cutIdx + " and " + (CR.cutIdx + 1) + ")",
+                          18, 196, F.wrong, 12);
+  }
+
+  /* outcome boxes — the CELL decides */
+  if (stage >= 3) {
+    gbBox(ctx, 40, 214, 396, 126, "rgba(232,161,60,.45)", "rgba(232,161,60,.05)");
+    genText(ctx, "NHEJ — non-homologous end joining", 54, 236, F.post, 12);
+    genText(ctx, "active all cycle · rejoins sloppily · leaves indels", 54, 256, "rgba(215,223,234,.7)", 11);
+    genText(ctx, "delete 1 base → frame shifts: " + CR.fsNovel + " of the " + CR.fsCodons + " codons here", 54, 278, F.post, 11);
+    genText(ctx, "become triplets that were never in the gene → KNOCKOUT", 54, 296, F.post, 11);
+    genText(ctx, "delete 3 → frame survives: " + CR.ifKeep + " downstream codons intact", 54, 318, "rgba(215,223,234,.6)", 11);
+    genText(ctx, "indel size is random, so ~2 in 3 land out of frame", 54, 336, "rgba(215,223,234,.6)", 11);
+  }
+  if (stage >= 4) {
+    gbBox(ctx, 462, 214, 398, 126, "rgba(111,180,224,.45)", "rgba(111,180,224,.05)");
+    genText(ctx, "HDR — homology-directed repair", 476, 236, GB_BLUE, 12);
+    genText(ctx, "copies from a supplied donor template → PRECISE", 476, 256, "rgba(215,223,234,.7)", 11);
+    ctx.fillStyle = GB_BLUE; ctx.globalAlpha = .35; ctx.fillRect(476, 266, 300, 12); ctx.globalAlpha = 1;
+    genText(ctx, "donor template", 480, 276, "#0d1117", 10);
+    genText(ctx, "but: restricted to S and G2 phase, and inefficient even there", 476, 300, F.wrong, 11);
+    genText(ctx, "→ barely works in neurons, hepatocytes, mature muscle —", 476, 318, F.wrong, 11);
+    genText(ctx, "which is where most genetic disease actually lives.", 476, 336, F.wrong, 11);
+  }
+  if (stage >= 5 && stage < 6) {
+    genText(ctx, "The break itself is not innocent: large deletions, chromothripsis, whole-chromosome loss and p53 activation are all documented at cut sites.",
+            18, 216, F.wrong, 12);
+    genText(ctx, "Every one of those findings motivated an editor that does not break the DNA at all.", 18, 238, F.txt, 12);
+  }
+  if (stage >= 6) {
+    const w0 = crLetterX(CR.W0) - CR_DX / 2, ww = (CR.W1 - CR.W0 + 1) * CR_DX;
+    ctx.strokeStyle = F.post; ctx.lineWidth = 1.4; ctx.strokeRect(w0, CR_YT - 20, ww, 46);
+    genText(ctx, "activity window", w0, CR_YT - 26, F.post, 10);
+    gbBox(ctx, 40, 214, 396, 126, "rgba(95,191,149,.45)", "rgba(95,191,149,.05)");
+    genText(ctx, "BASE EDITING — NO double-strand break", 54, 236, F.ok, 12);
+    genText(ctx, "impaired Cas9 fused to a deaminase; chemistry, not cutting", 54, 256, "rgba(215,223,234,.7)", 11);
+    genText(ctx, "CBE: C•G → T•A     ABE: A•T → G•C  (transitions only)", 54, 278, F.ok, 11);
+    genText(ctx, "works in NON-DIVIDING cells — the gap HDR could not fill", 54, 298, F.ok, 11);
+    genText(ctx, CR.winC + " cytosines sit in this window and both get rewritten —", 54, 320, F.wrong, 11);
+    genText(ctx, "one was the target; the other is a BYSTANDER edit.", 54, 338, F.wrong, 11);
+  }
+  if (stage >= 7) {
+    const nx = crLetterX(CR.cutIdx) - CR_DX / 2;
+    ctx.strokeStyle = GB_VIO; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(nx, CR_YT - 12); ctx.lineTo(nx, CR_YT + 10); ctx.stroke();
+    genText(ctx, "nick — ONE strand only", nx + 6, CR_YT - 16, GB_VIO, 10);
+    gbBox(ctx, 462, 214, 398, 126, "rgba(168,140,216,.45)", "rgba(168,140,216,.05)");
+    genText(ctx, "PRIME EDITING — a nick, not a break", 476, 236, GB_VIO, 12);
+    genText(ctx, "Cas9 NICKASE fused to a reverse transcriptase", 476, 256, "rgba(215,223,234,.7)", 11);
+    genText(ctx, "pegRNA carries a primer binding site + an RT template", 476, 276, "rgba(215,223,234,.7)", 11);
+    genText(ctx, "all 12 substitutions + small insertions and deletions", 476, 298, GB_VIO, 11);
+    genText(ctx, "no donor template, no double-strand break", 476, 318, GB_VIO, 11);
+    genText(ctx, "price: lower efficiency, and a much bigger construct to deliver", 476, 338, F.wrong, 11);
+  }
+}
+ANIMS.gen_crispr_static = (cv, ctx) => drawCrispr(ctx, cv, { stage: 2, scan: 1, cut: 0 });
+ANIMS.gen_crispr = async (cv, ctx) => {
+  drawCrispr(ctx, cv, { stage: 0 });
+  await narrate("CRISPR — clustered regularly interspaced short palindromic repeats — is a bacterial immune system reprogrammed as a tool. Here is " + CR.seqLen +
+    " base pairs of a target gene, both strands. Three things decide where it gets cut: a " + CR.guideLen +
+    "-nucleotide spacer in the guide RNA, two nuclease domains in the Cas9 protein, and a short motif called the PAM — protospacer adjacent motif — which for this Cas9 is N-G-G. No PAM, no cut.");
+
+  await tween(1600, k => drawCrispr(ctx, cv, { stage: 1, scan: k }));
+  await narrate("Recognition happens PAM-FIRST. Cas9 collides with DNA, finds a PAM, and only then unwinds the neighbouring duplex to test whether the guide matches. There are " + CR.pams.length +
+    " N-G-G sites in this stretch. It interrogates the one at position " + CR.pamDecoy + " and walks away — the guide does not pair there. It commits at position " + CR.pamReal +
+    ", because that PAM sits immediately three-prime of the sequence the guide was designed against. This is also how a bacterium avoids shredding its own CRISPR array, which stores those spacers with no adjacent PAM.");
+
+  drawCrispr(ctx, cv, { stage: 2, scan: 1 });
+  await tween(900, k => drawCrispr(ctx, cv, { stage: 2, scan: 1, cut: k }));
+  await narrate("Both domains fire — HNH on the target strand, RuvC on the other — and you get a blunt double-strand break about three base pairs upstream of the PAM, between base " + CR.cutIdx +
+    " and base " + (CR.cutIdx + 1) + ". And now the crucial point, the one that gets skipped. Cas9 does not edit. It breaks. What happens next is decided entirely by the cell's own repair machinery.");
+
+  drawCrispr(ctx, cv, { stage: 3, cut: 1 });
+  await narrate("Path one: non-homologous end joining, NHEJ. It runs throughout the cell cycle and rejoins the ends sloppily, leaving small insertions or deletions. Delete a single base at this cut and the reading frame shifts — " + CR.fsNovel +
+    " of the " + CR.fsCodons + " codons here become triplets that were never in the gene. Delete three bases instead and the frame survives: " + CR.ifKeep +
+    " downstream codons stay intact and you simply lose one. Indel size is random, so roughly two in three land out of frame, which is why one guide reliably disables a gene across a population of cells. Breaking a gene is easy.");
+
+  drawCrispr(ctx, cv, { stage: 4, cut: 1 });
+  await narrate("Path two: homology-directed repair, HDR. Supply a donor template and the cell can copy a precise sequence in. But HDR is restricted to S and G2 phase and is inefficient even there, so it barely works in non-dividing cells — neurons, hepatocytes, mature muscle. Which is exactly where most genetic disease lives. That asymmetry is the whole problem: breaking a gene is easy, fixing one is not.");
+
+  drawCrispr(ctx, cv, { stage: 5, cut: 1 });
+  await narrate("And the break itself is not innocent. Work from 2018 onward documented large deletions and complex rearrangements at cut sites, chromothripsis and whole-chromosome loss after cutting, and p53 activation that preferentially selects for p53-deficient cells in culture. Every one of those findings motivated the same idea: change the letters without breaking the backbone.");
+
+  drawCrispr(ctx, cv, { stage: 6, cut: 0 });
+  await narrate("Base editing. A catalytically impaired Cas9 — it still finds the site, it no longer cuts — is fused to a deaminase that chemically rewrites one base inside a small window of exposed single strand. A cytosine base editor converts C to T; an adenine base editor converts A to G. No break, no donor template, and it works in non-dividing cells. The limits are equally specific: only transitions, never transversions, and bystander editing — " + CR.winC +
+    " cytosines sit inside this window and the editor cannot tell them apart, so both get rewritten.");
+
+  drawCrispr(ctx, cv, { stage: 7, cut: 0 });
+  await narrate("Prime editing goes further. A Cas9 nickase — it cuts ONE strand, not two — is fused to a reverse transcriptase, and the guide is replaced by a pegRNA carrying a primer binding site plus a template encoding the edit you want. The nicked strand primes reverse transcription of that edit straight into the genome: all twelve base-to-base substitutions plus small insertions and deletions, with no double-strand break and no donor. The price is lower efficiency and a much larger construct — which lands you on the real bottleneck, which is not editing at all. It is getting the machine into the right tissue.");
+};
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   6) gen_crispr_clinic  →  concept "crispr-in-the-clinic"
+   Casgevy: not a correction of the sickle mutation but a knockout of the BCL11A
+   erythroid enhancer, re-awakening fetal haemoglobin. Then the caveats the card
+   actually carries — conditioning, cost, access — and why delivery is the limit.
+   ═════════════════════════════════════════════════════════════════════════════ */
+const CLIN = (() => {
+  const NCELL = 60, THRESH = 20;                    // per-cell HbF % that blocks polymerisation
+  const HBF_PRE = 5, SD_PRE = 3, HBF_POST = 40, SD_POST = 12;
+  const r = gbRng(20231208);                        // FDA approval date, 8 Dec 2023
+  const z = [], pos = [];
+  for (let i = 0; i < NCELL; i++) { z.push(gbNorm(r)); pos.push({ jx: r(), jy: r() }); }
+  const pre  = z.map(v => Math.max(0, HBF_PRE + SD_PRE * v));
+  const post = z.map(v => Math.max(0, Math.min(85, HBF_POST + SD_POST * v)));
+  const sickPre  = pre .filter(v => v < THRESH).length;
+  const sickPost = post.filter(v => v < THRESH).length;
+  const meanPre  = pre .reduce((a, b) => a + b, 0) / NCELL;
+  const meanPost = post.reduce((a, b) => a + b, 0) / NCELL;
+
+  const COST_LO = 2.0, COST_HI = 3.0;               // $M list price, before the episode of care
+  const NBIRTH = 100, AFRICA = 75;                  // share of affected births in sub-Saharan Africa
+  const birth = []; for (let i = 0; i < NBIRTH; i++) birth.push(i < AFRICA ? "ssa" : "row");
+  const nSsa = birth.filter(b => b === "ssa").length;
+
+  const EXVIVO = ["apheresis — collect CD34+ stem cells", "edit BCL11A enhancer ex vivo (Cas9 RNP)",
+                  "sequence and release the product", "myeloablative busulfan conditioning",
+                  "weeks inpatient — cytopenia, infection risk", "reinfuse and wait for engraftment"];
+  const INVIVO = ["inject the editor", "it edits the cells in place"];
+
+  return { NCELL, THRESH, pre, post, pos, sickPre, sickPost, meanPre, meanPost,
+           roundPost: NCELL - sickPost, roundPct: 100 * (NCELL - sickPost) / NCELL,
+           hbfGain: meanPost - meanPre, COST_LO, COST_HI, COST_MID: (2.0 + 3.0) / 2,
+           NBIRTH, nSsa, ssaPct: 100 * nSsa / NBIRTH, EXVIVO, INVIVO,
+           stepGap: EXVIVO.length - INVIVO.length, birth };
+})();
+
+function clinCell(ctx, x, y, hbf, k) {
+  const sick = hbf < CLIN.THRESH;
+  const s = sick ? 1 : 0;
+  ctx.save(); ctx.translate(x, y);
+  ctx.fillStyle = sick ? F.wrong : GB_BLUE; ctx.globalAlpha = .8;
+  ctx.beginPath();
+  if (s) { ctx.moveTo(-9, 6); ctx.quadraticCurveTo(0, -14, 9, 5); ctx.quadraticCurveTo(0, -3, -9, 6); }
+  else ctx.arc(0, 0, 7, 0, 7);
+  ctx.fill(); ctx.globalAlpha = 1; ctx.restore();
+}
+
+function drawClinic(ctx, cv, { scene = 0, k = 0, title } = {}) {
+  if (scene === 0) {
+    genFrame(ctx, title || "Casgevy — it does not fix the sickle mutation");
+    const steps = CLIN.EXVIVO, w = 132, y = 96;
+    steps.forEach((s, i) => {
+      const x = 22 + i * 143, on = k * steps.length > i;
+      gbBox(ctx, x, y, w, 74, on ? "rgba(95,191,149,.45)" : "rgba(124,141,165,.25)",
+            on ? "rgba(95,191,149,.06)" : "rgba(124,141,165,.03)");
+      genText(ctx, (i + 1) + "", x + 8, y + 18, on ? F.ok : "rgba(215,223,234,.4)", 12);
+      const words = s.split(" "); let line = "", ln = 0;
+      words.forEach(wd => {
+        if ((line + " " + wd).length > 18) { genText(ctx, line, x + 8, y + 36 + ln * 14, on ? F.txt : "rgba(215,223,234,.35)", 10); line = wd; ln++; }
+        else line = line ? line + " " + wd : wd;
+      });
+      genText(ctx, line, x + 8, y + 36 + ln * 14, on ? F.txt : "rgba(215,223,234,.35)", 10);
+      if (i < steps.length - 1) genText(ctx, "→", x + w + 4, y + 42, "rgba(215,223,234,.45)", 13);
+    });
+    genText(ctx, "EX VIVO — " + steps.length + " steps, every one of them inside a specialised transplant centre", 22, 196, F.txt, 12);
+    if (k > .9) {
+      gbBox(ctx, 22, 214, 856, 96, "rgba(232,161,60,.45)", "rgba(232,161,60,.05)");
+      genText(ctx, "THE EDIT ITSELF", 36, 236, F.post, 12);
+      genText(ctx, "Cas9 knocks out the ERYTHROID ENHANCER of BCL11A — the repressor that switches fetal haemoglobin off after birth.", 36, 258, F.txt, 12);
+      genText(ctx, "Lose the repressor → HbF comes back on → it interferes with sickle polymerisation and substitutes for the defective beta-globin.", 36, 278, F.txt, 12);
+      genText(ctx, "This is an easy NHEJ-style DISABLING edit — far more tractable than precisely repairing HBB inside a stem cell. That is why this indication got there first.", 36, 298, F.post, 11);
+      genText(ctx, "Approved 8 Dec 2023 alongside Lyfgenia — which is NOT editing: a lentivirus adds a modified beta-globin gene, and it carries a boxed warning for haematologic malignancy.",
+              22, 336, "rgba(215,223,234,.7)", 11);
+    }
+    return;
+  }
+
+  if (scene === 1) {
+    genFrame(ctx, title || "Fetal haemoglobin comes back, and the cells go round");
+    const hbf = CLIN.pre.map((p, i) => gbLerp(p, CLIN.post[i], k));
+    const mean = hbf.reduce((a, b) => a + b, 0) / hbf.length;
+    const sick = hbf.filter(v => v < CLIN.THRESH).length;
+    /* the haemoglobin bar */
+    const bx = 40, bw = 500, by = 74, bh = 30;
+    ctx.fillStyle = F.wrong; ctx.globalAlpha = .5; ctx.fillRect(bx, by, bw * (1 - mean / 100), bh); ctx.globalAlpha = 1;
+    ctx.fillStyle = F.ok; ctx.globalAlpha = .6; ctx.fillRect(bx + bw * (1 - mean / 100), by, bw * (mean / 100), bh); ctx.globalAlpha = 1;
+    gbBox(ctx, bx, by, bw, bh, "rgba(124,141,165,.4)");
+    genText(ctx, "HbS and other adult haemoglobin", bx + 8, by + 20, "#0d1117", 11);
+    genText(ctx, "HbF " + mean.toFixed(0) + "%", bx + bw - 8, by + 20, "#0d1117", 12, "right");
+    genText(ctx, "mean fetal haemoglobin across the " + CLIN.NCELL + " red cells drawn below", bx, by - 8, F.txt, 12);
+
+    genText(ctx, "sickled: " + sick + " / " + CLIN.NCELL, 570, by + 8, sick > CLIN.NCELL / 2 ? F.wrong : F.ok, 14);
+    genText(ctx, "round:   " + (CLIN.NCELL - sick) + " / " + CLIN.NCELL, 570, by + 30, F.ok, 14);
+    genText(ctx, "a cell resists polymerisation once its own HbF passes ~" + CLIN.THRESH + "%", 570, by + 52, "rgba(215,223,234,.6)", 10);
+
+    for (let i = 0; i < CLIN.NCELL; i++) {
+      const x = 60 + (i % 12) * 66 + CLIN.pos[i].jx * 14, y = 150 + Math.floor(i / 12) * 44 + CLIN.pos[i].jy * 12;
+      clinCell(ctx, x, y, hbf[i], k);
+    }
+    genText(ctx, "Ex-vivo edited stem cells engraft and start making red cells whose own HbF is high enough that the sickle haemoglobin never polymerises.",
+            22, 366, "rgba(215,223,234,.7)", 11);
+    return;
+  }
+
+  if (scene === 2) {
+    genFrame(ctx, title || "The caveats are not about the editing");
+    /* cost */
+    genText(ctx, "COST — list price, before the episode of care", 22, 66, F.txt, 12);
+    const cx0 = 22, cw = 400, cy = 78;
+    gbBox(ctx, cx0, cy, cw, 26, "rgba(124,141,165,.35)");
+    const px = m => cx0 + (m / 4) * cw;
+    ctx.fillStyle = F.wrong; ctx.globalAlpha = .45;
+    ctx.fillRect(px(CLIN.COST_LO), cy, px(CLIN.COST_HI) - px(CLIN.COST_LO), 26); ctx.globalAlpha = 1;
+    genText(ctx, "$" + CLIN.COST_LO.toFixed(0) + "–" + CLIN.COST_HI.toFixed(0) + "M", px(CLIN.COST_LO) + 8, cy + 18, F.txt, 12);
+    ["0", "1", "2", "3", "4"].forEach((t, i) => genText(ctx, "$" + t + "M", px(i), cy + 42, "rgba(215,223,234,.5)", 10, "center"));
+    genText(ctx, "apheresis, conditioning, inpatient stay and monitoring are all additional", cx0, cy + 62, "rgba(215,223,234,.6)", 10);
+
+    /* conditioning */
+    genText(ctx, "CONDITIONING — myeloablative busulfan, to clear marrow niches", 460, 66, F.txt, 12);
+    ["infertility risk", "prolonged cytopenia — infection and bleeding", "weeks of inpatient care",
+     "only specialised transplant centres can deliver it"].forEach((s, i) =>
+      genText(ctx, "· " + s, 460, 92 + i * 20, F.wrong, 11));
+    genText(ctx, "A patient must be well enough to survive the conditioning in order to receive the cure.", 460, 178, F.post, 11);
+
+    /* access */
+    genText(ctx, "ACCESS — where the affected births actually are (" + CLIN.NBIRTH + " drawn)", 22, 214, F.txt, 12);
+    CLIN.birth.forEach((b, i) => {
+      const x = 26 + (i % 50) * 16, y = 234 + Math.floor(i / 50) * 18;
+      gbDot(ctx, x, y, 5, b === "ssa" ? F.wrong : GB_BLUE, .8);
+    });
+    genText(ctx, CLIN.nSsa + " of " + CLIN.NBIRTH + " (" + CLIN.ssaPct.toFixed(0) +
+                 "%) are in sub-Saharan Africa, where none of that infrastructure exists.", 22, 288, F.wrong, 12);
+    genText(ctx, "A therapy reaching hundreds of people is simultaneously a scientific triumph and a delivery failure.", 22, 310, F.txt, 12);
+    genText(ctx, "The editing chemistry works. What limits the benefit is transplant medicine, manufacturing and money — the same constraints", 22, 338, "rgba(215,223,234,.7)", 11);
+    genText(ctx, "that always limited allogeneic bone marrow transplant, which could already cure sickle cell disease when a matched donor existed.", 22, 356, "rgba(215,223,234,.7)", 11);
+    return;
+  }
+
+  /* scene 3 — delivery */
+  genFrame(ctx, title || "Delivery is the bottleneck, not editing precision");
+  genText(ctx, "EX VIVO — what is approved today", 22, 66, F.post, 13);
+  CLIN.EXVIVO.forEach((s, i) => {
+    gbBox(ctx, 22, 80 + i * 34, 420, 28, "rgba(232,161,60,.35)", "rgba(232,161,60,.05)");
+    genText(ctx, (i + 1) + ".  " + s, 32, 99 + i * 34, F.txt, 11);
+  });
+  genText(ctx, CLIN.EXVIVO.length + " steps · maximum control — you can sequence the product before dosing it", 22, 300, F.post, 11);
+  genText(ctx, "· but limited to transplantable tissue, and it needs conditioning chemotherapy", 22, 318, F.post, 11);
+
+  genText(ctx, "IN VIVO — what would change who gets treated", 470, 66, F.ok, 13);
+  CLIN.INVIVO.forEach((s, i) => {
+    gbBox(ctx, 470, 80 + i * 34, 410, 28, "rgba(95,191,149,.4)", "rgba(95,191,149,.06)");
+    genText(ctx, (i + 1) + ".  " + s, 480, 99 + i * 34, F.txt, 11);
+  });
+  genText(ctx, CLIN.stepGap + " fewer steps — no apheresis, no busulfan, no transplant centre", 470, 168, F.ok, 11);
+  genText(ctx, "Lipid nanoparticles pick up an ApoE coat in circulation and are taken up by", 470, 196, "rgba(215,223,234,.7)", 11);
+  genText(ctx, "hepatocytes via the LDL receptor — which is exactly why LIVER targets went first,", 470, 214, "rgba(215,223,234,.7)", 11);
+  genText(ctx, "and why muscle, brain, lung and blood stem cells remain unsolved.", 470, 232, "rgba(215,223,234,.7)", 11);
+  genText(ctx, "AAV delivers durably but caps cargo near 4.7 kb — SpCas9 barely fits and", 470, 258, "rgba(215,223,234,.7)", 11);
+  genText(ctx, "prime editors do not — plus pre-existing immunity in much of the population.", 470, 276, "rgba(215,223,234,.7)", 11);
+  genText(ctx, "Everything here is SOMATIC — confined to the treated patient's own cells, not inherited by their children. Heritable embryo editing is a different line, and in May 2025",
+          22, 344, "rgba(215,223,234,.7)", 11);
+  genText(ctx, "the main gene-therapy societies jointly called for a ten-year global moratorium on it.", 22, 362, "rgba(215,223,234,.7)", 11);
+}
+ANIMS.gen_crispr_clinic_static = (cv, ctx) => drawClinic(ctx, cv, { scene: 1, k: 1 });
+ANIMS.gen_crispr_clinic = async (cv, ctx) => {
+  drawClinic(ctx, cv, { scene: 0, k: 0 });
+  await narrate("On the eighth of December 2023 the FDA approved two one-time therapies for severe sickle cell disease, and only one of them is gene editing. Casgevy is the CRISPR one. Here is what it actually involves — " + CLIN.EXVIVO.length + " steps, every one of them inside a specialised transplant centre.");
+
+  await tween(1800, k => drawClinic(ctx, cv, { scene: 0, k }));
+  await narrate("And now the design choice worth pausing on, because it is the cleverest thing in the whole product. Casgevy does NOT correct the sickle mutation. It knocks out the erythroid enhancer of BCL11A — the repressor that switches fetal haemoglobin, HbF, off shortly after birth. Disable the repressor and HbF comes back on; HbF interferes with sickle polymerisation and substitutes functionally for the defective beta-globin. That is a simple disabling edit of exactly the kind Cas9 does well, and it is far more tractable than precisely repairing the HBB gene inside a stem cell. The other approval that day, Lyfgenia, is not editing at all — a lentivirus adds a modified beta-globin gene, and it carries a boxed warning for haematologic malignancy.");
+
+  drawClinic(ctx, cv, { scene: 1, k: 0 });
+  await narrate("Here are " + CLIN.NCELL + " of the patient's red cells before treatment. Mean fetal haemoglobin " + CLIN.meanPre.toFixed(0) +
+    " percent, and " + CLIN.sickPre + " of " + CLIN.NCELL + " are sickled. A cell resists polymerisation once its own HbF passes roughly " + CLIN.THRESH + " percent, and almost none of these do.");
+
+  await tween(2600, k => drawClinic(ctx, cv, { scene: 1, k }));
+  await narrate("Now the edited stem cells engraft and start making red cells. Mean HbF rises from " + CLIN.meanPre.toFixed(0) + " to " +
+    CLIN.meanPost.toFixed(0) + " percent — a gain of " + CLIN.hbfGain.toFixed(0) + " points — and the sickled count falls from " + CLIN.sickPre + " to " +
+    CLIN.sickPost + ", so " + CLIN.roundPct.toFixed(0) + " percent of these cells are now round. That matches what the trials report: mean HbF around forty percent of total haemoglobin, the great majority of red cells becoming F-cells, and the large majority of treated patients free of vaso-occlusive crises. The results in treated patients are genuinely impressive.");
+
+  drawClinic(ctx, cv, { scene: 2 });
+  await narrate("Then the caveats, and notice that not one of them is about editing. Cost: list prices sit at " + CLIN.COST_LO.toFixed(0) + " to " +
+    CLIN.COST_HI.toFixed(0) + " million dollars, before apheresis, conditioning, the inpatient stay and monitoring. Conditioning: both products need myeloablative busulfan to clear marrow niches for the edited cells — infertility risk, prolonged cytopenia, weeks inpatient, and a patient has to be well enough to survive it in order to receive the cure. Access: " +
+    CLIN.nSsa + " of every " + CLIN.NBIRTH + " affected births, about " + CLIN.ssaPct.toFixed(0) +
+    " percent, are in sub-Saharan Africa, where none of that infrastructure exists. A therapy reaching hundreds of people is simultaneously a scientific triumph and a delivery failure.");
+
+  drawClinic(ctx, cv, { scene: 3 });
+  await narrate("Which is why delivery, not precision, is the frontier. Ex vivo means taking the cells out — " + CLIN.EXVIVO.length +
+    " steps, maximum control, you can sequence the product before you dose it, but you are limited to transplantable tissue and you cannot avoid the conditioning. In vivo means injecting the editor and letting it find the tissue: " + CLIN.INVIVO.length +
+    " steps, " + CLIN.stepGap + " fewer, and no transplant centre. Lipid nanoparticles pick up an ApoE coat in circulation and get taken into hepatocytes through the LDL receptor, which is exactly why liver targets went first — and why muscle, brain, lung and blood stem cells are still unsolved. In-vivo editing of blood stem cells, if it can be made to work, would change who gets treated far more than any further improvement in editing chemistry.");
+
+  await narrate("One boundary to keep straight. Everything in this lesson is somatic: the change is confined to the treated patient's own cells and is not passed to their children. Heritable editing of embryos is a separate line, and in May 2025 the main gene and cell therapy societies jointly called for a ten-year global moratorium on it. The technical objection has been weakening — a 2026 preprint reported efficient base editing in human embryos with fewer chromosomal alterations than earlier nuclease work, though still with mosaicism and off-target edits. Which leaves governance, equity and enhancement as the real arguments, plus the awkward fact that preimplantation genetic testing already lets most at-risk couples select an unaffected embryo without editing anything.");
+};
+
+/* ── deterministic-math handle — the harness asserts the narration's numbers ── */
+ANIMS._gen_b_debug = {
+  /* 1 — pharmacogenomics ladder */
+  pgxAsNm: AS_NM,
+  pgxActiveExp:   PGX.cols[0].exp.map(v => +v.toFixed(4)),
+  pgxClopExp:     PGX.cols[1].exp.map(v => +v.toFixed(4)),
+  pgxCodeineExp:  PGX.cols[2].exp.map(v => +v.toFixed(4)),
+  pgxActiveSlope: +PGX.cols[0].slope.toFixed(4),
+  pgxClopSlope:   +PGX.cols[1].slope.toFixed(4),
+  pgxCodSlope:    +PGX.cols[2].slope.toFixed(4),
+  pgxActiveBelow: PGX.cols[0].below, pgxActiveAbove: PGX.cols[0].above,
+  pgxClopBelow:   PGX.cols[1].below, pgxClopAbove:   PGX.cols[1].above,
+  pgxCodBelow:    PGX.cols[2].below, pgxCodAbove:    PGX.cols[2].above,
+
+  /* 2 — HLA-B*57:01 / abacavir */
+  hlaN: HLA.N, hlaCarriers: HLA.nCar, hlaCarrierPct: +HLA.carPct.toFixed(2),
+  hlaReactionsUnscreened: HLA.nRx, hlaReactionsScreened: 0,
+  hlaAvoided: HLA.nRx, hlaNumberNeededToScreen: HLA.nns,
+
+  /* 3 — Knudson two-hit */
+  thCells: TH.CELLS, thMonths: TH.MONTHS, thHitProb: TH.P,
+  thCarrierMedianMonths: TH.carMed, thSporadicMedianMonths: TH.spoMed,
+  thGapMonths: TH.gapMonths, thRatio: +TH.ratio.toFixed(3),
+  thCarrierPenetrancePct: +TH.carPen.toFixed(2), thSporadicPenetrancePct: +TH.spoPen.toFixed(3),
+  thCarrierMeanFoci: +TH.carFociMean.toFixed(3),
+  thDrawnCarrierFoci: TH.drawnCarFoci, thDrawnSporadicFoci: TH.drawnSpoFoci,
+  thDrawnCarrierFirstMonth: TH.carrierCell.reduce((b, c) => Math.min(b, c.t2), 999),
+
+  /* 4 — somatic / tumour sequencing */
+  somCells: SOM.n, somCloneA: SOM.nA, somCloneR: SOM.nR, somCloneS: SOM.nS,
+  somPctR: +SOM.pctR.toFixed(2), somBiopsyN: SOM.grabbed.length,
+  somBiopsyA: SOM.gA, somBiopsyR: SOM.gR, somBiopsyS: SOM.gS,
+  somNadirPct: +SOM.nadirPct.toFixed(2), somNadirMonth: SOM.nadirI, somBackToBaselineMonth: SOM.backI,
+  somFragments: SOM.NFRAG, somTumourFrags: SOM.nTum, somChipFrags: SOM.nChip,
+  somVafTumour: +SOM.vafTum.toFixed(3), somVafChip: +SOM.vafChip.toFixed(3),
+  somChipOverTumour: +(SOM.vafChip / SOM.vafTum).toFixed(2),
+
+  /* 5 — CRISPR mechanism */
+  crSeqLen: CR.seqLen, crGuideLen: CR.guideLen, crPamCount: CR.pams.length,
+  crPamReal: CR.pamReal, crPamDecoy: CR.pamDecoy, crCutIdx: CR.cutIdx,
+  crOrfCodons: CR.orfCodons, crFrameshiftCodons: CR.fsCodons, crFrameshiftNovel: CR.fsNovel,
+  crFrameshiftPreserved: CR.fsKeep, crInframeCodons: CR.ifCodons, crInframePreserved: CR.ifKeep,
+  crWindow: CR.win, crWindowCytosines: CR.winC,
+
+  /* 6 — CRISPR in the clinic */
+  clinCells: CLIN.NCELL, clinHbfThresh: CLIN.THRESH,
+  clinMeanHbfPre: +CLIN.meanPre.toFixed(2), clinMeanHbfPost: +CLIN.meanPost.toFixed(2),
+  clinHbfGain: +CLIN.hbfGain.toFixed(2),
+  clinSickledPre: CLIN.sickPre, clinSickledPost: CLIN.sickPost,
+  clinRoundPct: +CLIN.roundPct.toFixed(2),
+  clinCostLoM: CLIN.COST_LO, clinCostHiM: CLIN.COST_HI,
+  clinBirths: CLIN.NBIRTH, clinBirthsSSA: CLIN.nSsa, clinSSApct: +CLIN.ssaPct.toFixed(1),
+  clinExVivoSteps: CLIN.EXVIVO.length, clinInVivoSteps: CLIN.INVIVO.length, clinStepGap: CLIN.stepGap
+};
+
+})();
+
 </script>
 </body>
 </html>
