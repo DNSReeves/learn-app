@@ -6571,7 +6571,11 @@ function drawNaKPump(ctx, cv, st) {
 
   /* step caption */
   const step = PUMP_STEPS.find(s => p >= s[0] && p < s[1]) || PUMP_STEPS[PUMP_STEPS.length - 1];
-  _t(ctx, 350, 242, step[2], { align: "center", col: MED.post, size: 13, bold: true });
+  // LABEL-COLLISION (spot check, 2026-08-01): this stage caption sat at the same
+  // height as the Na/K-ATPase protein label (memBot+34) and the two printed on top
+  // of each other. Caught by LOOKING at a rendered contact sheet — a
+  // paints-without-throwing check cannot see overlapping glyphs.
+  _t(ctx, 350, 266, step[2], { align: "center", col: MED.post, size: 13, bold: true });
 }
 
 async function runNaKPump(cv, ctx, opts) {
@@ -12852,6 +12856,1498 @@ ANIMS._gen_b_debug = {
   clinExVivoSteps: CLIN.EXVIVO.length, clinInVivoSteps: CLIN.INVIVO.length, clinStepGap: CLIN.stepGap
 };
 
+})();
+
+/* ===== batch-2 visuals: health-physics-final ===== */
+/* ---- frag_dia_tightrope.js ---- */
+/* diabetes / dia_tightrope */
+(function(){
+const dt_X0=80,dt_X1=820,dt_Y0=330,dt_Y1=70,dt_ymax=300;
+const dt_sy=y=>dt_Y0-(y/dt_ymax)*(dt_Y0-dt_Y1);
+const dt_sx=t=>dt_X0+t*(dt_X1-dt_X0);
+const dt_LO=70,dt_HI=180;
+const dt_glu=(t)=>125+85*Math.exp(-Math.pow((t-0.28)/0.12,2))-70*Math.exp(-Math.pow((t-0.72)/0.12,2));
+function dt_bands(ctx){
+  ctx.fillStyle="rgba(212,106,98,0.18)";
+  ctx.fillRect(dt_X0,dt_Y1,dt_X1-dt_X0,dt_sy(dt_HI)-dt_Y1);
+  ctx.fillRect(dt_X0,dt_sy(dt_LO),dt_X1-dt_X0,dt_Y0-dt_sy(dt_LO));
+  ctx.fillStyle="rgba(95,191,149,0.18)";
+  ctx.fillRect(dt_X0,dt_sy(dt_HI),dt_X1-dt_X0,dt_sy(dt_LO)-dt_sy(dt_HI));
+}
+function dt_arrow(ctx,x1,y1,x2,y2){
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-9*Math.cos(a-0.4),y2-9*Math.sin(a-0.4));
+  ctx.lineTo(x2-9*Math.cos(a+0.4),y2-9*Math.sin(a+0.4));
+  ctx.closePath();ctx.fill();
+}
+function dt_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  dt_bands(ctx);
+  ctx.strokeStyle=F.wrong;ctx.lineWidth=1.5;ctx.setLineDash([6,5]);
+  ctx.beginPath();ctx.moveTo(dt_X0,dt_sy(dt_HI));ctx.lineTo(dt_X1,dt_sy(dt_HI));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(dt_X0,dt_sy(dt_LO));ctx.lineTo(dt_X1,dt_sy(dt_LO));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(dt_X0,dt_Y0);ctx.lineTo(dt_X1,dt_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(dt_X0,dt_Y1);ctx.lineTo(dt_X0,dt_Y0);ctx.stroke();
+  ctx.fillStyle=F.wrong;ctx.textAlign="left";
+  ctx.fillText("HIGH — hyperglycemia",dt_X0+8,dt_Y1+16);
+  ctx.fillText("LOW — hypoglycemia",dt_X0+8,dt_Y0-8);
+  ctx.fillStyle=F.ok;
+  ctx.fillText("SAFE range  (70–180 mg/dL)",dt_X0+8,dt_sy(125)+5);
+  ctx.fillStyle=F.txt;ctx.textAlign="right";
+  ctx.fillText("blood glucose over time",dt_X1,dt_Y1-16);
+  const p=s.p;
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();
+  let first=true;
+  for(let t=0;t<=p+0.0001;t+=0.005){const px=dt_sx(t),py=dt_sy(dt_glu(t));if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+  const gv=dt_glu(p),mx=dt_sx(p),my=dt_sy(gv);
+  ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(mx,my,6,0,7);ctx.fill();
+  if(gv>dt_HI-25){
+    ctx.strokeStyle=F.ok;ctx.fillStyle=F.ok;ctx.lineWidth=2;
+    dt_arrow(ctx,mx,my-4,mx,my+36);
+    ctx.textAlign="left";ctx.fillText("insulin pushes down",mx+12,my+14);
+  }else if(gv<dt_LO+25){
+    ctx.strokeStyle=F.ok;ctx.fillStyle=F.ok;ctx.lineWidth=2;
+    dt_arrow(ctx,mx,my+4,mx,my-36);
+    ctx.textAlign="left";ctx.fillText("glucagon pushes up",mx+12,my-8);
+  }
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText(Math.round(gv)+" mg/dL",dt_X0+8,dt_Y1+34);
+}
+ANIMS.dia_tightrope_static=(cv,ctx)=>dt_draw(ctx,cv,{p:0.5});
+ANIMS.dia_tightrope=async(cv,ctx)=>{
+  dt_draw(ctx,cv,{p:0.001});
+  await narrate("Your blood sugar must stay inside a narrow safe band — too high and too low are both dangerous.");
+  await tween(2200,k=>dt_draw(ctx,cv,{p:0.001+k*0.45}));
+  await narrate("When it drifts too high, the hormone insulin tugs it back down into range.");
+  await tween(2400,k=>dt_draw(ctx,cv,{p:0.46+k*0.42}));
+  await narrate("When it falls too low, the hormone glucagon tugs it back up — two opposing forces keep the balance.");
+  await tween(900,k=>dt_draw(ctx,cv,{p:0.88+k*0.115}));
+};
+})();
+/* ---- frag_dia_type1.js ---- */
+/* diabetes / dia_type1 */
+(function(){
+const d1_cells=[[300,150],[360,150],[260,190],[320,190],[380,190],[290,230],[350,230],[330,275]];
+const d1_N=d1_cells.length;
+function d1_islet(ctx){
+  ctx.fillStyle="rgba(124,141,165,0.12)";
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;
+  ctx.beginPath();ctx.ellipse(325,210,140,110,0,0,7);ctx.fill();ctx.stroke();
+}
+function d1_tcell(ctx,x,y){
+  ctx.fillStyle=F.wrong;ctx.beginPath();ctx.arc(x,y,11,0,7);ctx.fill();
+  ctx.strokeStyle=F.wrong;ctx.lineWidth=1.5;
+  for(let a=0;a<7;a++){const ang=a*0.9;ctx.beginPath();ctx.moveTo(x+11*Math.cos(ang),y+11*Math.sin(ang));ctx.lineTo(x+16*Math.cos(ang),y+16*Math.sin(ang));ctx.stroke();}
+}
+function d1_meter(ctx,frac){
+  const mx=700,my0=120,my1=320,w=54;
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;ctx.strokeRect(mx,my0,w,my1-my0);
+  const h=(my1-my0)*frac;
+  ctx.fillStyle=F.post;ctx.fillRect(mx,my1-h,w,h);
+  ctx.fillStyle=F.txt;ctx.textAlign="center";ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillText("insulin",mx+w/2,my0-24);
+  ctx.fillText("output",mx+w/2,my0-8);
+  ctx.fillText(Math.round(frac*100)+"%",mx+w/2,my1+20);
+}
+function d1_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  d1_islet(ctx);
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("pancreatic islet",325,345);
+  const dead=s.dead;
+  for(let i=0;i<d1_N;i++){
+    const c=d1_cells[i];
+    if(i>=dead){
+      ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(c[0],c[1],16,0,7);ctx.fill();
+    }else{
+      ctx.strokeStyle="rgba(212,106,98,0.55)";ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(c[0],c[1],8,0,7);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(c[0]-6,c[1]-6);ctx.lineTo(c[0]+6,c[1]+6);
+      ctx.moveTo(c[0]+6,c[1]-6);ctx.lineTo(c[0]-6,c[1]+6);ctx.stroke();
+    }
+  }
+  const p=s.p,tgt=Math.min(dead,d1_N-1),c=d1_cells[tgt];
+  d1_tcell(ctx,c[0]-72+p*56,c[1]-62+p*46);
+  d1_tcell(ctx,c[0]+82-p*62,c[1]+52-p*40);
+  d1_meter(ctx,(d1_N-dead)/d1_N);
+  ctx.textAlign="left";ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillStyle=F.post;ctx.fillText("● beta cells — make insulin",70,58);
+  ctx.fillStyle=F.wrong;ctx.fillText("● immune T-cells — attack them",70,78);
+}
+ANIMS.dia_type1_static=(cv,ctx)=>d1_draw(ctx,cv,{dead:0,p:0.2});
+ANIMS.dia_type1=async(cv,ctx)=>{
+  d1_draw(ctx,cv,{dead:0,p:0});
+  await narrate("Beta cells inside the pancreas are the body's only factory for insulin.");
+  await narrate("In type 1 diabetes, the immune system mistakes these beta cells for a threat and attacks them.");
+  for(let i=0;i<d1_N;i++){
+    await tween(500,k=>d1_draw(ctx,cv,{dead:i,p:k}));
+    d1_draw(ctx,cv,{dead:i+1,p:0});
+  }
+  await narrate("As the beta cells are destroyed one by one, insulin output falls toward zero.");
+  await narrate("With almost no insulin of its own, the body must get insulin from outside to survive.");
+};
+})();
+/* ---- frag_dia_family.js ---- */
+/* diabetes / dia_family */
+(function(){
+const df_X0=110,df_X1=800,df_Y0=320,df_Y1=70;
+const df_sx=x=>df_X0+x*(df_X1-df_X0);
+const df_sy=y=>df_Y0-y*(df_Y0-df_Y1);
+const df_vars=[
+  {x:0.13,y:0.24,n:"Type 1",d:"autoimmune, usually young",c:"post"},
+  {x:0.30,y:0.72,n:"LADA",d:"autoimmune, adult onset",c:"post"},
+  {x:0.46,y:0.14,n:"MODY",d:"single-gene, young",c:"ax"},
+  {x:0.74,y:0.42,n:"Gestational",d:"insulin-resistant, in pregnancy",c:"ok"},
+  {x:0.86,y:0.80,n:"Type 2",d:"insulin-resistant, often older",c:"ok"}
+];
+function df_grid(ctx){
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=1;g<4;g++){
+    const x=df_X0+(g/4)*(df_X1-df_X0);ctx.beginPath();ctx.moveTo(x,df_Y1);ctx.lineTo(x,df_Y0);ctx.stroke();
+    const y=df_Y1+(g/4)*(df_Y0-df_Y1);ctx.beginPath();ctx.moveTo(df_X0,y);ctx.lineTo(df_X1,y);ctx.stroke();
+  }
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(df_X0,df_Y0);ctx.lineTo(df_X1,df_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(df_X0,df_Y1);ctx.lineTo(df_X0,df_Y0);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.font="13px 'IBM Plex Mono'";
+  ctx.textAlign="left";ctx.fillText("autoimmune →",df_X0+2,df_Y0+22);
+  ctx.textAlign="right";ctx.fillText("← insulin-resistant",df_X1,df_Y0+22);
+  ctx.save();ctx.translate(df_X0-26,df_Y0);ctx.rotate(-Math.PI/2);ctx.textAlign="left";
+  ctx.fillText("younger onset →",0,0);ctx.restore();
+  ctx.save();ctx.translate(df_X0-26,df_Y1);ctx.rotate(-Math.PI/2);ctx.textAlign="right";
+  ctx.fillText("← older onset",0,0);ctx.restore();
+}
+function df_dot(ctx,v,alpha){
+  const px=df_sx(v.x),py=df_sy(v.y);
+  ctx.globalAlpha=alpha;
+  ctx.fillStyle=F[v.c];ctx.beginPath();ctx.arc(px,py,10,0,7);ctx.fill();
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText(v.n,px+16,py-1);
+  ctx.font="11px 'IBM Plex Mono'";ctx.fillStyle=F.ax;
+  ctx.fillText(v.d,px+16,py+14);
+  ctx.globalAlpha=1;
+}
+function df_draw(ctx,cv,n){
+  clear(ctx,cv);
+  df_grid(ctx);
+  const fl=Math.floor(n);
+  for(let i=0;i<df_vars.length;i++){
+    if(i<fl) df_dot(ctx,df_vars[i],1);
+    else if(i===fl) df_dot(ctx,df_vars[i],n-fl);
+  }
+}
+ANIMS.dia_family_static=(cv,ctx)=>df_draw(ctx,cv,df_vars.length);
+ANIMS.dia_family=async(cv,ctx)=>{
+  df_draw(ctx,cv,0);
+  await narrate("'Diabetes' is not one disease — it's a family, mapped here by cause and age of onset.");
+  await tween(1400,k=>df_draw(ctx,cv,k*2));
+  await narrate("Type 1 and LADA are both autoimmune — one starts young, the other slowly in adults.");
+  await tween(1400,k=>df_draw(ctx,cv,2+k*2));
+  await narrate("MODY comes from a single inherited gene; gestational diabetes arises during pregnancy.");
+  await tween(900,k=>df_draw(ctx,cv,4+k));
+  await narrate("Type 2, the most common, is driven by insulin resistance and often appears later in life.");
+};
+})();
+/* ---- frag_dia_phenotype.js ---- */
+/* diabetes / dia_phenotype */
+(function(){
+const dp_X0=90,dp_X1=820,dp_Y0=320,dp_Y1=70;
+const dp_bmin=18,dp_bmax=40;
+const dp_sx=b=>dp_X0+((b-dp_bmin)/(dp_bmax-dp_bmin))*(dp_X1-dp_X0);
+const dp_sy=r=>dp_Y0-r*(dp_Y0-dp_Y1);
+const dp_risk=(b,c)=>1/(1+Math.exp(-0.42*(b-c)));
+const dp_ASIAN=24,dp_EURO=29;
+function dp_axes(ctx){
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let b=20;b<=40;b+=5){ctx.beginPath();ctx.moveTo(dp_sx(b),dp_Y1);ctx.lineTo(dp_sx(b),dp_Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(dp_X0,dp_Y0);ctx.lineTo(dp_X1,dp_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(dp_X0,dp_Y1);ctx.lineTo(dp_X0,dp_Y0);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="center";
+  for(let b=20;b<=40;b+=5)ctx.fillText(b,dp_sx(b),dp_Y0+18);
+  ctx.fillText("BMI (body mass index, kg/m²)",(dp_X0+dp_X1)/2,dp_Y0+36);
+  ctx.save();ctx.translate(dp_X0-48,(dp_Y0+dp_Y1)/2);ctx.rotate(-Math.PI/2);ctx.textAlign="center";
+  ctx.fillText("risk of type 2 →",0,0);ctx.restore();
+}
+function dp_curve(ctx,c,col,p){
+  ctx.strokeStyle=col;ctx.lineWidth=2.6;ctx.beginPath();
+  const bend=dp_bmin+p*(dp_bmax-dp_bmin);let first=true;
+  for(let b=dp_bmin;b<=bend+0.001;b+=0.2){const px=dp_sx(b),py=dp_sy(dp_risk(b,c));if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+}
+function dp_thresh(ctx,b,col,label,up){
+  ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(dp_sx(b),dp_Y0);ctx.lineTo(dp_sx(b),dp_Y1+8);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=col;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";
+  ctx.fillText(label,dp_sx(b),up?dp_Y1+2:dp_Y1-8);
+}
+function dp_draw(ctx,cv,s){
+  clear(ctx,cv);
+  dp_axes(ctx);
+  dp_thresh(ctx,23,F.post,"action at BMI 23",false);
+  dp_thresh(ctx,25,F.ax,"action at BMI 25",true);
+  dp_curve(ctx,dp_ASIAN,F.post,s.pa);
+  dp_curve(ctx,dp_EURO,F.ax,s.pe);
+  ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillStyle=F.post;ctx.fillText("East / South Asian",dp_sx(24.6),dp_sy(dp_risk(24.6,dp_ASIAN))-12);
+  ctx.fillStyle=F.ax;ctx.fillText("European",dp_sx(30.2),dp_sy(dp_risk(30.2,dp_EURO))-12);
+  if(s.pa>0.99&&s.pe>0.99){
+    const ry=dp_sy(0.5),xe=dp_sx(dp_EURO),xa=dp_sx(dp_ASIAN);
+    ctx.strokeStyle=F.ok;ctx.fillStyle=F.ok;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(xe,ry);ctx.lineTo(xa+8,ry);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(xa,ry);ctx.lineTo(xa+11,ry-5);ctx.lineTo(xa+11,ry+5);ctx.closePath();ctx.fill();
+    ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText("shifted left",(xe+xa)/2,ry-8);
+  }
+}
+ANIMS.dia_phenotype_static=(cv,ctx)=>dp_draw(ctx,cv,{pa:1,pe:1});
+ANIMS.dia_phenotype=async(cv,ctx)=>{
+  dp_draw(ctx,cv,{pa:0,pe:0});
+  await narrate("This shows how the risk of type 2 diabetes rises with body mass index, or BMI.");
+  await tween(1800,k=>dp_draw(ctx,cv,{pa:0,pe:k}));
+  await narrate("For people of European ancestry, risk climbs steeply around a BMI of 25.");
+  await tween(1800,k=>dp_draw(ctx,cv,{pa:k,pe:1}));
+  await narrate("For East and South Asian populations, the same risk arrives at a much lower BMI, near 23.");
+  await narrate("It's the same disease at a different threshold — a 'thin-fat' body with less spare insulin-making reserve.");
+};
+})();
+/* ---- frag_dia_receptors.js ---- */
+/* diabetes / dia_receptors */
+(function(){
+const dr_cx=450,dr_cy=205,dr_rx=235,dr_ry=125;
+const dr_targets=[
+  {dx:450,dy:80, fx:450,fy:28, name:"insulin receptor",  drug:"insulin",           lx:450,ly:20, al:"center"},
+  {dx:222,dy:205,fx:66, fy:205,name:"GLP-1 receptor",     drug:"GLP-1 agonists",    lx:56, ly:200,al:"left"},
+  {dx:678,dy:205,fx:834,fy:205,name:"K-ATP channel",      drug:"sulfonylureas",     lx:844,ly:200,al:"right"},
+  {dx:450,dy:330,fx:450,fy:372,name:"SGLT2 (kidney)",     drug:"SGLT2 inhibitors",  lx:450,ly:362,al:"center"},
+  {dx:628,dy:96, fx:792,fy:52, name:"DPP-4 enzyme",       drug:"DPP-4 inhibitors",  lx:802,ly:48, al:"right"}
+];
+const dr_cols=["post","ok","wrong","ax","prior"];
+function dr_cell(ctx){
+  ctx.fillStyle="rgba(124,141,165,0.10)";
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=3;
+  ctx.beginPath();ctx.ellipse(dr_cx,dr_cy,dr_rx,dr_ry,0,0,7);ctx.fill();ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="center";
+  ctx.fillText("cell",dr_cx,dr_cy+5);
+}
+function dr_dock(ctx,t){
+  ctx.fillStyle="#0F1A2C";ctx.strokeStyle="#5A6E8C";ctx.lineWidth=2;
+  ctx.beginPath();ctx.rect(t.dx-13,t.dy-13,26,26);ctx.fill();ctx.stroke();
+}
+function dr_drug(ctx,t,col,p){
+  const x=t.fx+(t.dx-t.fx)*p,y=t.fy+(t.dy-t.fy)*p;
+  ctx.fillStyle=F[col];ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fill();
+}
+function dr_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  dr_cell(ctx);
+  for(let i=0;i<dr_targets.length;i++){
+    const t=dr_targets[i];
+    dr_dock(ctx,t);
+    ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign=t.al;
+    ctx.fillText(t.name,t.lx,t.ly);
+    ctx.fillStyle=F[dr_cols[i]];ctx.font="11px 'IBM Plex Mono'";
+    ctx.fillText(t.drug,t.lx,t.ly+15);
+    const p=s.prog[i];
+    if(p>0) dr_drug(ctx,t,dr_cols[i],p);
+  }
+}
+ANIMS.dia_receptors_static=(cv,ctx)=>dr_draw(ctx,cv,{prog:[0,0,0,0,0]});
+ANIMS.dia_receptors=async(cv,ctx)=>{
+  const prog=[0,0,0,0,0];
+  dr_draw(ctx,cv,{prog});
+  const lines=[
+    "Diabetes drugs are a toolkit, not one hammer — injected insulin docks into the insulin receptor itself.",
+    "GLP-1 receptor agonists switch on the GLP-1 receptor to boost insulin and curb appetite.",
+    "Sulfonylureas close the K-ATP channel, prompting beta cells to release more insulin.",
+    "SGLT2 inhibitors block a kidney transporter so excess glucose leaves in the urine.",
+    "DPP-4 inhibitors block the enzyme that breaks down the body's own GLP-1 hormone."
+  ];
+  for(let i=0;i<dr_targets.length;i++){
+    await tween(650,k=>{prog[i]=k;dr_draw(ctx,cv,{prog});});
+    prog[i]=1;dr_draw(ctx,cv,{prog});
+    await narrate(lines[i]);
+  }
+};
+})();
+/* ---- frag_glp_twominute.js ---- */
+/* glp-1 medicines / glp_twominute */
+(function(){
+  // Native GLP-1: exponential decay, half-life ~1.5 min, shown over 0..10 minutes.
+  const gtm_nHalf=1.5;                 // minutes
+  const gtm_native=(t)=>100*Math.pow(0.5,t/gtm_nHalf);
+  // Engineered drug (e.g. semaglutide): half-life ~7 days, shown over 0..14 days.
+  const gtm_dHalf=7;                   // days
+  const gtm_drug=(t)=>100*Math.pow(0.5,t/gtm_dHalf);
+
+  function gtm_panel(ctx,X0,X1,Y0,Y1,xmax,xlabel,fn,frac,color,tlabel){
+    // grid
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+    for(let g=0;g<=4;g++){const gx=X0+(g/4)*(X1-X0);ctx.beginPath();ctx.moveTo(gx,Y1);ctx.lineTo(gx,Y0);ctx.stroke();}
+    // axes
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+    const sx=x=>X0+(x/xmax)*(X1-X0);
+    const sy=y=>Y0-(y/100)*(Y0-Y1);
+    // curve up to frac of xmax
+    const cx=frac*xmax;
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.beginPath();
+    for(let x=0;x<=cx+1e-6;x+=xmax/240){const px=sx(x),py=sy(fn(x));if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+    ctx.stroke();
+    // axis tick labels
+    ctx.fillStyle=F.ax;ctx.font="11px 'IBM Plex Mono'";ctx.textAlign="center";
+    for(let g=0;g<=4;g++){const v=(g/4)*xmax;ctx.fillText((xmax<=10?v.toFixed(0):v.toFixed(0)),X0+(g/4)*(X1-X0),Y0+15);}
+    ctx.fillText(xlabel,(X0+X1)/2,Y0+30);
+    // title + active tag
+    ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillText(tlabel,X0,Y1-24);
+    ctx.fillStyle=color;ctx.font="11px 'IBM Plex Mono'";
+    ctx.fillText("active: "+fn(cx).toFixed(0)+"% of peak",X0,Y1-8);
+  }
+
+  function gtm_draw(ctx,cv,s){
+    clear(ctx,cv);
+    ctx.textAlign="left";
+    ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";
+    ctx.fillText("Same hormone signal — two very different lifespans",70,34);
+    ctx.font="11px 'IBM Plex Mono'";ctx.fillStyle=F.ax;
+    ctx.fillText("y-axis: hormone activity, % of peak   (note the LEFT axis is MINUTES, the RIGHT is DAYS)",70,52);
+    gtm_panel(ctx,70,430,320,80,10,"minutes",gtm_native,s.n,F.wrong,"Natural GLP-1 — chewed up by DPP-4");
+    gtm_panel(ctx,500,860,320,80,14,"days",gtm_drug,s.d,F.ok,"Engineered drug — resists DPP-4");
+  }
+
+  ANIMS.glp_twominute_static=(cv,ctx)=>gtm_draw(ctx,cv,{n:1,d:1});
+  ANIMS.glp_twominute=async(cv,ctx)=>{
+    gtm_draw(ctx,cv,{n:0,d:0});
+    await narrate("Your gut releases natural GLP-1 after a meal, but an enzyme called DPP-4 destroys it in about two minutes.");
+    await tween(1600,k=>gtm_draw(ctx,cv,{n:k,d:0}));
+    await narrate("So injecting the natural hormone is useless — it would be gone before it could do much.");
+    await narrate("The medicines are re-engineered to resist DPP-4, so one dose keeps signaling for days, not minutes.");
+    await tween(1800,k=>gtm_draw(ctx,cv,{n:1,d:k}));
+    await narrate("That durability is why a weekly shot, or now a daily pill, can work at all.");
+  };
+})();
+/* ---- frag_glp_family.js ---- */
+/* glp-1 medicines / glp_family */
+(function(){
+  // node: {x,y, name, brand, route, target, step} step = reveal order (1..3)
+  const gfa_nodes=[
+    {x:250,y:150,name:"liraglutide",brand:"Saxenda/Victoza",route:"daily shot",target:1,step:1},
+    {x:250,y:210,name:"semaglutide",brand:"Wegovy/Ozempic",route:"weekly shot / oral",target:1,step:1},
+    {x:250,y:270,name:"orforglipron",brand:"(newer)",route:"daily pill",target:1,step:2},
+    {x:680,y:210,name:"tirzepatide",brand:"Mounjaro/Zepbound",route:"weekly shot",target:2,step:3}
+  ];
+  const gfa_rootX=110, gfa_rootY=210;
+  const gfa_s1X=250, gfa_s1Y=210;   // single-target hub
+  const gfa_s2X=680, gfa_s2Y=210;   // dual-target hub
+
+  function gfa_dot(ctx,n,on){
+    ctx.globalAlpha=on?1:0.12;
+    ctx.fillStyle=n.target===2?F.post:F.ok;
+    ctx.beginPath();ctx.arc(n.x,n.y,6,0,7);ctx.fill();
+    ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillText(n.name,n.x+12,n.y-2);
+    ctx.fillStyle=F.ax;ctx.font="10px 'IBM Plex Mono'";
+    ctx.fillText(n.brand+"  ·  "+n.route,n.x+12,n.y+12);
+    ctx.globalAlpha=1;
+  }
+  function gfa_link(ctx,x1,y1,x2,y2,on){
+    ctx.globalAlpha=on?0.8:0.1;
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+
+  function gfa_draw(ctx,cv,step){
+    clear(ctx,cv);
+    ctx.textAlign="left";
+    ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";
+    ctx.fillText("The GLP-1 medicine family — who's who",70,32);
+    // branch headers
+    ctx.font="11px 'IBM Plex Mono'";
+    ctx.fillStyle=F.ok;ctx.fillText("SINGLE target: GLP-1 only",190,80);
+    ctx.globalAlpha=step>=3?1:0.15;
+    ctx.fillStyle=F.post;ctx.fillText("DUAL target: GLP-1 + GIP",620,80);
+    ctx.globalAlpha=1;
+    // root
+    ctx.fillStyle=F.ax;ctx.beginPath();ctx.arc(gfa_rootX,gfa_rootY,7,0,7);ctx.fill();
+    ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";ctx.fillText("GLP-1",gfa_rootX-18,gfa_rootY-14);
+    ctx.fillText("meds",gfa_rootX-14,gfa_rootY+22);
+    // links root->hubs
+    gfa_link(ctx,gfa_rootX,gfa_rootY,gfa_s1X,gfa_s1Y,step>=1);
+    gfa_link(ctx,gfa_rootX,gfa_rootY,gfa_s2X,gfa_s2Y,step>=3);
+    // single-target fan
+    for(const n of gfa_nodes){
+      if(n.target===1){gfa_link(ctx,gfa_s1X,gfa_s1Y,n.x,n.y,step>=n.step);}
+    }
+    // draw nodes
+    for(const n of gfa_nodes){gfa_dot(ctx,n,step>=n.step);}
+    // legend
+    ctx.font="10px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillStyle=F.ok;ctx.fillText("● single-target",70,360);
+    ctx.fillStyle=F.post;ctx.fillText("● dual-target (adds GIP)",210,360);
+    ctx.fillStyle=F.ax;ctx.fillText("route shown under each name (shot vs pill)",420,360);
+  }
+
+  ANIMS.glp_family_static=(cv,ctx)=>gfa_draw(ctx,cv,3);
+  ANIMS.glp_family=async(cv,ctx)=>{
+    gfa_draw(ctx,cv,0);
+    await narrate("These drugs all copy GLP-1, a gut hormone that curbs appetite and slows the stomach.");
+    gfa_draw(ctx,cv,1);
+    await narrate("Most act on that one target: liraglutide and semaglutide are the familiar injected names.");
+    gfa_draw(ctx,cv,2);
+    await narrate("The newest twist is route, not target — orforglipron delivers a GLP-1 effect as a daily pill.");
+    gfa_draw(ctx,cv,3);
+    await narrate("Tirzepatide is different: it hits a second hormone, GIP, as well — a dual-target drug.");
+    await narrate("So the map has two axes to remember: single versus dual target, and shot versus pill.");
+  };
+})();
+/* ---- frag_glp_agonists.js ---- */
+/* glp-1 medicines / glp_agonists */
+(function(){
+  // three columns: 1, 2, 3 targets. Each has a set of receptor "docks" and an effect bar.
+  const gag_cols=[
+    {cx:190,n:1,drug:"GLP-1 agonist",ex:"e.g. semaglutide",eff:0.55,recs:["GLP-1"]},
+    {cx:450,n:2,drug:"dual agonist",ex:"e.g. tirzepatide",eff:0.78,recs:["GLP-1","GIP"]},
+    {cx:710,n:3,drug:"triple agonist",ex:"e.g. retatrutide*",eff:0.95,recs:["GLP-1","GIP","glucagon"]}
+  ];
+  const gag_recColor={"GLP-1":F.ok,"GIP":F.post,"glucagon":F.wrong};
+  const gag_barBot=300, gag_barTop=90;
+
+  function gag_col(ctx,c,lit,barK){
+    ctx.textAlign="center";
+    // receptor docks
+    const ry0=140;
+    for(let i=0;i<c.recs.length;i++){
+      const r=c.recs[i];const dy=ry0+i*26;const on=lit>i;
+      ctx.globalAlpha=on?1:0.18;
+      ctx.fillStyle=gag_recColor[r];
+      ctx.beginPath();ctx.arc(c.cx-58,dy,7,0,7);ctx.fill();
+      ctx.fillStyle=F.txt;ctx.font="11px 'IBM Plex Mono'";ctx.textAlign="left";
+      ctx.fillText(r,c.cx-45,dy+4);
+      ctx.globalAlpha=1;
+    }
+    // effect bar (grows to c.eff*barK)
+    const full=gag_barBot-gag_barTop;
+    const h=full*c.eff*barK;
+    ctx.fillStyle="#22314a";
+    ctx.fillRect(c.cx+40,gag_barTop,34,full);
+    ctx.fillStyle=F.post;
+    ctx.fillRect(c.cx+40,gag_barBot-h,34,h);
+    // labels
+    ctx.textAlign="center";
+    ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";
+    ctx.fillText(c.n+" target"+(c.n>1?"s":""),c.cx,325);
+    ctx.fillStyle=F.ax;ctx.font="10px 'IBM Plex Mono'";
+    ctx.fillText(c.drug,c.cx,342);
+    ctx.fillText(c.ex,c.cx,356);
+  }
+
+  function gag_draw(ctx,cv,s){
+    clear(ctx,cv);
+    ctx.textAlign="left";
+    ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";
+    ctx.fillText("More targets → bigger metabolic effect",70,32);
+    ctx.font="11px 'IBM Plex Mono'";ctx.fillStyle=F.ax;
+    ctx.fillText("orange bar = relative effect (appetite + blood-sugar + weight)",70,50);
+    for(let i=0;i<gag_cols.length;i++){
+      const c=gag_cols[i];
+      const lit=(s.stage>i)?c.recs.length:0;
+      const bk=(s.stage>i)?(s.stage===i+1?s.bar:1):0;
+      gag_col(ctx,c,lit,bk);
+    }
+    ctx.fillStyle=F.ax;ctx.font="9px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillText("*retatrutide is still investigational (not yet approved)",70,372);
+  }
+
+  ANIMS.glp_agonists_static=(cv,ctx)=>gag_draw(ctx,cv,{stage:3,bar:1});
+  ANIMS.glp_agonists=async(cv,ctx)=>{
+    gag_draw(ctx,cv,{stage:0,bar:0});
+    await narrate("A GLP-1 drug docks onto one receptor to blunt appetite and steady blood sugar.");
+    await tween(1200,k=>gag_draw(ctx,cv,{stage:1,bar:k}));
+    await narrate("Add a second target, GIP, and the effect compounds — that is what tirzepatide does.");
+    await tween(1200,k=>gag_draw(ctx,cv,{stage:2,bar:k}));
+    await narrate("Add a third, glucagon, which raises energy burn, and effect climbs further in early trials.");
+    await tween(1200,k=>gag_draw(ctx,cv,{stage:3,bar:k}));
+    await narrate("More targets tends to mean more effect — and, importantly, also more chance of side effects.");
+  };
+})();
+/* ---- frag_glp_trials.js ---- */
+/* glp-1 medicines / glp_trials */
+(function(){
+  // Average weight loss (%) from the big trials.
+  const gtr_bars=[
+    {label:"placebo",trial:"(diet + shot)",val:2.5,color:F.ax},
+    {label:"semaglutide",trial:"STEP",val:15,color:F.ok},
+    {label:"tirzepatide",trial:"SURMOUNT",val:21,color:F.post}
+  ];
+  const gtr_ymax=25;
+
+  function gtr_draw(ctx,cv,s){
+    clear(ctx,cv);
+    ctx.textAlign="left";
+    ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";
+    ctx.fillText("What the big trials actually showed",70,32);
+    const X0=90,X1=560,Y0=310,Y1=70;
+    const sy=v=>Y0-(v/gtr_ymax)*(Y0-Y1);
+    // gridlines + y labels every 5%
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+    ctx.fillStyle=F.ax;ctx.font="10px 'IBM Plex Mono'";ctx.textAlign="right";
+    for(let v=0;v<=gtr_ymax;v+=5){const gy=sy(v);ctx.beginPath();ctx.moveTo(X0,gy);ctx.lineTo(X1,gy);ctx.stroke();ctx.fillText(v+"%",X0-8,gy+3);}
+    // axes
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+    ctx.fillStyle=F.ax;ctx.textAlign="left";ctx.font="10px 'IBM Plex Mono'";
+    ctx.save();ctx.translate(30,190);ctx.rotate(-Math.PI/2);ctx.fillText("average body-weight loss",0,0);ctx.restore();
+    // bars
+    const bw=90, gap=(X1-X0-gtr_bars.length*bw)/(gtr_bars.length+1);
+    for(let i=0;i<gtr_bars.length;i++){
+      const b=gtr_bars[i];
+      const bx=X0+gap+i*(bw+gap);
+      const h=(sy(0)-sy(b.val))*s.k;
+      ctx.fillStyle=b.color;ctx.fillRect(bx,sy(0)-h,bw,h);
+      ctx.fillStyle=F.txt;ctx.textAlign="center";ctx.font="13px 'IBM Plex Mono'";
+      ctx.fillText("~"+b.val+"%",bx+bw/2,sy(0)-h-8);
+      ctx.font="11px 'IBM Plex Mono'";ctx.fillText(b.label,bx+bw/2,Y0+16);
+      ctx.fillStyle=F.ax;ctx.font="10px 'IBM Plex Mono'";ctx.fillText(b.trial,bx+bw/2,Y0+30);
+    }
+    // SELECT callout panel on the right
+    const px=620;
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;ctx.strokeRect(px,90,220,150);
+    ctx.fillStyle=F.ok;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillText("SELECT trial",px+16,120);
+    ctx.fillStyle=F.txt;ctx.font="11px 'IBM Plex Mono'";
+    ctx.fillText("Not just weight —",px+16,146);
+    ctx.fillStyle=F.post;ctx.font="24px 'IBM Plex Mono'";
+    ctx.fillText("−20%",px+16,182);
+    ctx.fillStyle=F.txt;ctx.font="11px 'IBM Plex Mono'";
+    ctx.fillText("major heart events",px+90,182);
+    ctx.fillStyle=F.ax;ctx.font="10px 'IBM Plex Mono'";
+    ctx.fillText("(semaglutide, in people",px+16,208);
+    ctx.fillText("with heart disease, no",px+16,222);
+    ctx.fillText("diabetes)",px+16,236);
+  }
+
+  ANIMS.glp_trials_static=(cv,ctx)=>gtr_draw(ctx,cv,{k:1});
+  ANIMS.glp_trials=async(cv,ctx)=>{
+    gtr_draw(ctx,cv,{k:0});
+    await narrate("In the large trials, diet-and-lifestyle plus placebo shifted weight only a little — around 2 to 3 percent.");
+    await tween(1600,k=>gtr_draw(ctx,cv,{k:k}));
+    await narrate("Semaglutide in the STEP trials averaged about 15 percent body-weight loss.");
+    await narrate("Tirzepatide in SURMOUNT reached roughly 20 to 22 percent — territory once seen only with surgery.");
+    await narrate("And the SELECT trial showed semaglutide cut major heart events by about a fifth — a benefit beyond weight.");
+  };
+})();
+/* ---- frag_glp_sideeffects.js ---- */
+/* glp-1 medicines / glp_sideeffects */
+(function(){
+  // x = how common (0 rare .. 1 very common); y = how serious (0 mild .. 1 serious)
+  // dx,dy = label offset in pixels; reveal order = array order (mild/common first)
+  const gse_pts=[
+    {n:"nausea",x:0.90,y:0.20,dx:8,dy:4,ser:false},
+    {n:"diarrhea",x:0.74,y:0.17,dx:8,dy:14,ser:false},
+    {n:"vomiting",x:0.68,y:0.28,dx:-58,dy:-8,ser:false},
+    {n:"constipation",x:0.60,y:0.15,dx:8,dy:14,ser:false},
+    {n:"muscle loss",x:0.52,y:0.44,dx:8,dy:4,ser:false},
+    {n:"gallstones",x:0.34,y:0.55,dx:8,dy:4,ser:true},
+    {n:"thyroid C-cell (rodent)",x:0.12,y:0.66,dx:10,dy:4,ser:true},
+    {n:"stomach paralysis / ileus",x:0.20,y:0.74,dx:10,dy:4,ser:true},
+    {n:"pancreatitis",x:0.15,y:0.80,dx:-96,dy:4,ser:true},
+    {n:"aspiration (anesthesia)",x:0.24,y:0.88,dx:10,dy:4,ser:true},
+    {n:"NAION (eye)",x:0.08,y:0.90,dx:10,dy:4,ser:true}
+  ];
+
+  function gse_draw(ctx,cv,reveal){
+    clear(ctx,cv);
+    const X0=110,X1=690,Y0=320,Y1=70;
+    const sx=x=>X0+x*(X1-X0);
+    const sy=y=>Y0-y*(Y0-Y1);
+    ctx.textAlign="left";
+    ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";
+    ctx.fillText("Side effects: how common vs how serious",70,32);
+    // quadrant shading guides
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo((X0+X1)/2,Y1);ctx.lineTo((X0+X1)/2,Y0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X0,(Y0+Y1)/2);ctx.lineTo(X1,(Y0+Y1)/2);ctx.stroke();
+    // axes
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+    // axis labels
+    ctx.fillStyle=F.ax;ctx.font="11px 'IBM Plex Mono'";ctx.textAlign="center";
+    ctx.fillText("rare",X0+40,Y0+18);ctx.fillText("how common  →",(X0+X1)/2,Y0+32);ctx.fillText("very common",X1-50,Y0+18);
+    ctx.save();ctx.translate(78,(Y0+Y1)/2);ctx.rotate(-Math.PI/2);
+    ctx.fillText("how serious  →",0,0);ctx.restore();
+    ctx.textAlign="left";ctx.fillText("mild",X0-30,Y0-2);ctx.fillText("serious",X0-52,Y1+10);
+    // points
+    for(let i=0;i<gse_pts.length;i++){
+      if(i>=reveal)continue;
+      const p=gse_pts[i];const px=sx(p.x),py=sy(p.y);
+      const col=p.ser?F.wrong:F.ok;
+      ctx.fillStyle=col;ctx.beginPath();ctx.arc(px,py,5,0,7);ctx.fill();
+      ctx.fillStyle=F.txt;ctx.font="10px 'IBM Plex Mono'";ctx.textAlign="left";
+      ctx.fillText(p.n,px+p.dx,py+p.dy);
+    }
+    // legend
+    ctx.font="10px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillStyle=F.ok;ctx.fillText("● common, usually mild (gut)",710,110);
+    ctx.fillStyle=F.wrong;ctx.fillText("● rare, but serious",710,130);
+    ctx.fillStyle=F.ax;ctx.font="9px 'IBM Plex Mono'";
+    ctx.fillText("upper-left = watch",710,152);
+    ctx.fillText("closely, seek care",710,164);
+    ctx.fillText("if it happens",710,176);
+  }
+
+  ANIMS.glp_sideeffects_static=(cv,ctx)=>gse_draw(ctx,cv,gse_pts.length);
+  ANIMS.glp_sideeffects=async(cv,ctx)=>{
+    gse_draw(ctx,cv,0);
+    await narrate("Read this map by two questions: how common is a side effect, and how serious is it?");
+    await tween(1400,k=>gse_draw(ctx,cv,Math.round(k*5)));
+    await narrate("Most effects sit lower-right: nausea, vomiting, diarrhea — common, usually mild, often easing over time.");
+    await tween(1600,k=>gse_draw(ctx,cv,5+Math.round(k*(gse_pts.length-5))));
+    await narrate("Upper-left are the rare but serious ones: pancreatitis, gallstones, bowel-stopping ileus, an eye condition called NAION.");
+    await narrate("A rodent thyroid signal means avoid them with certain thyroid cancers, and tell anesthesia you take one before surgery.");
+    await narrate("Rare is not zero — knowing these plainly is the point; discuss your own risks with your clinician, this is not medical advice.");
+  };
+})();
+/* ---- frag_nut_energy.js ---- */
+/* nutrition / nut_energy */
+(function(){
+const ne_CX=450, ne_PY=120;           // pivot x, pivot y (top of stand)
+const ne_ARM=250;                       // half-length of the balance arm
+// out-side segments: label + share of the OUT total (approx, resting dominates)
+const ne_SEG=[
+  {lab:"resting metabolism", frac:0.65, col:F.ax},
+  {lab:"movement",           frac:0.23, col:F.ok},
+  {lab:"digesting food",     frac:0.12, col:F.post}
+];
+// draw a stacked bar for the OUT side, scaled by 'out' (0..1 of full height)
+function ne_outBar(ctx,x,yBase,out){
+  const full=150, h=full*out, w=70;
+  let yy=yBase;
+  for(const s of ne_SEG){
+    const sh=h*s.frac;
+    ctx.fillStyle=s.col; ctx.globalAlpha=0.85;
+    ctx.fillRect(x-w/2, yy-sh, w, sh);
+    ctx.globalAlpha=1;
+    ctx.strokeStyle="#0F1A2C"; ctx.lineWidth=1;
+    ctx.strokeRect(x-w/2, yy-sh, w, sh);
+    yy-=sh;
+  }
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.strokeRect(x-w/2, yBase-h, w, h);
+}
+function ne_drawEnergy(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="left";
+  // 'in' and 'out' are 0..1 loads; tilt is derived so IN heavier => IN side dips
+  const inL=s.in, outL=s.out;
+  const tilt=(inL-outL)*0.28;           // radians of arm tilt
+  // pivot stand
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(ne_CX,ne_PY); ctx.lineTo(ne_CX-24,ne_PY+140); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ne_CX,ne_PY); ctx.lineTo(ne_CX+24,ne_PY+140); ctx.stroke();
+  // balance arm
+  const dx=Math.cos(tilt)*ne_ARM, dy=Math.sin(tilt)*ne_ARM;
+  const lx=ne_CX-dx, ly=ne_PY+dy;       // IN (left) endpoint
+  const rx=ne_CX+dx, ry=ne_PY-dy;       // OUT (right) endpoint
+  ctx.strokeStyle=F.txt; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(rx,ry); ctx.stroke();
+  ctx.fillStyle=F.post; ctx.beginPath(); ctx.arc(ne_CX,ne_PY,5,0,7); ctx.fill();
+  // IN pan (food) — left
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx,ly+34); ctx.stroke();
+  const inH=120*inL, iw=76;
+  ctx.fillStyle=F.post; ctx.globalAlpha=0.85;
+  ctx.fillRect(lx-iw/2, ly+34, iw, inH); ctx.globalAlpha=1;
+  ctx.strokeStyle="#3A4C68"; ctx.strokeRect(lx-iw/2, ly+34, iw, inH);
+  ctx.fillStyle=F.txt; ctx.textAlign="center";
+  ctx.fillText("ENERGY IN", lx, ly+34+inH+20);
+  ctx.fillText("(food)", lx, ly+34+inH+38);
+  // OUT pan (metabolism + movement + digestion) — right
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(rx,ry+34); ctx.stroke();
+  ne_outBar(ctx,rx,ry+34+150,outL);
+  ctx.fillStyle=F.txt; ctx.textAlign="center";
+  ctx.fillText("ENERGY OUT", rx, ry+34+150+20);
+  // out-side segment legend
+  ctx.textAlign="left"; ctx.font="12px 'IBM Plex Mono'";
+  let ly2=250;
+  for(const seg of ne_SEG){
+    ctx.fillStyle=seg.col; ctx.fillRect(700,ly2-9,12,12);
+    ctx.fillStyle=F.txt; ctx.fillText(seg.lab,718,ly2+1); ly2+=20;
+  }
+  ctx.font="14px 'IBM Plex Mono'";
+  // adaptation banner
+  if(s.adapt){
+    ctx.fillStyle=F.wrong; ctx.textAlign="center";
+    ctx.fillText("body lowers OUT to resist the cut", ne_CX, 360);
+  }
+  ctx.textAlign="left";
+}
+ANIMS.nut_energy_static=(cv,ctx)=>ne_drawEnergy(ctx,cv,{in:0.8,out:0.8,adapt:false});
+ANIMS.nut_energy=async(cv,ctx)=>{
+  ne_drawEnergy(ctx,cv,{in:0.8,out:0.8,adapt:false});
+  await narrate("Body weight tracks energy in from food against energy out — metabolism, movement, and digesting what you eat.");
+  await narrate("Eat more than you burn and the IN side tips down; that surplus is stored.");
+  await tween(1400,k=>ne_drawEnergy(ctx,cv,{in:0.8+k*0.2,out:0.8,adapt:false}));
+  await narrate("Cut your intake and the balance tips the other way — at first.");
+  await tween(1200,k=>ne_drawEnergy(ctx,cv,{in:1.0-k*0.45,out:0.8,adapt:false}));
+  await narrate("But the body fights back: it lowers the OUT side, so the gap you were counting on shrinks.");
+  await tween(1600,k=>ne_drawEnergy(ctx,cv,{in:0.55,out:0.8-k*0.28,adapt:k>0.5}));
+  await narrate("This metabolic adaptation is why steady loss is hard — the target keeps moving.");
+};
+})();
+/* ---- frag_nut_macros.js ---- */
+/* nutrition / nut_macros */
+(function(){
+// three macronutrients: role, calories per gram, fill color
+const nm_MAC=[
+  {name:"PROTEIN", role:"builds & repairs", note:"most filling", kcal:4, col:F.ok},
+  {name:"CARBS",   role:"quick power",      note:"fuel",        kcal:4, col:F.post},
+  {name:"FAT",     role:"hormones, slow systems", note:"most energy-dense", kcal:9, col:F.wrong}
+];
+const nm_X0=90, nm_GAP=250, nm_W=150;    // first bar x, spacing, bar width
+const nm_BASE=300, nm_TOP=90;            // bar baseline y, max top y
+const nm_KMAX=9;                          // 9 kcal/g maps to full height
+function nm_drawMacros(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillStyle=F.txt; ctx.textAlign="center";
+  ctx.fillText("bar height = calories packed into one gram", 450, 40);
+  const full=nm_BASE-nm_TOP;
+  for(let i=0;i<3;i++){
+    const m=nm_MAC[i];
+    const x=nm_X0+i*nm_GAP;
+    // reveal fraction for this bar (0..1)
+    const rev=Math.max(0,Math.min(1,s.rev*3-i));
+    const h=full*(m.kcal/nm_KMAX)*rev;
+    // baseline
+    ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x-10,nm_BASE); ctx.lineTo(x+nm_W+10,nm_BASE); ctx.stroke();
+    // bar
+    ctx.fillStyle=m.col; ctx.globalAlpha=0.85;
+    ctx.fillRect(x,nm_BASE-h,nm_W,h); ctx.globalAlpha=1;
+    ctx.strokeStyle="#0F1A2C"; ctx.lineWidth=1; ctx.strokeRect(x,nm_BASE-h,nm_W,h);
+    if(rev>0.02){
+      // name under baseline
+      ctx.fillStyle=F.txt; ctx.font="16px 'IBM Plex Mono'";
+      ctx.fillText(m.name, x+nm_W/2, nm_BASE+24);
+      ctx.font="12px 'IBM Plex Mono'";
+      ctx.fillStyle=F.ax; ctx.fillText(m.role, x+nm_W/2, nm_BASE+42);
+      ctx.fillText(m.note, x+nm_W/2, nm_BASE+58);
+      // kcal/g label at bar top
+      if(rev>0.95){
+        ctx.fillStyle=F.txt; ctx.font="15px 'IBM Plex Mono'";
+        ctx.fillText(m.kcal+" cal/g", x+nm_W/2, nm_BASE-h-12);
+      }
+      ctx.font="14px 'IBM Plex Mono'";
+    }
+  }
+  // callout: fat vs carbs density
+  if(s.callout){
+    ctx.fillStyle=F.wrong; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign="center";
+    ctx.fillText("fat = 9 cal/g — more than double carbs & protein at 4", 450, 360);
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+  ctx.textAlign="left";
+}
+ANIMS.nut_macros_static=(cv,ctx)=>nm_drawMacros(ctx,cv,{rev:1,callout:true});
+ANIMS.nut_macros=async(cv,ctx)=>{
+  nm_drawMacros(ctx,cv,{rev:0,callout:false});
+  await narrate("Food is built from three macronutrients, each with a different job in the body.");
+  await tween(1000,k=>nm_drawMacros(ctx,cv,{rev:k/3,callout:false}));
+  await narrate("Protein builds and repairs tissue, and it's the most filling per calorie.");
+  await tween(1000,k=>nm_drawMacros(ctx,cv,{rev:1/3+k/3,callout:false}));
+  await narrate("Carbohydrates are quick power — both protein and carbs carry 4 calories per gram.");
+  await tween(1000,k=>nm_drawMacros(ctx,cv,{rev:2/3+k/3,callout:false}));
+  await narrate("Fat runs the slow systems — hormones and cell membranes — and packs 9 calories per gram.");
+  await tween(900,k=>nm_drawMacros(ctx,cv,{rev:1,callout:true}));
+  await narrate("That's more than double the density of carbs or protein, so fat adds up fast.");
+};
+})();
+/* ---- frag_nut_cardio_weights.js ---- */
+/* nutrition / nut_cardio_weights */
+(function(){
+// two training modes and the DIFFERENT systems each adapts
+const nc_AERO=["stronger heart pump","more mitochondria","better endurance","lower resting pulse"];
+const nc_RESIST=["bigger muscle","denser bone","more strength","faster metabolism"];
+const nc_LX=225, nc_RX=675;              // column centers
+const nc_TOP=120, nc_ROW=42;             // first row y, row spacing
+function nc_col(ctx,cx,title,items,col,rev){
+  // header chip
+  ctx.fillStyle=col; ctx.globalAlpha=0.9;
+  ctx.fillRect(cx-150,60,300,40); ctx.globalAlpha=1;
+  ctx.fillStyle="#0F1A2C"; ctx.font="18px 'IBM Plex Mono'"; ctx.textAlign="center";
+  ctx.fillText(title,cx,86);
+  ctx.font="14px 'IBM Plex Mono'";
+  for(let i=0;i<items.length;i++){
+    const on=rev*items.length>i;
+    if(!on) continue;
+    const y=nc_TOP+i*nc_ROW;
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(cx-120,y-4,5,0,7); ctx.fill();
+    ctx.fillStyle=F.txt; ctx.textAlign="left";
+    ctx.fillText(items[i],cx-105,y);
+  }
+}
+function nc_drawCW(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  // divider
+  ctx.strokeStyle="#22314a"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(450,55); ctx.lineTo(450,320); ctx.stroke();
+  nc_col(ctx,nc_LX,"AEROBIC / CARDIO",nc_AERO,F.post,s.aero);
+  nc_col(ctx,nc_RX,"RESISTANCE / WEIGHTS",nc_RESIST,F.ok,s.resist);
+  // both banner
+  if(s.both){
+    ctx.strokeStyle=F.txt; ctx.lineWidth=2;
+    ctx.strokeRect(300,332,300,34);
+    ctx.fillStyle=F.txt; ctx.font="16px 'IBM Plex Mono'"; ctx.textAlign="center";
+    ctx.fillText("different systems → do BOTH",450,354);
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+  ctx.textAlign="left";
+}
+ANIMS.nut_cardio_weights_static=(cv,ctx)=>nc_drawCW(ctx,cv,{aero:1,resist:1,both:true});
+ANIMS.nut_cardio_weights=async(cv,ctx)=>{
+  nc_drawCW(ctx,cv,{aero:0,resist:0,both:false});
+  await narrate("Cardio and weights aren't rivals — they train different systems in your body.");
+  await tween(1400,k=>nc_drawCW(ctx,cv,{aero:k,resist:0,both:false}));
+  await narrate("Aerobic work strengthens the heart, builds mitochondria, and raises endurance.");
+  await tween(1400,k=>nc_drawCW(ctx,cv,{aero:1,resist:k,both:false}));
+  await narrate("Resistance training builds muscle and bone, adds strength, and supports metabolism.");
+  await tween(700,k=>nc_drawCW(ctx,cv,{aero:1,resist:1,both:k>0.5}));
+  await narrate("Because each adapts a system the other misses, a balanced week includes both.");
+};
+})();
+/* ---- frag_nut_myths.js ---- */
+/* nutrition / nut_myths */
+(function(){
+// left = myth (gets ✗), right = the evidence-backed basic (gets ✓)
+const ny_ROWS=[
+  {myth:'"spot-reduce belly fat"',      truth:"enough protein daily"},
+  {myth:'"muscle turns into fat"',      truth:"mostly whole foods"},
+  {myth:'"detox teas cleanse toxins"',  truth:"resistance work + daily movement"},
+  {myth:'"carbs after 8pm ruin you"',   truth:"sleep 7–9 hours"}
+];
+const ny_TOP=120, ny_ROW=48;             // first row y, spacing
+const ny_MX=250, ny_TX=650;              // myth col x, truth col x
+function ny_drawMyths(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  // headers
+  ctx.textAlign="center";
+  ctx.fillStyle=F.wrong; ctx.font="17px 'IBM Plex Mono'";
+  ctx.fillText("MYTH",ny_MX,70);
+  ctx.fillStyle=F.ok; ctx.fillText("WHAT THE EVIDENCE SUPPORTS",ny_TX,70);
+  ctx.font="14px 'IBM Plex Mono'";
+  // divider
+  ctx.strokeStyle="#22314a"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(450,55); ctx.lineTo(450,340); ctx.stroke();
+  for(let i=0;i<ny_ROWS.length;i++){
+    const r=ny_ROWS[i], y=ny_TOP+i*ny_ROW;
+    // per-row resolve fraction
+    const rf=Math.max(0,Math.min(1,s.rev*ny_ROWS.length-i));
+    if(rf<=0) continue;
+    // myth text, struck out when resolved
+    ctx.textAlign="left"; ctx.fillStyle=F.txt;
+    ctx.fillText(r.myth, 90, y);
+    if(rf>0.5){
+      const w=ctx.measureText(r.myth).width;
+      ctx.strokeStyle=F.wrong; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(90,y-5); ctx.lineTo(90+w*Math.min(1,(rf-0.5)*2),y-5); ctx.stroke();
+      // red X mark
+      if(rf>0.9){ ctx.fillStyle=F.wrong; ctx.font="18px 'IBM Plex Mono'"; ctx.textAlign="center"; ctx.fillText("✗",405,y+1); ctx.font="14px 'IBM Plex Mono'"; }
+    }
+    // truth text with green check
+    ctx.textAlign="left"; ctx.fillStyle=F.txt;
+    ctx.fillText(r.truth, 495, y);
+    if(rf>0.9){ ctx.fillStyle=F.ok; ctx.font="18px 'IBM Plex Mono'"; ctx.textAlign="center"; ctx.fillText("✓",812,y+1); ctx.font="14px 'IBM Plex Mono'"; }
+  }
+  ctx.textAlign="left";
+}
+ANIMS.nut_myths_static=(cv,ctx)=>ny_drawMyths(ctx,cv,{rev:1});
+ANIMS.nut_myths=async(cv,ctx)=>{
+  ny_drawMyths(ctx,cv,{rev:0});
+  await narrate("Fitness advice is loud and often wrong — so let's sort the noise from the evidence.");
+  await tween(1200,k=>ny_drawMyths(ctx,cv,{rev:k/2}));
+  await narrate("You can't spot-reduce fat, and muscle never turns into fat — they're different tissues.");
+  await tween(1400,k=>ny_drawMyths(ctx,cv,{rev:0.5+k/2}));
+  await narrate("Detox teas don't cleanse you — your liver and kidneys already do that job.");
+  await narrate("What actually works is unglamorous: enough protein, mostly whole foods, and strength work.");
+  await narrate("Add daily movement and real sleep, and you've covered what the evidence supports.");
+};
+})();
+/* ---- frag_newton_laws.js ---- */
+/* newton / newton_laws */
+(function(){
+const nl_PANELS=[
+  {x0:60,x1:300,title:"1. INERTIA"},
+  {x0:330,x1:570,title:"2. F = m·a"},
+  {x0:600,x1:840,title:"3. ACTION–REACTION"}
+];
+const nl_FLOOR=300;
+function nl_arrow(ctx,x0,y0,x1,y1,col,w){
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w||2.5;
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+  const ang=Math.atan2(y1-y0,x1-x0),h=8;
+  ctx.beginPath();ctx.moveTo(x1,y1);
+  ctx.lineTo(x1-h*Math.cos(ang-0.4),y1-h*Math.sin(ang-0.4));
+  ctx.lineTo(x1-h*Math.cos(ang+0.4),y1-h*Math.sin(ang+0.4));
+  ctx.closePath();ctx.fill();
+}
+function nl_block(ctx,cx,cy,s,col){
+  ctx.fillStyle=col;ctx.strokeStyle="#0F1A2C";ctx.lineWidth=2;
+  ctx.fillRect(cx-s/2,cy-s/2,s,s);ctx.strokeRect(cx-s/2,cy-s/2,s,s);
+}
+function nl_frame(ctx,cv,st){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="center";ctx.textBaseline="alphabetic";
+  for(const p of nl_PANELS){
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.strokeRect(p.x0,60,p.x1-p.x0,280);
+    ctx.fillStyle=F.txt;ctx.fillText(p.title,(p.x0+p.x1)/2,86);
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(p.x0+10,nl_FLOOR);ctx.lineTo(p.x1-10,nl_FLOOR);ctx.stroke();
+  }
+  // Panel 1 INERTIA: block slides at constant velocity (no force) until st.p1>0.5 push
+  const p1=nl_PANELS[0];
+  const nx=(p1.x0+40)+st.p1*(p1.x1-p1.x0-80);
+  nl_block(ctx,nx,nl_FLOOR-15,30,F.ax);
+  ctx.fillStyle=F.prior;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("no force → velocity unchanged",(p1.x0+p1.x1)/2,320);
+  ctx.font="14px 'IBM Plex Mono'";
+  // Panel 2 F=ma: force arrow pushes mass; acceleration grows with st.p2
+  const p2=nl_PANELS[1];
+  const bx=(p2.x0+50)+st.p2*st.p2*(p2.x1-p2.x0-110);
+  nl_block(ctx,bx,nl_FLOOR-16,32,F.post);
+  nl_arrow(ctx,bx-16-40,nl_FLOOR-16,bx-16,nl_FLOOR-16,F.ok,3);
+  ctx.fillStyle=F.ok;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("F",bx-16-52,nl_FLOOR-20);
+  ctx.fillStyle=F.txt;
+  ctx.fillText("bigger F or smaller m → more a",(p2.x0+p2.x1)/2,320);
+  ctx.font="14px 'IBM Plex Mono'";
+  // Panel 3 ACTION-REACTION: two blocks push apart, equal-opposite arrows
+  const p3=nl_PANELS[2];
+  const cx=(p3.x0+p3.x1)/2,sep=10+st.p3*55;
+  const lx=cx-sep-14,rx=cx+sep+14;
+  nl_block(ctx,lx,nl_FLOOR-15,28,F.ax);
+  nl_block(ctx,rx,nl_FLOOR-15,28,F.post);
+  nl_arrow(ctx,cx-4,nl_FLOOR-15,cx-4-38,nl_FLOOR-15,F.wrong,3);
+  nl_arrow(ctx,cx+4,nl_FLOOR-15,cx+4+38,nl_FLOOR-15,F.ok,3);
+  ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("equal & opposite pushes",(p3.x0+p3.x1)/2,320);
+  ctx.textAlign="left";ctx.font="14px 'IBM Plex Mono'";
+}
+ANIMS.newton_laws_static=(cv,ctx)=>nl_frame(ctx,cv,{p1:0.5,p2:0.6,p3:0.6});
+ANIMS.newton_laws=async(cv,ctx)=>{
+  nl_frame(ctx,cv,{p1:0.0,p2:0.0,p3:0.0});
+  await narrate("Newton's first law: inertia keeps an object at rest or moving steadily until a force acts on it.");
+  await tween(1600,k=>nl_frame(ctx,cv,{p1:k,p2:0,p3:0}));
+  await narrate("Second law: force equals mass times acceleration, so a bigger force or a smaller mass gives more acceleration.");
+  await tween(1600,k=>nl_frame(ctx,cv,{p1:1,p2:k,p3:0}));
+  await narrate("Third law: every action has an equal and opposite reaction — push and you get pushed back.");
+  await tween(1600,k=>nl_frame(ctx,cv,{p1:1,p2:1,p3:k}));
+};
+})();
+/* ---- frag_newton_fbd.js ---- */
+/* newton / newton_fbd */
+(function(){
+// Incline angle theta; block sits at center BX,BY. Forces drawn from center.
+const nf_TH=25*Math.PI/180;      // incline angle (radians)
+const nf_BX=430,nf_BY=210;       // block center (pixels)
+const nf_G=95;                    // gravity arrow length (px)
+function nf_arrow(ctx,x0,y0,dx,dy,col,label,lox,loy){
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=3;
+  const x1=x0+dx,y1=y0+dy;
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+  const ang=Math.atan2(dy,dx),h=10;
+  ctx.beginPath();ctx.moveTo(x1,y1);
+  ctx.lineTo(x1-h*Math.cos(ang-0.4),y1-h*Math.sin(ang-0.4));
+  ctx.lineTo(x1-h*Math.cos(ang+0.4),y1-h*Math.sin(ang+0.4));
+  ctx.closePath();ctx.fill();
+  if(label){ctx.font="13px 'IBM Plex Mono'";ctx.fillText(label,x1+(lox||6),y1+(loy||0));}
+}
+function nf_frame(ctx,cv,st){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";ctx.textBaseline="alphabetic";
+  // Incline surface: a right triangle rising to the right
+  const ix0=120,iy0=330,ix1=760,iy1=330-Math.tan(nf_TH)*(760-120);
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(ix0,iy0);ctx.lineTo(ix1,iy1);ctx.lineTo(ix1,iy0);ctx.closePath();ctx.stroke();
+  ctx.fillStyle="rgba(124,141,165,0.10)";ctx.fill();
+  ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("θ = 25°",ix1-70,iy0-8);
+  // Block: a small square oriented on the incline
+  ctx.save();ctx.translate(nf_BX,nf_BY);ctx.rotate(-nf_TH);
+  ctx.fillStyle=F.post;ctx.strokeStyle="#0F1A2C";ctx.lineWidth=2;
+  ctx.fillRect(-24,-24,48,48);ctx.strokeRect(-24,-24,48,48);
+  ctx.restore();
+  // Unit directions
+  const upx=Math.cos(nf_TH),upy=-Math.sin(nf_TH);          // up-slope (+x right, +y down)
+  const nx=Math.sin(nf_TH),ny=-Math.cos(nf_TH);            // normal (perpendicular, away from surface)
+  // Magnitudes (scaled). Gravity W=nf_G down. Components along/perp to slope:
+  const W=nf_G;
+  const Wperp=W*Math.cos(nf_TH);   // balanced by Normal
+  const Wpar =W*Math.sin(nf_TH);   // pulls DOWN-slope
+  const applied=st.applied*Wpar*1.0; // applied force UP-slope, grows 0..just under Wpar
+  const s=st;
+  // 1 gravity (always down)
+  if(s.g>0) nf_arrow(ctx,nf_BX,nf_BY,0,W*s.g,F.ax,s.g>=1?"gravity (mg)":"",8,4);
+  // 2 normal (perpendicular to surface, outward)
+  if(s.n>0) nf_arrow(ctx,nf_BX,nf_BY,nx*Wperp*s.n,ny*Wperp*s.n,F.ok,s.n>=1?"normal N":"",6,-4);
+  // 3 friction (up-slope, opposing the down-slope slide) — partial, less than Wpar
+  const fric=Wpar*0.55;
+  if(s.f>0) nf_arrow(ctx,nf_BX,nf_BY,upx*fric*s.f,upy*fric*s.f,F.prior,s.f>=1?"friction f":"",-70,-2);
+  // 4 applied (up-slope)
+  if(s.a>0) nf_arrow(ctx,nf_BX,nf_BY,upx*applied*s.a,upy*applied*s.a,F.post,s.a>=1?"applied":"",6,18);
+  // 5 NET force = vector sum (gravity + normal + friction + applied)
+  if(s.net>0){
+    const sumx = 0 + nx*Wperp + upx*fric + upx*applied;
+    const sumy = W + ny*Wperp + upy*fric + upy*applied;
+    nf_arrow(ctx,nf_BX,nf_BY,sumx*s.net,sumy*s.net,F.wrong,s.net>=1?"NET → accelerates":"",6,4);
+  }
+  // dot at center
+  ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(nf_BX,nf_BY,3,0,7);ctx.fill();
+  ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("free-body diagram: one object, every force from its center",60,60);
+  ctx.textAlign="left";
+}
+ANIMS.newton_fbd_static=(cv,ctx)=>nf_frame(ctx,cv,{g:1,n:1,f:1,a:1,net:0});
+ANIMS.newton_fbd=async(cv,ctx)=>{
+  nf_frame(ctx,cv,{g:0,n:0,f:0,a:0,net:0,applied:0.35});
+  await narrate("A free-body diagram isolates one object and draws every force acting on it as an arrow from its center.");
+  await tween(900,k=>nf_frame(ctx,cv,{g:k,n:0,f:0,a:0,net:0,applied:0.35}));
+  await narrate("Gravity pulls straight down; the surface pushes back with a normal force perpendicular to the incline.");
+  await tween(900,k=>nf_frame(ctx,cv,{g:1,n:k,f:0,a:0,net:0,applied:0.35}));
+  await narrate("Friction acts along the surface, and any applied push adds its own arrow up the slope.");
+  await tween(900,k=>nf_frame(ctx,cv,{g:1,n:1,f:k,a:k,net:0,applied:0.35}));
+  await narrate("Add the arrows as vectors: the net force points down-slope, so the block accelerates that way.");
+  await tween(1200,k=>nf_frame(ctx,cv,{g:1,n:1,f:1,a:1,net:k,applied:0.35}));
+};
+})();
+/* ---- frag_newton_limits.js ---- */
+/* newton / newton_limits */
+(function(){
+// Validity map: X axis = speed (everyday → near light c), Y axis = scale (everyday → atomic, up).
+const nx_X0=110,nx_X1=800,nx_Y0=320,nx_Y1=70;
+const nx_sx=t=>nx_X0+t*(nx_X1-nx_X0);   // t 0..1 : slow → near c
+const nx_sy=t=>nx_Y0-t*(nx_Y0-nx_Y1);   // t 0..1 : everyday → atomic (up)
+// failure thresholds (in t units)
+const nx_REL=0.72;   // right of this: relativistic
+const nx_QNT=0.72;   // above this: quantum
+function nx_frame(ctx,cv,st){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";ctx.textBaseline="alphabetic";
+  // relativistic failure band (right column)
+  ctx.fillStyle="rgba(212,106,98,0.18)";
+  ctx.fillRect(nx_sx(nx_REL),nx_Y1,nx_sx(1)-nx_sx(nx_REL),nx_Y0-nx_Y1);
+  // quantum failure band (top row)
+  ctx.fillRect(nx_X0,nx_Y1,nx_X1-nx_X0,nx_sy(nx_QNT)-nx_Y1);
+  // green safe zone (everyday middle: low speed AND large scale)
+  ctx.fillStyle="rgba(95,191,149,0.16)";
+  ctx.fillRect(nx_X0,nx_sy(nx_QNT),nx_sx(nx_REL)-nx_X0,nx_Y0-nx_sy(nx_QNT));
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=1;g<5;g++){ctx.beginPath();ctx.moveTo(nx_sx(g/5),nx_Y1);ctx.lineTo(nx_sx(g/5),nx_Y0);ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(nx_X0,nx_Y0);ctx.lineTo(nx_X1,nx_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(nx_X0,nx_Y0);ctx.lineTo(nx_X0,nx_Y1);ctx.stroke();
+  // labels
+  ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";
+  ctx.textAlign="center";ctx.fillText("SPEED  →  near light (c)",(nx_X0+nx_X1)/2,nx_Y0+26);
+  ctx.save();ctx.translate(nx_X0-34,(nx_Y0+nx_Y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("SCALE → atomic",0,0);ctx.restore();
+  ctx.textAlign="left";
+  // zone captions
+  ctx.fillStyle=F.ok;ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillText("NEWTON WORKS",nx_sx(0.14),nx_sy(0.34));
+  ctx.font="12px 'IBM Plex Mono'";ctx.fillText("(the everyday world)",nx_sx(0.14),nx_sy(0.34)+18);
+  ctx.fillStyle=F.wrong;ctx.font="13px 'IBM Plex Mono'";
+  ctx.save();ctx.translate(nx_sx(0.86),nx_sy(0.30));ctx.rotate(-Math.PI/2);ctx.textAlign="center";
+  ctx.fillText("RELATIVITY (Einstein)",0,0);ctx.restore();
+  ctx.textAlign="center";ctx.fillText("QUANTUM MECHANICS",nx_sx(0.42),nx_sy(0.88));
+  ctx.textAlign="left";
+  // marker path: start safe center, move toward chosen edge
+  const mt=st.t;
+  let mx,my,fail=false,which="";
+  if(st.dir==="rel"){mx=0.20+mt*(0.90-0.20);my=0.28;if(mx>=nx_REL){fail=true;which="Newton fails: near light speed";}}
+  else{mx=0.28;my=0.20+mt*(0.90-0.20);if(my>=nx_QNT){fail=true;which="Newton fails: atomic scale";}}
+  const px=nx_sx(mx),py=nx_sy(my);
+  ctx.fillStyle=fail?F.wrong:F.post;
+  ctx.beginPath();ctx.arc(px,py,7,0,7);ctx.fill();
+  if(fail){
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=2;ctx.beginPath();ctx.arc(px,py,7+4*Math.sin(mt*20),0,7);ctx.stroke();
+    ctx.fillStyle=F.wrong;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="center";
+    ctx.fillText(which,px,py-16);ctx.textAlign="left";
+  }
+}
+ANIMS.newton_limits_static=(cv,ctx)=>nx_frame(ctx,cv,{t:0,dir:"rel"});
+ANIMS.newton_limits=async(cv,ctx)=>{
+  nx_frame(ctx,cv,{t:0,dir:"rel"});
+  await narrate("Newton's laws are superb across the everyday world — ordinary speeds and ordinary sizes, the green zone.");
+  await narrate("But push toward the speed of light and the everyday rules start to fail.");
+  await tween(1800,k=>nx_frame(ctx,cv,{t:k,dir:"rel"}));
+  await narrate("There you need Einstein's relativity instead of Newton.");
+  nx_frame(ctx,cv,{t:0,dir:"qnt"});
+  await narrate("Shrink down to the scale of atoms and Newton breaks again — quantum mechanics takes over.");
+  await tween(1800,k=>nx_frame(ctx,cv,{t:k,dir:"qnt"}));
+};
+})();
+/* ---- frag_bio_scaling.js ---- */
+/* biophysics / bio_scaling */
+(function(){
+// Cube of side L: surface area = 6·L², volume = L³, so SA/V = 6/L (falls as L grows).
+const bs_SAV=L=>6/L;             // ratio in 1/length units
+const bs_BASE=280;               // baseline y (px) both cubes stand on
+// draw a pseudo-3D cube of pixel side p, front-bottom-left at (x,y)
+function bs_cube(ctx,x,y,p,col){
+  const d=p*0.32;                // depth offset
+  // front face
+  ctx.fillStyle=col;ctx.strokeStyle="#0F1A2C";ctx.lineWidth=2;
+  ctx.fillRect(x,y-p,p,p);ctx.strokeRect(x,y-p,p,p);
+  // top face
+  ctx.fillStyle="rgba(255,255,255,0.14)";
+  ctx.beginPath();ctx.moveTo(x,y-p);ctx.lineTo(x+d,y-p-d);ctx.lineTo(x+p+d,y-p-d);ctx.lineTo(x+p,y-p);ctx.closePath();ctx.fill();ctx.stroke();
+  // right face
+  ctx.fillStyle="rgba(0,0,0,0.22)";
+  ctx.beginPath();ctx.moveTo(x+p,y-p);ctx.lineTo(x+p+d,y-p-d);ctx.lineTo(x+p+d,y-d);ctx.lineTo(x+p,y);ctx.closePath();ctx.fill();ctx.stroke();
+}
+function bs_frame(ctx,cv,st){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";ctx.textBaseline="alphabetic";
+  ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("surface area ∝ L²    volume (mass) ∝ L³    →    SA/V = 6 / L",120,50);
+  // small reference cube (left) — L=1
+  const smP=54;
+  bs_cube(ctx,110,bs_BASE,smP,F.ok);
+  ctx.fillStyle=F.txt;ctx.textAlign="center";ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("SMALL",110+smP/2,bs_BASE+24);
+  ctx.fillStyle=F.ok;ctx.fillText("SA/V = "+bs_SAV(1).toFixed(1),110+smP/2,bs_BASE+42);
+  ctx.fillText("(high — sheds heat fast)",110+smP/2,bs_BASE+60);
+  // growing / large cube (right) — L from st.L
+  const L=st.L;                       // 1 .. 4
+  const bigP=54*L*0.42+30;            // pixel side grows with L (bounded)
+  const bx=470;
+  ctx.fillStyle=L>2?F.post:F.ok;
+  bs_cube(ctx,bx,bs_BASE,bigP,L>2.2?F.post:F.ok);
+  const sav=bs_SAV(L);
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("L = "+L.toFixed(1)+"×",bx+bigP/2,bs_BASE+24);
+  ctx.fillStyle=F.post;ctx.font="18px 'IBM Plex Mono'";
+  ctx.fillText("SA/V = "+sav.toFixed(2),bx+bigP/2,bs_BASE+46);
+  ctx.font="13px 'IBM Plex Mono'";ctx.fillStyle=F.txt;
+  ctx.fillText(L>2.3?"(low — retains heat, needs thicker bones)":"(ratio falling…)",bx+bigP/2,bs_BASE+64);
+  // consequence note top-right
+  ctx.textAlign="right";ctx.fillStyle=F.prior;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("strength ∝ area ∝ L²   but weight ∝ L³",860,50);
+  ctx.textAlign="left";
+}
+ANIMS.bio_scaling_static=(cv,ctx)=>bs_frame(ctx,cv,{L:3.2});
+ANIMS.bio_scaling=async(cv,ctx)=>{
+  bs_frame(ctx,cv,{L:1.0});
+  await narrate("Surface area grows as length squared, but volume and mass grow as length cubed.");
+  await narrate("So as an animal gets bigger, its surface-to-volume ratio drops — here SA/V equals six divided by L.");
+  await tween(2200,k=>bs_frame(ctx,cv,{L:1.0+k*3.0}));
+  await narrate("Big animals have little surface per unit mass, so they lose body heat more slowly than small ones.");
+  await narrate("But weight climbs faster than bone strength, so big animals need disproportionately thicker bones to stand up.");
+};
+})();
+/* ---- frag_rome_roads.js ---- */
+/* rome / rome_roads */
+(function(){
+const rr_XL=230, rr_XR=670, rr_cx=450, rr_halfW=220;
+const rr_top=182, rr_crownH=16, rr_bottom=300;
+const rr_layers=[
+  {n:"Statumen — large foundation stones", y0:300, y1:262, fill:"#565f6e"},
+  {n:"Rudus — crushed rock & rubble",       y0:262, y1:230, fill:"#6b7484"},
+  {n:"Nucleus — fine gravel / concrete",    y0:230, y1:202, fill:"#8b93a2"},
+  {n:"Summum dorsum — paved surface",       y0:202, y1:182, fill:"#aeb6c4"},
+];
+const rr_ED="#2c3a52";
+const rr_clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const rr_camberTop=(x,c)=>{const t=(x-rr_cx)/rr_halfW; return rr_top - c*rr_crownH*(1-t*t);};
+
+// droplet path point for parameter p in 0..1 (surface -> shoulder -> ditch)
+function rr_dropPt(p){
+  if(p<0.5){const q=p/0.5, x=rr_cx+q*(rr_XR-rr_cx); return {x, y:rr_camberTop(x,1)};}
+  if(p<0.8){const q=(p-0.5)/0.3; return {x:rr_XR+q*(694-rr_XR), y:rr_top+q*(300-rr_top)};}
+  const q=(p-0.8)/0.2; return {x:694+q*8, y:300+q*16};
+}
+
+function rr_groma(ctx){
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  // staff
+  ctx.beginPath(); ctx.moveTo(110,150); ctx.lineTo(110,70); ctx.stroke();
+  // cross arm
+  ctx.beginPath(); ctx.moveTo(80,74); ctx.lineTo(140,74); ctx.stroke();
+  // plumb lines + bobs
+  ctx.strokeStyle="#7C8DA5"; ctx.lineWidth=1;
+  [80,140].forEach(px=>{
+    ctx.beginPath(); ctx.moveTo(px,74); ctx.lineTo(px,96); ctx.stroke();
+    ctx.fillStyle="#7C8DA5"; ctx.beginPath(); ctx.arc(px,99,2.5,0,7); ctx.fill();
+  });
+  // dead-straight sight line
+  ctx.strokeStyle="#E8A13C"; ctx.setLineDash([7,6]); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(140,74); ctx.lineTo(858,74); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle="#D7DFEA"; ctx.font="12px 'IBM Plex Mono'"; ctx.textAlign="left";
+  ctx.fillText("surveyed dead straight — the groma", 300, 64);
+}
+
+function rr_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'"; ctx.textAlign="left";
+
+  // existing grade line + side ditches
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(0,300); ctx.lineTo(180,300); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(720,300); ctx.lineTo(900,300); ctx.stroke();
+  ctx.setLineDash([]);
+  // ditch V notches
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(180,300); ctx.lineTo(196,318); ctx.lineTo(212,300); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(694,300); ctx.lineTo(702,316); ctx.lineTo(720,300); ctx.stroke();
+  ctx.fillStyle="#4c6a8a"; // water hint in ditches
+  ctx.beginPath(); ctx.moveTo(184,308); ctx.lineTo(196,315); ctx.lineTo(208,308); ctx.closePath(); ctx.fill();
+
+  // build layers bottom-up
+  for(let i=0;i<rr_layers.length;i++){
+    const L=rr_layers[i], rf=rr_clamp(s.built-i,0,1);
+    if(rf<=0) continue;
+    ctx.fillStyle=L.fill; ctx.strokeStyle=rr_ED; ctx.lineWidth=1;
+    if(i===3){
+      // summum: crowned camber top once fully revealed, else flat partial fill
+      if(rf>=1){
+        ctx.beginPath(); ctx.moveTo(rr_XL,L.y0);
+        for(let x=rr_XL;x<=rr_XR;x+=6) ctx.lineTo(x, rr_camberTop(x,s.camber));
+        ctx.lineTo(rr_XR,L.y0); ctx.closePath(); ctx.fill(); ctx.stroke();
+      }else{
+        const ty=L.y0-rf*(L.y0-L.y1);
+        ctx.fillRect(rr_XL,ty,rr_XR-rr_XL,L.y0-ty); ctx.strokeRect(rr_XL,ty,rr_XR-rr_XL,L.y0-ty);
+      }
+    }else{
+      const ty=L.y0-rf*(L.y0-L.y1);
+      ctx.fillRect(rr_XL,ty,rr_XR-rr_XL,L.y0-ty); ctx.strokeRect(rr_XL,ty,rr_XR-rr_XL,L.y0-ty);
+    }
+  }
+
+  // textures for fully-built layers
+  ctx.save(); ctx.beginPath(); ctx.rect(rr_XL,150,rr_XR-rr_XL,rr_bottom-150); ctx.clip();
+  if(s.built>=1){ // statumen: big stones
+    ctx.strokeStyle=rr_ED; ctx.lineWidth=1; ctx.fillStyle="rgba(0,0,0,0.10)";
+    for(let x=rr_XL+24;x<rr_XR-8;x+=48){ctx.beginPath(); ctx.ellipse(x,281,20,11,0,0,7); ctx.fill(); ctx.stroke();}
+  }
+  if(s.built>=2){ // rudus: rubble
+    ctx.fillStyle="rgba(20,26,38,0.45)";
+    for(let x=rr_XL+12;x<rr_XR;x+=19)for(let r=0;r<2;r++){ctx.beginPath(); ctx.arc(x+(r?8:0),240+r*14,3,0,7); ctx.fill();}
+  }
+  if(s.built>=3){ // nucleus: fine grains
+    ctx.fillStyle="rgba(30,38,54,0.40)";
+    for(let x=rr_XL+8;x<rr_XR;x+=11){ctx.beginPath(); ctx.arc(x,216,1.6,0,7); ctx.fill();}
+  }
+  if(s.built>=4){ // summum: paving joints
+    ctx.strokeStyle="rgba(30,38,54,0.55)"; ctx.lineWidth=1;
+    for(let x=rr_XL+20;x<rr_XR;x+=27){ctx.beginPath(); ctx.moveTo(x,rr_camberTop(x,s.camber)); ctx.lineTo(x,202); ctx.stroke();}
+  }
+  ctx.restore();
+
+  // shoulders (drainage slopes off the crown to the ditches)
+  if(s.built>=4){
+    ctx.strokeStyle="#8b93a2"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(rr_XR,rr_camberTop(rr_XR,s.camber)); ctx.lineTo(694,300); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(rr_XL,rr_camberTop(rr_XL,s.camber)); ctx.lineTo(206,300); ctx.stroke();
+  }
+
+  // camber crown indicator
+  if(s.camber>0.9 && s.built>=4){
+    ctx.strokeStyle="#E8A13C"; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(rr_cx,rr_camberTop(rr_cx,1)-6); ctx.lineTo(rr_cx,rr_camberTop(rr_cx,1)-26); ctx.stroke();
+    ctx.fillStyle="#E8A13C"; ctx.font="12px 'IBM Plex Mono'"; ctx.textAlign="center";
+    ctx.fillText("camber (crown)", rr_cx, rr_camberTop(rr_cx,1)-32); ctx.textAlign="left";
+  }
+
+  // water droplet running off
+  if(s.drop>=0){
+    const d=rr_dropPt(rr_clamp(s.drop,0,1));
+    ctx.fillStyle="#4fa3d1"; ctx.beginPath(); ctx.arc(d.x,d.y-3,4,0,7); ctx.fill();
+    ctx.strokeStyle="rgba(79,163,209,0.5)"; ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let p=0;p<=rr_clamp(s.drop,0,1)+0.001;p+=0.03){const q=rr_dropPt(p); if(p===0)ctx.moveTo(q.x,q.y-3); else ctx.lineTo(q.x,q.y-3);} ctx.stroke();
+  }
+
+  // layer labels (left) with leaders
+  ctx.font="12px 'IBM Plex Mono'";
+  const rr_lblY=[118,158,198,238]; // summum..statumen order top-down
+  const rr_mid=[186,216,246,281];
+  for(let j=0;j<4;j++){
+    const li=3-j; // label list top=summum(3)
+    const rf=rr_clamp(s.built-li,0,1); if(rf<1) continue;
+    ctx.fillStyle=rr_layers[li].fill; ctx.fillRect(14,rr_lblY[j]-9,10,10);
+    ctx.strokeStyle=rr_ED; ctx.strokeRect(14,rr_lblY[j]-9,10,10);
+    ctx.fillStyle="#D7DFEA"; ctx.fillText(rr_layers[li].n, 30, rr_lblY[j]);
+    ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(208,rr_lblY[j]-3); ctx.lineTo(rr_XL,rr_mid[li]); ctx.stroke();
+  }
+
+  if(s.showGroma) rr_groma(ctx);
+}
+
+ANIMS.rome_roads_static=(cv,ctx)=>rr_draw(ctx,cv,{built:4,camber:1,drop:0.92,showGroma:true});
+ANIMS.rome_roads=async(cv,ctx)=>{
+  rr_draw(ctx,cv,{built:0,camber:0,drop:-1,showGroma:false});
+  await narrate("Roman roads were built in engineered layers, dug into a trench and stacked for strength and drainage.");
+  await tween(2400,k=>rr_draw(ctx,cv,{built:k*4,camber:0,drop:-1,showGroma:false}));
+  await narrate("From the bottom up: statumen (large stones), rudus (crushed rock), nucleus (fine concrete), then the paved summum dorsum.");
+  await tween(1400,k=>rr_draw(ctx,cv,{built:4,camber:k,drop:-1,showGroma:false}));
+  await narrate("The surface was crowned into a camber, so rain runs off the middle to drainage ditches on each side.");
+  await tween(1700,k=>rr_draw(ctx,cv,{built:4,camber:1,drop:k,showGroma:false}));
+  await narrate("Surveyors sighted the route dead straight across the landscape using a tool called the groma.");
+  rr_draw(ctx,cv,{built:4,camber:1,drop:0.99,showGroma:true});
+};
+})();
+/* ---- frag_rome_machines.js ---- */
+/* rome / rome_machines */
+(function(){
+const rm_beamY=88, rm_groundY=342;
+const rm_bx=470;                 // block centre-line x
+const rm_fixTop=100, rm_fixBot=122;  // fixed block sheaves
+const rm_falls=[446,462,478,494];    // 4 rope falls -> mechanical advantage 4
+const rm_clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+function rm_arrow(ctx,x,y0,y1,col,w){
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=w;
+  ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,y1); ctx.stroke();
+  const d=y1>y0?1:-1;
+  ctx.beginPath(); ctx.moveTo(x,y1); ctx.lineTo(x-5,y1-d*9); ctx.lineTo(x+5,y1-d*9); ctx.closePath(); ctx.fill();
+}
+
+function rm_worker(ctx,hx,hy){
+  ctx.strokeStyle="#D7DFEA"; ctx.lineWidth=2; ctx.fillStyle="#D7DFEA";
+  const fx=290, fy=rm_groundY;      // feet
+  const head=fy-70;
+  ctx.beginPath(); ctx.arc(fx,head,7,0,7); ctx.stroke();       // head
+  ctx.beginPath(); ctx.moveTo(fx,head+7); ctx.lineTo(fx,fy-28); ctx.stroke(); // torso
+  ctx.beginPath(); ctx.moveTo(fx,fy-28); ctx.lineTo(fx-12,fy); ctx.moveTo(fx,fy-28); ctx.lineTo(fx+12,fy); ctx.stroke(); // legs
+  ctx.beginPath(); ctx.moveTo(fx,head+16); ctx.lineTo(hx,hy); ctx.stroke(); // arm to rope
+}
+
+function rm_treadwheel(ctx){
+  // faint historical power source at the right post
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(742,300,30,0,7); ctx.stroke();
+  ctx.beginPath(); ctx.arc(742,300,22,0,7); ctx.stroke();
+  for(let a=0;a<6;a++){const an=a*Math.PI/3; ctx.beginPath(); ctx.moveTo(742,300); ctx.lineTo(742+30*Math.cos(an),300+30*Math.sin(an)); ctx.stroke();}
+  ctx.fillStyle="#7C8DA5"; ctx.font="11px 'IBM Plex Mono'"; ctx.textAlign="center";
+  ctx.fillText("treadwheel", 742, 348); ctx.textAlign="left";
+}
+
+function rm_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'"; ctx.textAlign="left";
+  const lift=rm_clamp(s.lift,0,1);
+  const liftPx=60*lift;
+  const mvTop=248-liftPx;          // moving block top rises
+  const mvBot=mvTop+18;
+  const stoneTop=mvBot+18, stoneH=56, stoneW=94;
+
+  // ground
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(0,rm_groundY); ctx.lineTo(900,rm_groundY); ctx.stroke();
+
+  // gantry: beam + posts
+  ctx.strokeStyle="#6b7484"; ctx.lineWidth=6;
+  ctx.beginPath(); ctx.moveTo(180,rm_beamY); ctx.lineTo(760,rm_beamY); ctx.stroke();
+  ctx.lineWidth=8;
+  ctx.beginPath(); ctx.moveTo(200,rm_beamY); ctx.lineTo(200,rm_groundY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(740,rm_beamY); ctx.lineTo(740,rm_groundY); ctx.stroke();
+
+  rm_treadwheel(ctx);
+
+  // rope falls between the two blocks (the reeved tackle)
+  ctx.strokeStyle="#c9a06a"; ctx.lineWidth=2;
+  for(const fx of rm_falls){ctx.beginPath(); ctx.moveTo(fx,rm_fixBot); ctx.lineTo(fx,mvTop); ctx.stroke();}
+  // reeving arcs: bottom (moving) between 1-2 and 3-4, top (fixed) between 2-3
+  ctx.beginPath(); ctx.arc((rm_falls[0]+rm_falls[1])/2,mvTop,(rm_falls[1]-rm_falls[0])/2,0,Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.arc((rm_falls[2]+rm_falls[3])/2,mvTop,(rm_falls[3]-rm_falls[2])/2,0,Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.arc((rm_falls[1]+rm_falls[2])/2,rm_fixBot,(rm_falls[2]-rm_falls[1])/2,Math.PI,2*Math.PI); ctx.stroke();
+
+  // lead rope: from fixed block over a guide at the beam, down to the worker's hands
+  const handY=196+70*lift, handX=300;
+  ctx.strokeStyle="#c9a06a"; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(rm_falls[0],rm_fixBot);
+  ctx.lineTo(rm_falls[0],rm_fixTop-2);
+  ctx.lineTo(handX,rm_beamY);
+  ctx.lineTo(handX,handY);
+  ctx.stroke();
+  // guide sheave
+  ctx.fillStyle="#8b93a2"; ctx.beginPath(); ctx.arc(handX,rm_beamY,4,0,7); ctx.fill();
+
+  // fixed block
+  ctx.fillStyle="#565f6e"; ctx.strokeStyle="#2c3a52"; ctx.lineWidth=1.5;
+  ctx.fillRect(rm_bx-40,rm_fixTop-6,80,26); ctx.strokeRect(rm_bx-40,rm_fixTop-6,80,26);
+  // hanger from beam
+  ctx.strokeStyle="#6b7484"; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(rm_bx,rm_beamY); ctx.lineTo(rm_bx,rm_fixTop-6); ctx.stroke();
+
+  // moving block
+  ctx.fillStyle="#565f6e"; ctx.strokeStyle="#2c3a52"; ctx.lineWidth=1.5;
+  ctx.fillRect(rm_bx-32,mvTop,64,22); ctx.strokeRect(rm_bx-32,mvTop,64,22);
+  // short rope to stone
+  ctx.strokeStyle="#c9a06a"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(rm_bx,mvBot); ctx.lineTo(rm_bx,stoneTop); ctx.stroke();
+
+  // heavy stone block
+  ctx.fillStyle="#8b93a2"; ctx.strokeStyle="#2c3a52"; ctx.lineWidth=1.5;
+  ctx.fillRect(rm_bx-stoneW/2,stoneTop,stoneW,stoneH); ctx.strokeRect(rm_bx-stoneW/2,stoneTop,stoneW,stoneH);
+  ctx.strokeStyle="rgba(30,38,54,0.5)";
+  ctx.beginPath(); ctx.moveTo(rm_bx-stoneW/2,stoneTop+stoneH/2); ctx.lineTo(rm_bx+stoneW/2,stoneTop+stoneH/2); ctx.stroke();
+
+  rm_worker(ctx,handX,handY);
+
+  // force arrows + labels
+  rm_arrow(ctx,rm_bx,stoneTop+stoneH+6,stoneTop+stoneH+56,"#D46A62",4); // big load
+  ctx.fillStyle="#D46A62"; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign="center";
+  ctx.fillText("Load W ≈ 2 t (20 kN)", rm_bx, stoneTop+stoneH+72);
+
+  rm_arrow(ctx,handX+16,handY-4,handY+30,"#5FBF95",2.5);           // small effort
+  ctx.fillStyle="#5FBF95"; ctx.textAlign="left";
+  ctx.fillText("Effort ≈ W÷4 ≈ 5 kN", handX+24, handY+16);
+
+  // tackle annotation
+  ctx.fillStyle="#E8A13C"; ctx.font="12px 'IBM Plex Mono'"; ctx.textAlign="left";
+  ctx.fillText("4 supporting ropes", 540, 170);
+  ctx.strokeStyle="#E8A13C"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(535,166); ctx.lineTo(rm_falls[3]+4,(rm_fixBot+mvTop)/2); ctx.stroke();
+
+  // trade-off strip
+  ctx.fillStyle="#D7DFEA"; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign="center";
+  ctx.fillText("mechanical advantage 4×  —  pull 4× the rope for ¼ the force", 450, 372);
+}
+
+ANIMS.rome_machines_static=(cv,ctx)=>rm_draw(ctx,cv,{lift:0.55});
+ANIMS.rome_machines=async(cv,ctx)=>{
+  rm_draw(ctx,cv,{lift:0});
+  await narrate("Roman cranes used a block and tackle: one rope threaded back and forth between two pulley blocks.");
+  await tween(2200,k=>rm_draw(ctx,cv,{lift:k}));
+  await narrate("Each of the four rope falls carries a share of the load, so the pull is only about a quarter of the weight.");
+  await narrate("A 2-tonne stone needs a pull of just half a tonne — but the rope must be hauled four times as far.");
+  await narrate("That is mechanical advantage: you trade a longer pull for a smaller force, energy in equalling energy out.");
+  rm_draw(ctx,cv,{lift:1});
+};
 })();
 
 </script>
