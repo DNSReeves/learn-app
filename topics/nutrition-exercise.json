@@ -85,6 +85,121 @@
       ]
     },
     {
+      "id": "intermittent-fasting",
+      "title": "Intermittent fasting — the good, the bad, the ugly",
+      "summary": "Fasting windows are wildly popular. The honest verdict: a useful tool for some, mostly calorie restriction in a costume, and oversold as a 'cure.'",
+      "cards": [
+        {
+          "h": "What it is — and the Good",
+          "md": "**Intermittent fasting (IF)** is not a diet of *what* you eat but *when*. The common forms:\n\n- **16:8 (time-restricted eating)** — all food in an 8-hour window, fast the other 16.\n- **5:2** — eat normally 5 days, eat very little on 2.\n- **Alternate-day fasting** — every other day is a fast day.\n\n**The genuinely good news, from recent trials:**\n\n- It **works for weight loss** — roughly **4–5%** of body weight over 6–12 months, and it lowers blood sugar and blood pressure modestly.\n- **Simplicity.** No calorie-counting — just watch a clock. Many people **stick to a window more easily** than to portions.\n- **Early** eating windows (finishing food earlier in the day) may add a small metabolic edge, since your body handles glucose better in the morning."
+        },
+        {
+          "h": "The Bad — mostly calorie restriction in a costume",
+          "md": "Here is the finding the headlines skip. When researchers **match the calories** between an IF group and a plain daily-calorie-cut group, the results are **nearly identical** — same weight loss, same metabolic change. A landmark 2022 NEJM trial and several 2025 reviews land in the same place: **IF has no magic fat-burning advantage.** It works when — and because — it makes you eat less. The window is just a convenient *fence*.\n\nTwo real downsides:\n\n- **Muscle loss.** Aggressive fasting, and skipping the protein your muscle needs, can strip **lean tissue** along with fat — the very problem from the muscle concepts. Protect it with protein and resistance training.\n- **Not for everyone.** Some people overeat in the window; for anyone with a history of disordered eating, rigid fasting rules can be a trigger. Pregnancy and being underweight rule it out."
+        },
+        {
+          "h": "The Ugly — the scary headline and the real danger",
+          "md": "**The headline:** in 2024 a study of ~20,000 US adults reported that an eating window under 8 hours was linked to a **91% higher risk of cardiovascular death.** It went viral. Read the fine print, though:\n\n- It was a **conference abstract, never peer-reviewed or published.**\n- It was **observational** — it can show a link, never cause. People with very short eating windows may already have been ill, stressed, or losing weight *because* they were sick.\n- Experts across the board urged caution. This is a case study in **not letting one alarming headline overrule a body of evidence.**\n\n**The genuinely dangerous part** is quieter: fasting while on glucose-lowering medication — **insulin or sulfonylureas** — can drop blood sugar dangerously low (*hypoglycaemia*). Rapid weight loss can also bring on **gallstones**. Neither is a reason to never fast — they are reasons to do it with medical oversight."
+        },
+        {
+          "h": "Jason Fung and the 'cure' for Type 2 diabetes",
+          "md": "Dr. **Jason Fung**, a kidney specialist, popularised fasting to reverse type 2 diabetes (*The Diabetes Code*). He reframes the disease as too much insulin over years, and argues fasting can **undo** it — pushing back hard on the standard line that diabetes is 'chronic and progressive.' What is true, and what is overstated?\n\n**He is right about the big thing.** Type 2 diabetes **can** be put into **remission** — normal blood sugar, off medication. This is now mainstream (the DiRECT trial in the Diabetes module showed it via ~15 kg of weight loss). Fung's empowering message — *it is not always a one-way street* — is real.\n\n**But 'cure' is the wrong word — 'remission' is the right one.** The underlying tendency remains; **regain the weight and it comes back.** And the evidence is that **the weight loss** does the work — however you get it (fasting, low-calorie, surgery, GLP-1) — not fasting having unique magic. Fung's own evidence leans on case reports, not large trials. The verdict: a powerful *tool* for remission, wrapped in an overpromising *word*."
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "When researchers match the calories between an intermittent-fasting group and a plain daily-calorie-cut group, what happens?",
+          "options": [
+            "Fasting wins easily — it burns fat by a special pathway",
+            "Results are nearly identical — IF has no magic advantage; it works by making you eat less",
+            "The calorie-cut group always loses more",
+            "Nobody loses any weight"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That is the popular belief the matched-calorie trials actually disprove.",
+            "Correct — matched-calorie trials (2022 NEJM and 2025 reviews) show IF ≈ daily calorie restriction. The eating window is a convenient fence, not a metabolic trick.",
+            "They come out about even — neither approach wins on matched calories.",
+            "Both lose weight; the point is the two approaches lose about the *same*."
+          ],
+          "id": "intermittent-fasting-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "A viral 2024 study linked an under-8-hour eating window to a '91% higher risk of cardiovascular death.' How should you weigh it?",
+          "options": [
+            "As proof that fasting kills — stop immediately",
+            "Cautiously — it was an unpublished, observational conference abstract that shows a link, not cause, with heavy confounding",
+            "Ignore all fasting research forever",
+            "As a peer-reviewed randomized trial"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It proves nothing of the sort — it was never peer-reviewed and can't show causation.",
+            "Correct — it was a conference abstract (not peer-reviewed), observational, and confounded; people with tiny eating windows may already have been ill. A textbook case of not letting one headline overrule the evidence.",
+            "The lesson is to read carefully, not to dismiss the whole field.",
+            "It was the opposite — a preliminary abstract, not a randomized trial."
+          ],
+          "id": "intermittent-fasting-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Jason Fung says fasting can 'cure' type 2 diabetes. What is the accurate version?",
+          "options": [
+            "He is entirely wrong — type 2 diabetes never improves",
+            "Remission is real and achievable via weight loss, but 'cure' overstates it — it can relapse if weight returns",
+            "He is entirely right — it is a permanent cure with no caveats",
+            "Only medication can ever lower blood sugar"
+          ],
+          "answer": 1,
+          "feedback": [
+            "He is right that it can improve — remission is well established.",
+            "Correct — type 2 diabetes remission (normal sugar, off meds) is real, driven by weight loss however achieved. But 'remission' ≠ 'cure': the tendency remains and regaining weight can bring it back.",
+            "'Cure' overstates it — remission can relapse, so the word matters.",
+            "Weight loss, diet, and exercise all lower blood sugar — not only drugs."
+          ],
+          "id": "intermittent-fasting-q3"
+        },
+        {
+          "type": "mcq",
+          "prompt": "What is the genuinely dangerous risk of fasting for someone being treated for type 2 diabetes?",
+          "options": [
+            "There is no risk at all",
+            "Fasting while on insulin or sulfonylureas can drop blood sugar dangerously low — it needs medical supervision",
+            "Fasting raises blood sugar to fatal levels",
+            "It only risks mild boredom"
+          ],
+          "answer": 1,
+          "feedback": [
+            "There is a real and specific risk when glucose-lowering drugs are involved.",
+            "Correct — insulin and sulfonylureas lower blood sugar, and fasting lowers it too; together they can cause severe hypoglycaemia. Doses must be adjusted under medical oversight — the reason DIY aggressive fasting on medication is hazardous.",
+            "The danger is blood sugar going too LOW, not too high, when on these drugs.",
+            "The hypoglycaemia risk is serious, not trivial."
+          ],
+          "id": "intermittent-fasting-q4"
+        }
+      ],
+      "resources": [
+        {
+          "label": "NEJM — Calorie restriction with or without time-restricted eating",
+          "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa2114833",
+          "type": "paper"
+        },
+        {
+          "label": "Science Media Centre — expert reaction to the 8-hour TRE / CV-death abstract",
+          "url": "https://www.sciencemediacentre.org/expert-reaction-to-conference-abstract-about-time-restricted-eating-and-cardiovascular-death/",
+          "type": "article"
+        },
+        {
+          "label": "Diabetes UK — Type 2 diabetes remission",
+          "url": "https://www.diabetes.org.uk/about-diabetes/type-2-diabetes/type-2-diabetes-remission",
+          "type": "reading"
+        }
+      ],
+      "anim": "med_insulin_action"
+    },
+    {
       "id": "macronutrients",
       "title": "The three macronutrients — what each one is for",
       "summary": "Protein, carbohydrate and fat are the three fuels. Each does a different job: protein builds, carbs power, fat runs the slow systems.",
