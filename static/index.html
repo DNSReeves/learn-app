@@ -1530,7 +1530,9 @@ function drawChain(ctx,cv,k){
   const X=i=>80+i*(760/10), Y=p=>340-p*300;
   ctx.strokeStyle="#3A4C68"; ctx.beginPath(); ctx.moveTo(80,340); ctx.lineTo(840,340); ctx.moveTo(80,40); ctx.lineTo(80,340); ctx.stroke();
   ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'";
-  ctx.fillText("P(H)",30,45); ctx.fillText("evidence →",740,362);
+  // detected overlap: the y-axis title "P(H)" sat on top of the "1.0" tick —
+  // it now labels the axis at mid-height instead. Do not move it back up.
+  ctx.fillText("P(H)",12,194); ctx.fillText("evidence →",740,362);
   ctx.fillText("1.0",44,45); ctx.fillText("0.0",44,344);
   const upto=k*(pts.length-1);
   ctx.strokeStyle=F.post; ctx.lineWidth=3; ctx.beginPath();
@@ -4148,7 +4150,10 @@ function roman_drawSiphon(ctx,cv,st){
   ctx.fillStyle="#243550"; ctx.fillRect(752,110,74,60); ctx.strokeStyle="#3A4C68"; ctx.strokeRect(752,110,74,60);
   ctx.strokeStyle="#5A6E8C"; ctx.setLineDash([5,4]); ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(80,112); ctx.lineTo(cv.width-20,112); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle="#5A6E8C"; ctx.textAlign="right"; ctx.fillText("source level", cv.width-24,106);
+  // detected overlap: right-aligned at the canvas edge this collided with the
+  // "receiving tank" caption — it now sits over the open sky mid-span of the
+  // same dashed level line. Keep it left of ~600.
+  ctx.fillStyle="#5A6E8C"; ctx.textAlign="left"; ctx.fillText("source level", 200,106);
   ctx.strokeStyle="#3A4C68"; ctx.lineWidth=9; ctx.lineJoin="round"; ctx.beginPath();
   ctx.moveTo(roman_sip_path[0].x,roman_sip_path[0].y);
   for(let i=1;i<roman_sip_path.length;i++) ctx.lineTo(roman_sip_path[i].x,roman_sip_path[i].y);
@@ -6952,7 +6957,9 @@ function drawIncretin(ctx,cv,st){
     ylab:"blood glucose (mg/dL)"});
   _mmLine(ctx,gp,M.T,M.G,180,MED.blocker,4.2);                 // by vein
   _mmLine(ctx,gp,M.T,M.G,180,MED.post,2,[5,5]);                // by mouth, dashed on top
-  _t(ctx,gp.x+gp.w,gp.y+gp.h+16,"minutes",{align:"right",col:"#5A6E8C",size:11});
+  // detected overlap: right-aligned on the axis end this landed on the "180"
+  // tick — the unit now hangs just past the axis. Keep it outside gp.x+gp.w.
+  _t(ctx,gp.x+gp.w+12,gp.y+gp.h+16,"minutes",{align:"left",col:"#5A6E8C",size:11});
   _t(ctx,gp.x,gp.y+gp.h+32,"both days: the SAME glucose curve",
      {col:MED.good,size:12,bold:true});
 
@@ -8060,7 +8067,10 @@ function ca_draw(ctx,cv,T){
   ctx.beginPath();ctx.moveTo(ca_X0,ca_Y0);ctx.lineTo(ca_X1,ca_Y0);ctx.stroke();
   ctx.beginPath();ctx.moveTo(ca_X0,ca_Y1);ctx.lineTo(ca_X0,ca_Y0);ctx.stroke();
   ctx.fillStyle=F.ax;ctx.textAlign="right";ctx.fillText("time t (hr)",ca_X1-4,ca_Y0-8);
-  ctx.textAlign="left";ctx.fillText("speed",ca_X0+6,ca_Y1-2);
+  // detected overlap: the "speed" y-axis label sat inside the plot on top of the
+  // odometer readout — it now sits left of the axis. Keep it outside ca_X0.
+  ctx.fillText("speed",ca_X0-6,ca_Y1-2);
+  ctx.textAlign="left";
   // rate curve
   ctx.strokeStyle=F.ax;ctx.lineWidth=2.5;ctx.beginPath();
   for(let t=0;t<=ca_tmax+0.001;t+=0.02){const X=ca_sx(t),Y=ca_sy(ca_v(t));if(t===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}
@@ -10286,7 +10296,9 @@ function qff_draw(ctx,cv,s){
   ctx.stroke();
   if(s.grow>=0.999){
     ctx.fillStyle=F.ax;ctx.textAlign="left";
-    ctx.fillText("efficient frontier",sx(20.4)+4,sy(qff_front(20.4))-2);
+    // detected overlap: at x=20.4 this label ran into the "µ inputs" panel on the
+    // right. Anchor it further left along the same curve, above the line.
+    ctx.fillText("efficient frontier",sx(14.0)+4,sy(qff_front(14.0))-10);
   }
 
   // optimal point: interpolate base -> perturbed by s.swing (0..1)
@@ -10608,15 +10620,20 @@ function pc_draw(ctx,cv,s){
   // connectors + labels (only once the stack is essentially filled)
   if(s.showLabels&&fill>0.88){
     const lx=colX0+colW,tx=lx+70;
+    // detected overlap: the thin slices (Real assets 10%, Cash 5%) are only ~20px
+    // apart, so their two-line callouts stacked on each other. Space the LABEL
+    // anchors at least 40px going down and let the connector slant to the anchor.
+    const ly=[];
+    for(let k=0;k<4;k++) ly[k]=k?Math.max(centers[k],ly[k-1]+40):centers[k];
     for(let k=0;k<4;k++){
-      const cy=centers[k];
+      const cy=centers[k],ty=ly[k];
       ctx.strokeStyle=cols[k];ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.moveTo(lx,cy);ctx.lineTo(tx-8,cy);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(lx,cy);ctx.lineTo(tx-8,ty);ctx.stroke();
       ctx.textAlign="left";
       ctx.fillStyle=F.txt;
-      ctx.fillText(pc_names[k]+"  "+pc_w[k]+"%",tx,cy-3);
+      ctx.fillText(pc_names[k]+"  "+pc_w[k]+"%",tx,ty-3);
       ctx.fillStyle=s.showFunds?cols[k]:F.ax;
-      ctx.fillText(s.showFunds?("→ "+pc_funds[k]):"target weight",tx,cy+14);
+      ctx.fillText(s.showFunds?("→ "+pc_funds[k]):"target weight",tx,ty+14);
     }
   }
   ctx.textAlign="left";
@@ -12173,7 +12190,9 @@ function drawTwoHit(ctx, cv, { month = 0, stats = 0, title } = {}) {
       else if (hits === 1) { one++; gbRing(ctx, x, y, r, F.post, 1.6); }
       else gbDot(ctx, x, y, r - 1.4, "rgba(124,141,165,.35)");
     }
-    genText(ctx, "one hit: " + one + "    two hits (tumour): " + two, pan.x, y0 + TH.ROWS * P + 24,
+    // detected overlap: at y0+ROWS*P+24 this tally ran into the "month N" marker
+    // riding the age axis at ay-18. Sits 12px higher now — keep it above 292.
+    genText(ctx, "one hit: " + one + "    two hits (tumour): " + two, pan.x, y0 + TH.ROWS * P + 12,
             two ? F.wrong : F.txt, 12);
   });
 
@@ -12186,7 +12205,9 @@ function drawTwoHit(ctx, cv, { month = 0, stats = 0, title } = {}) {
     ctx.beginPath(); ctx.moveTo(x, ay - 4); ctx.lineTo(x, ay + 4); ctx.stroke();
     genText(ctx, t + "", x, ay + 18, "rgba(215,223,234,.6)", 10, "center");
   }
-  genText(ctx, "age, months", ax1 + 6, ay + 4, "rgba(215,223,234,.6)", 10);
+  // detected off-canvas: right-anchored at ax1+6 it ran past x=900 and rendered
+  // as "age, month". Right-align INSIDE the axis instead.
+  genText(ctx, "age, months", ax1 - 2, ay + 30, "rgba(215,223,234,.6)", 10, "right");
   const mx = ax0 + (m / TH.MONTHS) * (ax1 - ax0);
   ctx.strokeStyle = F.post; ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(mx, ay - 12); ctx.lineTo(mx, ay + 8); ctx.stroke();
@@ -13220,7 +13241,9 @@ ANIMS.dia_receptors=async(cv,ctx)=>{
     ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";
     ctx.fillText("Same hormone signal — two very different lifespans",70,34);
     ctx.font="11px 'IBM Plex Mono'";ctx.fillStyle=F.ax;
-    ctx.fillText("y-axis: hormone activity, % of peak   (note the LEFT axis is MINUTES, the RIGHT is DAYS)",70,52);
+    // detected overlap: at y=52 this note sat on the left panel's title, which is
+    // drawn at Y1-24=56. Moved to the footer under both x-axis labels (y=350).
+    ctx.fillText("y-axis: hormone activity, % of peak   (note the LEFT axis is MINUTES, the RIGHT is DAYS)",70,368);
     gtm_panel(ctx,70,430,320,80,10,"minutes",gtm_native,s.n,F.wrong,"Natural GLP-1 — chewed up by DPP-4");
     gtm_panel(ctx,500,860,320,80,14,"days",gtm_drug,s.d,F.ok,"Engineered drug — resists DPP-4");
   }
@@ -13658,7 +13681,9 @@ function nm_drawMacros(ctx,cv,s){
   // callout: fat vs carbs density
   if(s.callout){
     ctx.fillStyle=F.wrong; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign="center";
-    ctx.fillText("fat = 9 cal/g — more than double carbs & protein at 4", 450, 360);
+    // detected overlap: at y=360 this ran across the third caption line under each
+    // bar (nm_BASE+58 = 358). It now sits under the title. Keep it above y=66.
+    ctx.fillText("fat = 9 cal/g — more than double carbs & protein at 4", 450, 62);
     ctx.font="14px 'IBM Plex Mono'";
   }
   ctx.textAlign="left";
@@ -14320,8 +14345,11 @@ function rm_draw(ctx,cv,s){
 
   // force arrows + labels
   rm_arrow(ctx,rm_bx,stoneTop+stoneH+6,stoneTop+stoneH+56,"#D46A62",4); // big load
-  ctx.fillStyle="#D46A62"; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign="center";
-  ctx.fillText("Load W ≈ 2 t (20 kN)", rm_bx, stoneTop+stoneH+72);
+  ctx.fillStyle="#D46A62"; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign="left";
+  // detected overlap: under the arrow this label lands at y=379 (off-canvas at
+  // low lift) and crossed the trade-off strip at y=372. It now rides beside the
+  // stone, which never leaves the canvas. Do not put it back under the arrow.
+  ctx.fillText("Load W ≈ 2 t (20 kN)", rm_bx+stoneW/2+14, stoneTop+stoneH/2+5);
 
   rm_arrow(ctx,handX+16,handY-4,handY+30,"#5FBF95",2.5);           // small effort
   ctx.fillStyle="#5FBF95"; ctx.textAlign="left";
