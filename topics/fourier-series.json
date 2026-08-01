@@ -97,7 +97,8 @@
           "type": "reading",
           "note": "Reference formulas in every convention; the history section covers the Lagrange objection."
         }
-      ]
+      ],
+      "anim": "fourier_superpose"
     },
     {
       "id": "c02-orthogonality",
@@ -558,7 +559,8 @@
           "type": "reading",
           "note": "The precise statement across conventions — worth a skim so factor-of-2π placements never surprise you."
         }
-      ]
+      ],
+      "anim": "fourier_spectrum"
     },
     {
       "id": "c07-transform",

@@ -7917,6 +7917,659 @@ ANIMS._med_physio2_debug = {
   feedbackTurningPoints:_P2HOM_TURNS, noDelayTurningPoints:_P2HOM_NODELAY_TURNS
 };
 
+/* ===== batch-2 visuals: calculus ===== */
+/* ---- frag_calc_rules.js ---- */
+/* calculus / calc_rules */
+(function(){
+const cr_f=(x)=>0.4*x*x;        // f(x)=0.4 x^2
+const cr_df=(x)=>0.8*x;         // f'(x)=0.8 x  (power rule: 2*0.4 x^(2-1))
+const cr_X0=80,cr_X1=820,cr_Y0=330,cr_Y1=70,cr_xmax=4.0,cr_ymax=6.6;
+const cr_sx=(x)=>cr_X0+(x/cr_xmax)*(cr_X1-cr_X0);
+const cr_sy=(y)=>cr_Y0-(y/cr_ymax)*(cr_Y0-cr_Y1);
+function cr_draw(ctx,cv,px){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=4;g+=1){ctx.beginPath();ctx.moveTo(cr_sx(g),cr_Y1);ctx.lineTo(cr_sx(g),cr_Y0);ctx.stroke();}
+  for(let g=0;g<=6;g+=2){ctx.beginPath();ctx.moveTo(cr_X0,cr_sy(g));ctx.lineTo(cr_X1,cr_sy(g));ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(cr_X0,cr_Y0);ctx.lineTo(cr_X1,cr_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cr_X0,cr_Y1);ctx.lineTo(cr_X0,cr_Y0);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="right";ctx.fillText("x",cr_X1-4,cr_Y0-8);
+  // curve f(x)=0.4 x^2
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let x=0;x<=cr_xmax+0.001;x+=0.02){const X=cr_sx(x),Y=cr_sy(cr_f(x));if(x===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}
+  ctx.stroke();
+  ctx.textAlign="left";ctx.fillStyle=F.ax;ctx.fillText("f(x) = 0.4 x²",cr_sx(2.55),cr_sy(cr_f(2.55))-14);
+  // tangent line at px
+  const m=cr_df(px),y0=cr_f(px);
+  const half=1.35;
+  const xa=Math.max(0,px-half),xb=Math.min(cr_xmax,px+half);
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();
+  ctx.moveTo(cr_sx(xa),cr_sy(y0+m*(xa-px)));
+  ctx.lineTo(cr_sx(xb),cr_sy(y0+m*(xb-px)));
+  ctx.stroke();
+  // point on curve
+  ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(cr_sx(px),cr_sy(y0),5,0,Math.PI*2);ctx.fill();
+  // readouts
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("slope = f′(x) = 0.8 x = "+m.toFixed(2),cr_X0+12,cr_Y1+6);
+  ctx.fillText("at x = "+px.toFixed(2),cr_X0+12,cr_Y1+26);
+  // power-rule reminder
+  ctx.fillStyle=F.ok;ctx.textAlign="right";
+  ctx.fillText("power rule:  xⁿ → n·xⁿ⁻¹",cr_X1-6,cr_Y1+6);
+}
+ANIMS.calc_rules_static=(cv,ctx)=>cr_draw(ctx,cv,2.2);
+ANIMS.calc_rules=async(cv,ctx)=>{
+  cr_draw(ctx,cv,0.4);
+  await narrate("The derivative of a function is the slope of the line that just grazes its curve.");
+  await narrate("Watch the point slide along f(x) = 0.4 x squared while the tangent line tilts to match.");
+  await tween(2600,k=>cr_draw(ctx,cv,0.4+k*3.4));
+  await narrate("That tilting slope is exactly f prime of x = 0.8 x — steeper the farther right you go.");
+  await narrate("The power rule gives it instantly: x to the n becomes n times x to the n minus one.");
+};
+})();
+/* ---- frag_calc_techniques.js ---- */
+/* calculus / calc_techniques */
+(function(){
+// F(x) = 0.25 x^2  (an antiderivative of f(x) = 0.5 x); slope f(x)=0.5 x is shared across the +C family
+const ct_F=(x)=>0.25*x*x;
+const ct_slope=(x)=>0.5*x;
+const ct_X0=80,ct_X1=820,ct_Y0=330,ct_Y1=70,ct_xmax=4.0,ct_ymax=7.2;
+const ct_sx=(x)=>ct_X0+(x/ct_xmax)*(ct_X1-ct_X0);
+const ct_sy=(y)=>ct_Y0-(y/ct_ymax)*(ct_Y0-ct_Y1);
+const ct_Cs=[0.4,1.8,3.2,4.6];   // members of the +C family
+function ct_draw(ctx,cv,shift){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=4;g+=1){ctx.beginPath();ctx.moveTo(ct_sx(g),ct_Y1);ctx.lineTo(ct_sx(g),ct_Y0);ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ct_X0,ct_Y0);ctx.lineTo(ct_X1,ct_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ct_X0,ct_Y1);ctx.lineTo(ct_X0,ct_Y0);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="right";ctx.fillText("x",ct_X1-4,ct_Y0-8);
+  // family of parallel curves F(x)+C
+  const xt=2.6;                // where we draw the matching tangent ticks
+  const m=ct_slope(xt);
+  for(let i=0;i<ct_Cs.length;i++){
+    const C=ct_Cs[i]+shift;
+    const isPrimary=(i===1);
+    ctx.strokeStyle=isPrimary?F.post:F.prior;
+    ctx.lineWidth=isPrimary?2.6:1.8;
+    ctx.beginPath();
+    for(let x=0;x<=ct_xmax+0.001;x+=0.02){
+      const X=ct_sx(x),Y=ct_sy(ct_F(x)+C);
+      if(x===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);
+    }
+    ctx.stroke();
+    // matching-slope tick at xt on every member
+    const yt=ct_F(xt)+C, half=0.55;
+    ctx.strokeStyle=F.ok;ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(ct_sx(xt-half),ct_sy(yt+m*(-half)));
+    ctx.lineTo(ct_sx(xt+half),ct_sy(yt+m*(half)));
+    ctx.stroke();
+  }
+  // labels
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("F(x) + C   (same shape, shifted up by C)",ct_X0+12,ct_Y1+6);
+  ctx.fillStyle=F.ok;
+  ctx.fillText("every member: identical slope f(x) = 0.5 x",ct_X0+12,ct_Y1+26);
+}
+ANIMS.calc_techniques_static=(cv,ctx)=>ct_draw(ctx,cv,0);
+ANIMS.calc_techniques=async(cv,ctx)=>{
+  ct_draw(ctx,cv,0);
+  await narrate("An antiderivative runs differentiation backwards: from a slope you recover the curve it came from.");
+  await narrate("But many curves share the same slope everywhere — these parallels only differ by a constant.");
+  await tween(2200,k=>ct_draw(ctx,cv,0.9*Math.sin(k*Math.PI*2)));
+  await narrate("Slide the whole family up or down and the green tangent ticks stay perfectly parallel.");
+  await narrate("So reversing a derivative recovers F only up to a plus C — hence the constant of integration.");
+};
+})();
+/* ---- frag_calc_applied.js ---- */
+/* calculus / calc_applied */
+(function(){
+// speed(t) = 2.0 + 0.9 t  (units of distance per hour);  area under it = distance travelled
+const ca_v=(t)=>2.0+0.9*t;
+const ca_dist=(T)=>2.0*T+0.45*T*T;   // exact integral of ca_v from 0 to T
+const ca_X0=80,ca_X1=820,ca_Y0=330,ca_Y1=70,ca_tmax=4.0,ca_ymax=6.6;
+const ca_sx=(t)=>ca_X0+(t/ca_tmax)*(ca_X1-ca_X0);
+const ca_sy=(y)=>ca_Y0-(y/ca_ymax)*(ca_Y0-ca_Y1);
+function ca_draw(ctx,cv,T){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=4;g+=1){ctx.beginPath();ctx.moveTo(ca_sx(g),ca_Y1);ctx.lineTo(ca_sx(g),ca_Y0);ctx.stroke();}
+  for(let g=0;g<=6;g+=2){ctx.beginPath();ctx.moveTo(ca_X0,ca_sy(g));ctx.lineTo(ca_X1,ca_sy(g));ctx.stroke();}
+  // filled area under the rate curve, 0..T
+  ctx.fillStyle="rgba(232,161,60,0.28)";
+  ctx.beginPath();ctx.moveTo(ca_sx(0),ca_sy(0));
+  for(let t=0;t<=T+0.0001;t+=0.02)ctx.lineTo(ca_sx(t),ca_sy(ca_v(t)));
+  ctx.lineTo(ca_sx(T),ca_sy(0));ctx.closePath();ctx.fill();
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ca_X0,ca_Y0);ctx.lineTo(ca_X1,ca_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ca_X0,ca_Y1);ctx.lineTo(ca_X0,ca_Y0);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="right";ctx.fillText("time t (hr)",ca_X1-4,ca_Y0-8);
+  ctx.textAlign="left";ctx.fillText("speed",ca_X0+6,ca_Y1-2);
+  // rate curve
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let t=0;t<=ca_tmax+0.001;t+=0.02){const X=ca_sx(t),Y=ca_sy(ca_v(t));if(t===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}
+  ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.fillText("speed(t) = 2.0 + 0.9 t",ca_sx(2.05),ca_sy(ca_v(2.05))-14);
+  // sweeping edge
+  ctx.strokeStyle=F.post;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(ca_sx(T),ca_Y0);ctx.lineTo(ca_sx(T),ca_sy(ca_v(T)));ctx.stroke();
+  // odometer readout
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("distance = area so far = "+ca_dist(T).toFixed(2)+" mi",ca_X0+12,ca_Y1+6);
+  ctx.fillStyle=F.ok;
+  ctx.fillText("area under a rate  =  the accumulated total",ca_X0+12,ca_Y1+26);
+}
+ANIMS.calc_applied_static=(cv,ctx)=>ca_draw(ctx,cv,2.4);
+ANIMS.calc_applied=async(cv,ctx)=>{
+  ca_draw(ctx,cv,0.0);
+  await narrate("A car's speedometer shows a rate — how fast distance is piling up right now.");
+  await narrate("The shaded area under the speed curve is the distance actually travelled.");
+  await tween(2600,k=>ca_draw(ctx,cv,k*ca_tmax));
+  await narrate("As the fill sweeps forward the odometer counts up — that is the integral accumulating.");
+  await narrate("Same idea powers a total: rate times time summed up — distance, work, or charge.");
+};
+})();
+
+/* ===== batch-2 visuals: fourier ===== */
+/* ---- frag_fourier_superpose.js ---- */
+/* Fourier series / fourier_superpose */
+(function(){
+  // One odd-harmonic term of the square-wave series: sin((2k-1)x)/(2k-1)
+  const fsup_term=(k,x)=>Math.sin((2*k-1)*x)/(2*k-1);
+  // Partial sum of the square wave, scaled by 4/pi so it approaches +/-1.
+  // n = number of fully-added odd harmonics; frac = weight of the (n+1)th being added.
+  const fsup_sum=(x,n,frac)=>{
+    let s=0;
+    for(let k=1;k<=n;k++)s+=fsup_term(k,x);
+    if(frac>0)s+=frac*fsup_term(n+1,x);
+    return (4/Math.PI)*s;
+  };
+  // The target square wave, amplitude +/-1.
+  const fsup_target=(x)=>Math.sin(x)>=0?1:-1;
+  const fsup_X0=70,fsup_X1=830,fsup_YT=70,fsup_YB=330;
+  const fsup_yc=(fsup_YT+fsup_YB)/2, fsup_half=(fsup_YB-fsup_YT)/2;
+  const fsup_xmax=2*Math.PI, fsup_ymax=1.45;
+  const fsup_sx=x=>fsup_X0+(x/fsup_xmax)*(fsup_X1-fsup_X0);
+  const fsup_sy=y=>fsup_yc-(y/fsup_ymax)*fsup_half;
+  function fsup_draw(ctx,cv,st){
+    clear(ctx,cv);
+    ctx.font="14px 'IBM Plex Mono'";
+    const n=st.n, frac=st.frac||0;
+    // dim grid
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+    for(let g=0;g<=4;g++){const gx=fsup_sx(g*fsup_xmax/4);ctx.beginPath();ctx.moveTo(gx,fsup_YT);ctx.lineTo(gx,fsup_YB);ctx.stroke();}
+    // axes
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(fsup_X0,fsup_yc);ctx.lineTo(fsup_X1,fsup_yc);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(fsup_X0,fsup_YT);ctx.lineTo(fsup_X0,fsup_YB);ctx.stroke();
+    // faint target square wave
+    ctx.strokeStyle=F.ax;ctx.globalAlpha=0.35;ctx.lineWidth=1.5;ctx.beginPath();
+    let started=false;
+    for(let x=0;x<=fsup_xmax+1e-6;x+=0.005){
+      const px=fsup_sx(x),py=fsup_sy(fsup_target(x));
+      if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);
+    }
+    ctx.stroke();ctx.globalAlpha=1;
+    // partial sum
+    ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();
+    for(let x=0;x<=fsup_xmax+1e-6;x+=0.004){
+      const px=fsup_sx(x),py=fsup_sy(fsup_sum(x,n,frac));
+      if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    // label
+    const shown=frac>0?n+1:n;
+    ctx.fillStyle=F.txt;ctx.textAlign="left";
+    ctx.fillText("harmonics: "+shown+(shown===1?" (sin x)":""),fsup_X0,fsup_YT-30);
+    ctx.textAlign="right";
+    ctx.fillStyle=F.ax;
+    ctx.fillText("target: square wave",fsup_X1,fsup_YT-30);
+    ctx.textAlign="left";
+  }
+  ANIMS.fourier_superpose_static=(cv,ctx)=>fsup_draw(ctx,cv,{n:2,frac:0});
+  ANIMS.fourier_superpose=async(cv,ctx)=>{
+    fsup_draw(ctx,cv,{n:0,frac:0});
+    await narrate("Any repeating signal can be built by adding up simple sine waves.");
+    await narrate("Start with one sine, sin(x) — a smooth ripple, nothing like a square yet.");
+    await tween(1200,k=>fsup_draw(ctx,cv,{n:0,frac:k}));
+    await narrate("Add the 3rd harmonic at 1/3 the height: the flat tops start to appear.");
+    await tween(1200,k=>fsup_draw(ctx,cv,{n:1,frac:k}));
+    await narrate("Add the 5th, then the 7th — each odd harmonic squares the corners further.");
+    await tween(1100,k=>fsup_draw(ctx,cv,{n:2,frac:k}));
+    await tween(1100,k=>fsup_draw(ctx,cv,{n:3,frac:k}));
+    await narrate("More harmonics means a sharper square; the little overshoot at each jump is real (the Gibbs ripple).");
+  };
+})();
+/* ---- frag_fourier_spectrum.js ---- */
+/* Fourier series / fourier_spectrum */
+(function(){
+  // Three sine components: frequency (cycles over the window) and amplitude.
+  const fspec_comp=[{f:1,a:1.0},{f:2,a:0.6},{f:3,a:0.35}];
+  const fspec_amax=fspec_comp.reduce((s,c)=>s+c.a,0)+0.15; // headroom for the time axis
+  // weight of component i given n complete components + frac of the (n)th newest
+  const fspec_w=(i,n,frac)=>{ if(i<n)return 1; if(i===n)return frac; return 0; };
+  const fspec_signal=(x,n,frac)=>{
+    let s=0;
+    for(let i=0;i<fspec_comp.length;i++)s+=fspec_w(i,n,frac)*fspec_comp[i].a*Math.sin(fspec_comp[i].f*x);
+    return s;
+  };
+  // Left panel = time domain
+  const fspec_LX0=60,fspec_LX1=430,fspec_YT=80,fspec_YB=320;
+  const fspec_lyc=(fspec_YT+fspec_YB)/2, fspec_lhalf=(fspec_YB-fspec_YT)/2;
+  const fspec_xmax=2*Math.PI;
+  const fspec_lsx=x=>fspec_LX0+(x/fspec_xmax)*(fspec_LX1-fspec_LX0);
+  const fspec_lsy=y=>fspec_lyc-(y/fspec_amax)*fspec_lhalf;
+  // Right panel = frequency domain (bars)
+  const fspec_RX0=510,fspec_RX1=840,fspec_base=fspec_YB;
+  const fspec_barMax=fspec_YB-fspec_YT; // pixels for amplitude 1.0
+  function fspec_draw(ctx,cv,st){
+    clear(ctx,cv);
+    ctx.font="14px 'IBM Plex Mono'";
+    const n=st.n, frac=st.frac||0;
+    // ---- LEFT: time domain ----
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+    for(let g=0;g<=4;g++){const gx=fspec_lsx(g*fspec_xmax/4);ctx.beginPath();ctx.moveTo(gx,fspec_YT);ctx.lineTo(gx,fspec_YB);ctx.stroke();}
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(fspec_LX0,fspec_lyc);ctx.lineTo(fspec_LX1,fspec_lyc);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(fspec_LX0,fspec_YT);ctx.lineTo(fspec_LX0,fspec_YB);ctx.stroke();
+    ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();
+    for(let x=0;x<=fspec_xmax+1e-6;x+=0.004){
+      const px=fspec_lsx(x),py=fspec_lsy(fspec_signal(x,n,frac));
+      if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    ctx.fillStyle=F.txt;ctx.textAlign="left";
+    ctx.fillText("time →  (the wave)",fspec_LX0,fspec_YT-24);
+    // ---- divider ----
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(470,fspec_YT-10);ctx.lineTo(470,fspec_YB+10);ctx.stroke();
+    // ---- RIGHT: frequency domain ----
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(fspec_RX0,fspec_base);ctx.lineTo(fspec_RX1,fspec_base);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(fspec_RX0,fspec_YT);ctx.lineTo(fspec_RX0,fspec_base);ctx.stroke();
+    const bw=46, slot=(fspec_RX1-fspec_RX0)/fspec_comp.length;
+    for(let i=0;i<fspec_comp.length;i++){
+      const cx=fspec_RX0+slot*(i+0.5);
+      const w=fspec_w(i,n,frac);
+      const h=w*fspec_comp[i].a*fspec_barMax;
+      if(h>0.5){
+        ctx.fillStyle=F.ok;
+        ctx.fillRect(cx-bw/2,fspec_base-h,bw,h);
+      }
+      // frequency tick label
+      ctx.fillStyle=F.txt;ctx.textAlign="center";
+      ctx.fillText("f="+fspec_comp[i].f,cx,fspec_base+20);
+    }
+    ctx.fillStyle=F.txt;ctx.textAlign="left";
+    ctx.fillText("frequency →  (the spectrum)",fspec_RX0,fspec_YT-24);
+    ctx.textAlign="left";
+  }
+  ANIMS.fourier_spectrum_static=(cv,ctx)=>fspec_draw(ctx,cv,{n:fspec_comp.length,frac:0});
+  ANIMS.fourier_spectrum=async(cv,ctx)=>{
+    fspec_draw(ctx,cv,{n:0,frac:0});
+    await narrate("The same signal has two views: the wave over time (left) and its spectrum by frequency (right).");
+    await narrate("Raise the first bar: one slow sine of frequency 1 enters the time signal on the left.");
+    await tween(1200,k=>fspec_draw(ctx,cv,{n:0,frac:k}));
+    await narrate("Add a second, faster frequency — the left wave already looks less regular.");
+    await tween(1200,k=>fspec_draw(ctx,cv,{n:1,frac:k}));
+    await narrate("Add a third: a messy-looking wave, yet the spectrum is just three clean bars.");
+    await tween(1200,k=>fspec_draw(ctx,cv,{n:2,frac:k}));
+    await narrate("The spectrum tells you which frequencies are present and how strong — the same signal, a simpler view.");
+  };
+})();
+
+/* ===== batch-2 visuals: pdes ===== */
+/* ---- frag_pde_bc.js ---- */
+/* pde / pde_bc */
+(function(){
+  const pdebc_TL=0.92, pdebc_TR=0.08;        // pinned end temperatures (boundary conditions)
+  const pdebc_N=140;                          // number of colored cells along the rod
+  const pdebc_X0=120, pdebc_X1=780;           // rod extent in pixels
+  const pdebc_YT=170, pdebc_YB=242;           // rod top / bottom in pixels
+  const pdebc_clamp=(v)=>v<0?0:(v>1?1:v);
+  // steady state fixed by the two ends: a straight line from hot-left to cold-right
+  const pdebc_base=(f)=>pdebc_TL+(pdebc_TR-pdebc_TL)*f;
+  // initial hot bump in the middle; heat eqn spreads + dims it as tau grows
+  const pdebc_bump=(f,tau)=>0.95/Math.sqrt(1+tau*0.9)*Math.exp(-((f-0.5)*(f-0.5))/(0.010*(1+tau)));
+  const pdebc_temp=(f,tau)=>pdebc_clamp(pdebc_base(f)+pdebc_bump(f,tau));
+  // temperature -> colour: hue 240 (blue, cold) sweeping to 0 (red, hot)
+  const pdebc_col=(t)=>"hsl("+(240*(1-pdebc_clamp(t))).toFixed(0)+",70%,50%)";
+  function pdebc_draw(ctx,cv,s){
+    clear(ctx,cv);
+    ctx.font="14px 'IBM Plex Mono'";
+    const tau=s.tau;
+    const cw=(pdebc_X1-pdebc_X0)/pdebc_N;
+    for(let i=0;i<pdebc_N;i++){
+      const f=(i+0.5)/pdebc_N;
+      ctx.fillStyle=pdebc_col(pdebc_temp(f,tau));
+      ctx.fillRect(pdebc_X0+i*cw, pdebc_YT, cw+1, pdebc_YB-pdebc_YT);
+    }
+    // rod outline
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;
+    ctx.strokeRect(pdebc_X0,pdebc_YT,pdebc_X1-pdebc_X0,pdebc_YB-pdebc_YT);
+    // colour legend words
+    ctx.textAlign="center";ctx.fillStyle=F.txt;
+    ctx.fillText("a metal rod — colour = temperature",450,150);
+    // pinned end markers (boundary conditions)
+    ctx.fillStyle=F.post;
+    ctx.fillText("hot end",pdebc_X0,pdebc_YB+26);
+    ctx.fillText("cold end",pdebc_X1,pdebc_YB+26);
+    ctx.fillStyle=F.ax;ctx.font="12px 'IBM Plex Mono'";
+    ctx.fillText("pinned (boundary condition)",pdebc_X0,pdebc_YB+44);
+    ctx.fillText("pinned (boundary condition)",pdebc_X1,pdebc_YB+44);
+    // initial-condition tag on the bump (only while it is still visible)
+    if(tau<8){
+      ctx.font="12px 'IBM Plex Mono'";ctx.fillStyle=F.ok;
+      const arrTop=pdebc_YT-8;
+      ctx.strokeStyle=F.ok;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(450,arrTop-24);ctx.lineTo(450,arrTop);ctx.stroke();
+      ctx.fillText("initial condition: hot bump",450,arrTop-30);
+    }
+    ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";
+  }
+  ANIMS.pde_bc_static=(cv,ctx)=>pdebc_draw(ctx,cv,{tau:0});
+  ANIMS.pde_bc=async(cv,ctx)=>{
+    pdebc_draw(ctx,cv,{tau:0});
+    await narrate("This is a metal rod: colour shows temperature — blue is cold, red is hot.");
+    await narrate("The two ends are clamped at fixed temperatures — the boundary conditions, and they never move.");
+    await narrate("We also set a starting shape: a hot bump in the middle — the initial condition.");
+    await narrate("Now the heat equation takes over — the bump spreads and smooths toward the one steady profile the ends allow.");
+    await tween(3400,k=>pdebc_draw(ctx,cv,{tau:k*45}));
+    await narrate("The PDE alone allows endless solutions; the boundary and initial conditions pin down the single real one.");
+  };
+})();
+/* ---- frag_pde_modern.js ---- */
+/* pde / pde_modern */
+(function(){
+  const pdem_BX0=225, pdem_BX1=675;          // diffusion field box (pixels)
+  const pdem_BY0=58,  pdem_BY1=322;
+  const pdem_CX=(pdem_BX0+pdem_BX1)/2, pdem_CY=(pdem_BY0+pdem_BY1)/2; // source
+  const pdem_CS=9;                            // cell size (px)
+  const pdem_R0=520;                          // initial spread scale (px^2)
+  const pdem_clamp=(v)=>v<0?0:(v>1?1:v);
+  // 2D diffusion of a point source: peak dims as 1/(1+tau), width grows with tau
+  const pdem_field=(px,py,tau)=>{
+    const dx=px-pdem_CX, dy=py-pdem_CY;
+    return (1/(1+tau))*Math.exp(-(dx*dx+dy*dy)/(pdem_R0*(1+tau)));
+  };
+  // intensity -> colour: dark background -> orange -> hot white-yellow
+  const pdem_col=(i)=>{
+    i=pdem_clamp(i);
+    let r,g,b;
+    if(i<0.5){const t=i/0.5;r=15+(232-15)*t;g=26+(120-26)*t;b=44+(40-44)*t;}
+    else{const t=(i-0.5)/0.5;r=232+(255-232)*t;g=120+(240-120)*t;b=40+(180-40)*t;}
+    return "rgb("+(r|0)+","+(g|0)+","+(b|0)+")";
+  };
+  function pdem_labels(ctx){
+    ctx.fillStyle=F.txt;ctx.font="13px 'IBM Plex Mono'";
+    ctx.textAlign="center";
+    ctx.fillText("weather & climate",450,30);
+    ctx.fillText("airflow & aerodynamics",450,360);
+    ctx.textAlign="left";
+    ctx.fillText("heat & cooling",22,192);
+    ctx.textAlign="right";
+    ctx.fillText("MRI imaging",878,150);
+    ctx.fillText("option pricing (Black–Scholes)",878,238);
+    ctx.textAlign="left";
+  }
+  function pdem_draw(ctx,cv,s){
+    clear(ctx,cv);
+    const tau=s.tau;
+    for(let px=pdem_BX0;px<pdem_BX1;px+=pdem_CS){
+      for(let py=pdem_BY0;py<pdem_BY1;py+=pdem_CS){
+        const i=pdem_field(px+pdem_CS/2,py+pdem_CS/2,tau);
+        if(i<0.02)continue;
+        ctx.fillStyle=pdem_col(i);
+        ctx.fillRect(px,py,pdem_CS,pdem_CS);
+      }
+    }
+    // field border
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.strokeRect(pdem_BX0,pdem_BY0,pdem_BX1-pdem_BX0,pdem_BY1-pdem_BY0);
+    pdem_labels(ctx);
+  }
+  ANIMS.pde_modern_static=(cv,ctx)=>pdem_draw(ctx,cv,{tau:0});
+  ANIMS.pde_modern=async(cv,ctx)=>{
+    pdem_draw(ctx,cv,{tau:0});
+    await narrate("Watch a hot spot spread and fade — this is diffusion, the same math as heat flowing through a material.");
+    await narrate("A tiny handful of PDEs — heat, wave, and diffusion — describe how things spread, ripple, and settle.");
+    await tween(3000,k=>pdem_draw(ctx,cv,{tau:k*18}));
+    await narrate("The very same equations forecast the weather, sharpen MRI scans, and shape airflow over a wing.");
+    await tween(2400,k=>pdem_draw(ctx,cv,{tau:18+k*24}));
+    await narrate("They even price stock options: Black–Scholes is a diffusion equation in disguise.");
+    await narrate("Learn these few PDEs and you hold a master key to weather, imaging, engineering, and finance.");
+  };
+})();
+
+/* ===== batch-2 visuals: odes ===== */
+/* ---- frag_ode_field.js ---- */
+/* differential equations / ode_field */
+(function(){
+const ofld_f=(x,y)=>y*(1-y);                 // logistic slope  y' = y(1-y)
+const ofld_X0=70,ofld_X1=830,ofld_Y0=330,ofld_Y1=60;
+const ofld_xmax=6,ofld_ymax=1.6;
+const ofld_sx=x=>ofld_X0+(x/ofld_xmax)*(ofld_X1-ofld_X0);
+const ofld_sy=y=>ofld_Y0-(y/ofld_ymax)*(ofld_Y0-ofld_Y1);
+function ofld_field(ctx){
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=6;g++){ctx.beginPath();ctx.moveTo(ofld_sx(g),ofld_Y1);ctx.lineTo(ofld_sx(g),ofld_Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ofld_X0,ofld_Y0);ctx.lineTo(ofld_X1,ofld_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ofld_X0,ofld_Y1);ctx.lineTo(ofld_X0,ofld_Y0);ctx.stroke();
+  ctx.strokeStyle=F.prior;ctx.lineWidth=1.4;
+  const half=11;
+  for(let ix=0;ix<=11;ix++){
+    for(let iy=1;iy<=7;iy++){
+      const x=ix*0.5, y=iy*0.2;
+      const m=ofld_f(x,y);
+      let dpx=(ofld_X1-ofld_X0)/ofld_xmax;
+      let dpy=-(ofld_Y0-ofld_Y1)/ofld_ymax*m;
+      const L=Math.hypot(dpx,dpy);
+      dpx=dpx/L*half; dpy=dpy/L*half;
+      const px=ofld_sx(x), py=ofld_sy(y);
+      ctx.beginPath();ctx.moveTo(px-dpx,py-dpy);ctx.lineTo(px+dpx,py+dpy);ctx.stroke();
+    }
+  }
+}
+function ofld_curve(ctx,xEnd,y0){
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.6;ctx.beginPath();
+  let y=y0, first=true, lastY=y0;
+  const dx=0.02;
+  for(let x=0;x<=xEnd+1e-9;x+=dx){
+    const px=ofld_sx(x),py=ofld_sy(y);
+    if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
+    lastY=y;
+    y+=ofld_f(x,y)*dx;
+  }
+  ctx.stroke();
+  ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(ofld_sx(xEnd),ofld_sy(lastY),4.5,0,7);ctx.fill();
+}
+function ofld_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ofld_field(ctx);
+  ctx.strokeStyle="rgba(95,191,149,0.35)";ctx.setLineDash([5,5]);ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ofld_sx(0),ofld_sy(1));ctx.lineTo(ofld_sx(ofld_xmax),ofld_sy(1));ctx.stroke();
+  ctx.setLineDash([]);
+  if(s.curve) ofld_curve(ctx,s.xEnd,s.y0);
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("y' = y (1 − y)", ofld_X0+8, ofld_Y1-4);
+  ctx.fillStyle="rgba(95,191,149,0.9)";
+  ctx.fillText("y = 1  (stable)", ofld_sx(4.6), ofld_sy(1)-8);
+  ctx.fillStyle=F.txt;ctx.textAlign="right";ctx.fillText("x", ofld_X1, ofld_Y0+18);
+  ctx.textAlign="left";
+}
+ANIMS.ode_field_static=(cv,ctx)=>ofld_draw(ctx,cv,{curve:true,xEnd:6,y0:0.15});
+ANIMS.ode_field=async(cv,ctx)=>{
+  ofld_draw(ctx,cv,{curve:false});
+  await narrate("An ODE gives a rule for the slope at every point: here y' equals y times (1 minus y).");
+  await narrate("Each tick shows which way to head — steep where growth is fast, flat near the ceiling y = 1.");
+  ofld_draw(ctx,cv,{curve:true,xEnd:0.05,y0:0.15});
+  await tween(2600,k=>ofld_draw(ctx,cv,{curve:true,xEnd:0.05+k*5.95,y0:0.15}));
+  await narrate("A solution is a curve that always follows those arrows, threading through the field.");
+  await narrate("Starting small it climbs steeply, then levels off as it settles at the stable value y = 1.");
+};
+})();
+/* ---- frag_ode_separable.js ---- */
+/* differential equations / ode_separable */
+(function(){
+const osep_k=0.7, osep_C=0.35;
+const osep_X0=70,osep_X1=560,osep_Y0=330,osep_Y1=60;
+const osep_tmax=4,osep_ymax=5.2;
+const osep_yf=(t)=>osep_C*Math.exp(osep_k*t);
+const osep_sx=t=>osep_X0+(t/osep_tmax)*(osep_X1-osep_X0);
+const osep_sy=y=>osep_Y0-(y/osep_ymax)*(osep_Y0-osep_Y1);
+const osep_steps=["dy / y = k · dt","ln y = k · t + C","y = C · eᵏᵗ"];
+function osep_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=4;g++){ctx.beginPath();ctx.moveTo(osep_sx(g),osep_Y1);ctx.lineTo(osep_sx(g),osep_Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(osep_X0,osep_Y0);ctx.lineTo(osep_X1,osep_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(osep_X0,osep_Y1);ctx.lineTo(osep_X0,osep_Y0);ctx.stroke();
+  const tEnd=s.tEnd;
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.6;ctx.beginPath();
+  let first=true;
+  for(let t=0;t<=tEnd+1e-9;t+=0.02){const px=osep_sx(t),py=osep_sy(osep_yf(t));if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.strokeStyle=F.ax;ctx.lineWidth=1.7;
+  for(let i=1;i<=3;i++){
+    const t=i*1.0;
+    if(t>tEnd+0.01) continue;
+    const y=osep_yf(t), m=osep_k*y;
+    let dpx=(osep_X1-osep_X0)/osep_tmax;
+    let dpy=-(osep_Y0-osep_Y1)/osep_ymax*m;
+    const L=Math.hypot(dpx,dpy),seg=26;
+    dpx=dpx/L*seg;dpy=dpy/L*seg;
+    const px=osep_sx(t),py=osep_sy(y);
+    ctx.beginPath();ctx.moveTo(px-dpx,py-dpy);ctx.lineTo(px+dpx,py+dpy);ctx.stroke();
+  }
+  if(tEnd>0.03){ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(osep_sx(tEnd),osep_sy(osep_yf(tEnd)),4.5,0,7);ctx.fill();}
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("y' = k·y   (k>0)",osep_X0+8,osep_Y1-4);
+  ctx.textAlign="right";ctx.fillText("t",osep_X1,osep_Y0+18);
+  ctx.save();ctx.translate(osep_X0-16,(osep_Y0+osep_Y1)/2);ctx.rotate(-Math.PI/2);ctx.textAlign="center";ctx.fillStyle=F.txt;ctx.fillText("y",0,0);ctx.restore();
+  const sxs=615, sys=130, dh=56;
+  ctx.textAlign="left";
+  for(let i=0;i<osep_steps.length;i++){
+    const shown=i<s.steps;
+    const last=i===osep_steps.length-1;
+    ctx.fillStyle= shown ? (last?F.ok:F.txt) : "#33425c";
+    ctx.font=(last?"19px":"16px")+" 'IBM Plex Mono'";
+    if(shown&&i>0){ctx.strokeStyle="#3A4C68";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(sxs+6,sys+i*dh-30);ctx.lineTo(sxs+6,sys+i*dh-14);ctx.stroke();}
+    ctx.fillText(osep_steps[i], sxs, sys+i*dh);
+  }
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillStyle=F.txt;ctx.fillText("separate → integrate → exponentiate",sxs,sys-46);
+}
+ANIMS.ode_separable_static=(cv,ctx)=>osep_draw(ctx,cv,{tEnd:osep_tmax,steps:3});
+ANIMS.ode_separable=async(cv,ctx)=>{
+  osep_draw(ctx,cv,{tEnd:0.02,steps:0});
+  await narrate("In y' = k·y the slope is proportional to the current value — a bigger y means faster growth.");
+  await tween(2200,k=>osep_draw(ctx,cv,{tEnd:0.02+k*(osep_tmax-0.02),steps:0}));
+  await narrate("Watch the tangents steepen as y climbs: that feedback is what makes the growth take off.");
+  osep_draw(ctx,cv,{tEnd:osep_tmax,steps:1});
+  await narrate("To solve it, separate the variables — all the y on one side, all the t on the other: dy/y = k·dt.");
+  osep_draw(ctx,cv,{tEnd:osep_tmax,steps:2});
+  await narrate("Integrate both sides and you get ln y = k·t + C.");
+  osep_draw(ctx,cv,{tEnd:osep_tmax,steps:3});
+  await narrate("Exponentiate, and clean exponential growth falls out: y = C·eᵏᵗ.");
+};
+})();
+/* ---- frag_ode_stability.js ---- */
+/* differential equations / ode_stability */
+(function(){
+const ostb_U=(x)=>-Math.cos(x);        // potential landscape
+const ostb_Up=(x)=>Math.sin(x);        // dU/dx ;  dynamics x' = -U'(x) = -sin(x)
+const ostb_X0=70,ostb_X1=830,ostb_xmin=-2,ostb_xmax=7;
+const ostb_Ymid=155,ostb_amp=70,ostb_phaseY=300;
+const ostb_sx=x=>ostb_X0+((x-ostb_xmin)/(ostb_xmax-ostb_xmin))*(ostb_X1-ostb_X0);
+const ostb_sy=U=>ostb_Ymid - U*ostb_amp;
+const ostb_PI=Math.PI, ostb_2PI=2*Math.PI;
+function ostb_land(ctx){
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.4;ctx.beginPath();
+  let first=true;
+  for(let x=ostb_xmin;x<=ostb_xmax+1e-9;x+=0.03){const px=ostb_sx(x),py=ostb_sy(ostb_U(x));if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+}
+function ostb_ball(ctx,x){
+  const px=ostb_sx(x), py=ostb_sy(ostb_U(x))-9;
+  ctx.fillStyle=F.post;ctx.beginPath();ctx.arc(px,py,8,0,7);ctx.fill();
+  ctx.strokeStyle="rgba(15,26,44,0.6)";ctx.lineWidth=1.2;ctx.stroke();
+}
+function ostb_arrow(ctx,px,py,dir,color){
+  const len=15;
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=1.7;
+  ctx.beginPath();ctx.moveTo(px-dir*len/2,py);ctx.lineTo(px+dir*len/2,py);ctx.stroke();
+  const hx=px+dir*len/2;
+  ctx.beginPath();ctx.moveTo(hx,py);ctx.lineTo(hx-dir*6,py-4);ctx.lineTo(hx-dir*6,py+4);ctx.closePath();ctx.fill();
+}
+function ostb_phase(ctx){
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ostb_sx(ostb_xmin+0.2),ostb_phaseY);ctx.lineTo(ostb_sx(ostb_xmax-0.2),ostb_phaseY);ctx.stroke();
+  for(let x=ostb_xmin+0.5;x<=ostb_xmax-0.5;x+=0.7){
+    const v=-ostb_Up(x);
+    if(Math.abs(v)<0.08) continue;
+    ostb_arrow(ctx,ostb_sx(x),ostb_phaseY,Math.sign(v),F.prior);
+  }
+  [[0,F.ok],[ostb_PI,F.wrong],[ostb_2PI,F.ok]].forEach(([x,c])=>{
+    ctx.fillStyle=c;ctx.beginPath();ctx.arc(ostb_sx(x),ostb_phaseY,6,0,7);ctx.fill();
+  });
+}
+function ostb_roll(x0,tTotal){
+  let x=x0;const dt=0.02;
+  for(let t=0;t<tTotal;t+=dt){x+=-ostb_Up(x)*dt*3;}
+  return x;
+}
+function ostb_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ostb_land(ctx);
+  [[0,F.ok],[ostb_PI,F.wrong],[ostb_2PI,F.ok]].forEach(([x,c])=>{
+    ctx.fillStyle=c;ctx.beginPath();ctx.arc(ostb_sx(x),ostb_sy(ostb_U(x)),4,0,7);ctx.fill();
+  });
+  ctx.textAlign="center";
+  ctx.fillStyle=F.ok;ctx.fillText("stable",ostb_sx(0),ostb_sy(ostb_U(0))+34);
+  ctx.fillStyle=F.wrong;ctx.fillText("unstable",ostb_sx(ostb_PI),ostb_sy(ostb_U(ostb_PI))-14);
+  ctx.fillStyle=F.ok;ctx.fillText("stable",ostb_sx(ostb_2PI),ostb_sy(ostb_U(ostb_2PI))+34);
+  ostb_phase(ctx);
+  if(s.ballA!=null) ostb_ball(ctx,s.ballA);
+  if(s.ballB!=null) ostb_ball(ctx,s.ballB);
+  ctx.textAlign="left";ctx.fillStyle=F.txt;
+  ctx.fillText("potential landscape — a ball rolls downhill:  x' = −U'(x)",ostb_X0+4,38);
+  ctx.fillStyle="#8FA0B8";
+  ctx.fillText("phase line", ostb_sx(ostb_xmin+0.2), ostb_phaseY-14);
+}
+ANIMS.ode_stability_static=(cv,ctx)=>ostb_draw(ctx,cv,{ballA:0,ballB:ostb_PI});
+ANIMS.ode_stability=async(cv,ctx)=>{
+  ostb_draw(ctx,cv,{});
+  await narrate("Equilibria are the places where change stops — where the landscape is momentarily flat.");
+  await narrate("A valley is a stable equilibrium, a hilltop is unstable; the arrows show which way the state drifts.");
+  const vA0=-1.3;
+  ostb_draw(ctx,cv,{ballA:vA0});
+  await narrate("Nudge a ball near the valley and it rolls back down — small pushes just die out.");
+  await tween(1800,k=>ostb_draw(ctx,cv,{ballA:ostb_roll(vA0,k*3.0)}));
+  const vB0=ostb_PI+0.15;
+  ostb_draw(ctx,cv,{ballA:ostb_roll(vA0,3.0),ballB:vB0});
+  await narrate("Perch a ball on the hill and the tiniest nudge sends it rolling away — that is instability.");
+  await tween(2000,k=>ostb_draw(ctx,cv,{ballA:ostb_roll(vA0,3.0),ballB:ostb_roll(vB0,k*4.0)}));
+  await narrate("Stable equilibria pull you back; unstable ones push you away.");
+};
+})();
+
 </script>
 </body>
 </html>

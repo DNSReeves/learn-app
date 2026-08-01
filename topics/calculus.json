@@ -255,7 +255,8 @@
           "type": "reading",
           "note": "The classic drill reference: every rule with a stack of worked examples."
         }
-      ]
+      ],
+      "anim": "calc_rules"
     },
     {
       "id": "c04-applications",
@@ -580,7 +581,8 @@
           "type": "reading",
           "note": "Substitution through partial fractions, with the decision process spelled out."
         }
-      ]
+      ],
+      "anim": "calc_techniques"
     },
     {
       "id": "c08-applied",
@@ -665,7 +667,8 @@
           "type": "reading",
           "note": "Exam-grade problems if you want to pressure-test mastery beyond the review queue."
         }
-      ]
+      ],
+      "anim": "calc_applied"
     }
   ]
 }

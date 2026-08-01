@@ -101,7 +101,8 @@
           "type": "interactive",
           "note": "Practice problems with worked solutions when you want more reps than the checkpoints give."
         }
-      ]
+      ],
+      "anim": "ode_field"
     },
     {
       "id": "c02-separable",
@@ -186,7 +187,8 @@
           "type": "reading",
           "note": "The full course this ladder shadows. Unit 1 covers separable and linear first-order with lecture videos and problem sets."
         }
-      ]
+      ],
+      "anim": "ode_separable"
     },
     {
       "id": "c03-linear-first-order",
@@ -677,7 +679,8 @@
           "type": "reading",
           "note": "The formal ladder above this concept: Lyapunov stability, asymptotic stability, and the eigenvalue criteria for systems."
         }
-      ]
+      ],
+      "anim": "ode_stability"
     },
     {
       "id": "c08-numerical",
