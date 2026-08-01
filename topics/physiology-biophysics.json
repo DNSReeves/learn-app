@@ -1,0 +1,593 @@
+{
+  "id": "physiology-biophysics",
+  "title": "Physiology & Biophysics — How the Living Body Works",
+  "tagline": "From the charged membrane to the self-tuning heart: the machinery of life, and the physics that shapes it.",
+  "description": "A plain-language tour of physiology and its underlying biophysics: homeostasis, the membrane battery and the action potential, muscle contraction, the heart and the Frank–Starling law, membrane transport, oxygen carriage, and how simple physics (surface-to-volume, Laplace's law) sets the rules of living design. Educational; reuses the shared sarcomere visual.",
+  "category": "Health & Medicine",
+  "prereqs": [],
+  "concepts": [
+    {
+      "id": "homeostasis",
+      "title": "Homeostasis — the body's thermostats",
+      "summary": "Life keeps its internal world almost constant while the outside world swings. That balancing act — homeostasis — is the master theme of all physiology.",
+      "cards": [
+        {
+          "h": "The stable inner sea",
+          "md": "Your cells are fussy. They only work if temperature, acidity (pH), salt, and sugar stay within narrow bounds. Yet you walk from a hot kitchen into snow, skip a meal, run upstairs — and inside, almost nothing changes. The physiologist **Claude Bernard** called this protected inner world the *milieu intérieur* — the internal sea your cells swim in.\n\n**Homeostasis** is the active work of keeping that sea constant. It's not passive stillness; it's a small army of sensors and corrections running every second. Nearly every organ you'll meet in this course exists to defend one set point or another."
+        },
+        {
+          "h": "Negative feedback: the body's thermostat",
+          "md": "The core trick is **negative feedback** — the same logic as a home thermostat:\n\n1. A **sensor** detects a value (say, blood temperature).\n2. A **control centre** compares it to a **set point**.\n3. An **effector** pushes back the *opposite* way: too hot → sweat and dilate vessels; too cold → shiver and constrict.\n\nBecause the response *opposes* the change, the value is dragged back toward the set point. A few loops instead use **positive feedback** — pushing a change further, on purpose — like the surge of contractions in childbirth. But those are rare and self-limiting; negative feedback is the everyday engine of stability."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What does negative feedback do to a change in a body value?",
+          "options": [
+            "Opposes it, pushing the value back toward its set point",
+            "Amplifies it without limit",
+            "Ignores it",
+            "Freezes the value permanently"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the response counteracts the change, restoring balance.",
+            "No — that's positive feedback, which is rare.",
+            "No — feedback detects and responds to the change.",
+            "No — it dynamically corrects, not freezes."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Claude Bernard's 'milieu intérieur' refers to:",
+          "options": [
+            "The stable internal environment (fluid) that bathes the body's cells",
+            "The brain",
+            "The digestive tract",
+            "Outer skin"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the protected internal sea that homeostasis defends.",
+            "No — it's the body-wide internal fluid environment, not one organ.",
+            "No — it's the extracellular internal environment generally.",
+            "No — it's internal, not the outer surface."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Which is an example of POSITIVE feedback?",
+          "options": [
+            "The escalating contractions of childbirth",
+            "Sweating when hot",
+            "Shivering when cold",
+            "Releasing insulin when blood sugar rises"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — labour contractions push the process further until birth (self-limiting).",
+            "No — sweating opposes heat (negative feedback).",
+            "No — shivering opposes cold (negative feedback).",
+            "No — insulin opposes high sugar (negative feedback)."
+          ]
+        }
+      ],
+      "resources": []
+    },
+    {
+      "id": "membrane-potential",
+      "title": "The Living Battery — membranes and the resting potential",
+      "summary": "Every one of your cells is a tiny charged battery. That voltage across the membrane is what nerves and muscle spend when they fire.",
+      "cards": [
+        {
+          "h": "A charged skin around every cell",
+          "md": "Wrap a cell in its **membrane** — a double layer of fat — and something remarkable appears: a **voltage** across it, about **−70 millivolts** inside relative to outside. Every cell is a charged battery, holding a tiny electrical potential ready to use.\n\nThe charge comes from **unequal ions**. The cell keeps **potassium (K⁺) high inside** and **sodium (Na⁺) high outside**, using a tireless pump — the **Na⁺/K⁺-ATPase** — that shoves 3 sodium out and 2 potassium in, burning ATP to do it. Roughly a quarter of your resting energy goes just to running these pumps."
+        },
+        {
+          "h": "Why the inside is negative",
+          "md": "With potassium piled up inside, some of it leaks back out through open channels, following its gradient. Each K⁺ that leaves carries a positive charge away — leaving the inside slightly **negative**. That leak, balanced against the gradient, sets the resting voltage (the **Nernst** idea: each ion has an 'equilibrium voltage' where its push and pull cancel).\n\nSo the resting potential is a stored tension — a cocked spring. **Nerves and muscle don't create energy when they fire; they release this pre-charged battery**, letting sodium rush in. That's the subject of the next lesson: the action potential."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What maintains the ion gradients behind the resting potential?",
+          "options": [
+            "The Na⁺/K⁺-ATPase pump (3 Na⁺ out, 2 K⁺ in, using ATP)",
+            "Passive leaking alone",
+            "Digestion",
+            "Blood pressure"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the pump actively builds the gradients, at real energy cost.",
+            "No — leaking would run the gradients down; the pump rebuilds them.",
+            "No — it's a membrane pump, not digestion.",
+            "No — it's electrochemical, not pressure."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why is the inside of a resting cell negative relative to outside?",
+          "options": [
+            "K⁺ leaking out carries positive charge away, leaving the inside negative",
+            "Sodium floods in",
+            "The membrane makes electrons",
+            "Water leaves the cell"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — K⁺ efflux down its gradient sets the negative resting voltage.",
+            "No — sodium influx is prevented at rest; that happens during firing.",
+            "No — cells don't manufacture free electrons.",
+            "No — the charge is from ion movement, not water."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "When a nerve fires, where does the energy come from?",
+          "options": [
+            "Releasing the pre-charged gradient — sodium rushes in down its gradient",
+            "Making new ATP instantly",
+            "Sunlight",
+            "Muscle contraction"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — firing spends the stored battery; the pump recharges it afterward.",
+            "No — the energy was stored earlier in the gradients.",
+            "No — nerves aren't light-powered.",
+            "No — nerves drive muscle, not the reverse."
+          ]
+        }
+      ],
+      "resources": []
+    },
+    {
+      "id": "action-potential",
+      "title": "The Action Potential — how nerve and muscle fire",
+      "summary": "A nerve signal is a self-propagating wave of voltage — all-or-none, and astonishingly fast.",
+      "cards": [
+        {
+          "h": "Cross the threshold, and it fires all-or-none",
+          "md": "Nudge a resting cell's voltage up a little and nothing happens — until it hits a **threshold**. Then a switch flips: **voltage-gated sodium channels** fly open, Na⁺ pours in, and the inside shoots from −70 mV up past 0 to about +30 mV. This spike is the **action potential**.\n\nIt's **all-or-none**: below threshold, nothing; above it, a full spike every time — like a camera flash, not a dimmer. The message isn't in the *size* of each spike (they're identical) but in their **frequency** — how fast they fire."
+        },
+        {
+          "h": "Up, down, and a moment's rest",
+          "md": "The spike reverses itself automatically. The sodium channels **inactivate** (snap shut) and slower **potassium channels** open, letting K⁺ out to drive the voltage back down (**repolarisation**), briefly overshooting negative before settling.\n\nDuring the sodium channels' recovery there's a **refractory period** — a brief deafness where the cell *can't* fire again. This does two vital jobs: it caps the maximum firing rate, and it forces the wave to travel **one way only** down a nerve. In myelinated nerves the spike leaps between gaps (**saltatory conduction**), reaching speeds over 100 metres per second — which is why you yank your hand off a stove before you consciously feel it."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What does 'all-or-none' mean for an action potential?",
+          "options": [
+            "Below threshold nothing fires; above it, a full identical spike every time",
+            "It can be any size",
+            "It never stops once started",
+            "It only happens in the brain"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — spikes are uniform; information is carried by their frequency.",
+            "No — spikes are all the same size (all-or-none).",
+            "No — each spike is brief and self-terminating.",
+            "No — nerves and muscle throughout the body fire them."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "What causes the rapid UPSTROKE of the action potential?",
+          "options": [
+            "Voltage-gated sodium channels opening, letting Na⁺ rush in",
+            "Potassium leaving",
+            "The Na/K pump",
+            "Calcium leaving"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — Na⁺ influx depolarises the cell toward +30 mV.",
+            "No — K⁺ efflux drives the downstroke (repolarisation).",
+            "No — the pump is too slow; it recharges afterward.",
+            "No — the upstroke is sodium in, not calcium out."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "What does the refractory period ensure?",
+          "options": [
+            "The signal travels one direction and firing rate is capped",
+            "The spike lasts forever",
+            "The nerve gets bigger",
+            "Sodium and potassium swap places permanently"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — one-way propagation plus a maximum firing frequency.",
+            "No — it ends the spike promptly.",
+            "No — it's electrical, not structural growth.",
+            "No — the pump restores the original gradients."
+          ]
+        }
+      ],
+      "resources": []
+    },
+    {
+      "id": "muscle-contraction",
+      "title": "Muscle Contraction — the sliding filament",
+      "summary": "Muscle shortens by ratcheting protein filaments past one another — the same molecular engine in your biceps and your heart.",
+      "anim": "med_sarcomere",
+      "cards": [
+        {
+          "h": "Ratchets, not rubber bands",
+          "md": "A muscle doesn't shorten like a stretched rubber band snapping back. It **ratchets**. Inside each fibre are repeating units — **sarcomeres** — built from two interleaved filaments: thin **actin** and thick **myosin**. The animation shows the move: myosin's little heads grab actin, pull, release, and grab again, dragging the thin filaments inward so the sarcomere shortens. Billions in a row, and the whole muscle contracts.\n\nThis is the **sliding filament theory**: nothing actually gets shorter except the *overlap* between filaments."
+        },
+        {
+          "h": "Calcium is the 'go' signal; ATP is the fuel",
+          "md": "Two ingredients gate the ratchet:\n\n- **Calcium** is the trigger. At rest, the actin track is blocked by a protein (troponin/tropomyosin). An electrical signal releases **Ca²⁺** from internal stores; calcium pulls the block aside and contraction begins. Remove calcium and the muscle relaxes.\n- **ATP** is the fuel. Each cross-bridge stroke — and each *release* of the grip — costs ATP. (This is why rigor mortis stiffens muscle after death: no ATP left to release the grip.)\n\nHeart muscle uses this exact engine — which sets up the next lesson, the one closest to how the heart pumps."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "In the sliding filament theory, what actually shortens?",
+          "options": [
+            "The overlap region — filaments slide past each other; they don't shrink",
+            "The actin filaments themselves",
+            "The bones",
+            "The cell membrane"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — sliding increases overlap; the filaments keep their length.",
+            "No — actin doesn't shorten; it slides.",
+            "No — bones are pulled by muscle, not part of the sarcomere.",
+            "No — the membrane isn't the contractile element."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "What is the direct trigger that STARTS contraction?",
+          "options": [
+            "Calcium (Ca²⁺) released inside the cell, unblocking the actin track",
+            "Oxygen",
+            "Sodium leaving",
+            "Sunlight"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — Ca²⁺ moves the blocking proteins aside so cross-bridges can act.",
+            "No — oxygen fuels metabolism but isn't the trigger.",
+            "No — sodium drives the action potential, not the cross-bridge directly.",
+            "No — muscle isn't light-activated."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why does rigor mortis stiffen muscle after death?",
+          "options": [
+            "No ATP remains to release the myosin grip on actin",
+            "Too much calcium is made",
+            "The muscle keeps firing",
+            "Bones fuse"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — releasing each cross-bridge needs ATP; without it, grips lock.",
+            "No — it's ATP depletion, not calcium excess, that locks the grips.",
+            "No — there's no signalling after death; the grips simply can't release.",
+            "No — it's a muscle-protein effect, not bone."
+          ]
+        }
+      ],
+      "resources": []
+    },
+    {
+      "id": "frank-starling",
+      "title": "★ The Heart's Own Wisdom — Frank–Starling's Law",
+      "summary": "The heart automatically pumps out however much blood comes back to it — a self-tuning property that falls straight out of muscle mechanics.",
+      "cards": [
+        {
+          "h": "Fill it more, and it pumps harder — by itself",
+          "md": "Here is one of physiology's most elegant laws. **The more the heart fills during rest (diastole), the more forcefully it contracts and the more it ejects.** Blood returning from the body stretches the heart's walls; that stretch *itself* makes the next beat stronger. Send more blood back, the heart sends more out — with **no nerves or hormones required**. This is the **Frank–Starling law**.\n\nIts payoff is automatic balance: it keeps the left and right sides of the heart pumping *exactly* the same amount, beat after beat, so blood never pools on one side. The heart tunes itself to its own filling."
+        },
+        {
+          "h": "Why stretch makes strength — right down to the sarcomere",
+          "md": "The law isn't magic; it's the **length–tension relationship of muscle** you just met. A sarcomere has an **optimal length** where actin and myosin overlap ideally — the most cross-bridges can form, so the most force is produced. Stretch the resting heart muscle toward that optimum (by filling it more) and each beat generates more tension. (Newer work adds that stretch also makes the filaments more **calcium-sensitive**.)\n\nSo a whole-organ law about the heart reduces to the geometry of two sliding filaments. It's why **preload** — how much the heart is filled before it contracts — is a master control of cardiac output, and why physiologists have studied this curve for over a century. *(This length–tension mechanics is the field of cardiac muscle in which much foundational work was done.)*"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The Frank–Starling law states that, within limits:",
+          "options": [
+            "The more the heart fills, the more forcefully it contracts and ejects",
+            "The heart ignores how much blood returns",
+            "Filling weakens the next beat",
+            "Only nerves control the heart's output"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — greater filling (preload) → stronger contraction → more ejected, automatically.",
+            "No — the law is precisely that filling tunes output.",
+            "No — more filling STRENGTHENS the beat.",
+            "No — the effect is intrinsic, needing no nerves or hormones."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "What molecular fact explains WHY more stretch gives more force?",
+          "options": [
+            "Stretching toward the optimal sarcomere length lets more actin–myosin cross-bridges form",
+            "Stretch adds new muscle cells instantly",
+            "The heart makes adrenaline when stretched",
+            "Bones push the blood"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — better filament overlap = more cross-bridges = more tension (length–tension).",
+            "No — it's mechanics of existing filaments, not new cells.",
+            "No — the effect is intrinsic length–tension, not a hormone.",
+            "No — the heart muscle itself generates the force."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why is the Frank–Starling law so useful for the body?",
+          "options": [
+            "It automatically matches the outputs of the two sides of the heart, beat to beat",
+            "It lets the heart stop when tired",
+            "It stores blood in the lungs",
+            "It replaces the need for a heartbeat"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — self-balancing prevents blood pooling on either side.",
+            "No — it keeps output matched to return, not stopping.",
+            "No — it prevents pooling, not causes it.",
+            "No — it tunes each beat's strength."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "StatPearls — Physiology, Frank-Starling Law",
+          "type": "reading",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK470295/"
+        }
+      ]
+    },
+    {
+      "id": "transport",
+      "title": "Crossing the Membrane — diffusion, osmosis, transport",
+      "summary": "Everything a cell needs must cross its membrane. Some things drift across for free; others must be pumped, at a cost.",
+      "cards": [
+        {
+          "h": "Downhill for free, uphill for a price",
+          "md": "Molecules move in two fundamentally different ways across a membrane:\n\n- **Passive** (free): **diffusion** — things drift from where they're crowded to where they're sparse, down their gradient, needing no energy. Small or fat-soluble molecules (oxygen, CO₂) slip straight through; others use open channel proteins (**facilitated diffusion**).\n- **Active** (costs ATP): **pumps** haul molecules *uphill*, against their gradient — like the Na⁺/K⁺ pump that builds the battery. No free ride.\n\nThe rule of thumb: going **down** a gradient is free; going **up** one always costs energy."
+        },
+        {
+          "h": "Osmosis — water follows salt",
+          "md": "Water has its own version of this. **Osmosis** is the diffusion of *water* across a membrane, from where dissolved stuff is dilute toward where it's concentrated — water chasing the salt. It's why a cell placed in salty water shrivels (water leaves) and one in pure water swells and can burst.\n\nThe speed of any diffusion follows a simple physics (**Fick's law**): faster with more **surface area** and a steeper **gradient**, slower across a greater **distance**. This is why lungs and guts are folded into vast surface areas, and why no cell can be too thick — a theme we'll return to in the final lesson on why size matters."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Moving a molecule UP its concentration gradient requires:",
+          "options": [
+            "Active transport — a pump using ATP",
+            "Nothing — it's free",
+            "Only more surface area",
+            "Cooling the cell"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — going uphill against a gradient always costs energy.",
+            "No — only DOWNHILL movement is free.",
+            "No — surface area speeds passive flux, not uphill pumping.",
+            "No — temperature isn't the mechanism."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Osmosis is the movement of:",
+          "options": [
+            "Water across a membrane, toward the more concentrated (saltier) side",
+            "Salt toward water",
+            "Proteins across the membrane",
+            "Gases only"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — water diffuses toward higher solute concentration.",
+            "No — it's water that moves in osmosis.",
+            "No — osmosis specifically concerns water.",
+            "No — osmosis is about water, not gases."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "By Fick's law, diffusion is FASTER when there is:",
+          "options": [
+            "More surface area and a steeper gradient, over a shorter distance",
+            "Less surface area",
+            "A gentler gradient",
+            "A thicker barrier"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — flux rises with area and gradient, falls with distance.",
+            "No — less area slows it.",
+            "No — a steeper gradient speeds it.",
+            "No — a thicker barrier slows it."
+          ]
+        }
+      ],
+      "resources": []
+    },
+    {
+      "id": "oxygen-transport",
+      "title": "Carrying Oxygen — haemoglobin's clever curve",
+      "summary": "Haemoglobin grabs oxygen greedily in the lungs and lets go generously in hard-working tissue — thanks to a beautifully non-linear binding curve.",
+      "cards": [
+        {
+          "h": "Four seats, and they cooperate",
+          "md": "Oxygen barely dissolves in blood, so nearly all of it rides on **haemoglobin** inside red blood cells — each molecule carrying up to **four** O₂. The clever part is **cooperativity**: when the first oxygen binds, it nudges the protein into a shape that grabs the next ones more eagerly. Loading gets easier as it fills.\n\nPlot oxygen loading against the surrounding oxygen level and you get a famous **S-shaped (sigmoid) curve** — not a straight line. That shape is the whole trick."
+        },
+        {
+          "h": "Load in the lungs, unload in the muscle",
+          "md": "The S-curve is what lets haemoglobin do two opposite jobs well:\n\n- In the **lungs** (high oxygen), the curve is flat and near the top — haemoglobin fills to ~100%, and stays full even if lung oxygen dips a bit. Robust loading.\n- In **hard-working tissue** (low oxygen), you're on the steep part — a small drop in oxygen dumps a *large* amount off the haemoglobin, right where it's needed.\n\nExercising muscle tilts the curve further to unload even more (the **Bohr effect**: heat, acid and CO₂ from hard work tell haemoglobin to release its cargo). It's an elegant piece of chemical logic: greedy where oxygen is plentiful, generous where it's scarce."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why is the oxygen–haemoglobin curve S-shaped rather than straight?",
+          "options": [
+            "Cooperativity — binding one O₂ makes haemoglobin grab the next ones more easily",
+            "Oxygen is heavy",
+            "Red cells are round",
+            "The lungs are folded"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — cooperative binding produces the sigmoid shape.",
+            "No — weight isn't the cause.",
+            "No — cell shape isn't the reason for the curve.",
+            "No — lung folding aids gas exchange but isn't the binding curve."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In hard-working muscle (low oxygen), the S-curve helps because:",
+          "options": [
+            "You're on its steep part, so a small oxygen drop releases a lot of O₂ where needed",
+            "Haemoglobin holds tighter",
+            "No oxygen is released",
+            "The curve is flat there"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the steep region unloads generously into needy tissue.",
+            "No — it releases MORE there, not less.",
+            "No — plenty is released in low-oxygen tissue.",
+            "No — the flat part is in the lungs (loading)."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The Bohr effect means that acid, CO₂ and heat from exercise cause haemoglobin to:",
+          "options": [
+            "Release more oxygen to the working tissue",
+            "Grab oxygen tighter",
+            "Stop working",
+            "Make more red cells instantly"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — signs of hard work shift the curve to unload more O₂.",
+            "No — it releases more, not holds tighter.",
+            "No — it keeps delivering, more generously.",
+            "No — the Bohr effect is about release, not cell production."
+          ]
+        }
+      ],
+      "resources": []
+    },
+    {
+      "id": "scaling-biophysics",
+      "title": "Why Size Matters — the biophysics of being alive",
+      "summary": "Physics sets hard limits on living things. Simple rules about surface, volume and tension shape everything from cell size to why elephants aren't just big mice.",
+      "cards": [
+        {
+          "h": "Surface shrinks, volume balloons",
+          "md": "Grow a cube — or a cell, or an animal — and its **volume rises faster than its surface**. Double the size and volume goes up 8-fold but surface only 4-fold. Since a cell **feeds and breathes through its surface** but **consumes through its volume**, there's a hard ceiling: get too big and the surface can't supply the interior. *That's* why cells are microscopic, and why big organisms must fold in enormous surfaces — lungs, guts, capillary beds — to keep the ratio up.\n\nDiffusion adds a second limit: it's hopeless over long distances (it slows with the square of distance). No cell can sit more than ~0.1 mm from a blood supply — which is why you have billions of capillaries."
+        },
+        {
+          "h": "Tension, walls, and the heart (Laplace's law)",
+          "md": "A last piece of physics that runs right back to the heart. **Laplace's law** says the wall tension needed to hold a given pressure rises with the **radius** of a chamber. A bigger balloon needs a tougher skin for the same pressure.\n\nFor the heart this is profound: when a failing heart **dilates** (gets bigger), its walls must generate *more* tension for the same blood pressure — making a struggling pump work even harder, a vicious cycle. It also explains why thickening the wall (**hypertrophy**) reduces the tension each fibre bears. So the pump you studied in the Frank–Starling lesson lives inside these physical laws — physiology and biophysics are the same story told at two scales."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why can't cells grow very large?",
+          "options": [
+            "Volume outgrows surface area, so the surface can't supply the interior",
+            "Gravity crushes them",
+            "They run out of names",
+            "Large cells can't hold water"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the surface-to-volume ratio falls as size rises, starving the interior.",
+            "No — gravity isn't the limiting factor at cell scale.",
+            "No — that's not a physical constraint.",
+            "No — the limit is supply across the surface, not water-holding."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "By Laplace's law, why is a dilated (enlarged) heart at a disadvantage?",
+          "options": [
+            "A larger radius needs MORE wall tension for the same pressure — a struggling pump works harder",
+            "It has less blood",
+            "It beats too slowly by default",
+            "Larger hearts always fail"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — tension rises with radius, worsening the load on a dilated heart.",
+            "No — the issue is wall mechanics, not blood volume.",
+            "No — rate isn't dictated by Laplace's law.",
+            "No — it's a mechanical disadvantage, not an absolute rule."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why must large organisms fold in surfaces like lungs and guts?",
+          "options": [
+            "To restore the surface-to-volume ratio needed to supply their large volume",
+            "To look complex",
+            "To store fat",
+            "To reduce their weight"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — folded surfaces recover the exchange area a big body needs.",
+            "No — it's a functional necessity, not appearance.",
+            "No — the point is exchange surface, not fat storage.",
+            "No — it's about surface area, not weight."
+          ]
+        }
+      ],
+      "resources": []
+    }
+  ]
+}
