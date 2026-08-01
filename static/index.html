@@ -6413,6 +6413,434 @@ ANIMS._gen_debug={punnettAff:GEN.P.aff, punnettCar:GEN.P.car, punnettClear:GEN.P
   screenPPV:GEN.SCREEN.ppv, screenTP:GEN.SCREEN.tp, screenFP:GEN.SCREEN.fp,
   diagPPV:GEN.DIAG.ppv};
 
+
+/* ── PHYSIOLOGY visuals batch (operator, 2026-08-01: "add much more visual aids ...
+   the sodium/potassium ATP-driven pump ... and the action potential of a nerve firing").
+   Fills real gaps: 81 of 194 concepts had no visual. Narrated numbers are MEASURED off
+   the plotted arrays (ANIMS._med_pump_debug), never hardcoded. ─────────────────────── */
+/* ===== Physiology — two flagship canvas animations (operator-requested) =====
+   1) med_nakpump        — the Na⁺/K⁺-ATPase running its real transport cycle
+   2) med_actionpotential — a nerve firing, curve built in real time + channel states
+   House rules followed: MED palette, _t/_lerp/clear/tween/sleep/narrate helpers,
+   900×380 canvas, every animation ships BOTH <name>_static and <name>.
+   HARD RULE: every number spoken in narration is COMPUTED from the data drawn.
+   Computed values are exported on ANIMS._med_pump_debug at the bottom of this file. */
+
+/* ---------- shared tiny helpers (namespaced; do not shadow house helpers) ---------- */
+const _clamp01 = x => x < 0 ? 0 : (x > 1 ? 1 : x);
+const _seg = (p, a, b) => _clamp01((p - a) / (b - a));
+const _mvw = v => (v < 0 ? "minus " + Math.abs(Math.round(v)) : "plus " + Math.round(v));
+
+/* =====================================================================
+   1) Na⁺/K⁺-ATPase — the pump, as a working machine
+   ===================================================================== */
+
+/* stoichiometry is declared ONCE and both the drawing and the narration read it */
+const PUMP_NA = 3;                 // Na⁺ exported per cycle
+const PUMP_K  = 2;                 // K⁺ imported per cycle
+const PUMP_NET = PUMP_NA - PUMP_K; // net positive charge exported per cycle
+const PUMP_CYCLES = 3;             // cycles actually animated
+const PUMP_ATP_LOW = 20, PUMP_ATP_HIGH = 30;   // % of cellular ATP budget (drawn as a band)
+
+/* deterministic background ion cloud (same picture every run) */
+function _pumpRng(seed) { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
+const PUMP_CLOUD = (() => {
+  const r = _pumpRng(20260801), out = [];
+  const box = (n, kind, x0, x1, y0, y1) => { for (let i = 0; i < n; i++) out.push({ kind, x: x0 + r() * (x1 - x0), y: y0 + r() * (y1 - y0) }); };
+  box(15, "na", 62, 640, 58, 158);    // Na⁺ HIGH outside
+  box(4, "k", 62, 640, 58, 158);    // K⁺  low  outside
+  box(4, "na", 62, 640, 254, 318);   // Na⁺ low  inside
+  box(15, "k", 62, 640, 254, 318);   // K⁺  HIGH inside
+  return out;
+})();
+
+const PUMP_STEPS = [   // [phase-start, phase-end, caption]
+  [0.00, 0.16, `${PUMP_NA} Na⁺ bind from INSIDE (pump faces in)`],
+  [0.16, 0.28, "ATP → ADP: a phosphate is handed to the pump"],
+  [0.28, 0.44, "phosphorylated → the pump EVERTS (now faces out)"],
+  [0.44, 0.58, `grip on Na⁺ loosens → ${PUMP_NA} Na⁺ released OUTSIDE`],
+  [0.58, 0.72, `${PUMP_K} K⁺ bind from outside`],
+  [0.72, 0.82, "phosphate leaves (dephosphorylation)"],
+  [0.82, 0.92, "pump REVERTS → faces in again"],
+  [0.92, 1.00, `${PUMP_K} K⁺ released INSIDE — cycle complete: net ${PUMP_NET > 0 ? "+" : ""}${PUMP_NET} charge out`]
+];
+
+function drawNaKPump(ctx, cv, st) {
+  clear(ctx, cv);
+  const { pos = 0, title = "" } = st;                 // pos = cycles elapsed (float)
+  const done = Math.min(PUMP_CYCLES, Math.floor(pos + 1e-9));
+  const p = pos >= PUMP_CYCLES ? 1 : (pos - Math.floor(pos + 1e-9));
+  const cx = 380, memTop = 168, memBot = 212, memMid = (memTop + memBot) / 2;
+
+  _t(ctx, cv.width / 2, 26, title, { size: 17, bold: true, align: "center" });
+
+  /* compartments */
+  ctx.fillStyle = "rgba(111,168,220,0.07)"; ctx.fillRect(50, 50, 600, memTop - 50);
+  ctx.fillStyle = "rgba(232,161,60,0.06)"; ctx.fillRect(50, memBot, 600, 322 - memBot);
+  _t(ctx, 58, 66, "OUTSIDE the cell (extracellular fluid) — Na⁺ high", { col: MED.dim, size: 12 });
+  _t(ctx, 646, 318, "INSIDE the cell (cytosol) — K⁺ high", { col: MED.dim, size: 12, align: "right" });
+
+  /* lipid bilayer */
+  ctx.fillStyle = "rgba(95,191,149,0.12)"; ctx.fillRect(50, memTop, 600, memBot - memTop);
+  ctx.strokeStyle = MED.membrane; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(50, memTop); ctx.lineTo(650, memTop);
+  ctx.moveTo(50, memBot); ctx.lineTo(650, memBot); ctx.stroke();
+
+  /* background ion populations (the gradients the pump maintains) */
+  for (const ion of PUMP_CLOUD) {
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = ion.kind === "na" ? MED.blocker : MED.post;
+    ctx.beginPath(); ctx.arc(ion.x, ion.y, 5, 0, 7); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  /* pump body: cavity mouth opens DOWN when facing in, UP when everted */
+  const evert = _seg(p, 0.28, 0.44) * (1 - _seg(p, 0.82, 0.92));
+  const topGap = _lerp(7, 46, evert), botGap = _lerp(46, 7, evert);
+  const lobe = (sgn) => {
+    ctx.beginPath();
+    ctx.moveTo(cx + sgn * 52, memTop - 6); ctx.lineTo(cx + sgn * topGap / 2, memTop - 6);
+    ctx.lineTo(cx + sgn * botGap / 2, memBot + 6); ctx.lineTo(cx + sgn * 52, memBot + 6);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+  };
+  ctx.fillStyle = "rgba(95,191,149,0.30)"; ctx.strokeStyle = MED.membrane; ctx.lineWidth = 2;
+  lobe(-1); lobe(1);
+  _t(ctx, cx, memBot + 34, "Na⁺/K⁺-ATPase", { align: "center", col: MED.membrane, size: 12, bold: true });
+
+  /* ATP / ADP / phosphate */
+  const atpOn = p >= 0.16 && p < 0.30, phos = p >= 0.28 && p < 0.78;
+  if (atpOn) _t(ctx, cx - 96, memMid + 4, "ATP →", { align: "right", col: MED.post, size: 13, bold: true });
+  if (p >= 0.28 && p < 0.42) _t(ctx, cx - 96, memMid + 22, "ADP", { align: "right", col: MED.dim, size: 12 });
+  if (phos) {
+    ctx.fillStyle = MED.post; ctx.beginPath(); ctx.arc(cx + 60, memMid, 10, 0, 7); ctx.fill();
+    _t(ctx, cx + 60, memMid + 4, "P", { align: "center", col: "#1b2027", size: 12, bold: true });
+  }
+  if (p >= 0.72 && p < 0.82) _t(ctx, cx + 78, memMid + 26, "Pᵢ off", { col: MED.dim, size: 11 });
+
+  /* the transported ions — they MOVE between waypoints, never teleport */
+  const naHomeY = 296, naOutY = 92, cavLow = memBot - 8, cavHigh = memTop + 8;
+  for (let i = 0; i < PUMP_NA; i++) {
+    const hx = cx - 46 + i * 46, sx = cx - 22 + i * 22, ox = cx - 58 + i * 58;
+    let x, y;
+    const kBind = _seg(p, 0.00, 0.16), kEv = _seg(p, 0.28, 0.44), kRel = _seg(p, 0.44, 0.58);
+    x = _lerp(hx, sx, kBind); y = _lerp(naHomeY, cavLow, kBind);
+    y = _lerp(y, cavHigh, kEv);
+    x = _lerp(x, ox, kRel); y = _lerp(y, naOutY, kRel);
+    const a = 1 - _seg(p, 0.64, 0.80);
+    if (a <= 0.02) continue;
+    ctx.globalAlpha = a; ctx.fillStyle = MED.blocker;
+    ctx.beginPath(); ctx.arc(x, y, 9, 0, 7); ctx.fill();
+    _t(ctx, x, y + 4, "Na", { align: "center", col: "#14181d", size: 10, bold: true });
+  }
+  ctx.globalAlpha = 1;
+  for (let j = 0; j < PUMP_K; j++) {
+    const hx = cx + 150 + j * 46, sx = cx - 14 + j * 28, ix = cx + 140 + j * 48;
+    const a = _seg(p, 0.55, 0.60);
+    if (a <= 0.02) continue;
+    const kIn = _seg(p, 0.60, 0.72), kRev = _seg(p, 0.82, 0.92), kOut = _seg(p, 0.92, 1.00);
+    let x = _lerp(hx, sx, kIn), y = _lerp(96, cavHigh, kIn);
+    y = _lerp(y, cavLow, kRev);
+    x = _lerp(x, ix, kOut); y = _lerp(y, 300, kOut);
+    ctx.globalAlpha = a; ctx.fillStyle = MED.post;
+    ctx.beginPath(); ctx.arc(x, y, 9, 0, 7); ctx.fill();
+    _t(ctx, x, y + 4, "K", { align: "center", col: "#14181d", size: 10, bold: true });
+  }
+  ctx.globalAlpha = 1;
+
+  /* running tally — the electrogenic point */
+  const naOut = done * PUMP_NA + (p >= 0.58 && done < PUMP_CYCLES ? PUMP_NA : 0);
+  const kIn = done * PUMP_K;
+  const net = naOut - kIn;
+  ctx.strokeStyle = "#33404f"; ctx.lineWidth = 1; ctx.strokeRect(666, 56, 218, 132);
+  const cyc = Math.min(PUMP_CYCLES, done + (p > 0 && done < PUMP_CYCLES ? 1 : 0));
+  _t(ctx, 678, 78, cyc === 0 ? "ready — 0 cycles run" : `cycle ${cyc} of ${PUMP_CYCLES}`, { col: MED.dim, size: 12 });
+  _t(ctx, 678, 104, `Na⁺ pumped OUT:  ${naOut}`, { col: MED.blocker, size: 14, bold: true });
+  _t(ctx, 678, 128, `K⁺ pumped IN:   ${kIn}`, { col: MED.post, size: 14, bold: true });
+  ctx.strokeStyle = "#33404f"; ctx.beginPath(); ctx.moveTo(678, 140); ctx.lineTo(872, 140); ctx.stroke();
+  _t(ctx, 678, 162, `net charge OUT:  ${net > 0 ? "+" : ""}${net}`, { col: MED.good, size: 15, bold: true });
+  _t(ctx, 678, 180, "→ inside gets more negative", { col: MED.dim, size: 11 });
+
+  /* ATP budget bar — the scale fact */
+  const bx = 96, bw = 420, by = 336, bh = 12;
+  ctx.strokeStyle = MED.dim; ctx.lineWidth = 1; ctx.strokeRect(bx, by, bw, bh);
+  ctx.fillStyle = "rgba(232,161,60,0.75)";
+  ctx.fillRect(bx + bw * PUMP_ATP_LOW / 100, by, bw * (PUMP_ATP_HIGH - PUMP_ATP_LOW) / 100, bh);
+  ctx.fillStyle = "rgba(232,161,60,0.28)"; ctx.fillRect(bx, by, bw * PUMP_ATP_LOW / 100, bh);
+  _t(ctx, bx - 8, by + 11, "ATP spend", { align: "right", col: MED.dim, size: 11 });
+  _t(ctx, bx + bw + 12, by + 11, `≈${PUMP_ATP_LOW}–${PUMP_ATP_HIGH}% of the cell's ATP budget (more in neurons)`, { col: MED.fat, size: 12, bold: true });
+
+  /* step caption */
+  const step = PUMP_STEPS.find(s => p >= s[0] && p < s[1]) || PUMP_STEPS[PUMP_STEPS.length - 1];
+  _t(ctx, 350, 242, step[2], { align: "center", col: MED.post, size: 13, bold: true });
+}
+
+async function runNaKPump(cv, ctx, opts) {
+  const L = opts.lines || [], title = opts.title;
+  drawNaKPump(ctx, cv, { pos: 0, title });
+  if (L[0]) await narrate(L[0]);
+  /* cycle 1 — narrated, slow, step by step */
+  const stops = [0.28, 0.58, 1.00];
+  for (let i = 0; i < stops.length; i++) {
+    if (L[i + 1]) await narrate(L[i + 1]);
+    const a = i === 0 ? 0 : stops[i - 1], b = stops[i];
+    await tween(1500, k => drawNaKPump(ctx, cv, { pos: _lerp(a, b, k), title }));
+  }
+  if (L[4]) await narrate(L[4]);
+  /* cycles 2..N — faster, so the tally visibly climbs */
+  for (let c = 1; c < PUMP_CYCLES; c++) {
+    await tween(2000, k => drawNaKPump(ctx, cv, { pos: c + k, title }));
+    await sleep(120);
+  }
+  drawNaKPump(ctx, cv, { pos: PUMP_CYCLES, title });
+  if (L[5]) await narrate(L[5]);
+}
+
+/* =====================================================================
+   2) ACTION POTENTIAL — deterministic model, plotted, then MEASURED
+   ===================================================================== */
+const AP_REST = -70, AP_TH = -55, AP_PEAK = 40, AP_AHP = -80;
+const AP_S1 = 3, AP_S2 = 8, AP_S3 = 13;          // stimulus times (ms): weak, weak, strong
+const AP_A1 = 8, AP_A2 = 12, AP_ATAU = 0.8;      // sub-threshold bump sizes (mV) / shape
+const AP_TRAMP = 1.2, AP_TUP = 0.8, AP_TREP = 2.0, AP_TAHP = 3.2;
+const AP_TTH = AP_S3 + AP_TRAMP;                 // threshold crossing
+const AP_TPK = AP_TTH + AP_TUP;                  // peak
+const AP_TMIN = AP_TPK + AP_TREP;                // bottom of the undershoot
+const AP_TEND = 30, AP_DT = 0.05;
+
+function ap_alpha(u, tau) { return u <= 0 ? 0 : (u / tau) * Math.exp(1 - u / tau); }
+function ap_base(t) { return AP_REST + AP_A1 * ap_alpha(t - AP_S1, AP_ATAU) + AP_A2 * ap_alpha(t - AP_S2, AP_ATAU); }
+const AP_V13 = ap_base(AP_S3);
+function ap_v(t) {
+  if (t < AP_S3) return ap_base(t);
+  if (t < AP_TTH) { const u = (t - AP_S3) / AP_TRAMP; return AP_V13 + (AP_TH - AP_V13) * (1 - Math.exp(-4 * u)) / (1 - Math.exp(-4)); }
+  if (t < AP_TPK) { const u = (t - AP_TTH) / AP_TUP; return AP_TH + (AP_PEAK - AP_TH) * (1 - (1 - u) * (1 - u)); }
+  if (t < AP_TMIN) { const u = (t - AP_TPK) / AP_TREP; return AP_PEAK + (AP_AHP - AP_PEAK) * (u * u * (3 - 2 * u)); }
+  return AP_REST + (AP_AHP - AP_REST) * Math.exp(-(t - AP_TMIN) / AP_TAHP);
+}
+/* THE ARRAY. Everything narrated below is measured off this, not asserted. */
+const AP_TRACE = (() => { const n = Math.round(AP_TEND / AP_DT), a = []; for (let i = 0; i <= n; i++) { const t = i * AP_DT; a.push({ t, v: ap_v(t) }); } return a; })();
+
+const AP_M = (() => {
+  const V = AP_TRACE;
+  let pk = 0, mn = 0, sub = -1e9;
+  for (let i = 0; i < V.length; i++) {
+    if (V[i].v > V[pk].v) pk = i;
+    if (V[i].v < V[mn].v) mn = i;
+    if (V[i].t < AP_S3 && V[i].v > sub) sub = V[i].v;
+  }
+  /* threshold = the kink on the rising limb: max upward curvature after the last
+     return-to-rest and before the peak (the point where the rise turns regenerative) */
+  let w = 0;
+  for (let i = 1; i < pk; i++) if (V[i].v <= AP_REST + 0.5) w = i;
+  let th = w + 1, best = -1e9;
+  for (let i = w + 2; i < pk - 1; i++) {
+    const d2 = V[i + 1].v - 2 * V[i].v + V[i - 1].v;
+    if (d2 > best) { best = d2; th = i; }
+  }
+  let back = pk; while (back < V.length - 1 && V[back].v > AP_REST) back++;      // repolarised through rest
+  let rec = mn; while (rec < V.length - 1 && V[rec].v < AP_REST - 1) rec++;      // AHP faded (within 1 mV)
+  return {
+    restMv: Math.round(V[0].v), peakMv: Math.round(V[pk].v), ahpMv: Math.round(V[mn].v),
+    subPeakMv: Math.round(sub), thMv: Math.round(V[th].v),
+    thMs: V[th].t, peakMs: V[pk].t, backMs: V[back].t, recMs: V[rec].t, minMs: V[mn].t,
+    spikeMs: +(V[back].t - V[th].t).toFixed(2), ahpMs: +(V[rec].t - V[back].t).toFixed(2),
+    durationMs: +(V[rec].t - V[th].t).toFixed(2),          // threshold → fully recovered
+    windowMs: +(V[V.length - 1].t - V[0].t).toFixed(2), samples: V.length
+  };
+})();
+
+/* channel gating, tied to the SAME landmarks that shape the curve */
+const ap_naOpen = t => Math.min(_seg(t, AP_TTH, AP_TTH + 0.35), 1 - _seg(t, AP_TPK - 0.1, AP_TPK + 0.7));
+const ap_naInact = t => Math.min(_seg(t, AP_TPK, AP_TPK + 0.7), 1 - _seg(t, AP_M.backMs, AP_M.recMs));
+const ap_kOpen = t => Math.min(_seg(t, AP_TPK, AP_TMIN - 0.8), 1 - _seg(t, AP_TMIN, AP_M.recMs));
+
+function ap_phase(t) {
+  if (t < AP_S1) return ["resting — inside sits at " + AP_M.restMv + " mV", MED.dim];
+  if (t < AP_S3) return ["weak stimulus → sub-threshold bump → it DIES AWAY (no spike)", MED.dim];
+  if (t < AP_TTH) return ["stronger stimulus → climbing toward threshold", MED.post];
+  if (t < AP_TPK) return ["THRESHOLD " + AP_M.thMv + " mV → Na⁺ channels open → Na⁺ rushes IN (upstroke)", MED.blocker];
+  if (t < AP_TMIN) return ["Na⁺ channels INACTIVATE · K⁺ channels open → K⁺ flows OUT (repolarisation)", MED.post];
+  if (t < AP_M.recMs) return ["K⁺ channels close slowly → undershoot (after-hyperpolarisation)", MED.post];
+  return ["back at rest — ready to fire again", MED.good];
+}
+
+function drawAP(ctx, cv, st) {
+  clear(ctx, cv);
+  const { tNow = 0, title = "", refract = 0 } = st;
+  const x0 = 76, x1 = 590, yTop = 58, yBot = 322, vHi = 60, vLo = -95;
+  const TX = t => x0 + (x1 - x0) * (t / AP_TEND);
+  const VY = v => yTop + (vHi - v) * (yBot - yTop) / (vHi - vLo);
+
+  _t(ctx, cv.width / 2, 26, title, { size: 17, bold: true, align: "center" });
+
+  /* refractory shading (drawn under the trace) */
+  if (refract > 0) {
+    ctx.globalAlpha = 0.16 * refract;
+    ctx.fillStyle = MED.lean; ctx.fillRect(TX(AP_M.thMs), yTop, TX(AP_M.backMs) - TX(AP_M.thMs), yBot - yTop);
+    ctx.fillStyle = MED.post; ctx.fillRect(TX(AP_M.backMs), yTop, TX(AP_M.recMs) - TX(AP_M.backMs), yBot - yTop);
+    ctx.globalAlpha = 1;
+    _t(ctx, (TX(AP_M.thMs) + TX(AP_M.backMs)) / 2, yTop + 16, "absolute", { align: "center", col: MED.lean, size: 11, bold: true });
+    _t(ctx, (TX(AP_M.thMs) + TX(AP_M.backMs)) / 2, yTop + 29, "refractory", { align: "center", col: MED.lean, size: 11, bold: true });
+    _t(ctx, (TX(AP_M.backMs) + TX(AP_M.recMs)) / 2, yTop + 16, "relative refractory", { align: "center", col: MED.post, size: 11, bold: true });
+  }
+
+  /* axes */
+  ctx.strokeStyle = MED.dim; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(x0, yTop); ctx.lineTo(x0, yBot); ctx.moveTo(x0, VY(AP_REST)); ctx.lineTo(x1, VY(AP_REST)); ctx.stroke();
+  for (const v of [AP_PEAK, 0, AP_TH, AP_REST, AP_AHP]) {
+    _t(ctx, x0 - 8, VY(v) + 4, (v > 0 ? "+" : "") + v, { align: "right", col: MED.dim, size: 11 });
+    if (v === AP_TH || v === AP_REST) {
+      ctx.strokeStyle = v === AP_TH ? "rgba(232,161,60,0.55)" : "rgba(132,150,171,0.45)";
+      ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(x0, VY(v)); ctx.lineTo(x1, VY(v)); ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+  _t(ctx, x0 - 8, VY(AP_TH) - 8, "threshold", { align: "right", col: MED.post, size: 10 });
+  ctx.save(); ctx.translate(x0 - 52, (yTop + yBot) / 2); ctx.rotate(-Math.PI / 2);
+  _t(ctx, 0, 0, "membrane voltage (mV)", { align: "center", col: MED.dim, size: 12 }); ctx.restore();
+  for (let ms = 0; ms <= AP_TEND; ms += 5) {
+    ctx.strokeStyle = MED.dim; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(TX(ms), yBot); ctx.lineTo(TX(ms), yBot + 5); ctx.stroke();
+    _t(ctx, TX(ms), yBot + 19, String(ms), { align: "center", col: MED.dim, size: 11 });
+  }
+  _t(ctx, (x0 + x1) / 2, yBot + 36, "time (milliseconds)", { align: "center", col: MED.dim, size: 12 });
+
+  /* stimulus marks */
+  for (const [s, lab] of [[AP_S1, "stim"], [AP_S2, "stim"], [AP_S3, "STIM"]]) {
+    if (tNow < s - 0.4) continue;
+    ctx.strokeStyle = "rgba(159,178,198,0.5)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(TX(s), yBot - 6); ctx.lineTo(TX(s), yBot - 18); ctx.stroke();
+    _t(ctx, TX(s), yBot - 22, lab, { align: "center", col: MED.dim, size: 10, bold: lab === "STIM" });
+  }
+
+  /* the trace, drawn only up to tNow (it BUILDS) */
+  ctx.strokeStyle = MED.good; ctx.lineWidth = 2.6; ctx.beginPath();
+  let last = null;
+  for (const s of AP_TRACE) { if (s.t > tNow + 1e-9) break; const X = TX(s.t), Y = VY(s.v); last ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); last = s; }
+  ctx.stroke();
+  if (last) { ctx.fillStyle = MED.post; ctx.beginPath(); ctx.arc(TX(last.t), VY(last.v), 5.5, 0, 7); ctx.fill(); }
+
+  /* landmark labels appear as the curve reaches them */
+  if (tNow >= AP_M.peakMs) _t(ctx, TX(AP_M.peakMs) + 8, VY(AP_PEAK) - 6, `peak ${AP_M.peakMv > 0 ? "+" : ""}${AP_M.peakMv} mV`, { col: MED.good, size: 12, bold: true });
+  if (tNow >= AP_M.thMs) _t(ctx, TX(AP_M.thMs) - 6, VY(AP_TH) + 20, `${AP_M.thMv} mV`, { align: "right", col: MED.post, size: 11, bold: true });
+  if (tNow >= AP_S2 + 0.8) _t(ctx, TX(AP_S2) + 6, VY(AP_M.subPeakMv) - 8, `only ${AP_M.subPeakMv} mV → fails`, { col: MED.dim, size: 11 });
+  if (tNow >= AP_M.minMs) _t(ctx, TX(AP_M.minMs) + 6, VY(AP_AHP) + 16, `undershoot ${AP_M.ahpMv} mV`, { col: MED.post, size: 11 });
+
+  /* --- membrane panel: the channels that cause each phase --- */
+  const px0 = 618, px1 = 884, mT = 158, mB = 198;
+  ctx.fillStyle = "rgba(111,168,220,0.07)"; ctx.fillRect(px0, 74, px1 - px0, mT - 74);
+  ctx.fillStyle = "rgba(232,161,60,0.06)"; ctx.fillRect(px0, mB, px1 - px0, 286 - mB);
+  ctx.fillStyle = "rgba(95,191,149,0.12)"; ctx.fillRect(px0, mT, px1 - px0, mB - mT);
+  ctx.strokeStyle = MED.membrane; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(px0, mT); ctx.lineTo(px1, mT); ctx.moveTo(px0, mB); ctx.lineTo(px1, mB); ctx.stroke();
+  _t(ctx, px0 + 4, 70, "outside (Na⁺ high)", { col: MED.dim, size: 11 });
+  _t(ctx, px0 + 4, 300, "inside (K⁺ high)", { col: MED.dim, size: 11 });
+
+  const na = ap_naOpen(tNow), naI = ap_naInact(tNow), k = ap_kOpen(tNow);
+  const chan = (x, open, col, lab, state, stCol) => {
+    const g = _lerp(3, 15, open);
+    ctx.fillStyle = open > 0.15 ? "rgba(95,191,149,0.30)" : "rgba(132,150,171,0.22)";
+    ctx.strokeStyle = open > 0.15 ? col : MED.dim; ctx.lineWidth = 2;
+    for (const s of [-1, 1]) {
+      ctx.beginPath(); ctx.moveTo(x + s * 26, mT - 6); ctx.lineTo(x + s * g / 2, mT - 6);
+      ctx.lineTo(x + s * g / 2, mB + 6); ctx.lineTo(x + s * 26, mB + 6); ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+    _t(ctx, x, mB + 32, lab, { align: "center", col: MED.dim, size: 11 });
+    _t(ctx, x, mB + 48, state, { align: "center", col: stCol, size: 11, bold: true });
+  };
+  chan(684, na, MED.blocker, "Na⁺ channel", naI > 0.3 ? "INACTIVATED" : (na > 0.3 ? "OPEN" : "closed"), naI > 0.3 ? MED.lean : (na > 0.3 ? MED.good : MED.dim));
+  if (naI > 0.3) { ctx.fillStyle = MED.lean; ctx.beginPath(); ctx.arc(684, mB + 12, 7, 0, 7); ctx.fill(); }
+  chan(818, k, MED.post, "K⁺ channel", k > 0.3 ? "OPEN" : "closed", k > 0.3 ? MED.good : MED.dim);
+
+  /* ions flowing through the open channels, correct direction */
+  const flow = (x, open, col, lab, down) => {
+    if (open <= 0.15) return;
+    ctx.globalAlpha = open;
+    for (let i = 0; i < 4; i++) {
+      const f = ((tNow * 1.1 + i / 4) % 1);
+      const y = down ? _lerp(106, 258, f) : _lerp(258, 106, f);
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, 6.5, 0, 7); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    _t(ctx, x, down ? 92 : 282, down ? lab + " IN ↓" : lab + " OUT ↑", { align: "center", col, size: 11, bold: true });
+  };
+  flow(684, na, MED.blocker, "Na⁺", true);
+  flow(818, k, MED.post, "K⁺", false);
+
+  const [cap, capCol] = ap_phase(tNow);
+  _t(ctx, cv.width / 2, 370, cap, { align: "center", col: capCol, size: 13, bold: true });
+}
+
+async function runAP(cv, ctx, opts) {
+  const L = opts.lines || [], title = opts.title;
+  drawAP(ctx, cv, { tNow: 0, title });
+  const legs = [[0, AP_S1 - 0.5, 600], [AP_S1 - 0.5, AP_S3 - 0.4, 2200], [AP_S3 - 0.4, AP_TPK, 1800],
+  [AP_TPK, AP_TMIN, 1500], [AP_TMIN, AP_TEND, 2000]];
+  for (let i = 0; i < legs.length; i++) {
+    if (L[i]) await narrate(L[i]);
+    const [a, b, ms] = legs[i];
+    await tween(ms, k => drawAP(ctx, cv, { tNow: _lerp(a, b, k), title }));
+  }
+  if (L[legs.length]) await narrate(L[legs.length]);
+  await tween(700, k => drawAP(ctx, cv, { tNow: AP_TEND, title, refract: k }));
+  if (L[legs.length + 1]) await narrate(L[legs.length + 1]);
+}
+
+/* =====================================================================
+   thin ANIMS wrappers — narration built FROM the computed values
+   ===================================================================== */
+const PUMP_TITLE = "The sodium–potassium pump — 3 out, 2 in, every cycle";
+const PUMP_LINES = [
+  `This is the sodium-potassium pump, an enzyme called the sodium-potassium ATPase, sitting in the membrane of essentially every cell you own. Below the membrane is the cytosol — the fluid inside the cell. Above it is the extracellular fluid outside. Notice the gradients it maintains: sodium is concentrated outside, potassium inside.`,
+  `The cycle starts with the pump open to the inside. ${PUMP_NA} sodium ions bind. Then ATP — adenosine triphosphate, the cell's energy currency — hands the pump a single phosphate group. That phosphate is the whole trick: it changes the pump's shape.`,
+  `Phosphorylated, the pump everts — the pocket that faced inward now faces outward. Its grip on sodium loosens, and all ${PUMP_NA} sodium ions are released outside, against their gradient. ${PUMP_K} potassium ions then bind in their place.`,
+  `Losing the phosphate snaps the pump back to its inward-facing shape, and the ${PUMP_K} potassium ions are released into the cytosol. One full cycle: ${PUMP_NA} sodium out, ${PUMP_K} potassium in.`,
+  `Now count the charge. ${PUMP_NA} positive charges leave, only ${PUMP_K} come back — a net of plus ${PUMP_NET} exported every single cycle. That is what electrogenic means: the pump does not just move ions, it moves charge, so it directly drags the inside of the cell more negative. Watch the tally.`,
+  `After ${PUMP_CYCLES} cycles it has exported ${PUMP_CYCLES * PUMP_NA} sodium, imported ${PUMP_CYCLES * PUMP_K} potassium, and moved ${PUMP_CYCLES * PUMP_NET} net positive charges out — a small but real slice of the resting membrane potential, on top of the much larger contribution from the potassium gradient it builds. And it is expensive: running these pumps costs roughly ${PUMP_ATP_LOW} to ${PUMP_ATP_HIGH} percent of a typical cell's entire ATP budget, and considerably more in neurons. Every nerve impulse and every heartbeat is rented from this one machine.`
+];
+ANIMS.med_nakpump_static = (cv, ctx) => drawNaKPump(ctx, cv, { pos: 0, title: PUMP_TITLE });
+ANIMS.med_nakpump = (cv, ctx) => runNaKPump(cv, ctx, { title: PUMP_TITLE, lines: PUMP_LINES });
+
+const AP_TITLE = "A nerve firing — the action potential, built in real time";
+const AP_LINES = [
+  `This is the voltage across a nerve cell's membrane, in millivolts, plotted against time in milliseconds. At rest the inside sits about ${_mvw(AP_M.restMv)} millivolts relative to the outside. That is the resting membrane potential, and the sodium-potassium pump is what pays for it.`,
+  `Two weak stimuli. Each nudges the voltage upward and each one dies away — the bigger of the two only reaches ${_mvw(AP_M.subPeakMv)} millivolts. Nothing propagates. A sub-threshold stimulus does not produce a small action potential; it produces no action potential at all.`,
+  `Now a stronger stimulus drives the voltage up to about ${_mvw(AP_M.thMv)} millivolts — threshold. Voltage-gated sodium channels snap open, sodium rushes IN down its gradient, which depolarises the membrane further, which opens still more sodium channels. That runaway loop is the upstroke, and it always ends in the same place: ${_mvw(AP_M.peakMv)} millivolts. All-or-none — the spike has no volume knob.`,
+  `At the peak the sodium channels inactivate: they do not merely close, they latch shut and stay shut. Meanwhile the slower voltage-gated potassium channels are finally opening, so potassium now flows OUT, carrying positive charge with it, and the voltage falls.`,
+  `Those potassium channels are slow to close, so the membrane sails past rest all the way down to ${_mvw(AP_M.ahpMv)} millivolts. That is the after-hyperpolarisation. Measured off this trace: from threshold back down through rest takes ${AP_M.spikeMs.toFixed(1)} milliseconds, the undershoot takes roughly another ${Math.round(AP_M.ahpMs)} milliseconds to fade, so the whole event — threshold to fully recovered — runs about ${Math.round(AP_M.durationMs)} milliseconds.`,
+  `Note what did NOT change: the concentrations. Only a vanishing number of ions actually crossed. The pump quietly restores the books, which is why a neuron can do this again a moment later.`,
+  `The shaded band is the refractory period. In the red stretch — while the sodium channels are inactivated — no stimulus of any size can trigger a second spike; in the amber stretch it takes a stronger-than-normal stimulus. That is not a flaw, it is the design. It forces the impulse to travel one way down the axon, because the patch it just left cannot fire again, and it puts a hard ceiling on how fast the neuron can fire.`
+];
+ANIMS.med_actionpotential_static = (cv, ctx) => drawAP(ctx, cv, { tNow: 0, title: AP_TITLE });
+ANIMS.med_actionpotential = (cv, ctx) => runAP(cv, ctx, { title: AP_TITLE, lines: AP_LINES });
+
+/* ===== debug handle: every value the narration speaks, computed from the drawing ===== */
+ANIMS._med_pump_debug = {
+  naPerCycle: PUMP_NA,
+  kPerCycle: PUMP_K,
+  netChargePerCycle: PUMP_NET,
+  cyclesShown: PUMP_CYCLES,
+  naTotalOut: PUMP_CYCLES * PUMP_NA,
+  kTotalIn: PUMP_CYCLES * PUMP_K,
+  netChargeTotal: PUMP_CYCLES * PUMP_NET,
+  atpBudgetPctLow: PUMP_ATP_LOW,
+  atpBudgetPctHigh: PUMP_ATP_HIGH,
+  apRestMv: AP_M.restMv,
+  apSubThresholdPeakMv: AP_M.subPeakMv,
+  apThresholdMv: AP_M.thMv,
+  apPeakMv: AP_M.peakMv,
+  apAhpMv: AP_M.ahpMv,
+  apThresholdMs: +AP_M.thMs.toFixed(2),
+  apPeakMs: +AP_M.peakMs.toFixed(2),
+  apSpikeMs: AP_M.spikeMs,
+  apAhpMs: AP_M.ahpMs,
+  apDurationMs: AP_M.durationMs,        // threshold → fully recovered
+  apTraceWindowMs: AP_M.windowMs,       // plotted time axis
+  apSamples: AP_M.samples,
+  pumpLines: PUMP_LINES,
+  apLines: AP_LINES
+};
+
 </script>
 </body>
 </html>
