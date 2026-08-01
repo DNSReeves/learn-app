@@ -69,9 +69,28 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 .dash h1{font-size:34px;margin-bottom:2px}
 .dash .sub{color:var(--dim);margin-bottom:26px}
 .tcard{display:block;width:100%;text-align:left;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:16px;color:var(--ink);border:1.5px solid transparent}
-.cat-head{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
-.cat-head:first-of-type{margin-top:6px}
+.cat-head{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px;
+  /* CATEGORY COLLAPSE (2026-08-01): the header is now a real <button> so it is
+     keyboard-reachable and screen-reader-announced; these reset the UA button look. */
+  width:100%;background:none;border-top:0;border-left:0;border-right:0;text-align:left;font-family:inherit;cursor:pointer}
+.cat:first-child .cat-head{margin-top:6px}
+.cat-head:hover{color:var(--fg)}
+.cat-head:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .cat-count{font-weight:600;font-size:11px;color:var(--lock)}
+.cat-chev{display:inline-block;width:10px;font-size:10px;transition:transform .15s ease;color:var(--lock)}
+@media (prefers-reduced-motion: reduce){.cat-chev{transition:none}}
+/* the due-review roll-up: the ONE signal that must survive collapsing, or a student
+   with reviews due sees a tidy list and misses them. */
+.cat-due{margin-left:auto;font-weight:700;font-size:11px;color:var(--due,#d9a441);text-transform:none;letter-spacing:0}
+/* Expanded (default) shows every body. Collapsed hides all but the categories the
+   student opened — clicking a header toggles just that one. */
+.cats[data-mode="collapsed"] .cat:not([data-open="1"]) .cat-body{display:none}
+.cats[data-mode="collapsed"] .cat:not([data-open="1"]) .cat-chev{transform:rotate(-90deg)}
+.cats[data-mode="collapsed"] .cat-head{margin-top:14px}
+.catbar{display:flex;justify-content:flex-end;margin:2px 0 -8px}
+.catbar button{background:none;border:1px solid var(--line);color:var(--dim);font:inherit;font-size:12px;
+  padding:4px 10px;border-radius:7px;cursor:pointer}
+.catbar button:hover{color:var(--fg);border-color:var(--lock)}
 .tcard:hover{border-color:var(--post)}
 .tcard h2{font-size:23px}
 .tcard .tag{color:var(--dim);font-size:15px;margin:2px 0 14px}
@@ -342,6 +361,58 @@ function viewAuthor(){
     }catch(e){ bad(`<div class="tag" style="color:var(--wrong)">${esc(e.message)}</div>`); }
   };
 }
+/* CATEGORY VIEW (operator, 2026-08-01) — collapsed/expanded toggle for the topic list.
+   Persisted in localStorage keyed BY USER: the device is shared (Phase A), so David and
+   Kate each keep their own view rather than fighting over one setting. The token stays in
+   sessionStorage as before — this is a display preference, not an identity. */
+const catKey = u => `learn_cats:${u || "anon"}`;
+function catPrefs(user){
+  try{ const p=JSON.parse(localStorage.getItem(catKey(user))||"{}");
+       return {mode:p.mode==="collapsed"?"collapsed":"expanded", open:Array.isArray(p.open)?p.open:[]}; }
+  catch(_){ return {mode:"expanded", open:[]}; }        // corrupt value → the old behavior
+}
+function saveCatPrefs(user, p){
+  try{ localStorage.setItem(catKey(user), JSON.stringify(p)); }catch(_){ /* private mode / full */ }
+}
+function wireCategoryView(user){
+  const wrap=$("#cats"), btn=$("#cat-toggle");
+  if(!wrap||!btn) return;
+  const p=catPrefs(user);
+  const paint=()=>{
+    wrap.dataset.mode=p.mode;
+    const collapsed=p.mode==="collapsed";
+    btn.textContent = collapsed ? "⊞ Expand all" : "⊟ Collapse to categories";
+    btn.setAttribute("aria-pressed", String(collapsed));
+    wrap.querySelectorAll(".cat").forEach(sec=>{
+      const open = !collapsed || p.open.includes(sec.dataset.cat);
+      sec.dataset.open = open ? "1" : "0";
+      // In expanded mode nothing is collapsible, so the header claims no toggle state.
+      const h=sec.querySelector(".cat-head");
+      if(h) h.setAttribute("aria-expanded", String(open));
+    });
+    saveCatPrefs(user, p);
+  };
+  btn.onclick=()=>{
+    p.mode = p.mode==="collapsed" ? "expanded" : "collapsed";
+    if(p.mode==="collapsed") p.open=[];      // collapsing means collapsing — start clean
+    paint();
+  };
+  wrap.querySelectorAll(".cat").forEach(sec=>{
+    const h=sec.querySelector(".cat-head"); if(!h) return;
+    h.onclick=()=>{
+      // A header click in EXPANDED view collapses everything else and opens this one —
+      // the operator's "when the outer/upper most button is clicked it does the same
+      // collapsed view with expanded toggle": one click from anywhere gets you the
+      // short list with your section open.
+      if(p.mode!=="collapsed"){ p.mode="collapsed"; p.open=[sec.dataset.cat]; paint(); return; }
+      const i=p.open.indexOf(sec.dataset.cat);
+      i<0 ? p.open.push(sec.dataset.cat) : p.open.splice(i,1);
+      paint();
+    };
+  });
+  paint();
+}
+
 async function viewDash(){
   const d = await api("/topics");
   if(d.role){ ROLE=d.role; sessionStorage.setItem("learn_role",ROLE); }   // server-fresh author gate when provided
@@ -372,9 +443,26 @@ async function viewDash(){
           <span class="num">${t.mastered}/${t.concepts} mastered</span>
         </div>
       </button>`;
-      return cats.map(cat=>`
-        <div class="cat-head">${esc(cat)}<span class="cat-count">${g[cat].length}</span></div>
-        ${g[cat].map(tcard).join("")}`).join("");
+      /* CATEGORY COLLAPSE (operator, 2026-08-01): "as more and more topics are added
+         students will find it easier to navigate with less scrolling". A global toggle
+         switches between EXPANDED (every card visible — how it has always looked) and
+         COLLAPSED (category headers only); in collapsed view clicking a header opens
+         just that category. Both the mode and which categories are open persist per
+         USER (shared device — David and Kate keep their own view). Every card is always
+         RENDERED and only CSS-hidden, so toggling is instant with no refetch and the
+         existing .tcard click wiring below is untouched. */
+      const bar=`<div class="catbar"><button id="cat-toggle" type="button"></button></div>`;
+      return bar + `<div class="cats" id="cats">` + cats.map(cat=>{
+        const due=g[cat].reduce((n,t)=>n+(t.review_due||0),0);
+        return `<section class="cat" data-cat="${esc(cat)}">
+          <button class="cat-head" type="button" aria-expanded="true">
+            <span class="cat-chev" aria-hidden="true">▾</span>${esc(cat)}
+            <span class="cat-count">${g[cat].length}</span>
+            ${due?`<span class="cat-due">${due} review${due>1?"s":""} due</span>`:""}
+          </button>
+          <div class="cat-body">${g[cat].map(tcard).join("")}</div>
+        </section>`;
+      }).join("") + `</div>`;
     })()}
     <p class="sub" style="margin-top:18px;font-size:13px">
       <a href="#" id="an-open">📈 my analytics</a> ·
@@ -384,6 +472,7 @@ async function viewDash(){
       <input type="file" id="prog-file" accept=".json,application/json" hidden>
       <span id="prog-msg" class="mono" style="margin-left:8px"></span></p>
   </div>`;
+  wireCategoryView(d.user);
   main.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
   { const ao=$("#author-open"); if(ao) ao.onclick=e=>{e.preventDefault(); viewAuthor();}; }
   /* P4.16: move progress between deployments. Export = download the JSON; import =
