@@ -1,0 +1,725 @@
+{
+  "id": "glp1-medicines",
+  "title": "GLP-1 Medicines — How Ozempic, Wegovy & Mounjaro Work",
+  "tagline": "The gut hormone behind the biggest shift in medicine in a generation — how it works, the newest drugs, the muscle question, and the honest risks.",
+  "description": "A plain-language, up-to-date (2026) tour of the GLP-1 revolution: the incretin biology, how the drugs were engineered, the newest dual/triple agonists and the first oral pill, what the trials really showed, a special section on muscle loss and how the newest drugs preserve it, and an honest account of the serious side effects. Educational only — not medical advice.",
+  "category": "Health & Medicine",
+  "prereqs": [],
+  "concepts": [
+    {
+      "id": "incretin-effect",
+      "title": "The Incretin Effect — your gut talks to your pancreas",
+      "summary": "After you eat, your intestine releases hormones that tell the pancreas to make insulin — before blood sugar even climbs. GLP-1 is the star of that system.",
+      "cards": [
+        {
+          "h": "Eat a meal, and your gut sends a chemical telegram",
+          "md": "Swallow some food and cells lining your intestine start releasing hormones into the blood. These are the **incretins** — chemical telegrams that say *\"food is coming, get ready.\"* The most important one is **GLP-1** (glucagon-like peptide-1), released by **L-cells** in the lower gut, with a partner called **GIP** from the upper gut.\n\nEvery GLP-1 medicine — Ozempic, Wegovy, Mounjaro and the rest — is a copy of this natural *\"food is coming\"* signal, turned up and made to last."
+        },
+        {
+          "h": "The proof: sugar by mouth beats sugar by vein",
+          "md": "Here's the classic experiment. Give someone glucose **by mouth**, then on another day give the exact same rise in blood sugar **through a vein**. The mouthful triggers *far more insulin* — even though the blood sugar is identical.\n\nWhy? The vein bypasses the gut, so no incretin telegram is sent. That extra insulin from eating — up to **half to two-thirds** of your after-meal insulin — is the **incretin effect**. In type 2 diabetes this effect is blunted, which is part of why the drugs that restore it work so well."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What are incretins?",
+          "options": [
+            "Gut hormones released after eating that prime the pancreas to make insulin",
+            "Enzymes in the stomach that digest fat",
+            "Sugars absorbed directly into muscle",
+            "A type of insulin made in the liver"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — GLP-1 and GIP are the incretins, released by the gut when food arrives.",
+            "No — incretins are signalling hormones, not digestive enzymes.",
+            "No — incretins are hormones, not sugars.",
+            "No — insulin comes from the pancreas; incretins are separate gut hormones that trigger it."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The same rise in blood sugar produces MORE insulin when glucose is taken by mouth than by vein. Why?",
+          "options": [
+            "The mouth route lets the gut release incretins, which add an extra insulin push",
+            "Swallowing physically squeezes the pancreas",
+            "Vein glucose is destroyed before it reaches the pancreas",
+            "The stomach makes its own insulin"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — that extra push is the incretin effect; the vein bypasses the gut signal.",
+            "No — it's a hormonal signal from the gut, not a physical squeeze.",
+            "No — vein glucose raises blood sugar the same amount; the difference is the missing gut signal.",
+            "No — the stomach doesn't make insulin."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Which cells release GLP-1?",
+          "options": [
+            "L-cells lining the intestine",
+            "Red blood cells",
+            "Liver hepatocytes",
+            "Brain neurons only"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — intestinal L-cells release GLP-1 in response to nutrients.",
+            "No — red blood cells carry oxygen, not GLP-1.",
+            "No — the liver responds to insulin but doesn't release GLP-1.",
+            "No — while GLP-1 also acts in the brain, it's released by gut L-cells."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "GLP-1 therapies in 2026 — an overview (AJMC)",
+          "type": "article",
+          "url": "https://www.ajmc.com/view/glp-1-therapies-in-2026-beyond-blood-sugar-and-the-scale"
+        }
+      ]
+    },
+    {
+      "id": "four-actions",
+      "title": "Four Jobs GLP-1 Does",
+      "summary": "GLP-1 lowers blood sugar and appetite through four coordinated actions — and one clever detail keeps it from causing dangerous lows.",
+      "cards": [
+        {
+          "h": "Insulin up, glucagon down — but only when sugar is high",
+          "md": "GLP-1's first two jobs are on the pancreas:\n\n- **Turns insulin UP** in the beta-cells (insulin clears sugar from the blood).\n- **Turns glucagon DOWN** in the alpha-cells (glucagon is insulin's opposite — it *raises* sugar).\n\nThe crucial detail: this happens **only when blood sugar is elevated** — it's *glucose-dependent*. When your sugar is normal, GLP-1 goes quiet. That's why GLP-1 drugs alone rarely cause **hypoglycemia** (dangerous low blood sugar) — a big safety advantage over older diabetes drugs."
+        },
+        {
+          "h": "Slow the stomach, quiet the appetite",
+          "md": "The other two jobs explain the weight loss:\n\n- **Slows gastric emptying** — food leaves your stomach more slowly, so you feel full longer and blood sugar rises more gently after meals.\n- **Acts on the brain** — GLP-1 reaches the **hypothalamus**, the appetite control centre, and dials down hunger and food-seeking.\n\nEat less, feel full sooner, absorb sugar more smoothly. The same slowed stomach that curbs appetite is also behind the most common side effect — nausea."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why do GLP-1 drugs rarely cause dangerously low blood sugar on their own?",
+          "options": [
+            "Their insulin-boosting action is glucose-dependent — it switches off when sugar is normal",
+            "They contain sugar to top you up",
+            "They stop the pancreas from ever making insulin",
+            "They only work in the brain"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — glucose-dependence means no extra insulin push when sugar is already normal.",
+            "No — they don't contain sugar.",
+            "No — they boost insulin (when needed), not block it.",
+            "No — they act on the pancreas and gut too; the safety comes from glucose-dependence."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Which action most directly explains the appetite reduction?",
+          "options": [
+            "Action on the hypothalamus (brain appetite centre) plus slowed stomach emptying",
+            "Raising glucagon",
+            "Speeding up the stomach",
+            "Blocking insulin"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — brain appetite signalling plus a slower stomach make you eat less.",
+            "No — GLP-1 lowers glucagon.",
+            "No — it slows, not speeds, the stomach.",
+            "No — it boosts insulin when needed."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The most common side effect (nausea) comes from which action?",
+          "options": [
+            "Slowed gastric emptying",
+            "Lowered glucagon",
+            "Increased insulin",
+            "Brain appetite signalling"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the same slowed stomach that curbs appetite can cause nausea.",
+            "No — glucagon suppression affects blood sugar, not nausea.",
+            "No — insulin affects blood sugar.",
+            "No — appetite signalling reduces hunger; nausea is the stomach-slowing effect."
+          ]
+        }
+      ],
+      "resources": []
+    },
+    {
+      "id": "two-minute-problem",
+      "title": "The Two-Minute Problem — why you can't just inject GLP-1",
+      "summary": "Natural GLP-1 is destroyed within about two minutes. Turning it into a once-a-week medicine was a feat of protein engineering.",
+      "cards": [
+        {
+          "h": "An enzyme chops it up almost instantly",
+          "md": "Here's the obstacle drug companies had to beat: **natural GLP-1 lasts only about 1–2 minutes** in the blood. An enzyme called **DPP-4** (dipeptidyl peptidase-4) snips off its end almost as fast as the gut makes it.\n\nSo you can't bottle GLP-1 and inject it — it would be gone before it did anything. The whole drug industry around these medicines is really the story of *making GLP-1 survive*."
+        },
+        {
+          "h": "Two engineering tricks: dodge the enzyme, grab a taxi",
+          "md": "The medicines beat the two-minute problem with two changes to the molecule:\n\n1. **Resist the enzyme** — tweak the spot DPP-4 attacks so it can't cut.\n2. **Hitch a ride on albumin** — attach a **fatty-acid tail** that clings to *albumin*, the most abundant protein in blood. Albumin acts like a slow taxi, releasing the drug gradually over days.\n\nTogether these stretch GLP-1's life from **minutes to a week** — which is why one injection now lasts seven days. (A related class, the *gliptins*, instead blocks DPP-4 to protect your own GLP-1 — milder, older diabetes pills.)"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why can't natural GLP-1 be used directly as a medicine?",
+          "options": [
+            "The enzyme DPP-4 destroys it within about two minutes",
+            "It's too large to inject",
+            "It causes instant allergy",
+            "The stomach digests it into sugar"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — DPP-4 degrades native GLP-1 in ~1–2 minutes.",
+            "No — size isn't the barrier; its short lifespan is.",
+            "No — the problem is rapid enzymatic breakdown, not allergy.",
+            "No — it's degraded by DPP-4 in the blood, not digested to sugar."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "How does a fatty-acid tail make semaglutide last a week?",
+          "options": [
+            "It binds albumin in the blood, which slowly releases the drug over days",
+            "It makes the drug heavier so it sinks",
+            "It turns the drug into fat",
+            "It lets the drug be swallowed"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — albumin acts as a slow-release reservoir.",
+            "No — it's about albumin binding, not weight.",
+            "No — the drug still acts on GLP-1 receptors; it isn't converted to fat.",
+            "No — the tail extends half-life; oral versions need separate tricks."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "What does the enzyme DPP-4 do to GLP-1?",
+          "options": [
+            "Cuts it, inactivating it within minutes",
+            "Builds more of it",
+            "Carries it to the brain",
+            "Converts it into insulin"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — DPP-4 cleaves and inactivates GLP-1 rapidly.",
+            "No — DPP-4 breaks it down, not builds it.",
+            "No — DPP-4 degrades it; it doesn't transport it.",
+            "No — GLP-1 triggers insulin but isn't converted into it."
+          ]
+        }
+      ],
+      "resources": []
+    },
+    {
+      "id": "drug-family",
+      "title": "The Drug Family — a plain-language field guide",
+      "summary": "The confusing brand names map onto just a handful of molecules. Here's who's who as of 2026.",
+      "cards": [
+        {
+          "h": "One molecule, many brand names",
+          "md": "The brand names multiply because the *same molecule* gets a different name for diabetes vs weight loss. The key players:\n\n- **Semaglutide** = **Ozempic** (diabetes, weekly shot), **Wegovy** (obesity, weekly shot), **Rybelsus** (a daily pill). The workhorse single GLP-1.\n- **Tirzepatide** = **Mounjaro** (diabetes), **Zepbound** (obesity). A **dual** agonist — GLP-1 *plus* GIP (next lesson).\n- **Liraglutide** (Victoza / Saxenda) — an older *daily* shot.\n- **Dulaglutide** (Trulicity) — weekly, diabetes.\n- **Exenatide** — the original, derived from **Gila monster** venom (its natural GLP-1 look-alike resists the DPP-4 enzyme)."
+        },
+        {
+          "h": "2026's headline: the first GLP-1 you can just swallow",
+          "md": "The big 2026 change is a **pill that finally works like the shots**. **Orforglipron** (brand **Foundayo**) was FDA-approved in **April 2026** — the first **oral small-molecule** GLP-1.\n\nWhat makes it different from the older Rybelsus pill: orforglipron is *not* a fragile peptide, so there's **no fasting or water ritual** — you just take it. In its ATTAIN-1 trial it produced about **11% weight loss** at ~17 months. A daily pill with no needle is expected to widen access enormously.\n\n*(This lesson is educational, not medical advice — drug choice is a decision for you and your clinician.)*"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Ozempic and Wegovy contain the same active drug. What is it?",
+          "options": [
+            "Semaglutide",
+            "Tirzepatide",
+            "Metformin",
+            "Insulin"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — both are semaglutide; Ozempic is branded for diabetes, Wegovy for obesity.",
+            "No — tirzepatide is Mounjaro/Zepbound.",
+            "No — metformin is a different, older diabetes drug.",
+            "No — semaglutide mimics GLP-1; it isn't insulin."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "What was notable about orforglipron (Foundayo), approved in 2026?",
+          "options": [
+            "It's the first oral small-molecule GLP-1 — a pill with no fasting ritual",
+            "It's the first injectable GLP-1",
+            "It's a triple agonist",
+            "It cures type 1 diabetes"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the first non-peptide oral GLP-1, taken like an ordinary pill.",
+            "No — injectable GLP-1s existed for years.",
+            "No — it's a single GLP-1 agonist, not a triple.",
+            "No — it treats type 2 diabetes/obesity, and cures nothing."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The original drug in this class, exenatide, was derived from what?",
+          "options": [
+            "A GLP-1 look-alike in Gila monster venom",
+            "Human insulin",
+            "A plant sugar",
+            "Cow pancreas"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — exendin-4 from the Gila monster naturally resists DPP-4.",
+            "No — it's a GLP-1 mimic, not insulin.",
+            "No — it's a peptide from lizard venom.",
+            "No — that was the source of early insulin, not exenatide."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Lilly — oral GLP-1 orforglipron Phase 3 results (2026)",
+          "type": "article",
+          "url": "https://investor.lilly.com/news-releases/news-release-details/lillys-oral-glp-1-orforglipron-demonstrated-statistically"
+        }
+      ]
+    },
+    {
+      "id": "dual-triple-agonists",
+      "title": "Why 'Dual' and 'Triple' Agonists Hit Harder",
+      "summary": "Adding more gut-hormone signals to GLP-1 pushes weight loss from ~15% toward ~30%.",
+      "cards": [
+        {
+          "h": "Tirzepatide: GLP-1 plus a second hormone (GIP)",
+          "md": "If one incretin helps, why not two? **Tirzepatide** (Mounjaro / Zepbound) activates **both GLP-1 and GIP** receptors — a **dual agonist**. GIP adds its own effects on insulin, appetite and fat handling.\n\nThe payoff is real: head-to-head against semaglutide (the SURMOUNT-5 trial), tirzepatide delivered about **20% weight loss versus 14%**. Two signals beat one."
+        },
+        {
+          "h": "Retatrutide: a triple, adding a 'burn more' signal",
+          "md": "The next step adds a *third* receptor. **Retatrutide** is a **triple agonist** — GLP-1 + GIP + **glucagon**. That last one sounds backwards (glucagon *raises* blood sugar), but at these doses it also **boosts energy expenditure and fat burning** in the liver, while GLP-1 keeps appetite and sugar in check.\n\nIn its Phase 3 TRIUMPH trials (2026) retatrutide reached up to about **30% weight loss** — approaching what bariatric surgery achieves. It's not yet approved (filing expected around 2027). Note: a different combo, **CagriSema**, *missed* its head-to-head goal against tirzepatide — more targets isn't automatically better; the biology has to work."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What makes tirzepatide a 'dual' agonist?",
+          "options": [
+            "It activates both the GLP-1 and GIP receptors",
+            "It's taken twice a day",
+            "It contains two pills",
+            "It works in two organs"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — GLP-1 + GIP, two incretin receptors.",
+            "No — 'dual' refers to two hormone targets, not dosing.",
+            "No — it's a single injection.",
+            "No — 'dual' means two receptor targets."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Retatrutide adds a third target, glucagon. Why help a hormone that RAISES blood sugar?",
+          "options": [
+            "At these doses glucagon signalling boosts energy expenditure and fat burning, while GLP-1 controls appetite and sugar",
+            "It cancels out the GLP-1",
+            "It makes the drug cheaper",
+            "It has no effect and is just marketing"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the glucagon arm drives fat oxidation/energy use; GLP-1 offsets its sugar effect.",
+            "No — the arms are balanced deliberately, not cancelled.",
+            "No — cost isn't the rationale.",
+            "No — it meaningfully increases weight loss in trials."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "In the SURMOUNT-5 head-to-head, tirzepatide vs semaglutide gave roughly:",
+          "options": [
+            "20% vs 14% weight loss",
+            "5% vs 4%",
+            "50% vs 40%",
+            "They were identical"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — about 20.2% vs 13.7%.",
+            "No — the losses were larger than that.",
+            "No — those figures are far too high.",
+            "No — tirzepatide was clearly superior."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Lilly — retatrutide TRIUMPH-1 Phase 3 topline (2026)",
+          "type": "article",
+          "url": "https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-delivered-powerful-weight-loss"
+        }
+      ]
+    },
+    {
+      "id": "what-trials-showed",
+      "title": "What the Trials Actually Showed",
+      "summary": "Beyond weight: these drugs now have hard evidence for heart and kidney protection — not just the scale.",
+      "cards": [
+        {
+          "h": "The weight numbers, ranked",
+          "md": "Roughly, average weight loss in the big trials:\n\n- **Semaglutide (Wegovy)** — about **15%** (STEP program).\n- **Tirzepatide (Zepbound)** — about **20–22%** (SURMOUNT).\n- **Orforglipron pill** — about **11%** (ATTAIN, 2026).\n- **Retatrutide (triple, not yet approved)** — up to about **30%** (TRIUMPH, 2026).\n\nFor comparison, lifestyle changes alone average ~5%. These are the first medicines to rival surgery."
+        },
+        {
+          "h": "The bigger deal: hearts and kidneys",
+          "md": "Weight is the headline, but the practice-changing result is **organ protection**. In the **SELECT** trial, semaglutide cut **heart attacks, strokes and cardiovascular death by ~20%** in people with obesity and heart disease *who did not have diabetes* — the first time a weight-loss drug proved it protects the heart.\n\nOther trials show **kidney protection** (FLOW) and benefit in a form of **heart failure** (HFpEF). The message: these are metabolic medicines that happen to cause weight loss — not merely cosmetic."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What did the SELECT trial prove for semaglutide?",
+          "options": [
+            "It cut heart attacks, strokes and cardiovascular death (~20%) in people with obesity and heart disease, without diabetes",
+            "It cured type 1 diabetes",
+            "It only worked in people with diabetes",
+            "It had no effect on the heart"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the first cardiovascular-outcome win for an obesity drug.",
+            "No — it doesn't address type 1 diabetes.",
+            "No — the SELECT population specifically did NOT have diabetes.",
+            "No — it reduced cardiovascular events."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Ranked by average trial weight loss, which is highest?",
+          "options": [
+            "Retatrutide (triple, ~30%, not yet approved)",
+            "Semaglutide (~15%)",
+            "The orforglipron pill (~11%)",
+            "Lifestyle change alone (~5%)"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the triple agonist retatrutide led at ~30% in TRIUMPH.",
+            "No — semaglutide is ~15%.",
+            "No — the pill is ~11%.",
+            "No — lifestyle alone averages ~5%."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why do doctors call these 'metabolic' rather than merely 'weight-loss' drugs?",
+          "options": [
+            "They also protect the heart and kidneys, independent of the weight lost",
+            "They contain metabolism-boosting caffeine",
+            "They only change appearance",
+            "They work by starvation"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — organ-protective effects go beyond the scale.",
+            "No — no caffeine involved.",
+            "No — the point is they do far more than change appearance.",
+            "No — they reduce appetite via hormone signalling, not forced starvation."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "GLP-1 therapies in 2026 — beyond blood sugar and the scale (AJMC)",
+          "type": "article",
+          "url": "https://www.ajmc.com/view/glp-1-therapies-in-2026-beyond-blood-sugar-and-the-scale"
+        }
+      ]
+    },
+    {
+      "id": "muscle-where-weight-comes-from",
+      "title": "★ Where the Lost Weight Comes From — the muscle problem",
+      "summary": "Not all weight is fat. A large slice of the weight lost on these drugs is muscle — and that matters for strength, metabolism and healthy ageing.",
+      "anim": "med_bodycomp_glp1",
+      "cards": [
+        {
+          "h": "A quarter to a third of the loss is muscle",
+          "md": "Step on a scale and it shows one number — but your body is really **fat mass** plus **lean mass** (muscle, organs, bone, water). When you lose weight *any* way, some of both goes.\n\nThe catch with GLP-1 drugs: because the weight comes off fast and appetite drops, studies find that **roughly 15–45% of the weight lost is lean tissue — mostly muscle** (commonly cited as about a quarter to a third). The animation shows this: the body-mass column shrinks, but look at *what* you lost."
+        },
+        {
+          "h": "Why muscle loss is more than a vanity issue",
+          "md": "Muscle isn't just for looks. It's your **metabolic engine** (it burns calories and soaks up blood sugar), your **strength and balance** (preventing falls), and a **reserve** you draw on when ill.\n\nLosing muscle matters most for two groups: **older adults** — who are already losing muscle to age (*sarcopenia*) and can least afford more — and anyone who **stops the drug** and regains weight as *fat*, ending up with a worse fat-to-muscle ratio than they started. This is why 'quality of weight loss', not just quantity, is the new frontier — and why the next lesson matters."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Roughly how much of the weight lost on a standard GLP-1 is lean tissue (mostly muscle)?",
+          "options": [
+            "About a quarter to a third (15–45% in studies)",
+            "Essentially none — it's all fat",
+            "About 90%",
+            "Exactly half, always"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — commonly about 25–33%, with a studied range of ~15–45%.",
+            "No — a substantial fraction is lean tissue, not fat.",
+            "No — that would be catastrophic; the figure is far lower.",
+            "No — it varies; 'a quarter to a third' is the usual estimate."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why is muscle loss especially concerning in older adults?",
+          "options": [
+            "They're already losing muscle with age (sarcopenia) and need it for strength, balance and metabolism",
+            "Older adults can't take the drugs",
+            "Muscle has no function after 60",
+            "It makes the drug stop working"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — added muscle loss compounds age-related sarcopenia and raises fall/frailty risk.",
+            "No — many older adults do take them; the concern is muscle preservation.",
+            "No — muscle remains essential lifelong.",
+            "No — muscle loss doesn't change the drug's appetite effect."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Someone loses weight on a GLP-1, then stops and regains it as fat. Why is that a problem?",
+          "options": [
+            "They can end up with a worse muscle-to-fat ratio than before they started",
+            "It's not a problem — weight is weight",
+            "The regained fat is healthier",
+            "Muscle always comes back first"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — muscle lost fast isn't automatically regained; fat often returns preferentially.",
+            "No — body composition, not just weight, drives health.",
+            "No — regaining fat while short on muscle is metabolically worse.",
+            "No — regain tends to favour fat, not muscle."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Muscle-preserving therapies in the era of pharmacological weight loss (Conte, 2026)",
+          "type": "paper",
+          "url": "https://academic.oup.com/obendo/article/2/1/wjaf020/8408514"
+        }
+      ]
+    },
+    {
+      "id": "muscle-saving-the-newest-drugs",
+      "title": "★ Saving the Muscle — the newest drugs",
+      "summary": "A new class of drugs releases the body's 'muscle brake' so that GLP-1 weight loss is almost all fat. This is 2026's hottest frontier.",
+      "anim": "med_actrii",
+      "cards": [
+        {
+          "h": "The muscle brake: myostatin and activin",
+          "md": "Your body actively *limits* how much muscle you carry, using two signalling proteins — **myostatin** and **activin** — that dock onto a receptor called **ActRII** on the muscle-cell surface. When they bind, they hold muscle growth back. (Animals bred without myostatin are famously, enormously muscular.)\n\nDuring rapid weight loss this brake works against you, helping strip muscle away with the fat. The new idea: **block the brake**, and muscle is spared — even built — while the GLP-1 melts fat. Watch the animation: ligand binds → brake ON → muscle wastes; add a blocker → brake OFF → muscle preserved."
+        },
+        {
+          "h": "BELIEVE and the muscle-preserver pipeline",
+          "md": "The proof arrived in the **BELIEVE trial** (2026): **bimagrumab** — an antibody that blocks the ActRII brake — combined with **semaglutide**. The result was striking: **~93% of the weight lost was fat** (versus ~72% for semaglutide alone), and lean mass barely moved (**−2.6% vs −7.9%**). Bimagrumab *alone* even *added* muscle while cutting fat.\n\nThe pipeline is racing: **trevogrumab + garetosmab** (anti-myostatin/anti-activin, the COURAGE trial), **enobosarm** (a muscle-selective agent), and more. The near-future of weight loss may be a **combination**: a GLP-1 to burn fat plus a muscle-preserver to keep the engine. And the cheapest muscle-preservers remain **resistance exercise and adequate protein** — which every trial recommends alongside the drugs."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "How does a drug like bimagrumab preserve muscle during weight loss?",
+          "options": [
+            "It blocks the ActRII 'muscle brake', so myostatin/activin can't hold muscle back",
+            "It adds sugar to feed muscle",
+            "It replaces GLP-1",
+            "It freezes fat cells"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — blocking activin/myostatin at ActRII releases the brake on muscle.",
+            "No — it works via the activin/myostatin pathway, not by feeding muscle sugar.",
+            "No — it's paired WITH a GLP-1, not a replacement.",
+            "No — it targets muscle signalling, not fat freezing."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In the BELIEVE trial, what fraction of the weight lost on bimagrumab + semaglutide was fat?",
+          "options": [
+            "About 93%",
+            "About 50%",
+            "About 25%",
+            "Almost none — it was mostly muscle"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — ~92.8% fat, versus ~72% for semaglutide alone.",
+            "No — it was much higher; the point was fat-selective loss.",
+            "No — that's far too low.",
+            "No — the combo PRESERVED muscle; the loss was mostly fat."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "What are the cheapest, always-recommended muscle preservers alongside these drugs?",
+          "options": [
+            "Resistance exercise and adequate protein intake",
+            "Extra GLP-1",
+            "Bed rest",
+            "Skipping meals"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — strength training plus protein are the foundation every trial advises.",
+            "No — more GLP-1 doesn't preserve muscle.",
+            "No — inactivity accelerates muscle loss.",
+            "No — under-eating protein worsens muscle loss."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "BELIEVE — bimagrumab + semaglutide preserves lean mass (2026)",
+          "type": "article",
+          "url": "https://www.pbrc.edu/news/media/2026/semaglutide_and_bimagrumab.aspx"
+        },
+        {
+          "label": "Targeting the activin/myostatin–ActRII pathway in obesity (2026)",
+          "type": "paper",
+          "url": "https://link.springer.com/article/10.1007/s11154-026-10033-w"
+        }
+      ]
+    },
+    {
+      "id": "serious-side-effects",
+      "title": "The Serious Side Effects — the honest version",
+      "summary": "Beyond the common nausea, a handful of genuinely serious risks deserve real understanding — not fine print.",
+      "cards": [
+        {
+          "h": "The gut risks that can turn serious",
+          "md": "The everyday side effects — nausea, vomiting, diarrhea, constipation — come from the slowed stomach and usually ease with **slow dose titration**. But a few gut problems are serious:\n\n- **Severe gastroparesis** — the stomach nearly stops emptying; persistent vomiting.\n- **Ileus** — the bowel stops moving (a blockage); the FDA added this warning in 2023.\n- **Aspiration under anesthesia** — because the stomach empties slowly, food can remain for hours; during surgery that raises the risk of **inhaling stomach contents**. Anesthesia guidelines now advise **pausing the drug before procedures** — always tell your surgeon you take one.\n- **Pancreatitis** — inflammation of the pancreas; severe belly pain means stop and seek care.\n- **Gallstones** and **acute kidney injury** (from dehydration if vomiting/diarrhea is bad)."
+        },
+        {
+          "h": "The rarer but scarier ones — and the honest caveats",
+          "md": "- **Sudden vision loss (NAION)** — *non-arteritic anterior ischemic optic neuropathy*, a stroke of the optic nerve causing sudden, usually permanent loss of vision in one eye. Studies (2024) found a **4–7× higher risk** with semaglutide; it's **rare** (~1 in 10,000), and regulators are updating labels.\n- **Worsening diabetic retinopathy** — rapid sugar-lowering can transiently worsen existing eye disease.\n- **Thyroid C-cell tumors** — rodents developed these; there's a **boxed warning**, and the drugs are **not for people with a personal or family history of medullary thyroid cancer or MEN2**.\n- **Muscle loss** (earlier lesson) and **weight regain** — stopping usually brings back ~two-thirds of the weight, so treatment is often long-term.\n- **Pregnancy** — avoid; restored fertility has caused surprise pregnancies ('Ozempic babies').\n\n*This is education, not medical advice. These are decisions for you and your clinician — but you deserve the real list, not 'may cause side effects.'*"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why should you tell your surgeon or anesthesiologist that you take a GLP-1 drug?",
+          "options": [
+            "Slowed stomach emptying can leave food in the stomach, raising the risk of aspiration under anesthesia",
+            "It reacts with all anesthetics",
+            "It must be increased before surgery",
+            "It makes you immune to painkillers"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — retained gastric contents raise aspiration risk; guidelines advise pausing it before procedures.",
+            "No — the issue is a full stomach, not a chemical reaction with anesthetics.",
+            "No — it's typically PAUSED, not increased.",
+            "No — it doesn't block painkillers."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "NAION, a serious rare risk, is best described as:",
+          "options": [
+            "A stroke of the optic nerve causing sudden, usually permanent vision loss in one eye",
+            "Temporary blurriness that always resolves",
+            "An allergic rash",
+            "Low blood sugar"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — it's an ischemic optic-nerve injury; rare (~1/10,000) but often permanent.",
+            "No — NAION vision loss is usually permanent, not transient blur.",
+            "No — it affects the optic nerve, not the skin.",
+            "No — that's hypoglycemia, a different risk."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Who should NOT take these drugs because of the thyroid boxed warning?",
+          "options": [
+            "People with a personal or family history of medullary thyroid cancer or MEN2",
+            "Anyone over 50",
+            "People who exercise",
+            "People who have had the flu"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — that's the specific contraindication from the C-cell tumor signal.",
+            "No — age alone isn't the contraindication.",
+            "No — exercise is encouraged.",
+            "No — prior flu is irrelevant."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "What usually happens to weight after stopping a GLP-1 drug?",
+          "options": [
+            "About two-thirds of the lost weight tends to return, so treatment is often long-term",
+            "The weight stays off permanently",
+            "You keep losing weight",
+            "Nothing changes"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — most regain a large share, which is why these are often chronic therapies.",
+            "No — regain is common without continued treatment or strong lifestyle change.",
+            "No — the appetite effect fades when the drug stops.",
+            "No — appetite and weight typically rebound."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "WHO — semaglutide and risk of NAION (2025 notice)",
+          "type": "article",
+          "url": "https://www.who.int/news/item/27-06-2025-27-06-2025-semaglutide-medicines-naion"
+        }
+      ]
+    }
+  ]
+}
