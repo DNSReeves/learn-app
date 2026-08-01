@@ -92,7 +92,8 @@
           "type": "article",
           "note": "The canonical survey: planning, memory, tool use — one long, careful read."
         }
-      ]
+      ],
+      "anim": "agent_loop"
     },
     {
       "id": "tool-use",
@@ -181,7 +182,8 @@
           "type": "docs",
           "note": "The emerging open standard for exposing tools to any agent — schemas, servers, permissions."
         }
-      ]
+      ],
+      "anim": "agent_toolcall"
     },
     {
       "id": "the-agentic-loop",
@@ -432,7 +434,8 @@
           "type": "article",
           "note": "Short/long-term memory and retrieval, placed in the full agent architecture."
         }
-      ]
+      ],
+      "anim": "agent_memory"
     },
     {
       "id": "grounding",
@@ -717,7 +720,8 @@
           "type": "paper",
           "note": "The outcome-grounded coding benchmark: real issues, real repos, the repo's own tests as judge."
         }
-      ]
+      ],
+      "anim": "agent_eval"
     },
     {
       "id": "guardrails",
@@ -800,7 +804,8 @@
           "type": "article",
           "note": "The clearest ongoing writing on why 'content as instructions' is the agent-era vulnerability class."
         }
-      ]
+      ],
+      "anim": "agent_guardrail"
     },
     {
       "id": "failure-modes",

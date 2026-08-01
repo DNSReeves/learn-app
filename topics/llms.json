@@ -497,7 +497,8 @@
           "type": "reading",
           "note": "The three-stage pipeline, PPO vs DPO, and documented limitations — solid reference article."
         }
-      ]
+      ],
+      "anim": "llm_finetune"
     },
     {
       "id": "c06-prompting",
@@ -592,7 +593,8 @@
           "type": "reading",
           "note": "Follow one token through the stack step by step — makes 'each token is a forward pass' concrete."
         }
-      ]
+      ],
+      "anim": "llm_prompt"
     },
     {
       "id": "c07-failures",
@@ -705,7 +707,8 @@
           "type": "video",
           "note": "The last third covers jailbreaks, prompt injection, and data poisoning with live examples — rewatch it now that you have the mechanics."
         }
-      ]
+      ],
+      "anim": "llm_failure"
     },
     {
       "id": "c08-evaluation",

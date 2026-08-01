@@ -92,7 +92,8 @@
           "type": "interactive",
           "note": "Brown University. Drag-and-see visualizations of the core ideas."
         }
-      ]
+      ],
+      "anim": "bayes_belief"
     },
     {
       "id": "c02-conditional",
@@ -181,7 +182,8 @@
           "type": "video",
           "note": "3 min. Derives the theorem from the two factorizations of the joint — exactly this concept's punchline."
         }
-      ]
+      ],
+      "anim": "bayes_conditional"
     },
     {
       "id": "c03-bayes-theorem",

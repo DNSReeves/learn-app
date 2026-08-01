@@ -171,7 +171,8 @@
           "type": "interactive",
           "note": "Watch hidden neurons carve the input space — add layers on the spiral dataset and see composition happen."
         }
-      ]
+      ],
+      "anim": "nn_layers"
     },
     {
       "id": "c03-loss",
@@ -662,7 +663,8 @@
           "type": "reading",
           "note": "Free, rigorous, readable — the consolidation read after mastering this ladder."
         }
-      ]
+      ],
+      "anim": "nn_training"
     }
   ]
 }

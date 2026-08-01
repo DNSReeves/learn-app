@@ -86,7 +86,8 @@
           "type": "paper",
           "note": "A serious attempt to replace the binary word with a leveled, testable taxonomy (performance × generality × autonomy)."
         }
-      ]
+      ],
+      "anim": "agi_define"
     },
     {
       "id": "measuring-progress",
@@ -619,7 +620,8 @@
           "type": "essay",
           "note": "The articulate optimistic case, from someone who also signs the risk statements — useful for seeing both held at once."
         }
-      ]
+      ],
+      "anim": "agi_governance"
     },
     {
       "id": "deciding-under-uncertainty",
@@ -708,7 +710,8 @@
           "type": "data",
           "note": "Where the checkable indicators live: compute trends, capability measurements, constraint analyses — tripwire fuel."
         }
-      ]
+      ],
+      "anim": "agi_decision"
     }
   ]
 }

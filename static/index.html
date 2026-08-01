@@ -8570,6 +8570,1209 @@ ANIMS.ode_stability=async(cv,ctx)=>{
 };
 })();
 
+/* ===== batch-2 visuals: agi ===== */
+/* ---- frag_agi_define.js ---- */
+/* AGI and beyond / agi_define */
+(function(){
+const ad_stages=[
+  {x:0.10,label:"Narrow"},
+  {x:0.38,label:"Broad"},
+  {x:0.64,label:"General"},
+  {x:0.90,label:"Superhuman"}
+];
+// competing definition brackets: [center, half-width, color, name]
+const ad_defs=[
+  {c:0.50,w:0.10,name:"'beats most humans at most tasks'"},
+  {c:0.64,w:0.09,name:"'any cognitive task a person can'"},
+  {c:0.78,w:0.11,name:"'economically outperforms experts'"}
+];
+function ad_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,AXY=250;
+  const sx=t=>X0+t*(X1-X0);
+  // contested band shading (fuzzy AGI? zone) spanning the definitions
+  const bandL=sx(0.40),bandR=sx(0.90);
+  const ag=ctx.createLinearGradient(bandL,0,bandR,0);
+  ag.addColorStop(0,"rgba(232,161,60,0.02)");
+  ag.addColorStop(0.5,"rgba(232,161,60,0.16)");
+  ag.addColorStop(1,"rgba(232,161,60,0.02)");
+  ctx.fillStyle=ag;
+  ctx.fillRect(bandL,AXY-60,bandR-bandL,120);
+  ctx.fillStyle=F.post;ctx.textAlign="center";
+  ctx.fillText("contested  “AGI?”  band",sx(0.65),AXY-70);
+  // axis
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(X0,AXY);ctx.lineTo(X1,AXY);ctx.stroke();
+  // arrowhead
+  ctx.beginPath();ctx.moveTo(X1,AXY);ctx.lineTo(X1-10,AXY-5);ctx.lineTo(X1-10,AXY+5);ctx.closePath();
+  ctx.fillStyle="#3A4C68";ctx.fill();
+  // stage ticks + labels
+  ctx.textAlign="center";
+  for(const st of ad_stages){
+    const px=sx(st.x);
+    ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(px,AXY-6);ctx.lineTo(px,AXY+6);ctx.stroke();
+    ctx.fillStyle=F.txt;ctx.fillText(st.label,px,AXY+26);
+  }
+  ctx.fillStyle=F.ax;ctx.textAlign="left";
+  ctx.fillText("capability →",X1-96,AXY+48);
+  // definition brackets, each at its own height; lit one is highlighted
+  const ad_bt=[AXY-115,AXY-150,AXY-185];
+  for(let i=0;i<ad_defs.length;i++){
+    const d=ad_defs[i],by=ad_bt[i];
+    const L=sx(d.c-d.w),R=sx(d.c+d.w);
+    const lit=(s.active===i);
+    ctx.strokeStyle=lit?F.ok:"#4a5c78";
+    ctx.lineWidth=lit?2.5:1.4;
+    ctx.beginPath();
+    ctx.moveTo(L,by+8);ctx.lineTo(L,by);ctx.lineTo(R,by);ctx.lineTo(R,by+8);
+    ctx.stroke();
+    // drop line from bracket center to axis when lit
+    if(lit){
+      ctx.strokeStyle="rgba(95,191,149,0.4)";ctx.lineWidth=1;ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(sx(d.c),by+8);ctx.lineTo(sx(d.c),AXY-6);ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.fillStyle=lit?F.ok:F.ax;ctx.textAlign="center";
+    ctx.font=lit?"13px 'IBM Plex Mono'":"12px 'IBM Plex Mono'";
+    ctx.fillText(d.name,sx(d.c),by-6);
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+  // sliding marker
+  const mx=sx(s.pos);
+  ctx.strokeStyle=F.post;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(mx,AXY-58);ctx.lineTo(mx,AXY+14);ctx.stroke();
+  ctx.fillStyle=F.post;
+  ctx.beginPath();ctx.moveTo(mx,AXY-58);ctx.lineTo(mx-6,AXY-70);ctx.lineTo(mx+6,AXY-70);ctx.closePath();ctx.fill();
+  ctx.textAlign="left";
+}
+ANIMS.agi_define_static=(cv,ctx)=>ad_draw(ctx,cv,{pos:0.65,active:-1});
+ANIMS.agi_define=async(cv,ctx)=>{
+  ad_draw(ctx,cv,{pos:0.10,active:-1});
+  await narrate("Capability runs on a spectrum: from narrow tools to broad, general, then superhuman skill.");
+  await tween(1600,k=>ad_draw(ctx,cv,{pos:0.10+k*0.55,active:-1}));
+  await narrate("But where does 'AGI' begin? There is no single agreed line.");
+  ad_draw(ctx,cv,{pos:0.50,active:0});
+  await narrate("One camp says AGI is matching most humans at most tasks.");
+  ad_draw(ctx,cv,{pos:0.64,active:1});
+  await narrate("Another draws the line at any cognitive task a person can do.");
+  ad_draw(ctx,cv,{pos:0.78,active:2});
+  await narrate("A third only counts it once machines outperform expert professionals economically.");
+  await tween(1400,k=>ad_draw(ctx,cv,{pos:0.78-k*0.28,active:-1}));
+  await narrate("So 'AGI' is a contested band, not a fixed threshold — defined differently by different people.");
+};
+})();
+/* ---- frag_agi_governance.js ---- */
+/* AGI and beyond / agi_governance */
+(function(){
+// capability rises fast (steep), governance rises slowly (shallow)
+const agv_cap=(t)=>0.15+0.85*Math.pow(t,1.7);        // fast
+const agv_gov=(t,lift)=>0.12+0.30*t+lift*Math.pow(t,2); // slow, lever adds curvature
+function agv_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,Y0=320,Y1=60;
+  const sx=t=>X0+t*(X1-X0);
+  const sy=v=>Y0-v*(Y0-Y1);
+  const tmax=s.t;   // how far along in time we've drawn (0..1)
+  const lift=s.lift; // lever effect on governance curve (0..~0.45)
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0.25;g<1;g+=0.25){ctx.beginPath();ctx.moveTo(X0,sy(g));ctx.lineTo(X1,sy(g));ctx.stroke();}
+  // gap shading (risk) between capability and governance up to tmax
+  ctx.fillStyle="rgba(212,106,98,0.16)";
+  ctx.beginPath();
+  ctx.moveTo(sx(0),sy(agv_cap(0)));
+  for(let t=0;t<=tmax+0.001;t+=0.01)ctx.lineTo(sx(t),sy(agv_cap(t)));
+  for(let t=tmax;t>=0;t-=0.01)ctx.lineTo(sx(t),sy(agv_gov(t,lift)));
+  ctx.closePath();ctx.fill();
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  // capability curve
+  ctx.strokeStyle=F.post;ctx.lineWidth=3;ctx.beginPath();
+  for(let t=0;t<=tmax+0.001;t+=0.005){const px=sx(t),py=sy(agv_cap(t));if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  // governance curve
+  ctx.strokeStyle=F.ax;ctx.lineWidth=3;ctx.beginPath();
+  for(let t=0;t<=tmax+0.001;t+=0.005){const px=sx(t),py=sy(agv_gov(t,lift));if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  // labels at curve ends
+  ctx.textAlign="left";
+  ctx.fillStyle=F.post;ctx.fillText("capability",sx(tmax)+8,sy(agv_cap(tmax)));
+  ctx.fillStyle=F.ax;ctx.fillText("governance / oversight",sx(tmax)+8,sy(agv_gov(tmax,lift))+4);
+  // gap label
+  if(tmax>0.55){
+    const gt=0.78,midY=(sy(agv_cap(gt))+sy(agv_gov(gt,lift)))/2;
+    ctx.fillStyle=F.wrong;ctx.textAlign="center";
+    ctx.fillText(lift>0.2?"gap narrowing":"widening gap = risk",sx(gt),midY);
+  }
+  // axis captions
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("time →",(X0+X1)/2,Y0+34);
+  ctx.save();ctx.translate(X0-42,(Y0+Y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("level",0,0);ctx.restore();
+  // lever indicator when active
+  if(lift>0.05){
+    ctx.fillStyle=F.ok;ctx.textAlign="right";
+    ctx.fillText("↑ testing · oversight · regulation",X1,Y1-24);
+  }
+  ctx.textAlign="left";
+}
+ANIMS.agi_governance_static=(cv,ctx)=>agv_draw(ctx,cv,{t:1,lift:0});
+ANIMS.agi_governance=async(cv,ctx)=>{
+  agv_draw(ctx,cv,{t:0.02,lift:0});
+  await narrate("Two things rise over time: what AI can do, and how well society oversees it.");
+  await tween(2000,k=>agv_draw(ctx,cv,{t:0.02+k*0.98,lift:0}));
+  await narrate("Capability climbs fast; oversight — laws, testing, institutions — climbs slowly.");
+  await narrate("The shaded gap between them is the risk: powerful systems running ahead of our ability to check them.");
+  await tween(1800,k=>agv_draw(ctx,cv,{t:1,lift:k*0.42}));
+  await narrate("Governance is the effort to lift that lower curve — closing the gap before it grows.");
+};
+})();
+/* ---- frag_agi_decision.js ---- */
+/* AGI and beyond / agi_decision */
+(function(){
+// fan of futures spreading from a single origin
+const adc_N=9;                       // number of trajectories
+const adc_slope=(i)=>(i-(adc_N-1)/2)/((adc_N-1)/2); // -1..1 spread factor
+function adc_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=110,X1=800,Y0=340,Y1=40;
+  const oy=(Y0+Y1)/2;               // origin vertical (now)
+  const sx=t=>X0+t*(X1-X0);
+  const sy=v=>oy-v*((Y0-Y1)/2);     // v in -1..1
+  const spread=s.spread;            // 0..1 how far the fan has opened
+  // vertical "now" line
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="center";ctx.fillText("now",X0,Y0+24);
+  ctx.fillText("possible futures →",(X0+X1)/2,Y0+24);
+  // each trajectory: gently curving line to a fanned endpoint
+  for(let i=0;i<adc_N;i++){
+    const end=adc_slope(i)*0.92*spread;
+    ctx.strokeStyle="rgba(124,141,165,0.45)";ctx.lineWidth=1.4;
+    ctx.beginPath();
+    for(let t=0;t<=1.001;t+=0.02){
+      const v=end*Math.pow(t,1.25);   // spreads out as t grows
+      const px=sx(t),py=sy(v);
+      if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    // endpoint dot
+    ctx.fillStyle="rgba(124,141,165,0.6)";
+    ctx.beginPath();ctx.arc(sx(1),sy(end),2.5,0,7);ctx.fill();
+  }
+  // origin marker
+  ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(X0,oy,4,0,7);ctx.fill();
+  // ROBUST choice: a band of outcomes that stays "good" (near a payoff zone) across most futures
+  if(s.showRobust){
+    // payoff zone (good region) shaded
+    ctx.fillStyle="rgba(95,191,149,0.10)";
+    ctx.fillRect(X0,sy(0.55),X1-X0,sy(-0.55)-sy(0.55));
+    ctx.strokeStyle="rgba(95,191,149,0.35)";ctx.setLineDash([4,4]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(X0,sy(0.55));ctx.lineTo(X1,sy(0.55));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X0,sy(-0.55));ctx.lineTo(X1,sy(-0.55));ctx.stroke();
+    ctx.setLineDash([]);
+    // robust path: stays inside the good band regardless of branch
+    ctx.strokeStyle=F.ok;ctx.lineWidth=3;ctx.beginPath();
+    for(let t=0;t<=1.001;t+=0.02){
+      const v=0.18*Math.sin(t*3.3);   // wanders but stays central / inside band
+      const px=sx(t),py=sy(v);
+      if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    ctx.fillStyle=F.ok;ctx.textAlign="left";
+    ctx.fillText("robust — holds up across most futures",sx(1)+6,sy(0.05));
+  }
+  // FRAGILE choice: optimal on ONE branch, off the good band on the rest
+  if(s.showFragile){
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=3;ctx.beginPath();
+    for(let t=0;t<=1.001;t+=0.02){
+      const v=-0.92*Math.pow(t,1.25); // rides one extreme branch
+      const px=sx(t),py=sy(v);
+      if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    ctx.fillStyle=F.wrong;ctx.textAlign="left";
+    ctx.fillText("fragile — wins on only one branch",sx(1)+6,sy(-0.9));
+  }
+  ctx.textAlign="left";
+}
+ANIMS.agi_decision_static=(cv,ctx)=>adc_draw(ctx,cv,{spread:1,showRobust:false,showFragile:false});
+ANIMS.agi_decision=async(cv,ctx)=>{
+  adc_draw(ctx,cv,{spread:0.02,showRobust:false,showFragile:false});
+  await narrate("From today, the future fans out into many possible paths we cannot predict.");
+  await tween(1800,k=>adc_draw(ctx,cv,{spread:0.02+k*0.98,showRobust:false,showFragile:false}));
+  await narrate("This is deep uncertainty: we don't even know the odds of each branch.");
+  adc_draw(ctx,cv,{spread:1,showFragile:true});
+  await narrate("A fragile choice is tuned to be perfect on one branch — and fails if a different future arrives.");
+  adc_draw(ctx,cv,{spread:1,showFragile:true,showRobust:true});
+  await narrate("A robust choice gives up peak payoff to stay good across most futures.");
+  await narrate("Under deep uncertainty, prefer actions that hold up broadly over bets that win in only one world.");
+};
+})();
+
+/* ===== batch-2 visuals: ai-agents ===== */
+/* ---- frag_agent_loop.js ---- */
+/* AI agents / agent_loop */
+(function(){
+const al_CX=250, al_CY=190, al_R=110;
+// four stations around the ring, angle in radians (0 = right, going clockwise via -sin)
+const al_nodes=[
+  {a:-Math.PI/2, label:"Observe"},
+  {a:0,          label:"Think"},
+  {a:Math.PI/2,  label:"Act"},
+  {a:Math.PI,    label:"Environment"}
+];
+const al_px=a=>al_CX+al_R*Math.cos(a);
+const al_py=a=>al_CY+al_R*Math.sin(a);
+function al_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  // ---- the loop ring ----
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(al_CX,al_CY,al_R,0,Math.PI*2); ctx.stroke();
+  // direction arrowheads along the ring
+  ctx.fillStyle=F.ax;
+  for(let i=0;i<4;i++){
+    const a=i*Math.PI/2+Math.PI/4;
+    const hx=al_px(a), hy=al_py(a);
+    const t=a+Math.PI/2; // tangent (clockwise)
+    ctx.save(); ctx.translate(hx,hy); ctx.rotate(t);
+    ctx.beginPath(); ctx.moveTo(7,0); ctx.lineTo(-4,5); ctx.lineTo(-4,-5); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  // station nodes
+  for(const n of al_nodes){
+    const x=al_px(n.a), y=al_py(n.a);
+    ctx.fillStyle="#16233b"; ctx.strokeStyle=F.ax; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(x,y,9,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=F.txt;
+    // push label outward from center
+    const lx=al_CX+(al_R+30)*Math.cos(n.a), ly=al_CY+(al_R+30)*Math.sin(n.a);
+    ctx.fillText(n.label, lx, ly);
+  }
+  // LLM at center
+  ctx.fillStyle="#16233b"; ctx.strokeStyle=F.post; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(al_CX,al_CY,34,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle=F.post; ctx.fillText("LLM", al_CX, al_CY-7);
+  ctx.fillStyle=F.txt; ctx.font="11px 'IBM Plex Mono'"; ctx.fillText("+ goal", al_CX, al_CY+10);
+  ctx.font="14px 'IBM Plex Mono'";
+  // traveling token
+  if(s.tok!=null){
+    const a=-Math.PI/2 + s.tok*Math.PI*2; // start at Observe, go clockwise
+    const tx=al_px(a), ty=al_py(a);
+    ctx.fillStyle=F.ok;
+    ctx.beginPath(); ctx.arc(tx,ty,6,0,Math.PI*2); ctx.fill();
+  }
+  // ---- one-shot model (contrast) ----
+  const osX=560, osY=190;
+  ctx.strokeStyle=F.ax; ctx.lineWidth=2; ctx.fillStyle="#16233b";
+  ctx.fillRect(osX,osY-26,120,52); ctx.strokeRect(osX,osY-26,120,52);
+  ctx.fillStyle=F.txt; ctx.fillText("model", osX+60, osY);
+  // in arrow
+  ctx.strokeStyle=F.ax; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(osX-70,osY); ctx.lineTo(osX-6,osY); ctx.stroke();
+  ctx.fillStyle=F.ax; ctx.beginPath(); ctx.moveTo(osX,osY); ctx.lineTo(osX-9,osY-5); ctx.lineTo(osX-9,osY+5); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=F.txt; ctx.fillText("prompt", osX-40, osY-16);
+  // out arrow
+  ctx.strokeStyle=F.ax; ctx.beginPath(); ctx.moveTo(osX+120,osY); ctx.lineTo(osX+190,osY); ctx.stroke();
+  ctx.fillStyle=F.ax; ctx.beginPath(); ctx.moveTo(osX+196,osY); ctx.lineTo(osX+187,osY-5); ctx.lineTo(osX+187,osY+5); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=F.txt; ctx.fillText("reply", osX+165, osY-16);
+  // titles
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("agent = model in a loop", al_CX, 40);
+  ctx.fillText("one-shot: in → out", osX+63, 40);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+}
+ANIMS.agent_loop_static=(cv,ctx)=>al_draw(ctx,cv,{tok:null});
+ANIMS.agent_loop=async(cv,ctx)=>{
+  al_draw(ctx,cv,{tok:0});
+  await narrate("A plain model answers once: a prompt goes in, a reply comes out, and it stops.");
+  await narrate("An agent puts that model in a loop, pursuing a goal instead of a single reply.");
+  await tween(2600,k=>al_draw(ctx,cv,{tok:k}));
+  await narrate("Each turn it observes, thinks, and acts on its environment, then observes again.");
+  await tween(2600,k=>al_draw(ctx,cv,{tok:k}));
+  await narrate("Repeating that cycle with tools and a goal is what makes it an agent.");
+};
+})();
+/* ---- frag_agent_toolcall.js ---- */
+/* AI agents / agent_toolcall */
+(function(){
+// three stages laid out horizontally
+const atc_MX=160, atc_MY=150, atc_MW=150, atc_MH=70;   // model box
+const atc_TX=590, atc_TY=150, atc_TW=150, atc_TH=70;   // tool box
+const atc_PathY=185;                                    // out path
+const atc_RetY=245;                                     // return path
+function atc_box(ctx,x,y,w,h,fill,stroke){
+  ctx.fillStyle=fill; ctx.strokeStyle=stroke; ctx.lineWidth=2;
+  ctx.fillRect(x,y,w,h); ctx.strokeRect(x,y,w,h);
+}
+function atc_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  // model box
+  atc_box(ctx,atc_MX,atc_MY,atc_MW,atc_MH,"#16233b",F.post);
+  ctx.fillStyle=F.post; ctx.fillText("model", atc_MX+atc_MW/2, atc_MY+22);
+  ctx.fillStyle=F.txt; ctx.font="11px 'IBM Plex Mono'";
+  ctx.fillText(s.answered?"answer ready":"needs a fact", atc_MX+atc_MW/2, atc_MY+46);
+  ctx.font="14px 'IBM Plex Mono'";
+  // tool box
+  atc_box(ctx,atc_TX,atc_TY,atc_TW,atc_TH,"#16233b",F.ax);
+  ctx.fillStyle=F.txt; ctx.fillText("tool: search", atc_TX+atc_TW/2, atc_TY+22);
+  ctx.fillStyle=F.ax; ctx.font="11px 'IBM Plex Mono'";
+  ctx.fillText(s.running?"executing…":"idle", atc_TX+atc_TW/2, atc_TY+46);
+  ctx.font="14px 'IBM Plex Mono'";
+  const rightM=atc_MX+atc_MW, leftT=atc_TX;
+  // ---- outbound: structured tool call ----
+  ctx.strokeStyle=F.ax; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(rightM,atc_PathY); ctx.lineTo(leftT,atc_PathY); ctx.stroke();
+  ctx.fillStyle=F.ax; ctx.beginPath(); ctx.moveTo(leftT,atc_PathY); ctx.lineTo(leftT-9,atc_PathY-5); ctx.lineTo(leftT-9,atc_PathY+5); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=F.txt; ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText('{ tool:"search", args:"…" }', (rightM+leftT)/2, atc_PathY-16);
+  // ---- inbound: result ----
+  ctx.strokeStyle=F.ok; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(leftT,atc_RetY); ctx.lineTo(rightM,atc_RetY); ctx.stroke();
+  ctx.fillStyle=F.ok; ctx.beginPath(); ctx.moveTo(rightM,atc_RetY); ctx.lineTo(rightM+9,atc_RetY-5); ctx.lineTo(rightM+9,atc_RetY+5); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=F.txt; ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("result → back to model", (rightM+leftT)/2, atc_RetY+16);
+  ctx.font="14px 'IBM Plex Mono'";
+  // moving token: out (phase 0..0.5) then back (0.5..1)
+  if(s.tok!=null){
+    let tx,ty,col;
+    if(s.tok<0.5){ const p=s.tok/0.5; tx=rightM+(leftT-rightM)*p; ty=atc_PathY; col=F.ax; }
+    else { const p=(s.tok-0.5)/0.5; tx=leftT+(rightM-leftT)*p; ty=atc_RetY; col=F.ok; }
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(tx,ty,6,0,Math.PI*2); ctx.fill();
+  }
+  // title
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("tool use: the model calls out, a tool runs, the result returns", 450, 60);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+}
+ANIMS.agent_toolcall_static=(cv,ctx)=>atc_draw(ctx,cv,{tok:null,running:false,answered:false});
+ANIMS.agent_toolcall=async(cv,ctx)=>{
+  atc_draw(ctx,cv,{tok:null,running:false,answered:false});
+  await narrate("A language model only predicts text, so on its own it cannot look things up or act.");
+  await narrate("Instead it emits a structured tool call — naming a tool and its arguments.");
+  await tween(1600,k=>atc_draw(ctx,cv,{tok:k*0.5,running:false,answered:false}));
+  atc_draw(ctx,cv,{tok:0.5,running:true,answered:false});
+  await narrate("An external tool actually runs — a search, some code, an action in the world.");
+  await tween(1600,k=>atc_draw(ctx,cv,{tok:0.5+k*0.5,running:true,answered:false}));
+  atc_draw(ctx,cv,{tok:1,running:false,answered:true});
+  await narrate("Its result flows back, and the model continues with a grounded, updated answer.");
+};
+})();
+/* ---- frag_agent_memory.js ---- */
+/* AI agents / agent_memory */
+(function(){
+// context window box (left) — bounded, holds CAP slots
+const am_CX=90, am_CY=120, am_CW=300, am_SLOT=40, am_CAP=5;
+// long-term store (right)
+const am_SX=560, am_SY=120, am_SW=280, am_SH=180;
+function am_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="left"; ctx.textBaseline="middle";
+  const boxH=am_CAP*am_SLOT;
+  // ---- context window ----
+  ctx.strokeStyle=F.ax; ctx.lineWidth=2;
+  ctx.strokeRect(am_CX,am_CY,am_CW,boxH);
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign="center";
+  ctx.fillText("context window (finite)", am_CX+am_CW/2, am_CY-16);
+  ctx.font="14px 'IBM Plex Mono'"; ctx.textAlign="left";
+  // slot separators
+  ctx.strokeStyle="#22314a"; ctx.lineWidth=1;
+  for(let i=1;i<am_CAP;i++){ ctx.beginPath(); ctx.moveTo(am_CX,am_CY+i*am_SLOT); ctx.lineTo(am_CX+am_CW,am_CY+i*am_SLOT); ctx.stroke(); }
+  // items currently held: array of labels, newest at bottom
+  const items=s.items||[];
+  const shown=items.slice(-am_CAP);
+  for(let i=0;i<shown.length;i++){
+    const y=am_CY+boxH-(shown.length-i)*am_SLOT;
+    ctx.fillStyle="#16233b"; ctx.fillRect(am_CX+6,y+5,am_CW-12,am_SLOT-10);
+    ctx.strokeStyle=F.ax; ctx.lineWidth=1.5; ctx.strokeRect(am_CX+6,y+5,am_CW-12,am_SLOT-10);
+    ctx.fillStyle=F.txt; ctx.textAlign="left"; ctx.textBaseline="middle";
+    ctx.fillText(shown[i], am_CX+18, y+am_SLOT/2);
+  }
+  // evicted (overflow) item drifting out the top
+  if(s.evict){
+    ctx.globalAlpha=Math.max(0,1-s.evictP);
+    const ey=am_CY-10 - s.evictP*40;
+    ctx.fillStyle="#16233b"; ctx.fillRect(am_CX+6,ey,am_CW-12,am_SLOT-10);
+    ctx.strokeStyle=F.wrong; ctx.lineWidth=1.5; ctx.strokeRect(am_CX+6,ey,am_CW-12,am_SLOT-10);
+    ctx.fillStyle=F.wrong; ctx.fillText(s.evict+" (evicted)", am_CX+18, ey+(am_SLOT-10)/2);
+    ctx.globalAlpha=1;
+  }
+  // ---- long-term store ----
+  ctx.strokeStyle=F.ok; ctx.lineWidth=2; ctx.fillStyle="#122019";
+  ctx.fillRect(am_SX,am_SY,am_SW,am_SH); ctx.strokeRect(am_SX,am_SY,am_SW,am_SH);
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'"; ctx.textAlign="center";
+  ctx.fillText("long-term memory store", am_SX+am_SW/2, am_SY-16);
+  ctx.font="12px 'IBM Plex Mono'"; ctx.textAlign="left";
+  const saved=s.saved||[];
+  for(let i=0;i<saved.length;i++){
+    const y=am_SY+16+i*26;
+    ctx.fillStyle=F.ok; ctx.beginPath(); ctx.arc(am_SX+16,y+6,4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=F.txt; ctx.fillText(saved[i], am_SX+30, y+6);
+  }
+  ctx.font="14px 'IBM Plex Mono'";
+  // write arrow (context -> store)
+  if(s.write){
+    ctx.strokeStyle=F.ok; ctx.lineWidth=2; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(am_CX+am_CW,am_CY+boxH-am_SLOT/2); ctx.lineTo(am_SX,am_SY+30); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=F.ok; ctx.textAlign="center";
+    ctx.fillText("write", (am_CX+am_CW+am_SX)/2, (am_CY+boxH+am_SY)/2-24);
+  }
+  // recall arrow (store -> context)
+  if(s.recall){
+    ctx.strokeStyle=F.post; ctx.lineWidth=2; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(am_SX,am_SY+am_SH-30); ctx.lineTo(am_CX+am_CW,am_CY+boxH-am_SLOT/2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=F.post; ctx.beginPath();
+    ctx.moveTo(am_CX+am_CW,am_CY+boxH-am_SLOT/2); ctx.lineTo(am_CX+am_CW+11,am_CY+boxH-am_SLOT/2-6); ctx.lineTo(am_CX+am_CW+11,am_CY+boxH-am_SLOT/2+6); ctx.closePath(); ctx.fill();
+    ctx.textAlign="center";
+    ctx.fillText("retrieve when relevant", (am_CX+am_CW+am_SX)/2, (am_CY+boxH+am_SY)/2+30);
+  }
+  ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+}
+ANIMS.agent_memory_static=(cv,ctx)=>am_draw(ctx,cv,{items:["turn 1","turn 2","turn 3"],saved:["user prefers metric"]});
+ANIMS.agent_memory=async(cv,ctx)=>{
+  am_draw(ctx,cv,{items:["turn 1","turn 2"],saved:[]});
+  await narrate("Everything the model can currently see lives in a finite context window.");
+  am_draw(ctx,cv,{items:["turn 1","turn 2","turn 3","turn 4","turn 5"],saved:[]});
+  await narrate("As new turns arrive it fills up, and once full the oldest items get pushed out.");
+  await tween(1400,k=>am_draw(ctx,cv,{items:["turn 2","turn 3","turn 4","turn 5","turn 6"],saved:[],evict:"turn 1",evictP:k}));
+  await narrate("To remember longer, the agent writes important facts to a durable memory store.");
+  am_draw(ctx,cv,{items:["turn 4","turn 5","turn 6"],saved:["user prefers metric"],write:true});
+  await tween(900,k=>am_draw(ctx,cv,{items:["turn 4","turn 5","turn 6"],saved:["user prefers metric"],write:true}));
+  await narrate("Later it retrieves just the relevant memory back into context, when the task needs it.");
+  am_draw(ctx,cv,{items:["turn 9","user prefers metric"],saved:["user prefers metric"],recall:true});
+};
+})();
+/* ---- frag_agent_eval.js ---- */
+/* AI agents / agent_eval */
+(function(){
+// grid of task runs
+const ae_COLS=6, ae_ROWS=3, ae_N=ae_COLS*ae_ROWS;
+const ae_GX=90, ae_GY=110, ae_CELL=44, ae_GAP=10;
+// deterministic outcome pattern (true = pass). 13 pass / 18 = ~72%
+const ae_RES=[true,true,false,true,true,true, true,false,true,true,true,false, true,true,true,false,true,true];
+const ae_PASS=ae_RES.filter(Boolean).length;
+function ae_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  // title
+  ctx.fillStyle=F.txt; ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("task suite: each run passes or fails", ae_GX+ (ae_COLS*(ae_CELL+ae_GAP))/2 -6, 78);
+  ctx.font="14px 'IBM Plex Mono'";
+  // grid
+  const nrev=s.revealed||0;
+  for(let i=0;i<ae_N;i++){
+    const r=Math.floor(i/ae_COLS), c=i%ae_COLS;
+    const x=ae_GX+c*(ae_CELL+ae_GAP), y=ae_GY+r*(ae_CELL+ae_GAP);
+    if(i<nrev){
+      const ok=ae_RES[i];
+      ctx.fillStyle= ok? "rgba(95,191,149,0.28)":"rgba(212,106,98,0.28)";
+      ctx.fillRect(x,y,ae_CELL,ae_CELL);
+      ctx.strokeStyle= ok? F.ok:F.wrong; ctx.lineWidth=2; ctx.strokeRect(x,y,ae_CELL,ae_CELL);
+      ctx.fillStyle= ok? F.ok:F.wrong;
+      ctx.fillText(ok? "✓":"✗", x+ae_CELL/2, y+ae_CELL/2+1);
+    } else {
+      ctx.fillStyle="#16233b"; ctx.fillRect(x,y,ae_CELL,ae_CELL);
+      ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5; ctx.strokeRect(x,y,ae_CELL,ae_CELL);
+    }
+  }
+  // success-rate bar
+  const barX=ae_GX, barY=290, barW=ae_COLS*(ae_CELL+ae_GAP)-ae_GAP, barH=26;
+  ctx.strokeStyle=F.ax; ctx.lineWidth=1.5; ctx.strokeRect(barX,barY,barW,barH);
+  const passSoFar= s.revealed? ae_RES.slice(0,s.revealed).filter(Boolean).length:0;
+  const denom= s.revealed||1;
+  const frac= s.revealed? passSoFar/denom : 0;
+  ctx.fillStyle="rgba(95,191,149,0.5)"; ctx.fillRect(barX,barY,barW*frac,barH);
+  ctx.fillStyle=F.txt; ctx.textAlign="left"; ctx.textBaseline="middle";
+  const pct= s.revealed? Math.round(frac*100):0;
+  ctx.fillText("success rate: "+pct+"%  ("+passSoFar+"/"+ (s.revealed||0) +")", barX, barY-16);
+  // path/trajectory note
+  ctx.fillStyle=F.post; ctx.textAlign="left"; ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("grade the OUTCOME (did it succeed)", 470, ae_GY+20);
+  ctx.fillText("and the PATH (did it get there sensibly)", 470, ae_GY+44);
+  // small trajectory sketch
+  ctx.strokeStyle=F.ax; ctx.lineWidth=2;
+  const tx=480, ty=ae_GY+95;
+  ctx.beginPath(); ctx.moveTo(tx,ty);
+  const pts=[[0,0],[40,-18],[80,6],[130,-10],[180,-30]];
+  for(const p of pts) ctx.lineTo(tx+p[0],ty+p[1]);
+  ctx.stroke();
+  ctx.fillStyle=F.ax;
+  for(const p of pts){ ctx.beginPath(); ctx.arc(tx+p[0],ty+p[1],3.5,0,Math.PI*2); ctx.fill(); }
+  ctx.fillStyle=F.txt; ctx.fillText("trajectory of steps", tx, ty+34);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+}
+ANIMS.agent_eval_static=(cv,ctx)=>ae_draw(ctx,cv,{revealed:ae_N});
+ANIMS.agent_eval=async(cv,ctx)=>{
+  ae_draw(ctx,cv,{revealed:0});
+  await narrate("You don't judge an agent on one demo — you run it across a whole suite of tasks.");
+  for(let i=1;i<=ae_N;i++){
+    ae_draw(ctx,cv,{revealed:i});
+    await tween(180,()=>{});
+  }
+  await narrate("Each run resolves to a pass or a fail, and the success rate is the fraction it gets right.");
+  await narrate("Here it clears "+ae_PASS+" of "+ae_N+" tasks — a summary score you can track over versions.");
+  await narrate("But outcome isn't enough: you also grade the path it took to get there.");
+};
+})();
+/* ---- frag_agent_guardrail.js ---- */
+/* AI agents / agent_guardrail */
+(function(){
+const ag_AX=70, ag_AY=150, ag_AW=120, ag_AH=64;   // agent box
+const ag_GX=390, ag_GTOP=110, ag_GBOT=250;         // gate x + vertical extent
+const ag_EX=650, ag_EY=150, ag_EW=150, ag_EH=64;   // execute/env box
+const ag_LANE=185;                                  // action lane y
+function ag_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  // ---- sandbox boundary around gate+execute (what the agent can reach) ----
+  ctx.strokeStyle=F.ax; ctx.lineWidth=2; ctx.setLineDash([7,5]);
+  ctx.strokeRect(340,70,500,240);
+  ctx.setLineDash([]);
+  ctx.fillStyle=F.ax; ctx.font="12px 'IBM Plex Mono'"; ctx.textAlign="left";
+  ctx.fillText("sandbox boundary — limits what the agent can touch", 348, 88);
+  ctx.font="14px 'IBM Plex Mono'"; ctx.textAlign="center";
+  // agent box
+  ctx.fillStyle="#16233b"; ctx.strokeStyle=F.post; ctx.lineWidth=2;
+  ctx.fillRect(ag_AX,ag_AY,ag_AW,ag_AH); ctx.strokeRect(ag_AX,ag_AY,ag_AW,ag_AH);
+  ctx.fillStyle=F.post; ctx.fillText("agent", ag_AX+ag_AW/2, ag_AY+22);
+  ctx.fillStyle=F.txt; ctx.font="11px 'IBM Plex Mono'"; ctx.fillText("proposes action", ag_AX+ag_AW/2, ag_AY+44);
+  ctx.font="14px 'IBM Plex Mono'";
+  // lane from agent to gate
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(ag_AX+ag_AW,ag_LANE); ctx.lineTo(ag_GX,ag_LANE); ctx.stroke();
+  // ---- the gate (policy / checker) ----
+  const gc=(ag_GTOP+ag_GBOT)/2;
+  ctx.strokeStyle= s.gate==="safe"?F.ok : s.gate==="unsafe"?F.wrong : F.ax;
+  ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(ag_GX,ag_GTOP); ctx.lineTo(ag_GX,ag_GBOT); ctx.stroke();
+  // gate posts
+  ctx.fillStyle=ctx.strokeStyle;
+  ctx.beginPath(); ctx.arc(ag_GX,ag_GTOP,5,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(ag_GX,ag_GBOT,5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=F.txt; ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("policy", ag_GX, ag_GTOP-14);
+  ctx.fillText("check", ag_GX, ag_GBOT+16);
+  ctx.font="14px 'IBM Plex Mono'";
+  // lane from gate to execute
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(ag_GX,ag_LANE); ctx.lineTo(ag_EX,ag_LANE); ctx.stroke();
+  // execute box
+  ctx.fillStyle="#16233b"; ctx.strokeStyle=F.ax; ctx.lineWidth=2;
+  ctx.fillRect(ag_EX,ag_EY,ag_EW,ag_EH); ctx.strokeRect(ag_EX,ag_EY,ag_EW,ag_EH);
+  ctx.fillStyle=F.txt; ctx.fillText("execute", ag_EX+ag_EW/2, ag_EY+22);
+  ctx.fillStyle=F.ax; ctx.font="11px 'IBM Plex Mono'"; ctx.fillText("act on the world", ag_EX+ag_EW/2, ag_EY+44);
+  ctx.font="14px 'IBM Plex Mono'";
+  // ---- moving action token ----
+  if(s.tok!=null){
+    // travel from agent-right to gate over 0..0.5, then (if safe) gate->execute over 0.5..1
+    let tx, blocked=false;
+    if(s.tok<=0.5){ tx=(ag_AX+ag_AW)+(ag_GX-(ag_AX+ag_AW))*(s.tok/0.5); }
+    else if(s.kind==="safe"){ tx=ag_GX+(ag_EX-ag_GX)*((s.tok-0.5)/0.5); }
+    else { tx=ag_GX; blocked=true; }
+    const col= s.kind==="safe"?F.ok:F.wrong;
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(tx,ag_LANE,7,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=F.txt; ctx.font="11px 'IBM Plex Mono'";
+    ctx.fillText(s.kind==="safe"?"read file":"rm -rf /", tx, ag_LANE-16);
+    if(blocked){
+      ctx.strokeStyle=F.wrong; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(ag_GX-9,ag_LANE-9); ctx.lineTo(ag_GX+9,ag_LANE+9); ctx.moveTo(ag_GX+9,ag_LANE-9); ctx.lineTo(ag_GX-9,ag_LANE+9); ctx.stroke();
+      ctx.fillStyle=F.wrong; ctx.fillText("BLOCKED", ag_GX, ag_LANE+22);
+    }
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+  ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+}
+ANIMS.agent_guardrail_static=(cv,ctx)=>ag_draw(ctx,cv,{tok:null,gate:null});
+ANIMS.agent_guardrail=async(cv,ctx)=>{
+  ag_draw(ctx,cv,{tok:null,gate:null});
+  await narrate("Before any action runs, it passes through a gate that checks it against a policy.");
+  await tween(1400,k=>ag_draw(ctx,cv,{tok:k*0.5,kind:"safe",gate:null}));
+  ag_draw(ctx,cv,{tok:0.5,kind:"safe",gate:"safe"});
+  await narrate("A safe action — like reading a file — clears the check and is allowed to execute.");
+  await tween(1400,k=>ag_draw(ctx,cv,{tok:0.5+k*0.5,kind:"safe",gate:"safe"}));
+  await narrate("A dangerous action gets stopped at the gate before it can ever run.");
+  await tween(1400,k=>ag_draw(ctx,cv,{tok:k*0.5,kind:"unsafe",gate:null}));
+  ag_draw(ctx,cv,{tok:0.6,kind:"unsafe",gate:"unsafe"});
+  await narrate("And a sandbox boundary limits the blast radius — what the agent can reach at all.");
+};
+})();
+
+/* ===== batch-2 visuals: llms ===== */
+/* ---- frag_llm_finetune.js ---- */
+/* large language model / llm_finetune */
+(function(){
+const lf_gauss=(u,mu,sig)=>Math.exp(-((u-mu)*(u-mu))/(2*sig*sig));
+// three training stages: mean drifts toward "helpful", spread tightens
+const lf_stages=[
+  {mu:0.50,sig:0.26,col:F.prior,name:"PRETRAIN",sub:"broad raw language"},
+  {mu:0.68,sig:0.15,col:F.post ,name:"FINE-TUNE",sub:"narrow to a task"},
+  {mu:0.85,sig:0.065,col:F.ok  ,name:"RLHF",sub:"human preference"}
+];
+const lf_target=0.85; // the "helpful" output
+function lf_arrow(ctx,x0,y0,x1,y1){
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+  const a=Math.atan2(y1-y0,x1-x0),h=6;
+  ctx.beginPath();ctx.moveTo(x1,y1);
+  ctx.lineTo(x1-h*Math.cos(a-0.5),y1-h*Math.sin(a-0.5));
+  ctx.lineTo(x1-h*Math.cos(a+0.5),y1-h*Math.sin(a+0.5));
+  ctx.closePath();ctx.fill();
+}
+function lf_panel(ctx,left,st,alpha){
+  const w=200,Yb=300,ampMax=120;
+  const sx=u=>left+u*w;
+  const amp=Math.min(130,ampMax*(0.15/st.sig))*alpha;
+  // baseline
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(left,Yb);ctx.lineTo(left+w,Yb);ctx.stroke();
+  // "helpful" target line
+  ctx.strokeStyle="rgba(95,191,149,0.55)";ctx.lineWidth=1;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(sx(lf_target),Yb);ctx.lineTo(sx(lf_target),Yb-135);ctx.stroke();
+  ctx.setLineDash([]);
+  // distribution curve (filled)
+  ctx.fillStyle="rgba(124,141,165,0.10)";
+  ctx.beginPath();ctx.moveTo(sx(0),Yb);
+  for(let u=0;u<=1.0001;u+=0.02)ctx.lineTo(sx(u),Yb-amp*lf_gauss(u,st.mu,st.sig));
+  ctx.lineTo(sx(1),Yb);ctx.closePath();
+  const g=ctx.globalAlpha;ctx.globalAlpha=g*alpha;ctx.fill();ctx.globalAlpha=g;
+  ctx.strokeStyle=st.col;ctx.lineWidth=2.5;ctx.globalAlpha=g*alpha;
+  ctx.beginPath();
+  for(let u=0;u<=1.0001;u+=0.02){const px=sx(u),py=Yb-amp*lf_gauss(u,st.mu,st.sig);if(u===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();ctx.globalAlpha=g;
+  // labels
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.globalAlpha=g*(0.35+0.65*alpha);
+  ctx.font="14px 'IBM Plex Mono'";ctx.fillText(st.name,left+w/2,Yb+22);
+  ctx.fillStyle=F.ax;ctx.font="11px 'IBM Plex Mono'";ctx.fillText(st.sub,left+w/2,Yb+38);
+  ctx.globalAlpha=g;ctx.textAlign="left";
+}
+function lf_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const lefts=[70,350,630];
+  // title strip
+  ctx.fillStyle=F.txt;ctx.textAlign="left";ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText("output distribution over answers  →  tightening toward “helpful”",70,44);
+  ctx.fillStyle=F.ok;ctx.textAlign="right";ctx.fillText("↓ helpful",826,44);ctx.textAlign="left";
+  for(let i=0;i<3;i++){
+    const alpha=Math.max(0,Math.min(1,s.t-i));
+    if(alpha<=0)continue;
+    lf_panel(ctx,lefts[i],lf_stages[i],alpha);
+  }
+  // arrows between panels (once next stage is starting)
+  ctx.fillStyle=F.ax;ctx.strokeStyle=F.ax;ctx.lineWidth=1.5;
+  if(s.t>1)lf_arrow(ctx,278,240,342,240);
+  if(s.t>2)lf_arrow(ctx,558,240,622,240);
+  // preference nudges in the RLHF panel
+  if(s.t>2.2){
+    const w=200,left=630,Yb=300,sx=u=>left+u*w;
+    ctx.strokeStyle=F.ok;ctx.fillStyle=F.ok;ctx.lineWidth=1.5;
+    lf_arrow(ctx,sx(0.55),Yb-40,sx(0.78),Yb-40);
+    ctx.font="11px 'IBM Plex Mono'";ctx.fillStyle=F.ok;
+    ctx.fillText("prefer →",sx(0.42),Yb-46);
+  }
+}
+ANIMS.llm_finetune_static=(cv,ctx)=>lf_draw(ctx,cv,{t:3});
+ANIMS.llm_finetune=async(cv,ctx)=>{
+  lf_draw(ctx,cv,{t:1});
+  await narrate("Pretraining reads a huge amount of text, so the model learns language but answers all over the map.");
+  await tween(900,k=>lf_draw(ctx,cv,{t:1+k}));
+  await narrate("Fine-tuning trains it on curated examples of a task, narrowing that spread toward useful answers.");
+  await tween(900,k=>lf_draw(ctx,cv,{t:2+k}));
+  await narrate("RLHF adds human preference: people pick the better reply, and the model is nudged toward it.");
+  await narrate("The output distribution keeps tightening onto answers people find helpful and safe.");
+};
+})();
+/* ---- frag_llm_prompt.js ---- */
+/* large language model / llm_prompt */
+(function(){
+// task = give the ANTONYM (opposite). Zero-shot guesses a synonym; few-shot locks the pattern.
+const lp_examples=[["hot","cold"],["up","down"],["fast","slow"]];
+const lp_query="big";
+function lp_roundrect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+function lp_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const bx=70,by=70,bw=430,bh=250;
+  // prompt box
+  ctx.fillStyle="rgba(124,141,165,0.06)";lp_roundrect(ctx,bx,by,bw,bh,10);ctx.fill();
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;lp_roundrect(ctx,bx,by,bw,bh,10);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="left";ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("PROMPT  (context — read at inference)",bx+16,by+24);
+  ctx.fillStyle=F.txt;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("give the opposite word:",bx+16,by+50);
+  // example lines fade in as s.n grows
+  ctx.font="15px 'IBM Plex Mono'";
+  for(let i=0;i<lp_examples.length;i++){
+    const a=Math.max(0,Math.min(1,s.n-i));
+    if(a<=0)continue;
+    const g=ctx.globalAlpha;ctx.globalAlpha=g*a;
+    ctx.fillStyle=F.ax;
+    ctx.fillText(lp_examples[i][0]+"  →  "+lp_examples[i][1],bx+30,by+84+i*30);
+    ctx.globalAlpha=g;
+  }
+  // the new query, always present
+  ctx.fillStyle=F.txt;ctx.font="15px 'IBM Plex Mono'";
+  ctx.fillText(lp_query+"  →  ___",bx+30,by+84+3*30+8);
+  // frozen-weights chip
+  ctx.fillStyle=F.ax;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("weights: frozen  (nothing is trained)",bx+16,by+bh-16);
+  // arrow to output
+  ctx.strokeStyle=F.ax;ctx.fillStyle=F.ax;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(bx+bw+8,by+bh/2);ctx.lineTo(bx+bw+62,by+bh/2);ctx.stroke();
+  const ax=bx+bw+62,ay=by+bh/2;
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax-9,ay-5);ctx.lineTo(ax-9,ay+5);ctx.closePath();ctx.fill();
+  // output box
+  const ox=bx+bw+78,ow=250,oy=by+bh/2-52,oh=104;
+  const okmode=s.mode==="hit";
+  const col=s.mode==="hit"?F.ok:(s.mode==="zero"?F.wrong:F.ax);
+  ctx.fillStyle="rgba(124,141,165,0.06)";lp_roundrect(ctx,ox,oy,ow,oh,10);ctx.fill();
+  ctx.strokeStyle=col;ctx.lineWidth=2;lp_roundrect(ctx,ox,oy,ow,oh,10);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillText("MODEL COMPLETION",ox+14,oy+22);
+  // pulse when it snaps onto the pattern
+  const p=s.pulse||0;
+  let outWord="…",mark="";
+  if(s.mode==="zero"){outWord="large";mark="✗  (a synonym, not the task)";}
+  else if(s.mode==="hit"){outWord="small";mark="✓  (matched the pattern)";}
+  ctx.textAlign="left";ctx.fillStyle=col;
+  ctx.font=(22+p*8).toFixed(0)+"px 'IBM Plex Mono'";
+  ctx.fillText("big → "+outWord,ox+14,oy+60);
+  ctx.font="12px 'IBM Plex Mono'";ctx.fillStyle=col;
+  ctx.fillText(mark,ox+14,oy+86);
+}
+ANIMS.llm_prompt_static=(cv,ctx)=>lp_draw(ctx,cv,{n:3,mode:"hit"});
+ANIMS.llm_prompt=async(cv,ctx)=>{
+  lp_draw(ctx,cv,{n:0,mode:"zero"});
+  await narrate("Zero-shot: with no examples, the model guesses a synonym — the wrong task — and answers “large”.");
+  await narrate("Now put a few worked examples right in the prompt. This is few-shot, in-context learning.");
+  await tween(1600,k=>lp_draw(ctx,cv,{n:k*3,mode:"think"}));
+  await narrate("From just those examples the model infers the rule — give the opposite — and snaps onto it.");
+  await tween(500,k=>lp_draw(ctx,cv,{n:3,mode:"hit",pulse:Math.sin(k*Math.PI)}));
+  lp_draw(ctx,cv,{n:3,mode:"hit"});
+  await narrate("It learned the task from the prompt itself — no training, its weights never changed.");
+};
+})();
+/* ---- frag_llm_failure.js ---- */
+/* large language model / llm_failure */
+(function(){
+// a fluent, confident claim — one part is fabricated (marked false).
+const lx_words=[
+  {t:"Mount",f:false},{t:"Everest,",f:false},{t:"the",f:false},{t:"tallest",f:false},
+  {t:"mountain",f:false},{t:"on",f:false},{t:"Earth",f:false},{t:"at",f:false},
+  {t:"29,032",f:false},{t:"feet,",f:false},{t:"was",f:false},{t:"first",f:false},
+  {t:"climbed",f:false},{t:"in",f:false},{t:"1953",f:false},{t:"by",f:true},
+  {t:"a",f:true},{t:"French",f:true},{t:"team.",f:true}
+];
+function lx_roundrect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+// lay the sentence out with wrapping; returns per-word boxes
+function lx_layout(ctx){
+  ctx.font="17px 'IBM Plex Mono'";
+  const x0=88,x1=812,top=110,lh=30,sp=ctx.measureText(" ").width;
+  let x=x0,y=top,boxes=[];
+  for(const w of lx_words){
+    const ww=ctx.measureText(w.t).width;
+    if(x+ww>x1){x=x0;y+=lh;}
+    boxes.push({t:w.t,f:w.f,x:x,y:y,w:ww});
+    x+=ww+sp;
+  }
+  return boxes;
+}
+function lx_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.textAlign="left";
+  ctx.fillStyle=F.ax;ctx.font="12px 'IBM Plex Mono'";
+  ctx.fillText("MODEL OUTPUT  (fluent · confident)",70,60);
+  const boxes=lx_layout(ctx);
+  const shown=s.words;
+  // highlight false span first (behind text)
+  if(s.flag){
+    ctx.fillStyle="rgba(212,106,98,0.22)";
+    for(let i=0;i<boxes.length;i++){if(boxes[i].f&&i<shown){const b=boxes[i];lx_roundrect(ctx,b.x-3,b.y-19,b.w+6,26,5);ctx.fill();}}
+  }
+  // words stream in
+  ctx.font="17px 'IBM Plex Mono'";
+  for(let i=0;i<boxes.length&&i<shown;i++){
+    const b=boxes[i];
+    ctx.fillStyle=(s.flag&&b.f)?F.wrong:F.txt;
+    ctx.fillText(b.t,b.x,b.y);
+  }
+  // ---- grounding / verify panel ----
+  if(s.verify>0){
+    const g=ctx.globalAlpha;ctx.globalAlpha=g*Math.min(1,s.verify);
+    const px=70,py=250,pw=760,ph=96;
+    ctx.fillStyle="rgba(95,191,149,0.06)";lx_roundrect(ctx,px,py,pw,ph,10);ctx.fill();
+    ctx.strokeStyle=F.ok;ctx.lineWidth=1.5;lx_roundrect(ctx,px,py,pw,ph,10);ctx.stroke();
+    ctx.fillStyle=F.ok;ctx.font="12px 'IBM Plex Mono'";ctx.textAlign="left";
+    ctx.fillText("GROUNDING / VERIFY  — check each claim against a trusted source",px+16,py+24);
+    ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";
+    ctx.fillText("source: 1953 — Edmund Hillary & Tenzing Norgay  (British expedition)",px+16,py+52);
+    ctx.fillStyle=F.wrong;ctx.font="14px 'IBM Plex Mono'";
+    ctx.fillText("✗ “a French team” contradicts the source — flagged as fabricated",px+16,py+78);
+    ctx.globalAlpha=g;
+    // arrow from the false phrase down to the panel
+    if(s.verify>0.5){
+      let fb=null;for(const b of boxes)if(b.f){fb=b;break;}
+      if(fb){
+        ctx.strokeStyle=F.wrong;ctx.fillStyle=F.wrong;ctx.lineWidth=1.5;
+        const sx=fb.x+fb.w/2,sy=fb.y+8;
+        ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx,py-6);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(sx,py-2);ctx.lineTo(sx-5,py-11);ctx.lineTo(sx+5,py-11);ctx.closePath();ctx.fill();
+      }
+    }
+  }
+}
+ANIMS.llm_failure_static=(cv,ctx)=>lx_draw(ctx,cv,{words:99,flag:true,verify:1});
+ANIMS.llm_failure=async(cv,ctx)=>{
+  lx_draw(ctx,cv,{words:0,flag:false,verify:0});
+  await narrate("Ask a model a question and it writes a smooth, confident sentence, word after word.");
+  await tween(2000,k=>lx_draw(ctx,cv,{words:Math.round(k*lx_words.length),flag:false,verify:0}));
+  await narrate("But fluent is not the same as true — part of this claim is simply made up, or hallucinated.");
+  await tween(500,k=>lx_draw(ctx,cv,{words:99,flag:k>0.5,verify:0}));
+  lx_draw(ctx,cv,{words:99,flag:true,verify:0});
+  await narrate("So we ground the answer: check each claim against a trusted source.");
+  await tween(900,k=>lx_draw(ctx,cv,{words:99,flag:true,verify:k}));
+  await narrate("The source contradicts the invented detail, so verification catches the confident mistake.");
+};
+})();
+
+/* ===== batch-2 visuals: bayes-nn ===== */
+/* ---- frag_bayes_belief.js ---- */
+/* bayesian / bayes_belief */
+(function(){
+const bb_X0=190,bb_X1=720,bb_Y=205,bb_H=48;
+const bb_sx=b=>bb_X0+b*(bb_X1-bb_X0);
+function bb_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const bel=Math.max(0,Math.min(1,s.belief));
+  // title
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.font="15px 'IBM Plex Mono'";
+  ctx.fillText("belief: how strongly I hold the claim",bb_X0,90);
+  ctx.font="14px 'IBM Plex Mono'";
+  // evidence badge above the needle
+  if(s.ev){
+    const ex=bb_sx(bel);
+    const up=s.ev.sign>0;
+    ctx.fillStyle=up?F.ok:F.wrong;
+    ctx.textAlign="center";
+    ctx.fillText((up?"evidence supports  ▲":"evidence against  ▼"),ex,bb_Y-34);
+    ctx.beginPath();
+    ctx.moveTo(ex,bb_Y-26);ctx.lineTo(ex-7,bb_Y-14);ctx.lineTo(ex+7,bb_Y-14);ctx.closePath();
+    ctx.fill();
+  }
+  // track
+  ctx.fillStyle="#22314a";
+  ctx.fillRect(bb_X0,bb_Y,bb_X1-bb_X0,bb_H);
+  // fill up to belief
+  ctx.fillStyle=F.post;
+  ctx.fillRect(bb_X0,bb_Y,bb_sx(bel)-bb_X0,bb_H);
+  // border
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.strokeRect(bb_X0,bb_Y,bb_X1-bb_X0,bb_H);
+  // needle
+  const nx=bb_sx(bel);
+  ctx.strokeStyle=F.txt;ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(nx,bb_Y-8);ctx.lineTo(nx,bb_Y+bb_H+8);ctx.stroke();
+  // ticks
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1;ctx.fillStyle=F.txt;ctx.textAlign="center";
+  [0,0.25,0.5,0.75,1].forEach(t=>{
+    const tx=bb_sx(t);
+    ctx.beginPath();ctx.moveTo(tx,bb_Y+bb_H);ctx.lineTo(tx,bb_Y+bb_H+7);ctx.stroke();
+    ctx.fillText(t.toFixed(2),tx,bb_Y+bb_H+24);
+  });
+  // endpoint labels
+  ctx.textAlign="left";ctx.fillStyle=F.ax;
+  ctx.fillText("certainly false",bb_X0,bb_Y+bb_H+46);
+  ctx.textAlign="right";
+  ctx.fillText("certainly true",bb_X1,bb_Y+bb_H+46);
+  // current belief number (top-right, out of the way)
+  ctx.textAlign="right";ctx.fillStyle=F.txt;
+  ctx.font="16px 'IBM Plex Mono'";
+  ctx.fillText("belief = "+bel.toFixed(2),bb_X1,90);
+  ctx.font="14px 'IBM Plex Mono'";
+}
+ANIMS.bayes_belief_static=(cv,ctx)=>bb_draw(ctx,cv,{belief:0.5,ev:null});
+ANIMS.bayes_belief=async(cv,ctx)=>{
+  bb_draw(ctx,cv,{belief:0.5,ev:null});
+  await narrate("A frequency probability is a long-run count: flip a fair coin forever and heads shows up half the time.");
+  await narrate("But for a one-off claim, probability can instead mean a degree of belief — how strongly you hold it, from 0 to 1.");
+  await narrate("Start at 0.50: genuinely unsure whether the claim is true.");
+  bb_draw(ctx,cv,{belief:0.5,ev:{sign:1}});
+  await narrate("Supporting evidence arrives and nudges the belief upward.");
+  await tween(1100,k=>bb_draw(ctx,cv,{belief:0.5+k*0.22,ev:{sign:1}}));
+  bb_draw(ctx,cv,{belief:0.72,ev:{sign:1}});
+  await narrate("More support pushes it higher still — conviction grows.");
+  await tween(1000,k=>bb_draw(ctx,cv,{belief:0.72+k*0.11,ev:{sign:1}}));
+  bb_draw(ctx,cv,{belief:0.83,ev:{sign:-1}});
+  await narrate("Then contradicting evidence pulls it back down: belief is always open to revision.");
+  await tween(1000,k=>bb_draw(ctx,cv,{belief:0.83-k*0.20,ev:{sign:-1}}));
+  bb_draw(ctx,cv,{belief:0.63,ev:null});
+  await narrate("That revisable number is the Bayesian view: probability as a belief you update as evidence comes in.");
+};
+})();
+/* ---- frag_bayes_conditional.js ---- */
+/* bayesian / bayes_conditional */
+(function(){
+// joint probabilities (sum to 1):
+//   P(A,B)=0.30  P(¬A,B)=0.20  -> P(B)=0.50
+//   P(A,¬B)=0.15 P(¬A,¬B)=0.35 -> P(¬B)=0.50
+// within B column, A fills fraction P(A|B)=0.30/0.50=0.60
+// within ¬B column, A fills fraction P(A|¬B)=0.15/0.50=0.30
+const bc_pB=0.50, bc_AgB=0.60, bc_AgNB=0.30;
+const bc_X0=320,bc_X1=690,bc_YB=340,bc_YT=80;
+const bc_fx=f=>bc_X0+f*(bc_X1-bc_X0);
+const bc_fy=h=>bc_YB-h*(bc_YB-bc_YT); // h in 0..1 up from bottom
+function bc_col(ctx,x0,x1,aFrac){
+  // bottom A region
+  ctx.fillStyle="rgba(232,161,60,0.55)"; // F.post-ish for A
+  ctx.fillRect(x0,bc_fy(aFrac),x1-x0,bc_YB-bc_fy(aFrac));
+  // top ¬A region
+  ctx.fillStyle="rgba(124,141,165,0.30)"; // F.ax dim for ¬A
+  ctx.fillRect(x0,bc_YT,x1-x0,bc_fy(aFrac)-bc_YT);
+}
+function bc_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const t=Math.max(0,Math.min(1,s.t||0)); // 0 = joint, 1 = conditioned (B fills width)
+  const wB=bc_pB+t*(1-bc_pB);             // B column width fraction
+  const splitX=bc_fx(wB);
+  // B column (left), A fraction stays 0.60 throughout — the key invariant
+  bc_col(ctx,bc_fx(0),splitX,bc_AgB);
+  // ¬B column (right) shrinks away as we condition
+  if(wB<0.999) bc_col(ctx,splitX,bc_fx(1),bc_AgNB);
+  // grid outline of the unit square
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.strokeRect(bc_fx(0),bc_YT,bc_fx(1)-bc_fx(0),bc_YB-bc_YT);
+  // column divider
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  if(wB<0.999){ctx.beginPath();ctx.moveTo(splitX,bc_YT);ctx.lineTo(splitX,bc_YB);ctx.stroke();}
+  // A/¬A divider inside B column
+  ctx.setLineDash([4,4]);ctx.strokeStyle="#7C8DA5";
+  ctx.beginPath();ctx.moveTo(bc_fx(0),bc_fy(bc_AgB));ctx.lineTo(splitX,bc_fy(bc_AgB));ctx.stroke();
+  ctx.setLineDash([]);
+  // highlight B column outline
+  if(s.highlight){
+    ctx.strokeStyle=F.ok;ctx.lineWidth=2.5;
+    ctx.strokeRect(bc_fx(0)+1,bc_YT+1,splitX-bc_fx(0)-2,bc_YB-bc_YT-2);
+  }
+  // labels
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText(t>0.5?"B  (renormalized to full square)":"B",(bc_fx(0)+splitX)/2,bc_YB+22);
+  if(wB<0.999)ctx.fillText("¬B",(splitX+bc_fx(1))/2,bc_YB+22);
+  ctx.save();ctx.translate(bc_X0-22,(bc_YT+bc_YB)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("A  ·  ¬A  (up the square)",0,0);ctx.restore();
+  // region labels
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  const bMid=(bc_fx(0)+splitX)/2;
+  ctx.fillText("A ∩ B",bMid,(bc_fy(bc_AgB)+bc_YB)/2+4);
+  ctx.fillStyle=F.ax;ctx.fillText("¬A ∩ B",bMid,(bc_YT+bc_fy(bc_AgB))/2+4);
+  // readout
+  ctx.textAlign="left";ctx.font="15px 'IBM Plex Mono'";
+  if(t<0.5){
+    ctx.fillStyle=F.txt;
+    ctx.fillText("joint  P(A,B)=0.30   P(B)=0.50",bc_X0,60);
+  }else{
+    ctx.fillStyle=F.post;
+    ctx.fillText("P(A | B) = 0.30 / 0.50 = "+bc_AgB.toFixed(2),bc_X0,60);
+  }
+  ctx.font="14px 'IBM Plex Mono'";
+}
+ANIMS.bayes_conditional_static=(cv,ctx)=>bc_draw(ctx,cv,{t:0,highlight:true});
+ANIMS.bayes_conditional=async(cv,ctx)=>{
+  bc_draw(ctx,cv,{t:0,highlight:false});
+  await narrate("This unit square holds every outcome; each region's area is its joint probability.");
+  await narrate("Column B has area 0.50, split into A∩B = 0.30 (orange) and ¬A∩B = 0.20 (grey).");
+  bc_draw(ctx,cv,{t:0,highlight:true});
+  await narrate("To find P(A given B), we throw away the ¬B column and look only inside B.");
+  await tween(1600,k=>bc_draw(ctx,cv,{t:k,highlight:true}));
+  bc_draw(ctx,cv,{t:1,highlight:true});
+  await narrate("We rescale that slice back to a full square — renormalizing so its area sums to 1.");
+  await narrate("Now A fills 0.60 of the height: conditioning zooms into where B is true, giving P(A|B) = 0.60.");
+};
+})();
+/* ---- frag_nn_layers.js ---- */
+/* neural-networks / nn_layers */
+(function(){
+const nl_xs=[170,383,596,800];
+const nl_counts=[4,5,4,2];
+const nl_labels=["pixels\n(input)","edges","shapes","object\n(output)"];
+const nl_cy=185, nl_gap=54;
+function nl_nodePos(li,ni){
+  const n=nl_counts[li];
+  const y0=nl_cy-((n-1)*nl_gap)/2;
+  return {x:nl_xs[li],y:y0+ni*nl_gap};
+}
+function nl_lerpColor(t){ // dim -> lit (orange F.post)
+  t=Math.max(0,Math.min(1,t));
+  const r=Math.round(52+t*(232-52));
+  const g=Math.round(69+t*(161-69));
+  const b=Math.round(90+t*(60-90));
+  return "rgb("+r+","+g+","+b+")";
+}
+function nl_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const prog=s.prog||0; // 0..4, a wave sweeping across the layers
+  const act=li=>Math.max(0,Math.min(1,prog-li));
+  // edges first
+  for(let li=0;li<nl_xs.length-1;li++){
+    const a=Math.min(act(li),act(li+1));
+    for(let i=0;i<nl_counts[li];i++){
+      for(let j=0;j<nl_counts[li+1];j++){
+        const p=nl_nodePos(li,i),q=nl_nodePos(li+1,j);
+        ctx.strokeStyle=a>0.02?("rgba(232,161,60,"+(0.12+0.35*a).toFixed(3)+")"):"rgba(34,49,74,0.9)";
+        ctx.lineWidth=a>0.02?1.4:1;
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
+      }
+    }
+  }
+  // nodes
+  for(let li=0;li<nl_xs.length;li++){
+    const a=act(li);
+    for(let i=0;i<nl_counts[li];i++){
+      const p=nl_nodePos(li,i);
+      ctx.beginPath();ctx.arc(p.x,p.y,13,0,Math.PI*2);
+      ctx.fillStyle=nl_lerpColor(a);ctx.fill();
+      ctx.lineWidth=1.5;ctx.strokeStyle=a>0.5?F.txt:"#3A4C68";ctx.stroke();
+    }
+  }
+  // layer labels (rising abstraction)
+  ctx.textAlign="center";
+  for(let li=0;li<nl_xs.length;li++){
+    const parts=nl_labels[li].split("\n");
+    ctx.fillStyle=act(li)>0.5?F.post:F.ax;
+    ctx.fillText(parts[0],nl_xs[li],345);
+    if(parts[1])ctx.fillText(parts[1],nl_xs[li],362);
+  }
+  // arrow of abstraction
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("raw input",nl_xs[0]-40,60);
+  ctx.textAlign="right";
+  ctx.fillText("abstract features →",nl_xs[3]+15,60);
+}
+ANIMS.nn_layers_static=(cv,ctx)=>nl_draw(ctx,cv,{prog:1});
+ANIMS.nn_layers=async(cv,ctx)=>{
+  nl_draw(ctx,cv,{prog:0});
+  await narrate("A neural network stacks layers of simple units, each connected to the next.");
+  await narrate("Raw input enters on the left — here, the pixels of an image.");
+  await tween(900,k=>nl_draw(ctx,cv,{prog:k}));
+  await narrate("The first hidden layer combines pixels into edges — small local patterns.");
+  await tween(900,k=>nl_draw(ctx,cv,{prog:1+k}));
+  await narrate("The next layer combines edges into shapes, a step more abstract.");
+  await tween(900,k=>nl_draw(ctx,cv,{prog:2+k}));
+  await narrate("The output layer reads those shapes to name the object.");
+  await tween(900,k=>nl_draw(ctx,cv,{prog:3+k}));
+  nl_draw(ctx,cv,{prog:4});
+  await narrate("Each layer builds on the last, turning raw input into more useful, learned features.");
+};
+})();
+/* ---- frag_nn_training.js ---- */
+/* neural-networks / nn_training */
+(function(){
+const nt_E=40, nt_ymax=1.15;
+const nt_train=e=>0.92*Math.exp(-e/8)+0.09;                 // steady descent
+const nt_val  =e=>0.90*Math.exp(-e/6)+0.17+0.00050*e*e;      // dips then rises (overfit)
+// find validation minimum (early-stop epoch) by scanning
+let nt_estop=0, nt_vmin=1e9;
+for(let e=0;e<=nt_E;e++){const v=nt_val(e);if(v<nt_vmin){nt_vmin=v;nt_estop=e;}}
+const nt_X0=90,nt_X1=830,nt_Y0=330,nt_Y1=60;
+const nt_sx=e=>nt_X0+(e/nt_E)*(nt_X1-nt_X0);
+const nt_sy=y=>nt_Y0-(y/nt_ymax)*(nt_Y0-nt_Y1);
+function nt_curve(ctx,fn,color,emax){
+  ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.beginPath();
+  let first=true;
+  for(let e=0;e<=emax+0.001;e+=0.25){
+    const px=nt_sx(e),py=nt_sy(fn(e));
+    if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+}
+function nt_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const frac=Math.max(0,Math.min(1,s.frac===undefined?1:s.frac));
+  const emax=frac*nt_E;
+  const stop=Math.max(0,Math.min(1,s.stop||0));
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let e=0;e<=nt_E;e+=10){ctx.beginPath();ctx.moveTo(nt_sx(e),nt_Y1);ctx.lineTo(nt_sx(e),nt_Y0);ctx.stroke();}
+  for(let y=0;y<=1.0;y+=0.25){ctx.beginPath();ctx.moveTo(nt_X0,nt_sy(y));ctx.lineTo(nt_X1,nt_sy(y));ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(nt_X0,nt_Y0);ctx.lineTo(nt_X1,nt_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(nt_X0,nt_Y1);ctx.lineTo(nt_X0,nt_Y0);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="center";
+  ctx.fillText("epochs (training passes) →",(nt_X0+nt_X1)/2,nt_Y0+34);
+  for(let e=0;e<=nt_E;e+=10)ctx.fillText(String(e),nt_sx(e),nt_Y0+18);
+  ctx.save();ctx.translate(nt_X0-46,(nt_Y0+nt_Y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("loss (lower = better)",0,0);ctx.restore();
+  ctx.textAlign="right";
+  for(let y=0;y<=1.0;y+=0.25)ctx.fillText(y.toFixed(2),nt_X0-8,nt_sy(y)+4);
+  // curves
+  nt_curve(ctx,nt_train,F.ok,emax);
+  nt_curve(ctx,nt_val,F.wrong,emax);
+  // early-stop marker (drops in via stop 0..1)
+  if(stop>0){
+    const ex=nt_sx(nt_estop);
+    const ytop=nt_Y1, ybot=nt_Y1+stop*(nt_Y0-nt_Y1);
+    ctx.setLineDash([6,5]);ctx.strokeStyle=F.txt;ctx.lineWidth=1.8;
+    ctx.beginPath();ctx.moveTo(ex,ytop);ctx.lineTo(ex,ybot);ctx.stroke();
+    ctx.setLineDash([]);
+    if(stop>0.85){
+      const my=nt_sy(nt_val(nt_estop));
+      ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(ex,my,5,0,Math.PI*2);ctx.fill();
+      ctx.textAlign="center";
+      ctx.fillText("early stop",ex,nt_Y1-8);
+      ctx.fillText("(epoch "+nt_estop+")",ex,nt_Y1+8);
+    }
+  }
+  // legend
+  ctx.textAlign="left";ctx.font="14px 'IBM Plex Mono'";
+  ctx.fillStyle=F.ok;ctx.fillRect(nt_X1-190,nt_Y1-2,16,4);
+  ctx.fillStyle=F.txt;ctx.fillText("train loss",nt_X1-168,nt_Y1+4);
+  ctx.fillStyle=F.wrong;ctx.fillRect(nt_X1-190,nt_Y1+16,16,4);
+  ctx.fillStyle=F.txt;ctx.fillText("validation loss",nt_X1-168,nt_Y1+22);
+}
+ANIMS.nn_training_static=(cv,ctx)=>nt_draw(ctx,cv,{frac:1,stop:1});
+ANIMS.nn_training=async(cv,ctx)=>{
+  nt_draw(ctx,cv,{frac:0,stop:0});
+  await narrate("As training runs, we track the loss — how wrong the model is — over successive epochs.");
+  await narrate("Green is loss on the training data; red is loss on held-out validation data it never learns from.");
+  await tween(2200,k=>nt_draw(ctx,cv,{frac:k,stop:0}));
+  await narrate("Training loss keeps falling, but validation loss bottoms out and then climbs — the model is overfitting.");
+  await tween(900,k=>nt_draw(ctx,cv,{frac:1,stop:k}));
+  nt_draw(ctx,cv,{frac:1,stop:1});
+  await narrate("So we stop at the validation minimum: that early-stop point gives the best model on unseen data.");
+};
+})();
+
 </script>
 </body>
 </html>
