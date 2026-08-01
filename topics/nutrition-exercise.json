@@ -1,0 +1,638 @@
+{
+  "id": "nutrition-exercise",
+  "title": "Nutrition & Exercise",
+  "tagline": "How food and movement build the body — the honest, evidence-based version.",
+  "description": "What calories, protein, carbs and fat actually do; how muscle grows and shrinks; why the scale lies; cardio versus weights; exercise as metabolic medicine; protein and muscle as you age; and a clear-eyed pass through the myths. Plain language, current evidence, for everyone. Educational only — not medical advice.",
+  "category": "Health & Medicine",
+  "prereqs": [],
+  "concepts": [
+    {
+      "id": "energy-balance",
+      "title": "Energy balance — the honest version",
+      "summary": "Weight tracks calories in versus calories out. That law is real — but the two sides push on each other, so 'just eat less' rarely works alone.",
+      "cards": [
+        {
+          "h": "The one law that always holds",
+          "md": "Store more energy than you burn and you gain weight; burn more than you store and you lose it. This is thermodynamics — it is not up for debate, and no food is magically exempt.\n\nYour body spends energy three ways:\n\n- **Resting metabolism** — keeping you alive at rest. This is the big one: roughly **60–70%** of daily burn.\n- **Movement** — exercise *and* fidgeting, standing, walking around (called NEAT). Surprisingly variable person to person.\n- **Digesting food** — you burn calories processing meals (the *thermic effect*). **Protein costs the most to digest.**"
+        },
+        {
+          "h": "Why 'just eat less' fights back",
+          "md": "Here is what the simple calories-in-calories-out picture hides: **the two sides are connected.** Cut calories hard and your body defends itself:\n\n- Resting metabolism **drops** — you burn less at rest.\n- Hunger hormones (ghrelin) **rise**; fullness hormones (leptin, GLP-1) **fall**. You get hungrier.\n- You unconsciously move less.\n\nThis is *metabolic adaptation*, and it is why willpower alone so often loses. It also explains why the GLP-1 medicines work — they act on that hunger side of the equation directly. Energy balance is the law; the hormones decide how hard it fights you."
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "Roughly what share of your daily calorie burn is just resting metabolism — staying alive at rest?",
+          "options": [
+            "About 10%",
+            "About 30%",
+            "About 60–70%",
+            "Nearly all of it"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Far too low — resting metabolism is the single biggest slice.",
+            "Higher than that — exercise is usually the smaller piece.",
+            "Correct — roughly two-thirds of daily burn keeps you alive at rest; exercise is a smaller slice on top.",
+            "Not quite — movement and digestion still take a real share."
+          ],
+          "id": "energy-balance-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "When someone cuts calories sharply for a while, what does the body typically do in response?",
+          "options": [
+            "Speeds up resting metabolism to burn the fat faster",
+            "Lowers resting burn and raises hunger — it defends the weight",
+            "Nothing — the body has no way to respond",
+            "Permanently damages the metabolism"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The opposite — the body slows down to conserve energy.",
+            "Correct — metabolism drops and hunger rises. This *metabolic adaptation* is why dieting on willpower alone is so hard.",
+            "It responds strongly — that adaptation is the whole difficulty.",
+            "'Damage' overstates it; the slowdown is largely reversible, not permanent."
+          ],
+          "id": "energy-balance-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Which part of a meal costs the MOST energy just to digest and process?",
+          "options": [
+            "Fat",
+            "Carbohydrate",
+            "Protein",
+            "They are all identical"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Fat is the cheapest to store, not the costliest to process.",
+            "Carbs sit in the middle.",
+            "Correct — protein has the highest thermic effect; a real slice of it is burned off in digestion, one reason protein helps with weight.",
+            "They differ — protein is clearly the most expensive to process."
+          ],
+          "id": "energy-balance-q3"
+        }
+      ],
+      "resources": [
+        {
+          "label": "NIH — Energy balance and body weight",
+          "url": "https://www.niddk.nih.gov/health-information/weight-management/adult-overweight-obesity/factors-affecting-weight-health",
+          "type": "reading"
+        }
+      ]
+    },
+    {
+      "id": "macronutrients",
+      "title": "The three macronutrients — what each one is for",
+      "summary": "Protein, carbohydrate and fat are the three fuels. Each does a different job: protein builds, carbs power, fat runs the slow systems.",
+      "cards": [
+        {
+          "h": "Protein — the builder",
+          "md": "Protein breaks down into **amino acids**, the bricks your body uses to build and repair — muscle, enzymes, antibodies, hormones. Unlike fat, you **cannot store spare protein** for later, which is why a steady daily supply matters.\n\nProtein's superpowers:\n\n- **Most filling** of the three — it quiets appetite best.\n- **Costs the most to digest** — you keep less of what you eat.\n- **Preserves muscle** when you are losing weight.\n\nGood sources: meat, fish, eggs, dairy, beans, lentils, tofu, soy. About **0.8 g per kg of body weight** is the bare minimum; **1.2–1.6 g/kg** suits anyone active or losing weight."
+        },
+        {
+          "h": "Carbs and fat — power and the slow systems",
+          "md": "**Carbohydrate** is your fastest fuel. It breaks down to glucose and powers hard effort and the brain. Extra is stored as *glycogen* in muscle and liver. The useful split is by quality:\n\n- **Whole** carbs (vegetables, fruit, beans, whole grains) come wrapped in fibre — slow, filling, steady.\n- **Refined** carbs (sugar, white flour) hit fast and leave you hungry again.\n\n**Fat** is the most energy-dense fuel (9 calories per gram vs 4 for protein and carbs) and it is *essential* — some vitamins (A, D, E, K) only dissolve in fat, and your hormones are built from it. Favour unsaturated fats (olive oil, nuts, fish); go easy on the heavily processed kind. **No macronutrient is the enemy** — the dose and the quality are what matter."
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "What is the key thing that makes dietary protein different from fat in how your body handles it?",
+          "options": [
+            "Protein has no calories",
+            "You cannot store spare protein for later the way you store fat",
+            "Protein cannot be used for energy",
+            "Protein is only found in meat"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Protein has 4 calories per gram — it is not calorie-free.",
+            "Correct — there is no protein 'storage tank,' so a steady daily intake matters; fat, by contrast, stores easily.",
+            "It can be burned for energy, though that is not its main job.",
+            "Beans, lentils, dairy, eggs and soy are all rich sources too."
+          ],
+          "id": "macronutrients-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Fat contains how many calories per gram compared with protein and carbohydrate?",
+          "options": [
+            "Fewer — about 2",
+            "The same — about 4",
+            "More — about 9",
+            "Fat has no calories"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Fat is the most energy-dense, not the least.",
+            "Protein and carbs are 4; fat is higher.",
+            "Correct — fat packs 9 calories per gram, more than double protein or carbs, which is why fatty foods add up fast.",
+            "Fat is the most calorie-dense fuel there is."
+          ],
+          "id": "macronutrients-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Comparing a bowl of lentils to a sugary drink with the same calories, what is the main difference?",
+          "options": [
+            "The lentils have fibre — slower, more filling, steadier blood sugar",
+            "They are nutritionally identical since the calories match",
+            "The sugary drink is more filling",
+            "The lentils have no usable energy"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — 'a calorie is a calorie' for weight math, but *whole* carbs come with fibre that slows digestion and fills you up; refined sugar does neither.",
+            "Same calories, very different effect on hunger and blood sugar.",
+            "Refined sugar is famously *un*-filling — it leaves you hungry again.",
+            "Lentils are a genuine fuel and a protein source besides."
+          ],
+          "id": "macronutrients-q3"
+        }
+      ],
+      "resources": [
+        {
+          "label": "Harvard — The Nutrition Source: protein",
+          "url": "https://nutritionsource.hsph.harvard.edu/what-should-you-eat/protein/",
+          "type": "reading"
+        }
+      ]
+    },
+    {
+      "id": "muscle-growth-loss",
+      "title": "How muscle grows and shrinks",
+      "summary": "Muscle is a live balance between building and breaking. Training plus protein tips it toward growth; doing nothing tips it toward loss.",
+      "cards": [
+        {
+          "h": "A daily tug-of-war",
+          "md": "Muscle is never static. Every day two opposite processes run:\n\n- **Muscle protein synthesis (MPS)** — building new muscle protein.\n- **Muscle protein breakdown (MPB)** — tearing old protein down.\n\nWhether you gain or lose muscle is simply which one wins over time. Two levers push the balance toward **building**:\n\n1. **Resistance exercise** — lifting, pushing, pulling against load. The mechanical tension is the *signal* to grow.\n2. **Protein / the amino acid leucine** — the *raw material*, and itself a switch that flips synthesis on.\n\nSignal **plus** material together beat either one alone. This is the same sarcomere — the sliding-filament engine — you meet in the animation; training builds *more* of these units."
+        },
+        {
+          "h": "Use it or lose it — and it is fast",
+          "md": "Take the signal away and the balance flips toward breakdown **quickly**. In strict bed rest, healthy people can lose muscle within **days**. Immobilise a limb in a cast and it visibly shrinks in a couple of weeks. Muscle is metabolically expensive, so the body sheds what it is not asked to use.\n\nThe good news is the same law in reverse: the stimulus does not need to be heroic. Meaningful effort — carrying, climbing, lifting something genuinely challenging a few times a week — is enough to hold the signal 'on.' The muscle you keep is the muscle you keep *asking for*. This 'use it or lose it' rule becomes the whole ballgame as we age — the next concept but one."
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "Whether you gain or lose muscle over time comes down to the balance between which two processes?",
+          "options": [
+            "Eating and sleeping",
+            "Building muscle protein (synthesis) versus tearing it down (breakdown)",
+            "Cardio and stretching",
+            "Fat gain and fat loss"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Both matter, but they are not the muscle balance itself.",
+            "Correct — muscle is a live tug-of-war between synthesis (MPS) and breakdown (MPB); whichever wins over time decides the outcome.",
+            "Neither of those is the core muscle-balance equation.",
+            "That is body composition, a different axis from the muscle balance."
+          ],
+          "id": "muscle-growth-loss-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "To tip the balance toward BUILDING muscle, you need both a signal and raw material. What supplies each?",
+          "options": [
+            "Cardio for the signal, water for the material",
+            "Resistance exercise for the signal, protein/leucine for the material",
+            "Sleep for the signal, fat for the material",
+            "Neither is needed — muscle grows on its own"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Cardio is great for the heart but is not the main muscle-growth signal.",
+            "Correct — mechanical tension from resistance work is the *signal*, and protein (rich in leucine) is the *material* and itself a growth switch. Together they beat either alone.",
+            "Sleep helps recovery, but the growth signal is mechanical load.",
+            "Without a load signal and material, the balance drifts toward loss."
+          ],
+          "id": "muscle-growth-loss-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "How quickly can a healthy person start losing muscle during strict bed rest or a limb in a cast?",
+          "options": [
+            "It takes years",
+            "Within days to a couple of weeks",
+            "Muscle never shrinks once built",
+            "Only after age 80"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Far faster than that — disuse acts quickly.",
+            "Correct — remove the signal and the balance tips to breakdown within days; muscle is expensive, so the body sheds what it is not asked to use. 'Use it or lose it' is literal.",
+            "Muscle very much shrinks without use — that is the whole point.",
+            "It happens at any age when the stimulus is removed."
+          ],
+          "id": "muscle-growth-loss-q3"
+        }
+      ],
+      "resources": [
+        {
+          "label": "StatPearls — Muscle protein synthesis & hypertrophy",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK499810/",
+          "type": "reading"
+        }
+      ],
+      "anim": "med_sarcomere"
+    },
+    {
+      "id": "body-composition",
+      "title": "Body composition — why the scale lies",
+      "summary": "Your weight is fat plus muscle plus water plus bone. Two people at the same weight can look and function completely differently.",
+      "cards": [
+        {
+          "h": "The number hides the picture",
+          "md": "Step on a scale and you get **one number for everything at once** — fat, muscle, bone, water, even the food in your gut. It cannot tell them apart, and that makes it a poor judge of health or progress.\n\nWatch the animation: with resistance training and enough protein, **fat mass falls while muscle rises a little**. Add them up and total weight barely moves — the scale looks 'stuck' while the person is visibly leaner, stronger, and healthier. This is *body recomposition*, and it is invisible to a scale.\n\nIt also explains the reverse trap: crash-dieting can drop the scale fast, but if much of that loss is **muscle and water**, you are lighter and worse off."
+        },
+        {
+          "h": "Better than BMI",
+          "md": "**Body Mass Index (BMI)** — weight scaled for height — is a screening tool for populations, not a verdict on an individual. It cannot see composition, so a muscular athlete can register as 'overweight' while a sedentary person of 'normal' BMI carries risky fat around the organs.\n\nMore telling day to day:\n\n- **Waist size** — fat around the middle (*visceral fat*, wrapped around the organs) is the metabolically dangerous kind.\n- **How your clothes fit** over weeks.\n- **Strength and stamina** — are the stairs getting easier?\n\nThe lesson: judge the **direction of change and how you function**, not a single morning's number. Muscle is the organ you *want* to keep, even when it hides your weight loss."
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "Why is the bathroom scale a poor judge of health on its own?",
+          "options": [
+            "It is always inaccurate",
+            "It reports one number for fat, muscle, bone and water combined — it cannot tell them apart",
+            "It only works for athletes",
+            "Weight has nothing to do with health"
+          ],
+          "answer": 1,
+          "feedback": [
+            "A good scale is accurate — the problem is *what* it measures.",
+            "Correct — the scale lumps everything together, so it misses body recomposition (fat down, muscle up) entirely.",
+            "It works for everyone; it just cannot see composition.",
+            "Weight matters — but *what* the weight is made of matters more."
+          ],
+          "id": "body-composition-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "During successful 'body recomposition,' what happens to the scale?",
+          "options": [
+            "It drops dramatically",
+            "It barely moves, even though fat fell and muscle rose",
+            "It climbs sharply",
+            "Recomposition is impossible"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Not necessarily — that is the point; the scale can miss real change.",
+            "Correct — fat down plus muscle up nets to little scale change, so a stuck number can hide a body that transformed. Judge direction and function, not one morning's weight.",
+            "It stays roughly flat, not sharply up.",
+            "It is real and well documented, especially in beginners."
+          ],
+          "id": "body-composition-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Which is the metabolically DANGEROUS kind of fat, and a better everyday gauge than BMI?",
+          "options": [
+            "Fat under the skin of the arms; measured by height",
+            "Visceral fat around the organs; gauged by waist size",
+            "All fat is equally harmful; BMI is the only measure",
+            "There is no dangerous fat"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Limb fat under the skin is comparatively benign.",
+            "Correct — visceral fat wrapped around the organs drives metabolic risk, and waist size tracks it far better than BMI, which cannot see composition at all.",
+            "Fat location matters a great deal, and BMI is blind to it.",
+            "Excess visceral fat is genuinely harmful."
+          ],
+          "id": "body-composition-q3"
+        }
+      ],
+      "resources": [
+        {
+          "label": "CDC — Assessing your weight (BMI limits)",
+          "url": "https://www.cdc.gov/healthyweight/assessing/index.html",
+          "type": "reading"
+        }
+      ],
+      "anim": "med_bodycomp_recomp"
+    },
+    {
+      "id": "aerobic-vs-resistance",
+      "title": "Cardio vs weights — you need both",
+      "summary": "Aerobic exercise trains the heart and the endurance machinery; resistance exercise builds muscle, strength and bone. They are not interchangeable.",
+      "cards": [
+        {
+          "h": "Two different adaptations",
+          "md": "**Aerobic ('cardio')** — walking, cycling, swimming, running. Sustained effort that makes you breathe harder. It trains:\n\n- the **heart** to pump more per beat,\n- the **mitochondria** (your cells' power plants) to multiply,\n- **endurance** and cardiovascular health.\n\n**Resistance ('strength')** — lifting, pushing, pulling, bodyweight work. Brief, hard efforts against load. It builds:\n\n- **muscle size and strength**,\n- **bone density** — the pull of muscle on bone tells it to stay strong (critical against osteoporosis),\n- resting metabolism, because muscle is active tissue."
+        },
+        {
+          "h": "Why one cannot replace the other",
+          "md": "Run marathons and you can still be weak and lose bone. Only lift and your heart-lung endurance lags. They train **different systems**, so the strongest evidence — and the biggest drop in risk of dying early — comes from doing **both**.\n\nA widely used weekly target:\n\n- **150 minutes** of moderate aerobic activity (a brisk walk counts), *or* 75 minutes of vigorous, **plus**\n- **2 sessions** of resistance training hitting the major muscle groups.\n\nYou do not need a gym or heroics — brisk walking plus a handful of hard efforts against something heavy will do it. The best exercise is genuinely the one you will keep doing. Consistency beats intensity you cannot sustain."
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "Aerobic exercise and resistance exercise mainly train different systems. Which pairing is right?",
+          "options": [
+            "Cardio builds bone density; weights build the heart",
+            "Cardio trains the heart and mitochondria; weights build muscle, strength and bone",
+            "Both do exactly the same thing",
+            "Neither affects the heart or muscle"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Reversed — weights build bone, cardio trains the heart.",
+            "Correct — they drive different adaptations, which is exactly why they are not interchangeable and the best results come from doing both.",
+            "They overlap a little but train largely different systems.",
+            "Each strongly affects its own system."
+          ],
+          "id": "aerobic-vs-resistance-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Why does the pull of muscle on bone during strength training matter?",
+          "options": [
+            "It has no effect on bone",
+            "It signals bone to stay dense and strong — key against osteoporosis",
+            "It weakens bone over time",
+            "It only matters for young athletes"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It matters a lot — bone responds to mechanical load.",
+            "Correct — loading tells bone to maintain density, so resistance training is a frontline defence against the bone loss of ageing.",
+            "Loading strengthens bone, it does not weaken it.",
+            "It matters most for older adults, who are losing bone."
+          ],
+          "id": "aerobic-vs-resistance-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "What does the standard weekly activity target recommend?",
+          "options": [
+            "Only cardio, every single day",
+            "About 150 min of moderate cardio PLUS 2 resistance sessions",
+            "Only weightlifting, nothing else",
+            "As little movement as possible"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Cardio alone leaves strength and bone untrained.",
+            "Correct — roughly 150 minutes of moderate aerobic activity plus two strength sessions a week captures both systems; a brisk walk counts.",
+            "Weights alone leave endurance and heart health behind.",
+            "The evidence points strongly the other way — movement lowers risk."
+          ],
+          "id": "aerobic-vs-resistance-q3"
+        }
+      ],
+      "resources": [
+        {
+          "label": "WHO — Physical activity guidelines",
+          "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+          "type": "reading"
+        }
+      ]
+    },
+    {
+      "id": "exercise-metabolic-medicine",
+      "title": "Exercise as metabolic medicine",
+      "summary": "A contracting muscle pulls sugar out of the blood without needing insulin — a second door that insulin resistance cannot rust shut.",
+      "cards": [
+        {
+          "h": "The second door into the cell",
+          "md": "In the Diabetes module you met **GLUT4** — the glucose doors that insulin orders to the muscle-cell surface. Here is the beautiful part: **muscle can open those same doors by itself, without any insulin.**\n\nWhen a muscle contracts, an energy-sensing enzyme called **AMPK** switches on and sends GLUT4 to the surface directly. Glucose pours in and blood sugar falls — through a completely separate route from the insulin key.\n\nThat is why a single brisk walk after a meal measurably lowers blood sugar, and why exercise works **even when insulin resistance has set in**: it reaches a door that resistance cannot block. The animation is the same GLUT4 mechanism from Diabetes, opened by a different hand."
+        },
+        {
+          "h": "Why movement is genuine medicine",
+          "md": "The benefits compound well beyond that single glucose dip:\n\n- **Insulin sensitivity rises for a day or more** after a session — the insulin key itself works better afterward.\n- **Mitochondria multiply** (*mitochondrial biogenesis*) — more power plants means the muscle burns fuel more cleanly.\n- Regular training **shrinks visceral fat** and lowers blood pressure and inflammation.\n\nThis is why exercise is described, without exaggeration, as one of the most powerful **metabolic medicines** we have — and it is free. For someone with, or heading toward, type 2 diabetes, muscle is not just for looks: it is a large, trainable **glucose sink** that keeps working even as the insulin signal fades. *(Educational only — anyone on glucose-lowering medication should coordinate exercise changes with their clinician, since activity and medication both lower blood sugar.)*"
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "How can a contracting muscle lower blood sugar even when insulin is not working well?",
+          "options": [
+            "It cannot — muscle needs insulin for everything",
+            "Contraction activates AMPK, which opens GLUT4 doors directly, no insulin required",
+            "It makes the pancreas release more insulin",
+            "It converts sugar into bone"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Muscle has a genuine insulin-independent route — that is the key point.",
+            "Correct — the exercise-sensing enzyme AMPK sends GLUT4 to the surface on its own, a second door that bypasses insulin entirely.",
+            "The effect is inside the muscle itself, not via extra insulin.",
+            "Sugar goes into the muscle as fuel, not into bone."
+          ],
+          "id": "exercise-metabolic-medicine-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Beyond the immediate glucose dip, a training session tends to do what for insulin?",
+          "options": [
+            "Permanently destroys insulin",
+            "Raises insulin sensitivity for a day or more — the insulin key works better afterward",
+            "Has no lasting effect at all",
+            "Makes cells ignore insulin"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Exercise improves the insulin system, it does not destroy it.",
+            "Correct — insulin sensitivity climbs for 24 hours or more after exercise, so the key itself works better; the benefit outlasts the workout.",
+            "The after-effect is exactly what makes exercise 'metabolic medicine.'",
+            "The opposite — cells respond to insulin *better* after training."
+          ],
+          "id": "exercise-metabolic-medicine-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Why is muscle described as a trainable 'glucose sink,' especially valuable in type 2 diabetes?",
+          "options": [
+            "Muscle stores no glucose",
+            "It is a large tissue that keeps pulling glucose from the blood even as the insulin signal fades",
+            "Muscle raises blood sugar",
+            "Only fat can absorb glucose"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Muscle is in fact the body's biggest glucose store (as glycogen).",
+            "Correct — muscle is a big, exercise-responsive sink for blood glucose that keeps working through the insulin-independent door, which is why keeping muscle matters so much in type 2 diabetes.",
+            "Muscle lowers blood sugar by taking glucose up.",
+            "Muscle is the major site of glucose disposal, not fat."
+          ],
+          "id": "exercise-metabolic-medicine-q3"
+        }
+      ],
+      "resources": [
+        {
+          "label": "NIDDK — Physical activity & diabetes / insulin sensitivity",
+          "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/diet-eating-physical-activity",
+          "type": "reading"
+        }
+      ],
+      "anim": "med_exercise_glut4"
+    },
+    {
+      "id": "protein-ageing-sarcopenia",
+      "title": "Protein and muscle as you age",
+      "summary": "After midlife muscle quietly slips away — a condition called sarcopenia. Enough protein plus resistance training is the proven defence.",
+      "cards": [
+        {
+          "h": "The slow leak — sarcopenia",
+          "md": "From around the **30s–40s**, adults lose muscle at roughly **0.5–1% a year**, accelerating later — a condition called **sarcopenia** (Greek for 'poverty of flesh'). It is one of the biggest, most preventable drivers of frailty in later life.\n\nWhy it matters far beyond appearance:\n\n- **Falls and fractures** — weak legs and poor balance are how independence is lost.\n- **Metabolic health** — less muscle means a smaller glucose sink, nudging toward diabetes.\n- **Resilience** — muscle is the body's protein reserve for surviving illness, surgery, and hospital stays.\n\nOlder muscle also suffers *anabolic resistance*: it responds less to a given amount of protein, so older adults need **more**, not less."
+        },
+        {
+          "h": "The defence is remarkably simple",
+          "md": "Two moves, well supported by evidence:\n\n1. **More protein than the textbook minimum.** The old RDA of 0.8 g/kg is a floor to avoid deficiency, not a target for healthy ageing. Research supports **1.0–1.2 g/kg or more** for older adults, and spreading it **across meals** (each with enough of the amino acid *leucine* to flip the muscle-building switch), rather than loading it all at dinner.\n\n2. **Resistance training.** This is the non-negotiable one — the mechanical signal that tells the body to keep the muscle. It works at **any** age; studies of people in their 80s and 90s show real strength gains in weeks. Protein without the signal is bricks with no builder.\n\nThe encouraging truth: sarcopenia is one of the most reversible parts of ageing. Muscle you train for is muscle you keep — the 'use it or lose it' rule, now with the stakes of independence."
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "What is sarcopenia?",
+          "options": [
+            "A vitamin deficiency",
+            "The age-related loss of muscle mass and strength",
+            "A type of heart disease",
+            "Excess muscle growth"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It is about muscle, not a vitamin.",
+            "Correct — sarcopenia is the slow loss of muscle with age (~0.5–1%/yr from midlife), a leading and largely preventable driver of frailty.",
+            "It affects skeletal muscle, not the heart specifically.",
+            "It is the opposite — loss, not excess."
+          ],
+          "id": "protein-ageing-sarcopenia-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Because older muscle shows 'anabolic resistance,' how should protein intake change with age?",
+          "options": [
+            "Drop below the RDA — older adults need less",
+            "Rise above the old 0.8 g/kg minimum, spread across meals",
+            "Stay exactly at 0.8 g/kg forever",
+            "Protein no longer matters after 60"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The opposite — needs go up, because the muscle responds less per gram.",
+            "Correct — anabolic resistance means older muscle needs *more* protein (≈1.0–1.2 g/kg+), spread across meals with enough leucine each time, to trigger the same building.",
+            "The 0.8 floor is a deficiency threshold, not an ageing target.",
+            "Protein matters *more* with age, not less."
+          ],
+          "id": "protein-ageing-sarcopenia-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Which single intervention is the non-negotiable defence against age-related muscle loss?",
+          "options": [
+            "Protein supplements alone",
+            "Resistance training — the mechanical signal to keep the muscle",
+            "Cutting calories",
+            "Nothing works after a certain age"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Protein is the material, but without a load signal the balance still drifts to loss.",
+            "Correct — resistance training is the essential signal, and it works even in one's 80s and 90s. Protein is the bricks; training is the builder telling the body to keep them.",
+            "Under-eating accelerates muscle loss — the wrong direction.",
+            "Strength training produces real gains at every age tested."
+          ],
+          "id": "protein-ageing-sarcopenia-q3"
+        }
+      ],
+      "resources": [
+        {
+          "label": "StatPearls — Sarcopenia",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK560813/",
+          "type": "reading"
+        }
+      ],
+      "anim": "med_actrii"
+    },
+    {
+      "id": "myths-vs-evidence",
+      "title": "Cutting through the noise",
+      "summary": "The nutrition and fitness world runs on hype. Here are the stubborn myths and what the evidence actually says — the honest version.",
+      "cards": [
+        {
+          "h": "Myths that will not die",
+          "md": "- **'Muscle turns into fat if you stop training.'** Impossible — they are different tissues. Muscle *shrinks* and fat may *grow*; one does not transmute into the other.\n- **'You can spot-reduce belly fat with crunches.'** No. You cannot choose where fat comes off; it leaves the whole body in its own order. Crunches build the muscle *under* the fat.\n- **'Protein wrecks your kidneys.'** Not in healthy people — no good evidence of harm. (Those with existing kidney disease are a real exception and should follow medical advice.)\n- **'Detox teas / cleanses flush out toxins.'** Your liver and kidneys already do this, continuously and for free. 'Detox' products mostly lighten your wallet.\n- **'Carbs (or fat) are inherently fattening.'** Neither. *Excess calories* are fattening, from any source."
+        },
+        {
+          "h": "The short list that actually works",
+          "md": "Strip away the noise and the durable, evidence-backed basics are almost boringly simple:\n\n- **Enough protein**, spread across the day.\n- **Mostly whole foods** — plants, and minimally processed things — with room for what you enjoy.\n- **Resistance training + regular movement.**\n- **Sleep and stress** — poor sleep raises hunger hormones and eats into muscle recovery. It belongs on the list.\n\nOn supplements: the vast majority are unnecessary. The rare ones with solid evidence are **creatine** (safe, well-studied, helps strength and possibly brain) and **protein powder** — which is just a convenient food, not magic. Vitamin D can help if you are deficient. Everything promising fast, effortless results is selling the promise, not the result. **Consistency in the basics beats every shortcut.**"
+        }
+      ],
+      "questions": [
+        {
+          "type": "mcq",
+          "prompt": "Can targeted ab exercises like crunches 'spot-reduce' belly fat?",
+          "options": [
+            "Yes — crunches burn the fat directly above the muscle",
+            "No — you cannot choose where fat comes off; crunches build the muscle under it",
+            "Only if you do 100 a day",
+            "Only for people under 30"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Fat loss is not local to the working muscle — this is a durable myth.",
+            "Correct — fat leaves the whole body in its own genetically set order; you cannot target a spot. Crunches strengthen the muscle *beneath* the fat, they do not melt the fat above it.",
+            "Volume does not change the biology — spot reduction still does not happen.",
+            "Age does not unlock spot reduction; nobody can do it."
+          ],
+          "id": "myths-vs-evidence-q1"
+        },
+        {
+          "type": "mcq",
+          "prompt": "What does the evidence say about high protein intake and kidneys in HEALTHY people?",
+          "options": [
+            "It reliably destroys the kidneys",
+            "No good evidence of harm in healthy people (existing kidney disease is a real exception)",
+            "Protein is filtered by the liver, not the kidneys, so it is irrelevant",
+            "Only animal protein is safe"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That claim is not supported for people with healthy kidneys.",
+            "Correct — the 'protein harms kidneys' fear does not hold up in healthy people; the genuine exception is those with pre-existing kidney disease, who should follow medical guidance.",
+            "The kidneys do handle protein's by-products — but healthy ones cope fine.",
+            "Plant and animal protein are both fine for healthy kidneys."
+          ],
+          "id": "myths-vs-evidence-q2"
+        },
+        {
+          "type": "mcq",
+          "prompt": "Which two supplements actually have solid evidence behind them?",
+          "options": [
+            "Detox teas and fat-burners",
+            "Creatine and protein powder (a convenient food, not magic)",
+            "None — all supplements are scams",
+            "Whatever is trending this month"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Detox and fat-burner products are exactly the hype to ignore.",
+            "Correct — creatine is safe and well-studied for strength, and protein powder is simply convenient food; most other supplements are unnecessary. Vitamin D helps only if you are deficient.",
+            "A few (creatine, protein, vitamin D when deficient) do have real evidence.",
+            "Trends are the opposite of evidence — the basics are what endure."
+          ],
+          "id": "myths-vs-evidence-q3"
+        }
+      ],
+      "resources": [
+        {
+          "label": "NIH ODS — Dietary supplements: what you need to know",
+          "url": "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
+          "type": "reading"
+        }
+      ]
+    }
+  ]
+}

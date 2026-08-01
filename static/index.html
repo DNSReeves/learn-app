@@ -92,7 +92,7 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
   padding:4px 10px;border-radius:7px;cursor:pointer}
 .catbar button:hover{color:var(--fg);border-color:var(--lock)}
 .tcard:hover{border-color:var(--post)}
-.tcard h2{font-size:23px}
+.tcard h2{font-size:27px;font-weight:800}
 .tcard .tag{color:var(--dim);font-size:15px;margin:2px 0 14px}
 .meterline{display:flex;align-items:center;gap:12px}
 .meterline .bar{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
@@ -1446,6 +1446,25 @@ ANIMS.med_starling=(cv,ctx)=>runStarling(cv,ctx,{
     "This curve is the heart's signature. Along the bottom: how full the heart is before it beats — its preload. Up the side: how much blood it pumps out.",
     "Watch the dot climb. As more blood returns and fills the heart, each beat gets STRONGER and ejects more — automatically, no nerves needed. That rising line IS the Frank–Starling law, and underneath it is simply the sarcomere's length–tension curve: more stretch, better filament overlap, more force.",
     "Now the clinical punch line. A failing heart sits on a lower, flatter curve — the red line. For the same filling it pumps far less, and piling in more volume barely helps. Reading this one graph is reading the mechanics of heart failure."]});
+
+/* --- Nutrition/Exercise: thin wrappers that REUSE the physiology draw fns
+       with their own numbers + narration (the build-once, reuse-everywhere rule) --- */
+ANIMS.med_bodycomp_recomp_static=(cv,ctx)=>drawBodyComp(ctx,cv,{before:{fat:40,lean:60},after:{fat:40,lean:60},k:0,title:"Why the scale lies: fat vs muscle"});
+ANIMS.med_bodycomp_recomp=(cv,ctx)=>runBodyComp(cv,ctx,{
+  title:"Why the scale lies: fat vs muscle",
+  before:{fat:40,lean:60}, after:{fat:28,lean:62},
+  caption:"Fat down, muscle slightly UP — the scale barely moves, but the body changed completely.",
+  lines:[
+    "The bathroom scale weighs everything at once — fat on top, and lean tissue (muscle, bone, water, organs) underneath. It cannot tell them apart. Watch what happens with resistance training plus enough protein.",
+    "Fat mass falls, and muscle actually rises a little. Add those up and total weight hardly moves — so the scale looks 'stuck' while the person is getting visibly leaner and stronger. This is why a scale alone is a poor judge of progress: composition is what changed, not the number."]});
+ANIMS.med_exercise_glut4_static=(cv,ctx)=>drawInsulinAction(ctx,cv,{insulin:0,resistance:0,title:"Exercise: the second door into the cell"});
+ANIMS.med_exercise_glut4=(cv,ctx)=>runInsulinAction(cv,ctx,{
+  title:"Exercise: the second door into the cell",
+  resistance:0,
+  lines:[
+    "Normally insulin is the key that pulls glucose out of the blood and into muscle. But muscle has a second, independent way to open the very same GLUT4 doors — and it needs no insulin at all.",
+    "A contracting muscle throws those GLUT4 doors open on its own, through the exercise-sensing enzyme AMPK. Glucose pours in and blood sugar falls — even in someone whose insulin signal has gone weak.",
+    "That is why a single walk lowers blood sugar, and why regular training is genuine metabolic medicine: exercise opens a door that insulin resistance cannot rust shut. It is the same GLUT4 mechanism you met in the Diabetes module, reached by a different route."]});
 
 function drawSquare(ctx,cv,pH,lH,lN,split,shade){
   clear(ctx,cv);
