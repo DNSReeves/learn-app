@@ -960,6 +960,151 @@ const ANIMS = {
     await narrate("Fifteen heads, five tails: the posterior is Beta sixteen six — piled up near seventy five percent, and much narrower than where it began. More data, tighter belief. That narrowing is what confidence actually is.");
   }
 };
+/* ===== Health & Medicine — SHARED reusable visual components (2026-08-01) =====
+   Each physiology visual lives in ONE parameterized draw fn; every module (GLP-1,
+   Diabetes, Physiology, Nutrition/Exercise) reuses it via a thin ANIMS wrapper with its
+   own numbers + narration. Fix the visual once → it propagates to every module. */
+const MED = {fat:"#E8A13C", lean:"#D46A62", muscle:"#C85A52", actin:"#9FB2C6",
+             myosin:"#E8A13C", z:"#E6ECF5", membrane:"#5FBF95", ligand:"#D46A62",
+             blocker:"#6FA8DC", txt:"#D7DFEA", dim:"#8496AB", good:"#5FBF95"};
+function _t(ctx,x,y,s,{size=14,col=MED.txt,align="left",bold=false}={}){
+  ctx.fillStyle=col; ctx.textAlign=align; ctx.textBaseline="alphabetic";
+  ctx.font=`${bold?"600 ":""}${size}px -apple-system,system-ui,sans-serif`; ctx.fillText(s,x,y); }
+const _lerp=(a,b,k)=>a+(b-a)*k;
+
+/* --- 1) BODY COMPOSITION: how much of lost weight is fat vs lean/muscle --- */
+function drawBodyComp(ctx,cv,st){
+  clear(ctx,cv);
+  const {before,after,k=1,title="",caption=""}=st;
+  const cur={fat:_lerp(before.fat,after.fat,k), lean:_lerp(before.lean,after.lean,k)};
+  const PX=2.3, w=120, base=318;
+  _t(ctx,cv.width/2,32,title,{size:17,bold:true,align:"center"});
+  const bar=(x,fat,lean,lab)=>{
+    const lh=lean*PX, fh=fat*PX;
+    ctx.fillStyle=MED.lean; ctx.fillRect(x,base-lh,w,lh);
+    ctx.fillStyle=MED.fat;  ctx.fillRect(x,base-lh-fh,w,fh);
+    ctx.strokeStyle="#33404f"; ctx.lineWidth=1; ctx.strokeRect(x,base-lh-fh,w,lh+fh);
+    _t(ctx,x+w/2,base+22,lab,{align:"center",col:MED.dim,size:13}); };
+  bar(230,cur.fat,cur.lean,"body mass");
+  const lostFat=before.fat-cur.fat, lostLean=before.lean-cur.lean, lost=lostFat+lostLean;
+  const lx=560, lw=140;
+  if(lost>0.1){
+    const lfh=lostFat*PX, llh=lostLean*PX;
+    ctx.fillStyle=MED.lean; ctx.fillRect(lx,base-llh,lw,llh);
+    ctx.fillStyle=MED.fat;  ctx.fillRect(lx,base-llh-lfh,lw,lfh);
+    _t(ctx,lx+lw/2,base+22,"weight LOST",{align:"center",col:MED.dim,size:13});
+    const pctMus=Math.round(100*lostLean/lost);
+    _t(ctx,lx+lw+16,base-llh-lfh+16,`${100-pctMus}% fat`,{col:MED.fat,size:15,bold:true});
+    _t(ctx,lx+lw+16,base-llh/2+5,`${pctMus}% muscle`,{col:MED.lean,size:15,bold:true}); }
+  _t(ctx,230,base+44,"■ fat",{col:MED.fat,size:12});
+  _t(ctx,290,base+44,"■ lean / muscle",{col:MED.lean,size:12});
+  if(caption) _t(ctx,cv.width/2,362,caption,{align:"center",col:MED.dim,size:13}); }
+async function runBodyComp(cv,ctx,opts){
+  const {before,after,title,lines=[]}=opts;
+  drawBodyComp(ctx,cv,{before,after,k:0,title});
+  if(lines[0]) await narrate(lines[0]);
+  await tween(1500,k=>drawBodyComp(ctx,cv,{before,after,k,title,caption:opts.caption||""}));
+  for(let i=1;i<lines.length;i++) await narrate(lines[i]); }
+
+/* --- 2) SARCOMERE: sliding-filament shortening (the muscle engine) --- */
+function drawSarcomere(ctx,cv,st){
+  clear(ctx,cv);
+  const {contraction:c=0,title=""}=st;
+  _t(ctx,cv.width/2,32,title,{size:17,bold:true,align:"center"});
+  const cx=450, cy=205, W0=560, half=(W0/2)*(1-0.34*c);
+  for(const zx of [cx-half, cx+half]){
+    ctx.strokeStyle=MED.z; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(zx,cy-70); ctx.lineTo(zx,cy+70); ctx.stroke(); }
+  _t(ctx,cx-half,cy-82,"Z",{align:"center",col:MED.dim,size:13});
+  _t(ctx,cx+half,cy-82,"Z",{align:"center",col:MED.dim,size:13});
+  for(const ry of [-46,0,46]){
+    const y=cy+ry;
+    ctx.strokeStyle=MED.actin; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(cx-half,y); ctx.lineTo(cx-half+200,y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+half,y); ctx.lineTo(cx+half-200,y); ctx.stroke();
+    ctx.strokeStyle=MED.myosin; ctx.lineWidth=7;
+    ctx.beginPath(); ctx.moveTo(cx-110,y); ctx.lineTo(cx+110,y); ctx.stroke();
+    ctx.lineWidth=2;
+    for(let hx=cx-100; hx<=cx+100; hx+=26){
+      ctx.beginPath(); ctx.moveTo(hx,y-4); ctx.lineTo(hx+7,y-11); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(hx,y+4); ctx.lineTo(hx+7,y+11); ctx.stroke(); } }
+  _t(ctx,cx,cy+96,"thin = actin  ·  thick = myosin (with cross-bridge heads)",{align:"center",col:MED.dim,size:12});
+  _t(ctx,cx,cy+118, c>0.6?"filaments slide over each other → the sarcomere SHORTENS":"relaxed sarcomere",
+     {align:"center",col:c>0.6?MED.good:MED.dim,size:13,bold:c>0.6}); }
+async function runSarcomere(cv,ctx,opts){
+  const lines=opts.lines||[];
+  drawSarcomere(ctx,cv,{contraction:0,title:opts.title});
+  if(lines[0]) await narrate(lines[0]);
+  await tween(1600,k=>drawSarcomere(ctx,cv,{contraction:k,title:opts.title}));
+  for(let i=1;i<lines.length;i++) await narrate(lines[i]); }
+
+/* --- 3) ACTIVIN/MYOSTATIN → ActRII: the muscle brake + its blocker --- */
+function drawActRII(ctx,cv,st){
+  clear(ctx,cv);
+  const {ligand:lg=0, blocker:bl=0, muscle:m=0.5, title=""}=st;
+  _t(ctx,cv.width/2,32,title,{size:17,bold:true,align:"center"});
+  const mw=180+120*m, mh=150+70*m, mx=90, my=205-mh/2;
+  ctx.fillStyle="rgba(200,90,82,0.20)"; ctx.strokeStyle=MED.muscle; ctx.lineWidth=2;
+  ctx.fillRect(mx,my,mw,mh); ctx.strokeRect(mx,my,mw,mh);
+  _t(ctx,mx+mw/2,my+mh/2+5,"muscle",{align:"center",col:MED.muscle,size:15,bold:true});
+  const rx=mx+mw, ry=205;
+  ctx.strokeStyle=MED.membrane; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(rx,ry-42); ctx.lineTo(rx,ry+42); ctx.stroke();
+  ctx.fillStyle=MED.membrane; ctx.fillRect(rx-6,ry-14,12,28);
+  _t(ctx,rx+2,ry+64,"ActRII receptor",{align:"center",col:MED.dim,size:12});
+  ctx.fillStyle=MED.ligand;
+  for(let i=0;i<4;i++){
+    const bound = i < lg*4;
+    const lxp = bound ? rx+18 : rx+140 - i*4;
+    const lyp = ry-40 + i*26;
+    ctx.beginPath(); ctx.arc(lxp,lyp,8,0,7); ctx.fill(); }
+  _t(ctx,rx+150,118,"myostatin /",{col:MED.ligand,size:13,bold:true});
+  _t(ctx,rx+150,136,"activin",{col:MED.ligand,size:13,bold:true});
+  if(bl>0.05){
+    ctx.strokeStyle=MED.blocker; ctx.lineWidth=3;
+    for(let i=0;i<3;i++){ const yy=ry-30+i*30, xx=rx+72;
+      ctx.beginPath(); ctx.moveTo(xx,yy); ctx.lineTo(xx-10,yy-9); ctx.moveTo(xx,yy); ctx.lineTo(xx-10,yy+9); ctx.stroke(); }
+    _t(ctx,rx+92,ry+92,"blocker (antibody)",{align:"center",col:MED.blocker,size:12,bold:true}); }
+  const brakeOn = lg>0.4 && bl<0.3;
+  _t(ctx,cv.width/2,352, brakeOn ? "receptor active → BRAKE on muscle growth (muscle wastes)"
+       : "receptor blocked → brake OFF → muscle preserved / grows",
+     {align:"center",col:brakeOn?MED.ligand:MED.good,size:14,bold:true}); }
+async function runActRII(cv,ctx,opts){
+  const lines=opts.lines||[];
+  const seq=opts.seq||[{ligand:0,blocker:0,muscle:0.55},{ligand:1,blocker:0,muscle:0.32},{ligand:1,blocker:1,muscle:0.8}];
+  drawActRII(ctx,cv,{...seq[0],title:opts.title});
+  for(let i=0;i<seq.length;i++){
+    if(lines[i]) await narrate(lines[i]);
+    const a=seq[i], b=seq[Math.min(i+1,seq.length-1)];
+    await tween(1100,k=>drawActRII(ctx,cv,{ligand:_lerp(a.ligand,b.ligand,k),blocker:_lerp(a.blocker,b.blocker,k),muscle:_lerp(a.muscle,b.muscle,k),title:opts.title})); }
+  if(lines[seq.length]) await narrate(lines[seq.length]); }
+
+/* --- thin per-module wrappers (reuse the components above) --- */
+ANIMS.med_bodycomp_glp1_static=(cv,ctx)=>drawBodyComp(ctx,cv,{before:{fat:45,lean:55},after:{fat:45,lean:55},k:0,title:"Where does the lost weight come from?"});
+ANIMS.med_bodycomp_glp1=(cv,ctx)=>runBodyComp(cv,ctx,{
+  title:"Where does the lost weight come from?",
+  before:{fat:45,lean:55}, after:{fat:30,lean:49},
+  caption:"On a standard GLP-1, roughly a quarter to a third of the weight lost is lean tissue.",
+  lines:[
+    "Body weight is not one thing. Split it into fat mass on top and lean mass — muscle and organs — underneath. Watch the whole column shrink as the drug works.",
+    "Now look at the panel on the right: this is what you actually lost. On a standard GLP-1 like semaglutide, roughly a quarter to a third of that loss is not fat at all — it is lean tissue, mostly muscle. That is the quality-of-weight-loss problem the newest drugs are chasing."]});
+ANIMS.med_actrii_static=(cv,ctx)=>drawActRII(ctx,cv,{ligand:0,blocker:0,muscle:0.55,title:"The muscle brake — and how to release it"});
+ANIMS.med_actrii=(cv,ctx)=>runActRII(cv,ctx,{
+  title:"The muscle brake — and how to release it",
+  seq:[{ligand:0,blocker:0,muscle:0.55},{ligand:1,blocker:0,muscle:0.32},{ligand:1,blocker:1,muscle:0.8}],
+  lines:[
+    "Your body has a built-in brake on muscle growth. Two signalling proteins — myostatin and activin — dock onto a receptor called ActRII on the muscle-cell surface.",
+    "When they bind, the brake switches ON: the cell holds muscle back. During rapid weight loss this same brake helps strip muscle away along with the fat.",
+    "Here is the new idea. A blocker — an antibody such as bimagrumab — intercepts myostatin and activin before they reach the receptor. The brake comes OFF, and muscle is preserved, even built, while the GLP-1 burns fat.",
+    "That is the BELIEVE trial: pair a muscle-brake blocker with semaglutide and almost all of the weight lost is fat — the muscle stays."]});
+ANIMS.med_sarcomere_static=(cv,ctx)=>drawSarcomere(ctx,cv,{contraction:0,title:"How a muscle shortens — the sliding filament"});
+ANIMS.med_sarcomere=(cv,ctx)=>runSarcomere(cv,ctx,{
+  title:"How a muscle shortens — the sliding filament",
+  lines:[
+    "This is a sarcomere — the tiny repeating engine inside every muscle, from your biceps to your heart. Thin filaments called actin are anchored to the Z-lines at each end; a thick filament called myosin sits in the middle.",
+    "To contract, the myosin heads grab the actin and ratchet it inward. The filaments slide past each other and the Z-lines are pulled together — nothing shortens except the overlap. Line up billions of these and the whole muscle shortens.",
+    "Lose muscle — through ageing, disuse, or rapid weight loss — and you lose these engines in parallel: fewer sarcomeres, less force. That is why protecting lean mass matters far beyond the mirror."]});
+
 function drawSquare(ctx,cv,pH,lH,lN,split,shade){
   clear(ctx,cv);
   const x=140,y=40,W=420,Hh=300, sx=x+W*pH;
