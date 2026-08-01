@@ -242,7 +242,7 @@
         },
         {
           "h": "2026's headline: the first GLP-1 you can just swallow",
-          "md": "The big 2026 change is a **pill that finally works like the shots**. **Orforglipron** (brand **Foundayo**) was FDA-approved in **April 2026** — the first **oral small-molecule** GLP-1.\n\nWhat makes it different from the older Rybelsus pill: orforglipron is *not* a fragile peptide, so there's **no fasting or water ritual** — you just take it. In its ATTAIN-1 trial it produced about **11% weight loss** at ~17 months. A daily pill with no needle is expected to widen access enormously.\n\n*(This lesson is educational, not medical advice — drug choice is a decision for you and your clinician.)*"
+          "md": "The big 2026 change is a **pill that finally works like the shots**. **Orforglipron** (brand **Foundayo**) was FDA-approved in **April 2026** — the first **oral small-molecule** GLP-1.\n\nWhat makes it different from the older Rybelsus pill: orforglipron is *not* a fragile peptide, so there's **no fasting or water ritual** — you just take it. In its ATTAIN-1 trial it produced about **11–12% weight loss** at ~17 months. A daily pill with no needle is expected to widen access enormously.\n\n*(This lesson is educational, not medical advice — drug choice is a decision for you and your clinician.)*"
         }
       ],
       "questions": [
@@ -305,7 +305,7 @@
         {
           "label": "Lilly — oral GLP-1 orforglipron Phase 3 results (2026)",
           "type": "article",
-          "url": "https://investor.lilly.com/news-releases/news-release-details/lillys-oral-glp-1-orforglipron-demonstrated-statistically"
+          "url": "https://www.ajmc.com/view/fda-approves-lilly-s-oral-glp-1-orforglipron-for-obesity"
         }
       ],
       "anim": "glp_family"
@@ -384,7 +384,7 @@
         {
           "label": "Lilly — retatrutide TRIUMPH-1 Phase 3 topline (2026)",
           "type": "article",
-          "url": "https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-delivered-powerful-weight-loss"
+          "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa2301972"
         }
       ],
       "anim": "glp_agonists"
@@ -396,7 +396,7 @@
       "cards": [
         {
           "h": "The weight numbers, ranked",
-          "md": "Roughly, average weight loss in the big trials:\n\n- **Semaglutide (Wegovy)** — about **15%** (STEP program).\n- **Tirzepatide (Zepbound)** — about **20–22%** (SURMOUNT).\n- **Orforglipron pill** — about **11%** (ATTAIN, 2026).\n- **Retatrutide (triple, not yet approved)** — up to about **30%** (TRIUMPH, 2026).\n\nFor comparison, lifestyle changes alone average ~5%. These are the first medicines to rival surgery."
+          "md": "Roughly, average weight loss in the big trials:\n\n- **Semaglutide (Wegovy)** — about **15%** (STEP program).\n- **Tirzepatide (Zepbound)** — about **20–22%** (SURMOUNT).\n- **Orforglipron pill** — about **11–12%** (ATTAIN-1, 2026).\n- **Retatrutide (triple, not yet approved)** — up to about **30%** (TRIUMPH, 2026).\n\nFor comparison, lifestyle changes alone average ~5%. These are the first medicines to rival surgery."
         },
         {
           "h": "The bigger deal: hearts and kidneys",

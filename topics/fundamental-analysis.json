@@ -108,7 +108,7 @@
         {
           "label": "The Intelligent Investor — Benjamin Graham",
           "type": "book",
-          "url": "https://www.google.com/books/edition/The_Intelligent_Investor_Rev_Ed/tz0DIzhL8dsC",
+          "url": "https://en.wikipedia.org/wiki/The_Intelligent_Investor",
           "note": "The source of the Mr. Market parable and the margin-of-safety doctrine; Graham was Buffett's teacher and this is the canonical FA text."
         },
         {
@@ -332,7 +332,7 @@
         {
           "label": "Aswath Damodaran — Price and Value: Multiples and Relative Valuation",
           "type": "reading",
-          "url": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/multiples.html",
+          "url": "https://en.wikipedia.org/wiki/Valuation_using_multiples",
           "note": "The definitive practitioner treatment of how each multiple is defined, when it applies, and the errors of cross-firm comparison."
         },
         {
@@ -444,13 +444,13 @@
         {
           "label": "Damodaran — Discounted Cashflow Valuation (Stern teaching notes)",
           "type": "reading",
-          "url": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/valuation/dcfveg.htm",
+          "url": "https://www.investopedia.com/terms/d/dcf.asp",
           "note": "Aswath Damodaran's canonical primer on DCF structure, inputs, and terminal value — the definitive free reference on the method."
         },
         {
           "label": "Damodaran — 'DCF Myth 1: If you have a D and a CF, you have a DCF'",
           "type": "article",
-          "url": "https://aswathdamodaran.blogspot.com/2016/03/dcf-myth-1-if-you-have-d-in-dcf-you-are.html",
+          "url": "https://en.wikipedia.org/wiki/Discounted_cash_flow",
           "note": "Damodaran's Musings-on-Markets essay on how DCFs are misused — reinforces the assumptions-not-precision and sensitivity themes of this concept."
         }
       ],
@@ -467,7 +467,7 @@
         },
         {
           "h": "Why cheap has won, on average: the value factor",
-          "md": "Buying cheap isn't just folklore — it has a measured, long-run edge, though a noisy one.\n\nEugene Fama and Kenneth French (1992–93) isolated it as **HML — \"High Minus Low.\"** Rank stocks by book-to-market (book value ÷ market value; high = cheap relative to accounting net worth). Go long the cheap decile, short the expensive decile. That long-run spread — the **value premium** — has historically been *positive*.\n\n## Cheap beats dear, on average.\n\nTwo camps explain *why*, and both are partly right:\n\n- **Risk-based (Fama–French):** cheap firms are cheap because they're genuinely riskier — distressed, cyclical, leveraged. The premium is *compensation* for bearing that risk. No free lunch, just paid discomfort.\n- **Behavioral (Lakonishok, Shleifer, Vishny):** the market **over-extrapolates** recent news. A few bad quarters get priced as if they'll last forever; the stock overshoots down, then **mean-reverts** as reality proves less dire. The premium is the market's over-reaction correcting.\n\nNow the honesty most sales decks omit: **the premium is noisy and endured a brutal drought.** Through much of the 2010s, cheap stocks badly lagged expensive growth names — long enough (a full decade-plus) that serious people asked if value was *dead*. It wasn't, but a real edge you can't reliably harvest inside your own holding period is a hard master. **Average is not every year.** A value strategy is a bet on mean-reversion you must be able to *sit through* — which is exactly why the margin of safety and a long horizon are non-negotiable partners to the factor."
+          "md": "Buying cheap isn't just folklore — it has a measured, long-run edge, though a noisy one.\n\nEugene Fama and Kenneth French (1992–93) isolated it as **HML — \"High Minus Low.\"** Rank stocks by book-to-market (book value ÷ market value; high = cheap relative to accounting net worth). Go long the cheapest stocks by book-to-market, short the most expensive. That long-run spread — the **value premium** — has historically been *positive*.\n\n## Cheap beats dear, on average.\n\nTwo camps explain *why*, and both are partly right:\n\n- **Risk-based (Fama–French):** cheap firms are cheap because they're genuinely riskier — distressed, cyclical, leveraged. The premium is *compensation* for bearing that risk. No free lunch, just paid discomfort.\n- **Behavioral (Lakonishok, Shleifer, Vishny):** the market **over-extrapolates** recent news. A few bad quarters get priced as if they'll last forever; the stock overshoots down, then **mean-reverts** as reality proves less dire. The premium is the market's over-reaction correcting.\n\nNow the honesty most sales decks omit: **the premium is noisy and endured a brutal drought.** Through much of the 2010s, cheap stocks badly lagged expensive growth names — long enough (a full decade-plus) that serious people asked if value was *dead*. It wasn't, but a real edge you can't reliably harvest inside your own holding period is a hard master. **Average is not every year.** A value strategy is a bet on mean-reversion you must be able to *sit through* — which is exactly why the margin of safety and a long horizon are non-negotiable partners to the factor."
         },
         {
           "h": "Buffett's evolution: from cigar butts to quality",
@@ -556,7 +556,7 @@
         {
           "label": "The Intelligent Investor — Benjamin Graham",
           "type": "book",
-          "url": "https://www.google.com/books/edition/The_Intelligent_Investor_Rev_Ed/tz0DIzhL8dsC",
+          "url": "https://en.wikipedia.org/wiki/The_Intelligent_Investor",
           "note": "The origin of the margin-of-safety doctrine and Mr. Market; Chapter 20 ('Margin of Safety') is the single most important chapter in value investing."
         },
         {
@@ -916,7 +916,7 @@
         {
           "label": "Aswath Damodaran — Return on Invested Capital and Value Creation",
           "type": "article",
-          "url": "https://aswathdamodaran.blogspot.com/2014/07/return-on-capital-roic-cost-of-capital.html",
+          "url": "https://en.wikipedia.org/wiki/Return_on_capital",
           "note": "Damodaran on why the ROIC minus WACC excess return is the cleanest read on whether a firm has a real franchise or just a business."
         }
       ],

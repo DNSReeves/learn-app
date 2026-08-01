@@ -300,13 +300,13 @@
         },
         {
           "label": "SEC Investor Bulletin: Exchange-Traded Notes (ETNs)",
-          "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/exchange-traded-notes-etns",
+          "url": "https://www.investopedia.com/terms/e/etn.asp",
           "type": "docs",
           "note": "Regulator's plain-language warning on credit risk, call/redemption features, and premium/discount detachment."
         },
         {
           "label": "ETN vs. ETF: What's the Difference? — Investopedia",
-          "url": "https://www.investopedia.com/articles/investing/060915/introduction-exchange-traded-notes.asp",
+          "url": "https://www.finra.org/investors/insights/exchange-traded-notes-avoid-shock",
           "type": "article",
           "note": "Side-by-side on why an ETF's trust-held assets survive sponsor bankruptcy while an ETN holder is an unsecured creditor."
         }

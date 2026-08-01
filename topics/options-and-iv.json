@@ -767,7 +767,7 @@
         {
           "id": "q3",
           "type": "mcq",
-          "prompt": "A $5-wide put credit spread collects $1.50. Roughly speaking, the market is pricing the probability that the spread finishes at max loss at about:",
+          "prompt": "A $5-wide put credit spread collects $1.50. Roughly speaking, the market is pricing the probability that the spread finishes beyond the short strike (i.e. in some loss) at about:",
           "options": [
             "70% — the credit is the probability of losing",
             "30% — credit over width approximates the risk-neutral odds of finishing beyond the short strike",

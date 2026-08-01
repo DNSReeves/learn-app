@@ -89,7 +89,7 @@
         },
         {
           "label": "StockCharts ChartSchool — Overview of technical analysis",
-          "url": "https://school.stockcharts.com/doku.php?id=overview:technical_analysis",
+          "url": "https://www.investopedia.com/terms/t/technicalanalysis.asp",
           "type": "docs",
           "note": "The standard free reference for every indicator in this module; start here when a term is fuzzy."
         }
@@ -103,7 +103,7 @@
       "cards": [
         {
           "h": "The mechanic",
-          "md": "A **simple moving average (SMA)** of length N is the arithmetic mean of the last N closing prices, recomputed each day as the window slides forward. SMA-10 averages two trading weeks; SMA-50 about a quarter; SMA-200 about a year.\n\nAveraging is a **low-pass filter**: day-to-day noise (which flips sign constantly) cancels against itself inside the window, while the trend (which points one way for months) survives. The longer the window, the more noise dies — and the more slowly the line responds when the trend genuinely changes.\n\nThat is the entire trade-off, and there is no third dial: **smoothness and responsiveness are the same budget spent two ways.**"
+          "md": "A **simple moving average (SMA)** of length N is the arithmetic mean of the last N closing prices, recomputed each day as the window slides forward. SMA-10 averages two trading weeks; SMA-50 about a quarter; SMA-200 about ten months.\n\nAveraging is a **low-pass filter**: day-to-day noise (which flips sign constantly) cancels against itself inside the window, while the trend (which points one way for months) survives. The longer the window, the more noise dies — and the more slowly the line responds when the trend genuinely changes.\n\nThat is the entire trade-off, and there is no third dial: **smoothness and responsiveness are the same budget spent two ways.**"
         },
         {
           "h": "The canonical periods — and what each is for",
@@ -173,7 +173,7 @@
       "resources": [
         {
           "label": "StockCharts ChartSchool — Moving averages (SMA/EMA mechanics)",
-          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages",
+          "url": "https://www.investopedia.com/terms/m/movingaverage.asp",
           "type": "docs",
           "note": "SMA vs EMA mechanics with worked examples — the arithmetic behind the smoothing-vs-lag dial."
         },
@@ -263,7 +263,7 @@
       "resources": [
         {
           "label": "StockCharts ChartSchool — Moving averages: SMA vs EMA weighting",
-          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages",
+          "url": "https://www.investopedia.com/terms/m/movingaverage.asp",
           "type": "docs",
           "note": "SMA vs EMA mechanics with worked examples — the arithmetic behind the smoothing-vs-lag dial."
         },
@@ -352,7 +352,7 @@
       "resources": [
         {
           "label": "StockCharts ChartSchool — Average directional index (ADX)",
-          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:average_directional_index_adx",
+          "url": "https://www.investopedia.com/terms/a/adx.asp",
           "type": "docs",
           "note": "How ADX quantifies trend strength — the filter that keeps crossover signals out of chop."
         },
@@ -442,13 +442,13 @@
       "resources": [
         {
           "label": "StockCharts ChartSchool — Relative strength index (RSI), including trend-range behavior",
-          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:relative_strength_index_rsi",
+          "url": "https://www.investopedia.com/terms/r/rsi.asp",
           "type": "docs",
           "note": "RSI construction plus the trend-vs-range behavior that the overbought myth ignores."
         },
         {
           "label": "StockCharts ChartSchool — MACD, construction and divergence",
-          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_average_convergence_divergence_macd",
+          "url": "https://www.investopedia.com/terms/m/macd.asp",
           "type": "docs",
           "note": "MACD assembled from its two EMAs — makes the 'trend tool in oscillator clothing' point visible."
         }
@@ -532,13 +532,13 @@
       "resources": [
         {
           "label": "StockCharts ChartSchool — Bollinger Bands and the squeeze",
-          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:bollinger_bands",
+          "url": "https://www.investopedia.com/terms/b/bollingerbands.asp",
           "type": "docs",
           "note": "Band construction and the squeeze — with the direction-blindness caveat stated plainly."
         },
         {
           "label": "StockCharts ChartSchool — Average true range (ATR) for stops and sizing",
-          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:average_true_range_atr",
+          "url": "https://www.investopedia.com/terms/a/atr.asp",
           "type": "docs",
           "note": "ATR as the unit of normal motion — the basis for stops and sizing that ignore noise."
         }
@@ -844,7 +844,7 @@
         },
         {
           "label": "SEC Investor.gov — Exchange-traded funds: the vehicle-level basics",
-          "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-funds-etfs",
+          "url": "https://www.investopedia.com/terms/e/etf.asp",
           "type": "reading",
           "note": "The vehicle-level ETF basics from the regulator — creation/redemption, costs, tax mechanics."
         }
