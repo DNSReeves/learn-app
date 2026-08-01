@@ -120,7 +120,8 @@
           "type": "interactive",
           "note": "The industry's nonprofit education arm — mechanics, exercise/assignment rules, and strategy courses, no account required."
         }
-      ]
+      ],
+      "anim": "opt_payoff"
     },
     {
       "id": "c02-parity",
@@ -233,7 +234,8 @@
           "type": "video",
           "note": "The two-portfolio replication argument drawn out slowly — worth 10 minutes even if the algebra is already obvious."
         }
-      ]
+      ],
+      "anim": "opt_parity"
     },
     {
       "id": "c03-black-scholes-heat",
@@ -368,7 +370,8 @@
           "type": "reading",
           "note": "The formula, the assumptions, and their known failures — the honest fingerprint to check before leaning on the model."
         }
-      ]
+      ],
+      "anim": "opt_bs_heat"
     },
     {
       "id": "c04-greeks",
@@ -817,7 +820,8 @@
           "type": "reading",
           "note": "Payoff diagrams for every standard structure — verticals, condors, straddles — in one reference page."
         }
-      ]
+      ],
+      "anim": "opt_structures"
     },
     {
       "id": "c08-failure-modes",
@@ -934,7 +938,8 @@
           "type": "reading",
           "note": "The authoritative rules on exercise, assignment timing, and expiration processing — the operational fine print."
         }
-      ]
+      ],
+      "anim": "opt_failure"
     }
   ]
 }

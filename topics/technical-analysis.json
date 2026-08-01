@@ -362,7 +362,8 @@
           "type": "article",
           "note": "Defines the golden cross and, importantly, its confirmation-not-prediction caveat."
         }
-      ]
+      ],
+      "anim": "ta_crossover"
     },
     {
       "id": "oscillators",
@@ -451,7 +452,8 @@
           "type": "docs",
           "note": "MACD assembled from its two EMAs — makes the 'trend tool in oscillator clothing' point visible."
         }
-      ]
+      ],
+      "anim": "ta_oscillator"
     },
     {
       "id": "bands-volatility-volume",
@@ -540,7 +542,8 @@
           "type": "docs",
           "note": "ATR as the unit of normal motion — the basis for stops and sizing that ignore noise."
         }
-      ]
+      ],
+      "anim": "ta_bands"
     },
     {
       "id": "how-money-is-lost",
@@ -845,7 +848,8 @@
           "type": "reading",
           "note": "The vehicle-level ETF basics from the regulator — creation/redemption, costs, tax mechanics."
         }
-      ]
+      ],
+      "anim": "ta_playbook"
     }
   ]
 }

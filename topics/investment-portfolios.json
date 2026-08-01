@@ -272,7 +272,8 @@
           "type": "reading",
           "note": "Covers the mechanics and trade-offs of rebalancing approaches, including threshold (band) versus calendar triggers and their cost implications."
         }
-      ]
+      ],
+      "anim": "port_construction"
     },
     {
       "id": "kinds-of-risk",
@@ -721,7 +722,8 @@
           "type": "reading",
           "note": "Clear practitioner-reviewed explanation of contango versus backwardation and why rolling futures in contango erodes fund returns — directly supports the roll-yield trap card and its question."
         }
-      ]
+      ],
+      "anim": "port_commodities"
     },
     {
       "id": "alternatives-liquid-and-private",
@@ -810,7 +812,8 @@
           "type": "docs",
           "note": "The regulator's plain-language explanation of accreditation thresholds and the reduced disclosure protections in private offerings — the access and suitability side of the privates decision."
         }
-      ]
+      ],
+      "anim": "port_alternatives"
     },
     {
       "id": "the-portfolio-playbook",
@@ -895,7 +898,8 @@
           "type": "docs",
           "note": "The regulator's plain-language guidance on allocation, diversification, and rebalancing — a neutral, stable grounding for the claim that allocation and discipline dominate product selection."
         }
-      ]
+      ],
+      "anim": "port_playbook"
     }
   ]
 }

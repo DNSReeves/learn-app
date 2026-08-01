@@ -247,7 +247,8 @@
           "type": "reading",
           "note": "Formal definition plus the maximum-drawdown literature pointers."
         }
-      ]
+      ],
+      "anim": "qf_risk"
     },
     {
       "id": "c03-mvo-fragility",
@@ -360,7 +361,8 @@
           "type": "reading",
           "note": "The 1/N paper — the cleanest published humiliation of sample-based optimization."
         }
-      ]
+      ],
+      "anim": "qf_frontier"
     },
     {
       "id": "c04-factors",
@@ -927,7 +929,8 @@
           "type": "reading",
           "note": "The same discipline as practiced (and fought over) in the experimental sciences."
         }
-      ]
+      ],
+      "anim": "qf_research"
     }
   ]
 }

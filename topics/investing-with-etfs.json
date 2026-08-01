@@ -423,7 +423,8 @@
           "type": "reading",
           "note": "The tracking error / tracking difference distinction in more depth."
         }
-      ]
+      ],
+      "anim": "etf_reading"
     },
     {
       "id": "c03-fund-taxonomy",
@@ -1048,7 +1049,8 @@
           "type": "reading",
           "note": "Quick regulator's reference on how ETF trading differs from mutual funds."
         }
-      ]
+      ],
+      "anim": "etf_execution"
     },
     {
       "id": "c06-costs-and-taxes",

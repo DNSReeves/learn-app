@@ -9773,6 +9773,1370 @@ ANIMS.nn_training=async(cv,ctx)=>{
 };
 })();
 
+/* ===== batch-2 visuals: technical-analysis ===== */
+/* ---- frag_ta_crossover.js ---- */
+/* technical-analysis / ta_crossover */
+(function(){
+const tac_X0=70,tac_X1=830,tac_Y0=320,tac_Y1=60;
+const tac_N=120;
+// price series: rises, dips, then rallies — engineered so fast MA crosses slow once (up)
+const tac_price=(i)=>{
+  const t=i/tac_N;
+  return 50 + 18*t + 9*Math.sin(t*7.5) - 14*Math.exp(-Math.pow((t-0.30)/0.12,2));
+};
+// simple trailing moving average of window w at index i
+const tac_ma=(i,w)=>{
+  let s=0,n=0;
+  for(let j=i-w+1;j<=i;j++){ if(j>=0){ s+=tac_price(j); n++; } }
+  return n? s/n : tac_price(i);
+};
+const tac_FAST=8, tac_SLOW=24;
+// find the index where fast crosses above slow (golden cross)
+const tac_cross=(()=>{
+  for(let i=tac_SLOW+1;i<tac_N;i++){
+    const pf=tac_ma(i-1,tac_FAST)-tac_ma(i-1,tac_SLOW);
+    const cf=tac_ma(i,tac_FAST)-tac_ma(i,tac_SLOW);
+    if(pf<=0 && cf>0) return i;
+  }
+  return -1;
+})();
+function tac_draw(ctx,cv,upto){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const ymin=44,ymax=82;
+  const sx=i=>tac_X0+(i/(tac_N-1))*(tac_X1-tac_X0);
+  const sy=v=>tac_Y0-((v-ymin)/(ymax-ymin))*(tac_Y0-tac_Y1);
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=4;g++){const yy=tac_Y1+g*(tac_Y0-tac_Y1)/4;ctx.beginPath();ctx.moveTo(tac_X0,yy);ctx.lineTo(tac_X1,yy);ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(tac_X0,tac_Y0);ctx.lineTo(tac_X1,tac_Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tac_X0,tac_Y1);ctx.lineTo(tac_X0,tac_Y0);ctx.stroke();
+  const drawLine=(fn,col,wid,start)=>{
+    ctx.strokeStyle=col;ctx.lineWidth=wid;ctx.beginPath();
+    let first=true;
+    for(let i=start;i<=upto;i++){
+      const px=sx(i),py=sy(fn(i));
+      if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+  };
+  // price (dim), then MAs
+  drawLine(i=>tac_price(i),"#5b6b85",1.5,0);
+  drawLine(i=>tac_ma(i,tac_SLOW),F.prior,2.5,tac_SLOW-1);
+  drawLine(i=>tac_ma(i,tac_FAST),F.post,2.5,tac_FAST-1);
+  // mark crossover once revealed
+  if(tac_cross>0 && upto>=tac_cross){
+    const cx=sx(tac_cross),cy=sy(tac_ma(tac_cross,tac_FAST));
+    ctx.strokeStyle=F.ok;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(cx,cy,10,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle=F.ok;ctx.textAlign="center";
+    ctx.fillText("golden cross",cx,cy-18);
+    ctx.textAlign="left";
+  }
+  // legend
+  ctx.textAlign="left";
+  ctx.fillStyle="#5b6b85";ctx.fillText("price",tac_X0+8,tac_Y1+14);
+  ctx.fillStyle=F.post;ctx.fillText("fast MA (8)",tac_X0+8,tac_Y1+32);
+  ctx.fillStyle=F.prior;ctx.fillText("slow MA (24)",tac_X0+8,tac_Y1+50);
+  ctx.fillStyle=F.txt;ctx.textAlign="right";
+  ctx.fillText("time →",tac_X1,tac_Y0+22);
+  ctx.textAlign="left";
+}
+ANIMS.ta_crossover_static=(cv,ctx)=>tac_draw(ctx,cv,tac_N-1);
+ANIMS.ta_crossover=async(cv,ctx)=>{
+  tac_draw(ctx,cv,tac_SLOW);
+  await narrate("Here is a price line with two moving averages: a fast one and a slow one.");
+  await tween(2200,k=>tac_draw(ctx,cv,Math.round(tac_SLOW+k*(tac_cross-tac_SLOW))));
+  await narrate("When the fast average crosses ABOVE the slow one, that is a golden cross — a bullish hint.");
+  await tween(2000,k=>tac_draw(ctx,cv,Math.round(tac_cross+k*(tac_N-1-tac_cross))));
+  await narrate("The reverse, fast crossing below slow, is a death cross — a bearish hint.");
+  await narrate("Crossovers flag a possible trend change, but they arrive late and are often wrong — treat them as odds, not proof.");
+};
+})();
+/* ---- frag_ta_oscillator.js ---- */
+/* technical-analysis / ta_oscillator */
+(function(){
+const tao_X0=70,tao_X1=830;
+// price panel (top), oscillator panel (bottom)
+const tao_PY1=55, tao_PY0=150;   // price panel
+const tao_OY1=185, tao_OY0=340;  // oscillator panel (0..100)
+const tao_N=120;
+// price: runs up hard, then sells off — drives oscillator to extremes
+const tao_price=(i)=>{
+  const t=i/tao_N;
+  return 50 + 26*Math.sin(t*Math.PI - 0.6) + 4*Math.sin(t*11);
+};
+// RSI-style oscillator, smoothed, bounded 0..100, driven by recent price change
+const tao_osc=(i)=>{
+  let up=0,dn=0;
+  const w=10;
+  for(let j=i-w+1;j<=i;j++){
+    if(j>=1){
+      const d=tao_price(j)-tao_price(j-1);
+      if(d>=0) up+=d; else dn+=-d;
+    }
+  }
+  const rs = dn===0 ? 100 : up/(up+dn)*100;
+  return Math.max(2,Math.min(98,rs));
+};
+function tao_draw(ctx,cv,upto){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const sx=i=>tao_X0+(i/(tao_N-1))*(tao_X1-tao_X0);
+  const pmin=20,pmax=80;
+  const spy=v=>tao_PY0-((v-pmin)/(pmax-pmin))*(tao_PY0-tao_PY1);
+  const soy=v=>tao_OY0-(v/100)*(tao_OY0-tao_OY1);
+  // --- oscillator zones ---
+  ctx.fillStyle="rgba(95,191,149,0.10)"; // oversold (<30) — green tint
+  ctx.fillRect(tao_X0,soy(30),tao_X1-tao_X0,tao_OY0-soy(30));
+  ctx.fillStyle="rgba(212,106,98,0.12)"; // overbought (>70) — red tint
+  ctx.fillRect(tao_X0,tao_OY1,tao_X1-tao_X0,soy(70)-tao_OY1);
+  // zone lines
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(tao_X0,soy(70));ctx.lineTo(tao_X1,soy(70));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tao_X0,soy(30));ctx.lineTo(tao_X1,soy(30));ctx.stroke();
+  ctx.setLineDash([]);
+  // panel frames
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(tao_X0,tao_PY0);ctx.lineTo(tao_X1,tao_PY0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tao_X0,tao_OY0);ctx.lineTo(tao_X1,tao_OY0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tao_X0,tao_OY1);ctx.lineTo(tao_X0,tao_OY0);ctx.stroke();
+  // price line
+  ctx.strokeStyle="#5b6b85";ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<=upto;i++){const px=sx(i),py=spy(tao_price(i));i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  // oscillator line — color by current zone
+  const w=10;
+  ctx.lineWidth=2.5;ctx.beginPath();
+  let first=true;
+  for(let i=w;i<=upto;i++){const px=sx(i),py=soy(tao_osc(i));first?(ctx.moveTo(px,py),first=false):ctx.lineTo(px,py);}
+  ctx.strokeStyle=F.ax;ctx.stroke();
+  // current dot colored by zone
+  if(upto>=w){
+    const v=tao_osc(upto),px=sx(upto),py=soy(v);
+    const col = v>70?F.wrong : v<30?F.ok : F.ax;
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fill();
+  }
+  // labels
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("price",tao_X0+6,tao_PY1+14);
+  ctx.fillStyle=F.wrong;ctx.textAlign="right";ctx.fillText("overbought  70",tao_X1-6,soy(70)-6);
+  ctx.fillStyle=F.ok;ctx.fillText("oversold  30",tao_X1-6,soy(30)+16);
+  ctx.fillStyle="#7C8DA5";ctx.textAlign="left";ctx.fillText("RSI 0–100",tao_X0+6,tao_OY1+14);
+  ctx.textAlign="left";
+}
+ANIMS.ta_oscillator_static=(cv,ctx)=>tao_draw(ctx,cv,tao_N-1);
+ANIMS.ta_oscillator=async(cv,ctx)=>{
+  tao_draw(ctx,cv,12);
+  await narrate("Below the price is an oscillator, RSI, that measures momentum on a 0-to-100 scale.");
+  await tween(2400,k=>tao_draw(ctx,cv,Math.round(12+k*(66-12))));
+  await narrate("As price runs up, the oscillator pushes above 70 — the overbought zone.");
+  await tween(2400,k=>tao_draw(ctx,cv,Math.round(66+k*(tao_N-1-66))));
+  await narrate("As price falls back, it dips below 30 — the oversold zone.");
+  await narrate("These zones hint a move may be stretched — a caution flag, not a buy or sell command.");
+};
+})();
+/* ---- frag_ta_bands.js ---- */
+/* technical-analysis / ta_bands */
+(function(){
+const tab_X0=70,tab_X1=830;
+const tab_Y1=55, tab_Y0=270;    // price/band panel
+const tab_VY0=340, tab_VY1=290; // volume panel (bars grow upward from tab_VY0)
+const tab_N=120;
+const tab_SQ0=40, tab_SQ1=74;   // squeeze window (calm), breakout after
+// price: flat & calm during the squeeze, then breaks out upward with more wiggle
+const tab_price=(i)=>{
+  const t=i/tab_N;
+  let base=50 + 10*t;
+  if(i<tab_SQ1){ base += 1.2*Math.sin(t*9); }         // calm
+  else { base += 12*(t-tab_SQ1/tab_N) + 3*Math.sin(t*18); } // breakout + turbulence
+  return base;
+};
+const tab_ma=(i,w)=>{let s=0,n=0;for(let j=i-w+1;j<=i;j++){if(j>=0){s+=tab_price(j);n++;}}return n?s/n:tab_price(i);};
+// rolling standard deviation → band half-width (volatility)
+const tab_sd=(i,w)=>{
+  const m=tab_ma(i,w);let s=0,n=0;
+  for(let j=i-w+1;j<=i;j++){if(j>=0){const d=tab_price(j)-m;s+=d*d;n++;}}
+  return n?Math.sqrt(s/n):0;
+};
+const tab_W=20, tab_K=2.1;
+const tab_vol=(i)=>{
+  // volume calm during squeeze, surges on breakout
+  const t=i/tab_N;
+  let v=0.28+0.10*Math.sin(t*13);
+  if(i>=tab_SQ1) v=0.35+0.55*Math.exp(-Math.pow((i-(tab_SQ1+8))/10,2))+0.15*Math.sin(t*20);
+  return Math.max(0.05,Math.min(1,v));
+};
+function tab_draw(ctx,cv,upto){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const sx=i=>tab_X0+(i/(tab_N-1))*(tab_X1-tab_X0);
+  const ymin=42,ymax=86;
+  const sy=v=>tab_Y0-((v-ymin)/(ymax-ymin))*(tab_Y0-tab_Y1);
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=3;g++){const yy=tab_Y1+g*(tab_Y0-tab_Y1)/3;ctx.beginPath();ctx.moveTo(tab_X0,yy);ctx.lineTo(tab_X1,yy);ctx.stroke();}
+  // band as a filled ribbon (upper minus lower)
+  ctx.fillStyle="rgba(124,141,165,0.16)";
+  ctx.beginPath();
+  let started=false;
+  for(let i=tab_W-1;i<=upto;i++){const px=sx(i),py=sy(tab_ma(i,tab_W)+tab_K*tab_sd(i,tab_W));started?ctx.lineTo(px,py):(ctx.moveTo(px,py),started=true);}
+  for(let i=upto;i>=tab_W-1;i--){const px=sx(i),py=sy(tab_ma(i,tab_W)-tab_K*tab_sd(i,tab_W));ctx.lineTo(px,py);}
+  ctx.closePath();ctx.fill();
+  // band edges
+  const edge=(sign,col)=>{
+    ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();let f=true;
+    for(let i=tab_W-1;i<=upto;i++){const px=sx(i),py=sy(tab_ma(i,tab_W)+sign*tab_K*tab_sd(i,tab_W));f?(ctx.moveTo(px,py),f=false):ctx.lineTo(px,py);}
+    ctx.stroke();
+  };
+  edge(1,F.prior);edge(-1,F.prior);
+  // middle MA
+  ctx.strokeStyle=F.post;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.beginPath();
+  {let f=true;for(let i=tab_W-1;i<=upto;i++){const px=sx(i),py=sy(tab_ma(i,tab_W));f?(ctx.moveTo(px,py),f=false):ctx.lineTo(px,py);}ctx.stroke();}
+  ctx.setLineDash([]);
+  // price line
+  ctx.strokeStyle=F.txt;ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<=upto;i++){const px=sx(i),py=sy(tab_price(i));i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  // volume bars
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(tab_X0,tab_VY0);ctx.lineTo(tab_X1,tab_VY0);ctx.stroke();
+  const bw=(tab_X1-tab_X0)/tab_N;
+  for(let i=0;i<=upto;i++){
+    const h=tab_vol(i)*(tab_VY0-tab_VY1);
+    ctx.fillStyle = i>=tab_SQ1 ? "rgba(232,161,60,0.75)" : "rgba(124,141,165,0.55)";
+    ctx.fillRect(sx(i)-bw*0.35,tab_VY0-h,bw*0.7,h);
+  }
+  // annotate squeeze while it's on screen
+  if(upto>=tab_SQ0 && upto<=tab_SQ1+6){
+    ctx.fillStyle=F.ax;ctx.textAlign="center";
+    ctx.fillText("squeeze (calm)",sx((tab_SQ0+tab_SQ1)/2),sy(ymax)-4);
+    ctx.textAlign="left";
+  }
+  if(upto>tab_SQ1+6){
+    ctx.fillStyle=F.post;ctx.textAlign="center";
+    ctx.fillText("breakout",sx(tab_SQ1+14),sy(ymax)-4);
+    ctx.textAlign="left";
+  }
+  // labels
+  ctx.fillStyle=F.txt;ctx.textAlign="left";ctx.fillText("price",tab_X0+6,tab_Y1+14);
+  ctx.fillStyle=F.prior;ctx.fillText("volatility bands",tab_X0+6,tab_Y1+32);
+  ctx.fillStyle="#7C8DA5";ctx.fillText("volume",tab_X0+6,tab_VY1-4);
+  ctx.textAlign="left";
+}
+ANIMS.ta_bands_static=(cv,ctx)=>tab_draw(ctx,cv,tab_N-1);
+ANIMS.ta_bands=async(cv,ctx)=>{
+  tab_draw(ctx,cv,tab_SQ0);
+  await narrate("Around price we draw a middle average with upper and lower volatility bands.");
+  await tween(2000,k=>tab_draw(ctx,cv,Math.round(tab_SQ0+k*(tab_SQ1-tab_SQ0))));
+  await narrate("In calm markets the bands pinch together — a squeeze — while volume stays quiet.");
+  await tween(2400,k=>tab_draw(ctx,cv,Math.round(tab_SQ1+k*(tab_N-1-tab_SQ1))));
+  await narrate("When volatility returns the bands flare open, and here volume surges on the breakout.");
+  await narrate("A squeeze often precedes a big move and volume shows conviction — but neither promises the direction.");
+};
+})();
+/* ---- frag_ta_playbook.js ---- */
+/* technical-analysis / ta_playbook */
+(function(){
+// three-indicator ETF entry dashboard: trend, momentum, context
+// each resolves to a state; combined signal fires only when ALL are green
+const tap_cx=[220,450,680];      // card centers x
+const tap_cy=170;                 // card center y
+const tap_cw=180, tap_ch=150;
+const tap_labels=["TREND","MOMENTUM","CONTEXT"];
+const tap_sub=["fast MA > slow MA","RSI rising, not overbought","squeeze breakout + volume"];
+// final resolved states (all green → aligned → fire)
+const tap_col=(s)=> s==="green"?F.ok : s==="amber"?F.post : s==="red"?F.wrong : "#3A4C68";
+function tap_draw(ctx,cv,st){
+  // st: {n: how many cards resolved (0..3), states:[...], verdict: bool}
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  ctx.textAlign="center";
+  ctx.fillStyle=F.txt;
+  ctx.font="16px 'IBM Plex Mono'";
+  ctx.fillText("ETF entry checklist — do the signals agree?",450,36);
+  ctx.font="14px 'IBM Plex Mono'";
+  for(let c=0;c<3;c++){
+    const x=tap_cx[c], y=tap_cy;
+    const resolved = c<st.n;
+    const state = resolved ? st.states[c] : "off";
+    const col=tap_col(state);
+    // card
+    ctx.fillStyle="#16233b";
+    ctx.strokeStyle=resolved?col:"#3A4C68";
+    ctx.lineWidth=resolved?2.5:1.5;
+    ctx.beginPath();
+    const x0=x-tap_cw/2,y0=y-tap_ch/2,r=10;
+    ctx.moveTo(x0+r,y0);
+    ctx.arcTo(x0+tap_cw,y0,x0+tap_cw,y0+tap_ch,r);
+    ctx.arcTo(x0+tap_cw,y0+tap_ch,x0,y0+tap_ch,r);
+    ctx.arcTo(x0,y0+tap_ch,x0,y0,r);
+    ctx.arcTo(x0,y0,x0+tap_cw,y0,r);
+    ctx.closePath();ctx.fill();ctx.stroke();
+    // label
+    ctx.fillStyle=F.txt;ctx.fillText(tap_labels[c],x,y-38);
+    // status lamp
+    ctx.fillStyle=resolved?col:"#243450";
+    ctx.beginPath();ctx.arc(x,y-2,20,0,Math.PI*2);ctx.fill();
+    // status text
+    ctx.fillStyle=resolved?col:"#5b6b85";
+    const stxt = resolved? (state==="green"?"OK":state==="amber"?"MIXED":"NO") : "…";
+    ctx.font="16px 'IBM Plex Mono'";ctx.fillText(stxt,x,y+40);
+    ctx.font="12px 'IBM Plex Mono'";
+    ctx.fillStyle="#7C8DA5";ctx.fillText(tap_sub[c],x,y+58);
+    ctx.font="14px 'IBM Plex Mono'";
+  }
+  // combined verdict bar
+  const vy=300;
+  ctx.textAlign="center";
+  if(st.n>=3){
+    const fired=st.verdict;
+    ctx.fillStyle=fired?F.ok:F.post;
+    ctx.font="18px 'IBM Plex Mono'";
+    ctx.fillText(fired? "SIGNALS ALIGN → entry signal (odds, not a promise)"
+                      : "no alignment → stand aside, wait for agreement", 450, vy);
+    ctx.font="14px 'IBM Plex Mono'";
+  } else {
+    ctx.fillStyle="#5b6b85";
+    ctx.fillText("resolving indicators…",450,vy);
+  }
+  ctx.textAlign="left";
+}
+// the demo scenario: all three line up green → fires
+const tap_final={n:3,states:["green","green","green"],verdict:true};
+ANIMS.ta_playbook_static=(cv,ctx)=>tap_draw(ctx,cv,tap_final);
+ANIMS.ta_playbook=async(cv,ctx)=>{
+  tap_draw(ctx,cv,{n:0,states:[],verdict:false});
+  await narrate("No single indicator is enough, so we combine three for an ETF entry.");
+  tap_draw(ctx,cv,{n:1,states:["green"],verdict:false});
+  await narrate("First, TREND: the fast average is above the slow one — up-trend, green.");
+  tap_draw(ctx,cv,{n:2,states:["green","green"],verdict:false});
+  await narrate("Second, MOMENTUM: RSI is rising and not yet overbought — green.");
+  tap_draw(ctx,cv,{n:3,states:["green","green","amber"],verdict:false});
+  await narrate("Third, CONTEXT: a breakout, but volume is only lukewarm — amber, a caution.");
+  await tween(900,()=>{});
+  tap_draw(ctx,cv,tap_final);
+  await narrate("Only when trend, momentum and context all align does the signal fire — and even then it is odds, not certainty.");
+};
+})();
+
+/* ===== batch-2 visuals: quant-finance ===== */
+/* ---- frag_qf_risk.js ---- */
+/* risk measures / qf_risk */
+(function(){
+// Return distribution: a bell-ish histogram over standardized returns.
+// A small skew/fat left tail so VaR vs CVaR read clearly.
+const qfr_pdf=(x)=>Math.exp(-0.5*x*x)+0.18*Math.exp(-0.5*Math.pow((x+2.4)/0.9,2));
+const qfr_VAR=-1.645;   // 5% quantile line (x-axis, standardized)
+const qfr_CVAR=-2.30;   // mean of the tail beyond VaR (deeper than VaR)
+// Equity curve for the drawdown inset: rises, peaks, drops to a trough, recovers.
+const qfr_eq=(t)=>{ // t in 0..1
+  return 1.00 + 0.55*t + 0.14*Math.sin(t*7.0) - 0.42*Math.exp(-Math.pow((t-0.62)/0.13,2));
+};
+const qfr_PEAK_T=0.47, qfr_TROUGH_T=0.66; // peak-to-trough of the max drawdown
+
+function qfr_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  // ---- Main panel: the return distribution (left ~62% of width) ----
+  const X0=70,X1=560,Y0=300,Y1=70;
+  const xmin=-4.2,xmax=3.4,ymax=1.30;
+  const sx=x=>X0+((x-xmin)/(xmax-xmin))*(X1-X0);
+  const sy=y=>Y0-(y/ymax)*(Y0-Y1);
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=-4;g<=3;g+=1){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  // histogram bars
+  const bw=0.28;
+  for(let x=xmin;x<xmax-0.001;x+=bw){
+    const h=qfr_pdf(x+bw/2);
+    const inTail = (x+bw/2) <= qfr_VAR;
+    // reveal the tail highlight progressively via s.tail (0..1): fills from VaR leftward
+    let hl=0;
+    if(inTail){
+      const depth=(qfr_VAR-(x+bw/2))/(qfr_VAR-xmin); // 0 at VaR .. 1 at far left
+      hl = s.tail>=depth?1:0;
+    }
+    ctx.fillStyle = inTail && hl ? "rgba(212,106,98,0.55)" : "rgba(124,141,165,0.35)";
+    ctx.strokeStyle = inTail && hl ? F.wrong : "#3A4C68";
+    ctx.lineWidth=1;
+    const px=sx(x),pw=sx(x+bw)-sx(x),py=sy(h),ph=Y0-sy(h);
+    ctx.fillRect(px,py,pw-1,ph);
+    ctx.strokeRect(px,py,pw-1,ph);
+  }
+  // VaR quantile line
+  ctx.strokeStyle=F.post;ctx.lineWidth=2;ctx.setLineDash([6,4]);
+  ctx.beginPath();ctx.moveTo(sx(qfr_VAR),Y1);ctx.lineTo(sx(qfr_VAR),Y0);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=F.post;ctx.textAlign="center";
+  ctx.fillText("VaR 5%",sx(qfr_VAR),Y1-8);
+  // CVaR line (deeper — average loss beyond VaR)
+  ctx.strokeStyle=F.wrong;ctx.lineWidth=2;ctx.setLineDash([2,3]);
+  ctx.beginPath();ctx.moveTo(sx(qfr_CVAR),Y1+20);ctx.lineTo(sx(qfr_CVAR),Y0);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=F.wrong;ctx.fillText("CVaR",sx(qfr_CVAR),Y1+14);
+  // axis label
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("return  (std. deviations from mean)",(X0+X1)/2,Y0+26);
+  ctx.textAlign="left";ctx.fillStyle="#9FB0C4";
+  ctx.fillText("loss ←",X0,Y0+26);
+
+  // ---- Inset: equity curve with max drawdown (right ~30%) ----
+  const IX0=630,IX1=850,IY0=300,IY1=110;
+  const emin=0.9,emax=1.65;
+  const isx=t=>IX0+t*(IX1-IX0);
+  const isy=v=>IY0-((v-emin)/(emax-emin))*(IY0-IY1);
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(IX0,IY0);ctx.lineTo(IX1,IY0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(IX0,IY1);ctx.lineTo(IX0,IY0);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("equity curve",(IX0+IX1)/2,IY1-14);
+  // curve
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.2;ctx.beginPath();
+  for(let t=0;t<=1.001;t+=0.01){const px=isx(t),py=isy(qfr_eq(t));if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  // drawdown measure: peak -> trough vertical bracket, revealed via s.dd (0..1)
+  if(s.dd>0){
+    const pv=qfr_eq(qfr_PEAK_T), tv=qfr_eq(qfr_TROUGH_T);
+    const curV = pv + (tv-pv)*s.dd;
+    const xdd = isx(qfr_TROUGH_T);
+    // peak reference line
+    ctx.strokeStyle="#5FBF95";ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(isx(qfr_PEAK_T),isy(pv));ctx.lineTo(xdd,isy(pv));ctx.stroke();
+    ctx.setLineDash([]);
+    // the drop arrow
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=2.2;
+    ctx.beginPath();ctx.moveTo(xdd,isy(pv));ctx.lineTo(xdd,isy(curV));ctx.stroke();
+    // arrowhead
+    ctx.beginPath();ctx.moveTo(xdd,isy(curV));ctx.lineTo(xdd-4,isy(curV)-7);ctx.lineTo(xdd+4,isy(curV)-7);ctx.closePath();
+    ctx.fillStyle=F.wrong;ctx.fill();
+    const ddPct=((tv-pv)/pv*100)*s.dd;
+    ctx.fillStyle=F.wrong;ctx.textAlign="left";
+    ctx.fillText("maxDD "+ddPct.toFixed(0)+"%",xdd+8,isy((pv+curV)/2));
+  }
+  ctx.textAlign="left";
+}
+
+ANIMS.qf_risk_static=(cv,ctx)=>qfr_draw(ctx,cv,{tail:1,dd:1});
+ANIMS.qf_risk=async(cv,ctx)=>{
+  qfr_draw(ctx,cv,{tail:0,dd:0});
+  await narrate("Volatility measures how much returns swing around their average — but it treats gains and losses the same.");
+  await narrate("Value-at-Risk marks a quantile: with 95% confidence, losses stay above this line.");
+  await tween(1400,k=>qfr_draw(ctx,cv,{tail:k,dd:0}));
+  await narrate("But VaR is silent about the tail beyond it — CVaR, the average loss once you breach VaR, measures how bad the bad days get.");
+  await tween(1600,k=>qfr_draw(ctx,cv,{tail:1,dd:k}));
+  await narrate("Drawdown captures a fourth face: the worst peak-to-trough drop your capital actually lived through.");
+  await narrate("Each measure hides what another catches — read them together, never one alone.");
+};
+})();
+/* ---- frag_qf_frontier.js ---- */
+/* portfolio theory / qf_frontier */
+(function(){
+// Efficient frontier: risk (x) vs expected return (y), an upward-bending curve.
+// y = a + b*sqrt(x - x0)  gives the classic concave hyperbola-like top edge.
+const qff_front=(x)=>4.0 + 5.4*Math.sqrt(Math.max(0,(x-6.0)/14.0));
+// Two "optimal" (max-Sharpe / tangency) points for base vs perturbed inputs.
+// A tiny nudge to expected-return inputs swings the optimum far along the curve.
+const qff_OPT_BASE={x:9.5};
+const qff_OPT_PERT={x:16.8};
+
+function qff_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=680,Y0=310,Y1=60;
+  const xmin=6.0,xmax=22.0,ymin=3.0,ymax=10.5;
+  const sx=x=>X0+((x-xmin)/(xmax-xmin))*(X1-X0);
+  const sy=y=>Y0-((y-ymin)/(ymax-ymin))*(Y0-Y1);
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=8;g<=22;g+=4){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  for(let g=4;g<=10;g+=2){ctx.beginPath();ctx.moveTo(X0,sy(g));ctx.lineTo(X1,sy(g));ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("risk  (annualized volatility, %)",(X0+X1)/2,Y0+28);
+  ctx.save();ctx.translate(X0-46,(Y0+Y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("expected return (%)",0,0);ctx.restore();
+
+  // scatter of feasible portfolios (cloud below the frontier) — fixed, illustrative
+  ctx.fillStyle="rgba(124,141,165,0.30)";
+  const seed=[[10,4.4],[12,5.2],[9,4.0],[14,5.0],[16,6.1],[11,4.9],[13,5.6],[15,5.5],
+              [18,6.6],[17,6.0],[19,6.9],[20,6.7],[8.5,3.9],[12.5,5.0],[14.5,5.7],[16.5,6.2]];
+  for(const p of seed){ctx.beginPath();ctx.arc(sx(p[0]),sy(p[1]),3,0,7);ctx.fill();}
+
+  // frontier curve, drawn up to s.grow (0..1)
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2.6;ctx.beginPath();
+  const xend=xmin+ (xmax-xmin)*Math.max(0.02,s.grow);
+  let started=false;
+  for(let x=xmin;x<=xend+0.001;x+=0.1){
+    const px=sx(x),py=sy(qff_front(x));
+    if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  if(s.grow>=0.999){
+    ctx.fillStyle=F.ax;ctx.textAlign="left";
+    ctx.fillText("efficient frontier",sx(20.4)+4,sy(qff_front(20.4))-2);
+  }
+
+  // optimal point: interpolate base -> perturbed by s.swing (0..1)
+  if(s.showOpt){
+    const ox=qff_OPT_BASE.x+(qff_OPT_PERT.x-qff_OPT_BASE.x)*s.swing;
+    const oy=qff_front(ox);
+    // ghost of the base optimum while swinging
+    if(s.swing>0){
+      ctx.strokeStyle="rgba(232,161,60,0.35)";ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(sx(qff_OPT_BASE.x),sy(qff_front(qff_OPT_BASE.x)),7,0,7);ctx.stroke();
+    }
+    ctx.fillStyle=F.post;
+    ctx.beginPath();ctx.arc(sx(ox),sy(oy),7,0,7);ctx.fill();
+    ctx.strokeStyle="#0F1A2C";ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(sx(ox),sy(oy),7,0,7);ctx.stroke();
+    ctx.fillStyle=F.post;ctx.textAlign="center";
+    ctx.fillText('"optimal" portfolio',sx(ox),sy(oy)-14);
+  }
+
+  // ---- input panel on the right: expected-return estimates + the nudge ----
+  const PX=720, PY=90;
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("μ̂ inputs",PX,PY-14);
+  const assets=["A","B","C"];
+  const base=[6.8,7.4,7.1];
+  for(let i=0;i<assets.length;i++){
+    const yy=PY+i*30;
+    const bump = i===1 ? 0.3*s.swing : 0.0; // nudge only asset B by +0.3%
+    ctx.fillStyle="#9FB0C4";
+    ctx.fillText(assets[i]+":",PX,yy);
+    ctx.fillStyle = bump>0.01 ? F.wrong : F.txt;
+    ctx.fillText((base[i]+bump).toFixed(1)+"%",PX+28,yy);
+    if(i===1){
+      ctx.fillStyle=F.wrong;ctx.font="12px 'IBM Plex Mono'";
+      ctx.fillText(s.swing>0.01?"+0.3":"",PX+80,yy);
+      ctx.font="14px 'IBM Plex Mono'";
+    }
+  }
+  ctx.textAlign="left";
+}
+
+ANIMS.qf_frontier_static=(cv,ctx)=>qff_draw(ctx,cv,{grow:1,showOpt:true,swing:0});
+ANIMS.qf_frontier=async(cv,ctx)=>{
+  qff_draw(ctx,cv,{grow:0,showOpt:false,swing:0});
+  await narrate("Every dot is a possible portfolio; mean-variance optimization traces the best return you can get at each level of risk.");
+  await tween(1600,k=>qff_draw(ctx,cv,{grow:k,showOpt:false,swing:0}));
+  qff_draw(ctx,cv,{grow:1,showOpt:true,swing:0});
+  await narrate("On that efficient frontier, the optimizer picks one 'best' portfolio from your estimated returns.");
+  await narrate("Now nudge just one expected-return input by three-tenths of a percent — well inside estimation error.");
+  await tween(1600,k=>qff_draw(ctx,cv,{grow:1,showOpt:true,swing:k}));
+  await narrate("The 'optimal' answer lurches across the frontier — MVO amplifies tiny input errors, so it maximizes estimation error.");
+};
+})();
+/* ---- frag_qf_research.js ---- */
+/* honest research / qf_research */
+(function(){
+// In-sample: a curve tortured to fit noise — climbs beautifully to the split.
+// Out-of-sample: the same "edge" continues, but it decays / falls apart.
+const qfh_SPLIT=0.60; // holdout boundary as a fraction of the time axis
+// deterministic pseudo-noise so the wiggles look like real equity, no Math.random at draw time
+const qfh_noise=(t)=>0.30*Math.sin(t*23.0)+0.18*Math.sin(t*57.0+1.3)+0.10*Math.sin(t*97.0+0.7);
+// in-sample fitted equity: strong upward climb + the noise it overfits
+const qfh_inSample=(t)=>1.00 + 1.35*t + 0.16*qfh_noise(t);
+// out-of-sample truth: flat-to-declining once the overfit edge stops working
+const qfh_oos=(t)=>{ // t from SPLIT..1
+  const v0=qfh_inSample(qfh_SPLIT);
+  return v0 - 0.85*(t-qfh_SPLIT) + 0.14*qfh_noise(t+3.0);
+};
+
+function qfh_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,Y0=310,Y1=60;
+  const ymin=0.7,ymax=2.6;
+  const sx=t=>X0+t*(X1-X0);
+  const sy=v=>Y0-((v-ymin)/(ymax-ymin))*(Y0-Y1);
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0.2;g<=1.0;g+=0.2){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  // shade the holdout region
+  ctx.fillStyle="rgba(212,106,98,0.06)";
+  ctx.fillRect(sx(qfh_SPLIT),Y1,sx(1)-sx(qfh_SPLIT),Y0-Y1);
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("time",(X0+X1)/2,Y0+26);
+  ctx.save();ctx.translate(X0-46,(Y0+Y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("cumulative return",0,0);ctx.restore();
+
+  // split line
+  ctx.strokeStyle=F.post;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(sx(qfh_SPLIT),Y1);ctx.lineTo(sx(qfh_SPLIT),Y0);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=F.post;ctx.textAlign="center";
+  ctx.fillText("holdout split",sx(qfh_SPLIT),Y1-8);
+
+  // region labels
+  ctx.fillStyle="#9FB0C4";ctx.textAlign="center";
+  ctx.fillText("in-sample (fitted)",sx(qfh_SPLIT/2),Y1+16);
+  if(s.oos>0.02) ctx.fillText("out-of-sample (holdout)",sx((qfh_SPLIT+1)/2),Y1+16);
+
+  // in-sample curve, drawn up to s.fit (0..1) of the in-sample span
+  ctx.strokeStyle=F.ok;ctx.lineWidth=2.6;ctx.beginPath();
+  const tfit=qfh_SPLIT*Math.max(0.02,s.fit);
+  let started=false;
+  for(let t=0;t<=tfit+0.0001;t+=0.004){
+    const px=sx(t),py=sy(qfh_inSample(t));
+    if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  // out-of-sample curve, revealed by s.oos (0..1) of the holdout span
+  if(s.oos>0){
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=2.6;ctx.beginPath();
+    const tend=qfh_SPLIT+(1-qfh_SPLIT)*s.oos;
+    let st2=false;
+    for(let t=qfh_SPLIT;t<=tend+0.0001;t+=0.004){
+      const px=sx(t),py=sy(qfh_oos(t));
+      if(!st2){ctx.moveTo(px,py);st2=true;}else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    // dot + label at the OOS frontier
+    const tv=qfh_SPLIT+(1-qfh_SPLIT)*s.oos, vv=qfh_oos(tv);
+    ctx.fillStyle=F.wrong;ctx.beginPath();ctx.arc(sx(tv),sy(vv),4,0,7);ctx.fill();
+  }
+  ctx.textAlign="left";
+}
+
+ANIMS.qf_research_static=(cv,ctx)=>qfh_draw(ctx,cv,{fit:1,oos:1});
+ANIMS.qf_research=async(cv,ctx)=>{
+  qfh_draw(ctx,cv,{fit:0,oos:0});
+  await narrate("Tune a strategy hard enough on past data and its backtest can be made to climb almost perfectly.");
+  await tween(1700,k=>qfh_draw(ctx,cv,{fit:k,oos:0}));
+  await narrate("But that curve is fitted to noise — the model memorized this exact history, not a real edge.");
+  await narrate("The honest test: hold out data the model never saw, and run it forward past the split line.");
+  await tween(1700,k=>qfh_draw(ctx,cv,{fit:1,oos:k}));
+  await narrate("Out-of-sample, the 'edge' falls apart — only pre-registered, holdout tests separate skill from curve-fitting.");
+};
+})();
+
+/* ===== batch-2 visuals: etf-basics ===== */
+/* ---- frag_etf_reading.js ---- */
+/* etf-basics / etf_reading */
+(function(){
+const etr_P0=10000, etr_YRS=30, etr_YMAX=80000;
+const etr_lowR=0.0697;   /* 7.00% gross minus 0.03% expense ratio */
+const etr_highR=0.0625;  /* 7.00% gross minus 0.75% expense ratio */
+const etr_val=(r,y)=>etr_P0*Math.pow(1+r,y);
+function etr_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=90,X1=740,Y0=320,Y1=60;
+  const sx=x=>X0+(x/etr_YRS)*(X1-X0);
+  const sy=y=>Y0-(y/etr_YMAX)*(Y0-Y1);
+  /* grid */
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=0;g<=etr_YRS;g+=10){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  for(let v=0;v<=etr_YMAX;v+=20000){ctx.beginPath();ctx.moveTo(X0,sy(v));ctx.lineTo(X1,sy(v));ctx.stroke();}
+  /* axes */
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  /* axis labels */
+  ctx.fillStyle=F.ax;ctx.textAlign="center";
+  for(let g=0;g<=etr_YRS;g+=10)ctx.fillText(g+"y",sx(g),Y0+20);
+  ctx.textAlign="right";
+  for(let v=0;v<=etr_YMAX;v+=20000)ctx.fillText("$"+(v/1000)+"k",X0-8,sy(v)+4);
+  ctx.textAlign="left";ctx.fillStyle=F.txt;ctx.fillText("$10k invested, 7% gross return",X0+8,Y1-8);
+  const yr=s.year;
+  /* shaded gap between the two curves up to yr */
+  ctx.fillStyle="rgba(212,106,98,0.18)";
+  ctx.beginPath();ctx.moveTo(sx(0),sy(etr_val(etr_lowR,0)));
+  for(let x=0;x<=yr+0.001;x+=0.25)ctx.lineTo(sx(x),sy(etr_val(etr_lowR,x)));
+  for(let x=yr;x>=-0.001;x-=0.25)ctx.lineTo(sx(x),sy(etr_val(etr_highR,x)));
+  ctx.closePath();ctx.fill();
+  /* high-fee curve (red = the drag) */
+  ctx.strokeStyle=F.wrong;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let x=0;x<=yr+0.001;x+=0.1){const px=sx(x),py=sy(etr_val(etr_highR,x));if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  /* low-fee curve (green = the keeper) */
+  ctx.strokeStyle=F.ok;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let x=0;x<=yr+0.001;x+=0.1){const px=sx(x),py=sy(etr_val(etr_lowR,x));if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  /* end dots + legend */
+  const lowE=etr_val(etr_lowR,yr), highE=etr_val(etr_highR,yr);
+  ctx.fillStyle=F.ok;ctx.beginPath();ctx.arc(sx(yr),sy(lowE),3.5,0,7);ctx.fill();
+  ctx.fillStyle=F.wrong;ctx.beginPath();ctx.arc(sx(yr),sy(highE),3.5,0,7);ctx.fill();
+  ctx.textAlign="left";
+  ctx.fillStyle=F.ok;ctx.fillText("0.03% fee  $"+lowE.toFixed(0),sx(yr)+8,sy(lowE)-2);
+  ctx.fillStyle=F.wrong;ctx.fillText("0.75% fee  $"+highE.toFixed(0),sx(yr)+8,sy(highE)+16);
+  /* gap label once the fee gap has opened up */
+  if(yr>=6){
+    const gap=lowE-highE, my=(sy(lowE)+sy(highE))/2;
+    ctx.strokeStyle=F.txt;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(sx(yr),sy(lowE));ctx.lineTo(sx(yr),sy(highE));ctx.stroke();
+    ctx.fillStyle=F.txt;ctx.textAlign="right";
+    ctx.fillText("gap $"+gap.toFixed(0),sx(yr)-6,my+4);
+    ctx.textAlign="left";
+  }
+}
+ANIMS.etf_reading_static=(cv,ctx)=>etr_draw(ctx,cv,{year:etr_YRS});
+ANIMS.etf_reading=async(cv,ctx)=>{
+  etr_draw(ctx,cv,{year:0});
+  await narrate("Two funds hold the same thing and earn the same 7% — but one charges 0.03% a year, the other 0.75%.");
+  await narrate("Watch a $10,000 investment grow year by year; the tiny fee difference quietly bends the red curve down.");
+  await tween(3200,k=>etr_draw(ctx,cv,{year:k*etr_YRS}));
+  await narrate("After 30 years the cheaper fund is worth over $13,000 more — the gap is money the fee ate.");
+  await narrate("An expense ratio looks like a rounding error, but it compounds for decades — always read it first.");
+};
+})();
+/* ---- frag_etf_execution.js ---- */
+/* etf-basics / etf_execution */
+(function(){
+const ete_asks=[[50.02,120],[50.04,200],[50.06,260],[50.08,180],[50.10,300]];
+const ete_bids=[[49.98,140],[49.96,220],[49.94,280],[49.92,160],[49.90,260]];
+const ete_BEST_BID=49.98, ete_BEST_ASK=50.02, ete_LIMIT=49.95;
+const ete_PMIN=49.865, ete_PMAX=50.135;
+const ete_Y0=340, ete_Y1=48, ete_BX=150, ete_BMAX=170, ete_SMAX=300, ete_LANE=560;
+const ete_sy=p=>ete_Y0-(p-ete_PMIN)/(ete_PMAX-ete_PMIN)*(ete_Y0-ete_Y1);
+function ete_bar(ctx,p,size,color){
+  const y=ete_sy(p), w=(size/ete_SMAX)*ete_BMAX, h=9;
+  ctx.fillStyle=color;ctx.fillRect(ete_BX,y-h/2,w,h);
+  ctx.fillStyle=F.txt;ctx.textAlign="right";ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillText(p.toFixed(2),ete_BX-8,y+4);
+}
+function ete_token(ctx,p,label,color){
+  const x=ete_LANE,y=ete_sy(p);
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,11,0,7);ctx.fill();
+  ctx.fillStyle="#0F1A2C";ctx.font="bold 12px 'IBM Plex Mono'";ctx.textAlign="center";ctx.fillText("$",x,y+4);
+  ctx.fillStyle=color;ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";ctx.fillText(label,x+18,y+4);
+}
+function ete_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  /* spread band between best bid and best ask */
+  const yTop=ete_sy(ete_BEST_ASK), yBot=ete_sy(ete_BEST_BID);
+  ctx.fillStyle="rgba(124,141,165,0.14)";ctx.fillRect(ete_BX,yTop,700,yBot-yTop);
+  ctx.fillStyle=F.ax;ctx.textAlign="left";ctx.fillText("spread 0.04",ete_LANE+18,(yTop+yBot)/2+4);
+  /* depth bars */
+  for(const[p,sz]of ete_asks)ete_bar(ctx,p,sz,F.wrong);
+  for(const[p,sz]of ete_bids)ete_bar(ctx,p,sz,F.ok);
+  /* headings */
+  ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.fillStyle=F.wrong;ctx.fillText("ASK  (sellers)",ete_BX+ete_BMAX+30,ete_sy(50.10)-2);
+  ctx.fillStyle=F.ok;ctx.fillText("BID  (buyers)",ete_BX+ete_BMAX+30,ete_sy(49.90)+4);
+  ctx.fillStyle=F.txt;ctx.font="14px 'IBM Plex Mono'";ctx.fillText("Order book — price ladder",ete_BX-40,ete_Y1-16);
+  /* limit resting line at 49.95 */
+  if(s.limit){
+    const ly=ete_sy(ete_LIMIT);
+    ctx.strokeStyle=F.ax;ctx.lineWidth=1;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(ete_BX,ly);ctx.lineTo(700,ly);ctx.stroke();ctx.setLineDash([]);
+    ete_token(ctx,ete_LIMIT,"LIMIT 49.95 — waiting",F.ax);
+  }
+  /* market order token */
+  if(s.market){
+    if(s.mkFilled){
+      const fy=ete_sy(ete_BEST_ASK);
+      ctx.strokeStyle=F.ok;ctx.lineWidth=2;ctx.beginPath();ctx.arc(ete_LANE,fy,15,0,7);ctx.stroke();
+      ete_token(ctx,ete_BEST_ASK,"MARKET — FILLED @ 50.02",F.ok);
+    }else{
+      ete_token(ctx,s.mp,"MARKET — crossing…",F.post);
+    }
+  }
+}
+ANIMS.etf_execution_static=(cv,ctx)=>ete_draw(ctx,cv,{});
+ANIMS.etf_execution=async(cv,ctx)=>{
+  ete_draw(ctx,cv,{});
+  await narrate("This is an order book: buyers bid $49.98, sellers ask $50.02 — the 4-cent spread is the gap between them.");
+  await narrate("A market order buys right now by crossing the spread; watch it jump up and fill instantly at the ask.");
+  await tween(1600,k=>ete_draw(ctx,cv,{market:true,mp:49.885+k*(ete_BEST_ASK-49.885)}));
+  ete_draw(ctx,cv,{market:true,mkFilled:true});
+  await narrate("A limit order names your price, say $49.95, and rests below — it fills only if a seller drops to meet it.");
+  ete_draw(ctx,cv,{market:true,mkFilled:true,limit:true});
+  await narrate("So the trade-off is speed versus price: market pays the spread for a sure fill, limit holds out and might not fill.");
+};
+})();
+
+/* ===== batch-2 visuals: portfolios ===== */
+/* ---- frag_port_construction.js ---- */
+/* portfolios / port_construction */
+(function(){
+const pc_names=["Equities","Bonds","Real assets","Cash"];
+const pc_w=[55,30,10,5];                 // policy target weights, % — sum = 100
+const pc_funds=["VTI · VXUS","BND","VNQ · DBC","T-bills"];
+function pc_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const cols=[F.post,F.ax,F.ok,"#C9A24B"];
+  const colX0=170,colW=150,Y0=330,Y1=70,H=Y0-Y1;   // 100% == 260px
+  const scale=H/100;
+  const fill=s.fill;
+  // title
+  ctx.fillStyle=F.txt;ctx.textAlign="left";ctx.font="15px 'IBM Plex Mono'";
+  ctx.fillText("Policy → Positions",colX0-30,44);
+  ctx.font="14px 'IBM Plex Mono'";
+  // baseline
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(colX0-10,Y0);ctx.lineTo(colX0+colW+10,Y0);ctx.stroke();
+  // stack from the bottom up: Cash, Real, Bonds, Equities  (indices 3..0)
+  let bottom=Y0;
+  const centers=[0,0,0,0];
+  for(let k=3;k>=0;k--){
+    const h=pc_w[k]*scale*fill;
+    const top=bottom-h;
+    ctx.fillStyle=cols[k];
+    ctx.fillRect(colX0,top,colW,h);
+    ctx.strokeStyle="#0F1A2C";ctx.lineWidth=1;ctx.strokeRect(colX0,top,colW,h);
+    centers[k]=(top+bottom)/2;
+    bottom=top;
+  }
+  // 100% frame
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  ctx.strokeRect(colX0,Y1,colW,H);
+  ctx.fillStyle=F.ax;ctx.textAlign="right";
+  ctx.fillText("100%",colX0-14,Y1+5);
+  ctx.fillText("0%",colX0-14,Y0+5);
+  // connectors + labels (only once the stack is essentially filled)
+  if(s.showLabels&&fill>0.88){
+    const lx=colX0+colW,tx=lx+70;
+    for(let k=0;k<4;k++){
+      const cy=centers[k];
+      ctx.strokeStyle=cols[k];ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(lx,cy);ctx.lineTo(tx-8,cy);ctx.stroke();
+      ctx.textAlign="left";
+      ctx.fillStyle=F.txt;
+      ctx.fillText(pc_names[k]+"  "+pc_w[k]+"%",tx,cy-3);
+      ctx.fillStyle=s.showFunds?cols[k]:F.ax;
+      ctx.fillText(s.showFunds?("→ "+pc_funds[k]):"target weight",tx,cy+14);
+    }
+  }
+  ctx.textAlign="left";
+}
+ANIMS.port_construction_static=(cv,ctx)=>pc_draw(ctx,cv,{fill:1,showLabels:true,showFunds:false});
+ANIMS.port_construction=async(cv,ctx)=>{
+  pc_draw(ctx,cv,{fill:0,showLabels:false,showFunds:false});
+  await narrate("A portfolio starts from a policy: target weights for each asset class.");
+  await tween(1600,k=>pc_draw(ctx,cv,{fill:k,showLabels:false,showFunds:false}));
+  pc_draw(ctx,cv,{fill:1,showLabels:true,showFunds:false});
+  await narrate("Here the policy is 55% equities, 30% bonds, 10% real assets, 5% cash.");
+  await narrate("Then each target weight gets filled with specific funds that track it.");
+  await tween(600,k=>pc_draw(ctx,cv,{fill:1,showLabels:true,showFunds:true}));
+  await narrate("The result is a real portfolio: policy weights turned into fundable positions.");
+};
+})();
+/* ---- frag_port_commodities.js ---- */
+/* portfolios / port_commodities */
+(function(){
+// both curves expressed as a fraction 0..1 of the plot height, over time t in 0..1
+const pcm_inf=t=>0.34+0.44*Math.exp(-Math.pow((t-0.5)/0.11,2));
+const pcm_com=t=>{
+  const base=0.40+0.42*Math.exp(-Math.pow((t-0.5)/0.085,2));   // correlated spike
+  const noise=0.055*Math.sin(38*t)+0.034*Math.sin(71*t+1.3)+0.02*Math.sin(113*t+0.4);
+  let v=base+noise;
+  if(v<0.06)v=0.06; if(v>0.94)v=0.94;
+  return v;
+};
+function pcm_line(ctx,sx,sy,f,p,col,w){
+  ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();
+  let first=true;
+  for(let t=0;t<=p+1e-9;t+=0.004){
+    const px=sx(t),py=sy(f(t));
+    if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+}
+function pcm_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=70,X1=820,Y0=330,Y1=70;
+  const sx=t=>X0+t*(X1-X0);
+  const sy=f=>Y0-f*(Y0-Y1);
+  // grid
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=1;g<5;g++){const y=Y1+g*(Y0-Y1)/5;ctx.beginPath();ctx.moveTo(X0,y);ctx.lineTo(X1,y);ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="left";
+  ctx.fillText("time →",X1-64,Y0+22);
+  ctx.save();ctx.translate(X0-46,(Y0+Y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.textAlign="center";ctx.fillText("level (indexed)",0,0);ctx.restore();
+  const p=s.p;
+  pcm_line(ctx,sx,sy,pcm_inf,p,F.wrong,2.5);     // inflation
+  pcm_line(ctx,sx,sy,pcm_com,p,F.post,2);        // commodities (choppy)
+  // legend
+  ctx.textAlign="left";ctx.font="13px 'IBM Plex Mono'";
+  ctx.fillStyle=F.wrong;ctx.fillRect(X0+8,Y1-2,16,4);ctx.fillText("Inflation",X0+30,Y1+3);
+  ctx.fillStyle=F.post;ctx.fillRect(X0+130,Y1-2,16,4);ctx.fillText("Commodities",X0+152,Y1+3);
+  ctx.font="14px 'IBM Plex Mono'";
+  // callout on the choppy tail
+  if(s.hi&&p>0.85){
+    ctx.fillStyle=F.txt;ctx.textAlign="right";
+    ctx.fillText("choppy — ends near where it began",X1-6,sy(pcm_com(0.9))-14);
+  }
+  ctx.textAlign="left";
+}
+ANIMS.port_commodities_static=(cv,ctx)=>pcm_draw(ctx,cv,{p:1,hi:true});
+ANIMS.port_commodities=async(cv,ctx)=>{
+  pcm_draw(ctx,cv,{p:0,hi:false});
+  await narrate("Watch inflation (red) and a broad commodities index (orange) over time.");
+  await tween(1500,k=>pcm_draw(ctx,cv,{p:k*0.5,hi:false}));
+  await narrate("When inflation spikes, commodities tend to rise with it — a real inflation hedge.");
+  await tween(1500,k=>pcm_draw(ctx,cv,{p:0.5+k*0.5,hi:false}));
+  await narrate("But the commodities line is choppy and drifts sideways — little real return long-run.");
+  pcm_draw(ctx,cv,{p:1,hi:true});
+  await narrate("So treat commodities as insurance against inflation, not as a growth engine.");
+};
+})();
+/* ---- frag_port_alternatives.js ---- */
+/* portfolios / port_alternatives */
+(function(){
+const pal_N=121;                 // daily "true value" points
+const pal_S=20;                  // reported only every ~20 days (quarterly-ish)
+const pal_rand=i=>{const x=Math.sin(i*12.9898)*43758.5453;return 2*(x-Math.floor(x))-1;};
+// build the jagged TRUE value path (a fund that is actually volatile)
+const pal_path=(function(){
+  const a=[];let v=1.0;
+  for(let i=0;i<pal_N;i++){v*=(1+0.0016+0.03*pal_rand(i));a.push(v);}
+  return a;
+})();
+const pal_min=Math.min.apply(null,pal_path);
+const pal_max=Math.max.apply(null,pal_path);
+function pal_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=70,X1=820,Y0=330,Y1=70;
+  const pad=(pal_max-pal_min)*0.12;
+  const lo=pal_min-pad,hi=pal_max+pad;
+  const sx=i=>X0+(i/(pal_N-1))*(X1-X0);
+  const sy=v=>Y0-((v-lo)/(hi-lo))*(Y0-Y1);
+  // grid + axes
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=1;g<4;g++){const y=Y1+g*(Y0-Y1)/4;ctx.beginPath();ctx.moveTo(X0,y);ctx.lineTo(X1,y);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="left";ctx.fillText("time →",X1-64,Y0+22);
+  ctx.save();ctx.translate(X0-46,(Y0+Y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.textAlign="center";ctx.fillText("value",0,0);ctx.restore();
+  // TRUE jagged path (what daily marks would show)
+  const tn=Math.max(1,Math.round(s.trueP*(pal_N-1)));
+  ctx.strokeStyle="rgba(124,141,165,0.85)";ctx.lineWidth=1.5;ctx.beginPath();
+  for(let i=0;i<=tn;i++){const px=sx(i),py=sy(pal_path[i]);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  // REPORTED smooth path: sparse valuation marks joined by straight lines
+  const marks=[];for(let i=0;i<pal_N;i+=pal_S)marks.push(i);
+  if(marks[marks.length-1]!==pal_N-1)marks.push(pal_N-1);
+  const rp=s.repP;
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.6;ctx.beginPath();
+  const lastX=X0+rp*(X1-X0);
+  let started=false;
+  for(let m=0;m<marks.length;m++){
+    const i=marks[m];const px=sx(i);
+    if(px>lastX+0.5){
+      // interpolate the final visible segment up to lastX
+      const pi=marks[m-1];const ppx=sx(pi);
+      const frac=(lastX-ppx)/(px-ppx);
+      const vy=pal_path[pi]+(pal_path[i]-pal_path[pi])*frac;
+      ctx.lineTo(lastX,sy(vy));break;
+    }
+    const py=sy(pal_path[i]);
+    if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  // valuation dots
+  if(s.repP>=0.999){
+    ctx.fillStyle=F.post;
+    for(let m=0;m<marks.length;m++){const i=marks[m];ctx.beginPath();ctx.arc(sx(i),sy(pal_path[i]),3.2,0,7);ctx.fill();}
+  }
+  // legend + notes
+  ctx.font="13px 'IBM Plex Mono'";ctx.textAlign="left";
+  ctx.strokeStyle="rgba(124,141,165,0.85)";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0+8,Y1-4);ctx.lineTo(X0+30,Y1-4);ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.fillText("true value (daily)",X0+36,Y1-1);
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.6;
+  ctx.beginPath();ctx.moveTo(X0+240,Y1-4);ctx.lineTo(X0+262,Y1-4);ctx.stroke();
+  ctx.fillStyle=F.post;ctx.fillText("private, reported (marked rarely)",X0+268,Y1-1);
+  if(s.note){
+    ctx.fillStyle=F.txt;ctx.textAlign="right";
+    ctx.fillText("smooth ≠ safe · high fees · locked up",X1-6,Y0-10);
+  }
+  ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";
+}
+ANIMS.port_alternatives_static=(cv,ctx)=>pal_draw(ctx,cv,{trueP:1,repP:1,note:true});
+ANIMS.port_alternatives=async(cv,ctx)=>{
+  pal_draw(ctx,cv,{trueP:0,repP:0,note:false});
+  await narrate("This is a fund's real value if it traded every day — genuinely jagged and volatile.");
+  await tween(1500,k=>pal_draw(ctx,cv,{trueP:k,repP:0,note:false}));
+  await narrate("A private fund reports its value only rarely, then draws straight lines between marks.");
+  await tween(1600,k=>pal_draw(ctx,cv,{trueP:1,repP:k,note:false}));
+  await narrate("That smoothing hides the real swings — sometimes called volatility laundering.");
+  pal_draw(ctx,cv,{trueP:1,repP:1,note:true});
+  await narrate("The risk is still there; you also pay higher fees and your money is locked up.");
+};
+})();
+/* ---- frag_port_playbook.js ---- */
+/* portfolios / port_playbook */
+(function(){
+const ppb_names=["Equities","Bonds","Real assets","Cash"];
+const ppb_tgt=[55,30,10,5];       // policy targets, %
+const ppb_drift=[62,24,9,5];      // where weights wander to as markets move (sum 100)
+function ppb_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const bx=250,sc=4.6,Y1=90,rowH=58;   // 100% -> 460px
+  ctx.fillStyle=F.txt;ctx.textAlign="left";ctx.font="15px 'IBM Plex Mono'";
+  ctx.fillText(s.title||"Hold the mix · rebalance the drift",70,44);
+  ctx.font="14px 'IBM Plex Mono'";
+  for(let k=0;k<4;k++){
+    const y=Y1+k*rowH;
+    const w=s.w[k],tg=ppb_tgt[k];
+    // label
+    ctx.fillStyle=F.txt;ctx.textAlign="right";
+    ctx.fillText(ppb_names[k],bx-16,y+5);
+    // track
+    ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+    ctx.strokeRect(bx,y-13,100*sc,26);
+    // current-weight bar
+    const off=w-tg;
+    const col=Math.abs(off)<0.4?F.ax:(off>0?F.post:F.wrong);
+    ctx.fillStyle=col;
+    ctx.fillRect(bx,y-13,w*sc,26);
+    // target tick (dashed)
+    ctx.strokeStyle=F.ok;ctx.lineWidth=2;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(bx+tg*sc,y-18);ctx.lineTo(bx+tg*sc,y+18);ctx.stroke();
+    ctx.setLineDash([]);
+    // weight readout
+    ctx.textAlign="left";ctx.fillStyle=F.txt;
+    ctx.fillText(w.toFixed(0)+"%",bx+100*sc+14,y+5);
+    // drift arrow + delta
+    if(s.arrows&&Math.abs(off)>=0.6){
+      const ax0=bx+tg*sc,ax1=bx+w*sc;const ay=y-24;
+      ctx.strokeStyle=col;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(ax0,ay);ctx.lineTo(ax1,ay);ctx.stroke();
+      const dir=off>0?1:-1;
+      ctx.beginPath();ctx.moveTo(ax1,ay);ctx.lineTo(ax1-dir*6,ay-3);ctx.lineTo(ax1-dir*6,ay+3);ctx.closePath();
+      ctx.fillStyle=col;ctx.fill();
+      ctx.fillText((off>0?"+":"")+off.toFixed(0),ax1+dir*4+(dir>0?2:-18),ay+4);
+    }
+  }
+  // legend
+  ctx.textAlign="left";ctx.font="13px 'IBM Plex Mono'";
+  ctx.strokeStyle=F.ok;ctx.lineWidth=2;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(bx,360);ctx.lineTo(bx+22,360);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=F.ax;ctx.fillText("= target weight (policy)",bx+30,364);
+  ctx.font="14px 'IBM Plex Mono'";ctx.textAlign="left";
+}
+function ppb_mix(a,b,k){return a.map((v,i)=>v+(b[i]-v)*k);}
+ANIMS.port_playbook_static=(cv,ctx)=>ppb_draw(ctx,cv,{w:ppb_mix(ppb_tgt,ppb_drift,0.5),arrows:true});
+ANIMS.port_playbook=async(cv,ctx)=>{
+  ppb_draw(ctx,cv,{w:ppb_tgt.slice(),arrows:false,title:"Start at the target mix"});
+  await narrate("Start with a diversified target mix — the dashed ticks mark each policy weight.");
+  await tween(1600,k=>ppb_draw(ctx,cv,{w:ppb_mix(ppb_tgt,ppb_drift,k),arrows:true,title:"Markets move — weights drift"}));
+  await narrate("As markets move, winners grow and the weights drift away from target.");
+  await narrate("Here equities have run to 62% while bonds slipped to 24% — the mix has changed.");
+  await tween(1200,k=>ppb_draw(ctx,cv,{w:ppb_mix(ppb_drift,ppb_tgt,k),arrows:true,title:"Rebalance back to policy"}));
+  ppb_draw(ctx,cv,{w:ppb_tgt.slice(),arrows:false,title:"Rebalance back to policy"});
+  await narrate("Rebalancing sells a little of what's up and buys what's down, snapping back to target.");
+  await narrate("Hold the mix and rebalance on drift — let diversification and discipline do the work.");
+};
+})();
+
+/* ===== batch-2 visuals: options-iv ===== */
+/* ---- frag_opt_payoff.js ---- */
+/* options / opt_payoff */
+(function(){
+const op_K=100, op_prem=10;
+const op_xmin=60, op_xmax=150, op_ymin=-25, op_ymax=45;
+const op_call=(S)=>Math.max(S-op_K,0)-op_prem;
+const op_put=(S)=>Math.max(op_K-S,0)-op_prem;
+function op_draw(ctx,cv,s){
+  clear(ctx,cv);
+  ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,Y0=330,Y1=70;
+  const sx=x=>X0+((x-op_xmin)/(op_xmax-op_xmin))*(X1-X0);
+  const sy=y=>Y0-((y-op_ymin)/(op_ymax-op_ymin))*(Y0-Y1);
+  const isPut=s.put;
+  const fn=isPut?op_put:op_call;
+  const be=isPut?(op_K-op_prem):(op_K+op_prem);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=op_xmin;g<=op_xmax;g+=10){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,sy(0));ctx.lineTo(X1,sy(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.strokeStyle="#5a6b86";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(sx(op_K),Y1);ctx.lineTo(sx(op_K),Y0);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();
+  let first=true;
+  for(let S=op_xmin;S<=op_xmax+0.001;S+=0.5){const px=sx(S),py=sy(fn(S));if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.fillStyle=F.ok;ctx.beginPath();ctx.arc(sx(be),sy(0),4,0,7);ctx.fill();
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("K = "+op_K,sx(op_K),Y0+18);
+  ctx.fillText("breakeven "+be,sx(be),sy(0)-10);
+  ctx.textAlign="left";
+  ctx.fillText((isPut?"long PUT":"long CALL")+"   premium = "+op_prem,X0+10,Y1-30);
+  ctx.fillStyle="#8a97ab";
+  ctx.textAlign="right";ctx.fillText("stock price at expiry →",X1,Y0+18);
+  ctx.save();ctx.translate(X0-42,(Y0+Y1)/2);ctx.rotate(-Math.PI/2);ctx.textAlign="center";ctx.fillText("profit / loss",0,0);ctx.restore();
+  ctx.textAlign="left";
+  if(s.px!==undefined){
+    const S=s.px, pl=fn(S);
+    ctx.strokeStyle="#5a6b86";ctx.lineWidth=1;ctx.setLineDash([2,3]);
+    ctx.beginPath();ctx.moveTo(sx(S),Y0);ctx.lineTo(sx(S),sy(pl));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=pl>=0?F.ok:F.wrong;ctx.beginPath();ctx.arc(sx(S),sy(pl),5,0,7);ctx.fill();
+    ctx.fillStyle=F.txt;ctx.textAlign="right";
+    ctx.fillText("S = "+S.toFixed(0)+"   P/L = "+(pl>=0?"+":"")+pl.toFixed(0),X1,Y1-10);
+    ctx.textAlign="left";
+  }
+}
+ANIMS.opt_payoff_static=(cv,ctx)=>op_draw(ctx,cv,{});
+ANIMS.opt_payoff=async(cv,ctx)=>{
+  op_draw(ctx,cv,{px:op_xmin});
+  await narrate("A long call's payoff is a kinked line: below the strike you lose only the premium you paid.");
+  await tween(2000,k=>op_draw(ctx,cv,{px:op_xmin+k*(op_xmax-op_xmin)}));
+  await narrate("Above the strike it slopes up one-for-one with the stock, so gains are leveraged and open-ended.");
+  await narrate("You break even once the stock clears the strike plus the premium — here 110.");
+  op_draw(ctx,cv,{put:true,px:op_xmin});
+  await narrate("A long put is the mirror image: it pays off when the stock falls below the strike.");
+  await tween(1600,k=>op_draw(ctx,cv,{put:true,px:op_xmax-k*(op_xmax-op_xmin)}));
+};
+})();
+/* ---- frag_opt_parity.js ---- */
+/* options / opt_parity */
+(function(){
+const opa_K=100;
+const opa_xmin=60, opa_xmax=140, opa_ymin=-45, opa_ymax=45;
+const opa_call=(S)=>Math.max(S-opa_K,0);
+const opa_sput=(S)=>-Math.max(opa_K-S,0);
+const opa_sum=(S)=>opa_call(S)+opa_sput(S);
+function opa_axes(ctx,sx,sy,X0,X1,Y0,Y1){
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=opa_xmin;g<=opa_xmax;g+=10){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,sy(0));ctx.lineTo(X1,sy(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.strokeStyle="#5a6b86";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(sx(opa_K),Y1);ctx.lineTo(sx(opa_K),Y0);ctx.stroke();ctx.setLineDash([]);
+}
+function opa_curve(ctx,fn,sx,sy,color,w){
+  ctx.strokeStyle=color;ctx.lineWidth=w;ctx.beginPath();let f=true;
+  for(let S=opa_xmin;S<=opa_xmax+0.001;S+=0.5){const px=sx(S),py=sy(fn(S));if(f){ctx.moveTo(px,py);f=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+}
+function opa_draw(ctx,cv,s){
+  clear(ctx,cv);ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,Y0=330,Y1=70;
+  const sx=x=>X0+((x-opa_xmin)/(opa_xmax-opa_xmin))*(X1-X0);
+  const sy=y=>Y0-((y-opa_ymin)/(opa_ymax-opa_ymin))*(Y0-Y1);
+  opa_axes(ctx,sx,sy,X0,X1,Y0,Y1);
+  const ph=s.phase===undefined?3:s.phase;
+  if(ph>=1) opa_curve(ctx,opa_call,sx,sy,F.ax,2);
+  if(ph>=2) opa_curve(ctx,opa_sput,sx,sy,F.wrong,2);
+  if(ph>=3){
+    const frac=s.frac===undefined?1:s.frac;
+    ctx.strokeStyle=F.post;ctx.lineWidth=3;ctx.beginPath();let f=true;
+    const Smax=opa_xmin+frac*(opa_xmax-opa_xmin);
+    for(let S=opa_xmin;S<=Smax+0.001;S+=0.5){const px=sx(S),py=sy(opa_sum(S));if(f){ctx.moveTo(px,py);f=false;}else ctx.lineTo(px,py);}
+    ctx.stroke();
+  }
+  ctx.fillStyle=F.txt;ctx.textAlign="left";
+  ctx.fillText("K = "+opa_K,sx(opa_K)+6,Y1+14);
+  if(ph>=1){ctx.fillStyle=F.ax;ctx.fillText("long call",sx(128),sy(opa_call(128))-8);}
+  if(ph>=2){ctx.fillStyle=F.wrong;ctx.fillText("short put",sx(64),sy(opa_sput(64))-8);}
+  if(ph>=3){ctx.fillStyle=F.post;ctx.fillText("call − put = synthetic long stock",sx(104),sy(opa_sum(126)));}
+  ctx.fillStyle="#8a97ab";ctx.textAlign="right";ctx.fillText("stock price at expiry →",X1,Y0+18);
+  ctx.textAlign="left";
+}
+ANIMS.opt_parity_static=(cv,ctx)=>opa_draw(ctx,cv,{});
+ANIMS.opt_parity=async(cv,ctx)=>{
+  opa_draw(ctx,cv,{phase:1});
+  await narrate("Start with a long call: it pays nothing below the strike and rises above it.");
+  opa_draw(ctx,cv,{phase:2});
+  await narrate("Add a short put: you collected a premium, so you lose as the stock falls below the strike.");
+  await tween(2000,k=>opa_draw(ctx,cv,{phase:3,frac:k}));
+  await narrate("Their payoffs add to a straight 45-degree line — the same as simply owning the stock.");
+  await narrate("So a call minus a put equals the stock minus the discounted strike: put-call parity.");
+};
+})();
+/* ---- frag_opt_bs_heat.js ---- */
+/* options / opt_bs_heat */
+(function(){
+const obh_K=100, obh_vol=0.3, obh_r=0;
+const obh_xmin=60, obh_xmax=140, obh_ymin=0, obh_ymax=45;
+const obh_intrinsic=(S)=>Math.max(S-obh_K,0);
+function obh_ncdf(x){
+  const k=1/(1+0.2316419*Math.abs(x));
+  const a1=0.319381530,a2=-0.356563782,a3=1.781477937,a4=-1.821255978,a5=1.330274429;
+  const w=1-(1/Math.sqrt(2*Math.PI))*Math.exp(-x*x/2)*(((((a5*k+a4)*k+a3)*k+a2)*k+a1)*k);
+  return x>=0?w:1-w;
+}
+const obh_bs=(S,T)=>{
+  if(T<=1e-6) return obh_intrinsic(S);
+  const v=obh_vol*Math.sqrt(T);
+  const d1=(Math.log(S/obh_K)+(obh_r+0.5*obh_vol*obh_vol)*T)/v;
+  const d2=d1-v;
+  return S*obh_ncdf(d1)-obh_K*Math.exp(-obh_r*T)*obh_ncdf(d2);
+};
+function obh_draw(ctx,cv,s){
+  clear(ctx,cv);ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,Y0=330,Y1=70;
+  const sx=x=>X0+((x-obh_xmin)/(obh_xmax-obh_xmin))*(X1-X0);
+  const sy=y=>Y0-((y-obh_ymin)/(obh_ymax-obh_ymin))*(Y0-Y1);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=obh_xmin;g<=obh_xmax;g+=10){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.strokeStyle="#5a6b86";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(sx(obh_K),Y1);ctx.lineTo(sx(obh_K),Y0);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=F.ax;ctx.lineWidth=2;ctx.beginPath();let f=true;
+  for(let S=obh_xmin;S<=obh_xmax+0.001;S+=0.5){const px=sx(S),py=sy(obh_intrinsic(S));if(f){ctx.moveTo(px,py);f=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+  const T=s.T===undefined?1.0:s.T;
+  ctx.strokeStyle=F.post;ctx.lineWidth=2.5;ctx.beginPath();f=true;
+  for(let S=obh_xmin;S<=obh_xmax+0.001;S+=0.5){const px=sx(S),py=sy(Math.min(obh_bs(S,T),obh_ymax));if(f){ctx.moveTo(px,py);f=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.fillStyle=F.ax;ctx.textAlign="left";ctx.fillText("payoff at expiry (kink)",sx(120),sy(obh_intrinsic(120))+16);
+  ctx.fillStyle=F.post;ctx.fillText("value before expiry (smoothed)",sx(62),sy(obh_bs(62,T))-10);
+  ctx.fillStyle=F.txt;ctx.textAlign="center";ctx.fillText("K = "+obh_K,sx(obh_K),Y0+18);
+  ctx.textAlign="right";ctx.fillStyle="#8a97ab";ctx.fillText("time to expiry = "+T.toFixed(2)+" yr",X1,Y1-8);
+  ctx.textAlign="left";
+}
+ANIMS.opt_bs_heat_static=(cv,ctx)=>obh_draw(ctx,cv,{T:1.0});
+ANIMS.opt_bs_heat=async(cv,ctx)=>{
+  obh_draw(ctx,cv,{T:0.02});
+  await narrate("At expiry an option is worth its payoff exactly: a sharp kink at the strike.");
+  await tween(2200,k=>obh_draw(ctx,cv,{T:0.02+k*1.98}));
+  await narrate("With time left, uncertainty rounds that corner off — the value curve lifts and smooths.");
+  await narrate("More time to expiry means more diffusion, spreading the payoff just like heat spreads.");
+  await tween(1800,k=>obh_draw(ctx,cv,{T:2.0-k*1.98}));
+  await narrate("As expiry approaches the smoothing vanishes and the curve snaps back to the kink.");
+};
+})();
+/* ---- frag_opt_structures.js ---- */
+/* options / opt_structures */
+(function(){
+const ostr_K1=100, ostr_K2=120, ostr_c1=10, ostr_c2=3;
+const ostr_net=ostr_c1-ostr_c2;
+const ostr_xmin=80, ostr_xmax=140, ostr_ymin=-15, ostr_ymax=20;
+const ostr_long=(S)=>Math.max(S-ostr_K1,0)-ostr_c1;
+const ostr_short=(S)=>ostr_c2-Math.max(S-ostr_K2,0);
+const ostr_netfn=(S)=>ostr_long(S)+ostr_short(S);
+function ostr_curve(ctx,fn,sx,sy,color,w,dash){
+  ctx.strokeStyle=color;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();let f=true;
+  for(let S=ostr_xmin;S<=ostr_xmax+0.001;S+=0.5){const px=sx(S),py=sy(fn(S));if(f){ctx.moveTo(px,py);f=false;}else ctx.lineTo(px,py);}
+  ctx.stroke();ctx.setLineDash([]);
+}
+function ostr_draw(ctx,cv,s){
+  clear(ctx,cv);ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,Y0=330,Y1=70;
+  const sx=x=>X0+((x-ostr_xmin)/(ostr_xmax-ostr_xmin))*(X1-X0);
+  const sy=y=>Y0-((y-ostr_ymin)/(ostr_ymax-ostr_ymin))*(Y0-Y1);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=ostr_xmin;g<=ostr_xmax;g+=10){ctx.beginPath();ctx.moveTo(sx(g),Y1);ctx.lineTo(sx(g),Y0);ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,sy(0));ctx.lineTo(X1,sy(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.strokeStyle="#5a6b86";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  [ostr_K1,ostr_K2].forEach(k=>{ctx.beginPath();ctx.moveTo(sx(k),Y1);ctx.lineTo(sx(k),Y0);ctx.stroke();});
+  ctx.setLineDash([]);
+  const ph=s.phase===undefined?3:s.phase;
+  if(ph>=1) ostr_curve(ctx,ostr_long,sx,sy,F.ax,1.5,[3,3]);
+  if(ph>=2) ostr_curve(ctx,ostr_short,sx,sy,F.wrong,1.5,[3,3]);
+  if(ph>=3){
+    const frac=s.frac===undefined?1:s.frac;
+    ctx.strokeStyle=F.post;ctx.lineWidth=3;ctx.beginPath();let f=true;
+    const Smax=ostr_xmin+frac*(ostr_xmax-ostr_xmin);
+    for(let S=ostr_xmin;S<=Smax+0.001;S+=0.5){const px=sx(S),py=sy(ostr_netfn(S));if(f){ctx.moveTo(px,py);f=false;}else ctx.lineTo(px,py);}
+    ctx.stroke();
+  }
+  ctx.fillStyle=F.txt;ctx.textAlign="center";
+  ctx.fillText("K1 = "+ostr_K1,sx(ostr_K1),Y0+18);
+  ctx.fillText("K2 = "+ostr_K2,sx(ostr_K2),Y0+18);
+  if(ph>=3){
+    const mp=(ostr_K2-ostr_K1)-ostr_net, ml=-ostr_net;
+    ctx.fillStyle=F.ok;ctx.textAlign="left";ctx.fillText("max profit +"+mp,sx(ostr_K2)+6,sy(mp)-6);
+    ctx.fillStyle=F.wrong;ctx.fillText("max loss "+ml,sx(ostr_xmin)+6,sy(ml)-6);
+  }
+  if(ph>=1){ctx.fillStyle=F.ax;ctx.textAlign="left";ctx.fillText("long call K1",X0+10,Y1-8);}
+  if(ph>=2){ctx.fillStyle=F.wrong;ctx.fillText("short call K2",X0+150,Y1-8);}
+  ctx.fillStyle="#8a97ab";ctx.textAlign="right";ctx.fillText("stock price at expiry →",X1,Y1-8);
+  ctx.textAlign="left";
+}
+ANIMS.opt_structures_static=(cv,ctx)=>ostr_draw(ctx,cv,{});
+ANIMS.opt_structures=async(cv,ctx)=>{
+  ostr_draw(ctx,cv,{phase:1});
+  await narrate("Buy a call at the lower strike K1: it costs premium and pays off as the stock rises.");
+  ostr_draw(ctx,cv,{phase:2});
+  await narrate("Sell a call at the higher strike K2: that premium cuts your cost but caps your upside.");
+  await tween(2000,k=>ostr_draw(ctx,cv,{phase:3,frac:k}));
+  await narrate("The net is a bull call spread: it ramps between the strikes, then flattens at a fixed maximum.");
+  await narrate("Both the most you can lose and the most you can make are known in advance.");
+};
+})();
+/* ---- frag_opt_failure.js ---- */
+/* options / opt_failure */
+(function(){
+const ofa_eq=(function(){
+  const arr=[]; let e=100;
+  for(let i=0;i<=44;i++){ arr.push(e); e+=1.1+0.25*Math.sin(i*0.7); }
+  arr.push(e); e-=42; arr.push(e);
+  for(let i=0;i<14;i++){ arr.push(e); e+=0.8; }
+  return arr;
+})();
+const ofa_n=ofa_eq.length-1;
+const ofa_emin=50, ofa_emax=160;
+function ofa_draw(ctx,cv,s){
+  clear(ctx,cv);ctx.font="14px 'IBM Plex Mono'";
+  const X0=80,X1=820,Y0=330,Y1=70;
+  const sx=i=>X0+(i/ofa_n)*(X1-X0);
+  const sy=y=>Y0-((y-ofa_emin)/(ofa_emax-ofa_emin))*(Y0-Y1);
+  ctx.strokeStyle="#22314a";ctx.lineWidth=1;
+  for(let g=60;g<=160;g+=20){ctx.beginPath();ctx.moveTo(X0,sy(g));ctx.lineTo(X1,sy(g));ctx.stroke();}
+  ctx.strokeStyle="#3A4C68";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X1,Y0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();
+  ctx.strokeStyle="#5a6b86";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(X0,sy(100));ctx.lineTo(X1,sy(100));ctx.stroke();ctx.setLineDash([]);
+  const prog=s.prog===undefined?1:s.prog;
+  const shown=Math.max(1,Math.round(prog*ofa_n));
+  ctx.strokeStyle=F.ok;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let i=0;i<=shown;i++){const px=sx(i),py=sy(ofa_eq[i]);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+  ctx.stroke();
+  if(shown>=46){
+    ctx.strokeStyle=F.wrong;ctx.lineWidth=3;ctx.beginPath();
+    ctx.moveTo(sx(45),sy(ofa_eq[45]));ctx.lineTo(sx(46),sy(ofa_eq[46]));ctx.stroke();
+  }
+  const hi=Math.min(shown,ofa_n);
+  ctx.fillStyle=F.txt;ctx.beginPath();ctx.arc(sx(hi),sy(ofa_eq[hi]),4,0,7);ctx.fill();
+  ctx.fillStyle="#8a97ab";ctx.textAlign="left";ctx.fillText("start = 100",X0+8,sy(100)-6);
+  ctx.fillStyle=F.txt;ctx.fillText("equity (premium-selling strategy)",X0+8,Y1-8);
+  ctx.textAlign="right";ctx.fillStyle="#8a97ab";ctx.fillText("time →",X1,Y0+18);
+  if(shown>=47){ctx.fillStyle=F.wrong;ctx.textAlign="center";ctx.fillText("volatility gap: months erased",sx(46),sy(ofa_eq[46])+24);}
+  ctx.textAlign="left";
+}
+ANIMS.opt_failure_static=(cv,ctx)=>ofa_draw(ctx,cv,{});
+ANIMS.opt_failure=async(cv,ctx)=>{
+  ofa_draw(ctx,cv,{prog:0.02});
+  await narrate("Selling options collects a small premium over and over — the equity curve grinds steadily up.");
+  await tween(2400,k=>ofa_draw(ctx,cv,{prog:0.02+k*0.63}));
+  await narrate("It looks like a smooth, low-risk moneymaker, so the position often gets bigger over time.");
+  await tween(900,k=>ofa_draw(ctx,cv,{prog:0.65+k*0.12}));
+  await narrate("Then the market gaps and one move erases months of gains — that is negative convexity.");
+  await tween(1400,k=>ofa_draw(ctx,cv,{prog:0.77+k*0.23}));
+  await narrate("Steady pennies in front of a rare steamroller is how option sellers actually blow up.");
+};
+})();
+
 </script>
 </body>
 </html>
