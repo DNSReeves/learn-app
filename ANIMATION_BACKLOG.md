@@ -1,5 +1,8 @@
 # Animation backlog — P1.3 coverage pass (2026-07-25, iss_eb4f851e)
 
+> ## ▶▶ COMPLETE (2026-08-01) — 100% VISUAL COVERAGE
+> The batch-2 visual-aids programme closed this backlog out. **Every one of the 195 concepts now carries a bespoke animated, voice-narrated canvas (192 distinct animations) — coverage 100%.** The final push added **73 animations** across Mathematics, AI/ML, Investing & Finance, Health & Medicine, Physics, and Genetics, built by parallel authoring agents (fragment-author → merge-verify) and browser-verified (static frames paint + runners play, 0 page errors) before each commit. The declarative-vs-imperative decision record below stays the standing build guidance. The status block that follows is the earlier (64%) snapshot, kept for history.
+
 > ## ▶ STATUS (2026-07-26) — backlog largely DELIVERED
 > The list below was the *plan*; most of it has shipped. Current state:
 > - **Coverage ~18% → 64%** (72 of 112 concepts carry a bespoke animation) — the

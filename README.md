@@ -1,7 +1,7 @@
 # Learn
 
 Mastery-based learning dashboard. Multi-user, extensible to any topic, all data local.
-First topic: **Bayesian Inference** (10 gated concepts, 30 checkpoint questions, 4 narrated animations, 15 vetted resources).
+A growing library: **22 topics across 5 categories** (Investing & Finance · AI & Machine Learning · Health & Medicine · Mathematics · Physics & Engineering) — **195 gated concepts, 664 checkpoint questions, and every concept carrying an animated, voice-narrated canvas** (192 distinct animations; Kokoro TTS). Started as a single Bayesian-Inference topic and generalized to any subject — drop a JSON pack in `topics/` and it appears on the dashboard. (The managed service runs on `:8801`; the `--port 8090` below is the manual-run example.)
 
 ## Run
 
