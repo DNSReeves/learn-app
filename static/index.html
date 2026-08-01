@@ -6018,6 +6018,249 @@ ANIMS._pf_debug={flRatioHi:FL.hi.ratio,flRatioMid:FL.mid.ratio,flRatioLo:FL.lo.r
   caEqCrash:CA.eq[CA.c1]/CA.eq[CA.c0]-1,alR2:AL.r2};
 })();
 
+
+/* ── GENETICS anims (2026-08-01, operator-requested module) ───────────────────
+   House rules obeyed here: append-only, canvas 900×380, the F palette, narrate()
+   for the spoken line, REDUCED-motion safe via tween()/sleep(). And the lesson the
+   TA module taught the hard way — every number spoken is COMPUTED from the data
+   that is actually drawn (see ANIMS._gen_debug at the end), never hardcoded prose,
+   so a retune can't leave the narration lying. */
+const GEN = (()=>{
+  /* Punnett: two carriers (Aa × Aa). Counts are derived, not asserted. */
+  const punnett = (p1,p2)=>{
+    const cells=[]; for(const a of p1) for(const b of p2) cells.push([a,b].sort().join(""));
+    const aff=cells.filter(c=>c==="aa").length, car=cells.filter(c=>c==="Aa").length;
+    return {cells, aff, car, clear:cells.length-aff-car, n:cells.length};
+  };
+  /* Polygenic: N loci, each ±small effect, summed over a population. A bell curve
+     is the CONSEQUENCE of adding many small independent effects, not an assumption —
+     so we actually add them, with a fixed seed for determinism. */
+  const lcg=s=>()=>((s=(s*1103515245+12345)&0x7fffffff)/0x7fffffff);
+  const polyscores=(nLoci,nPeople,seed)=>{
+    const r=lcg(seed), out=[];
+    for(let i=0;i<nPeople;i++){ let s=0;
+      for(let k=0;k<nLoci;k++) s += (r()<0.5?0:1)+(r()<0.5?0:1);   // two alleles per locus
+      out.push(s); }
+    return out;
+  };
+  const hist=(xs)=>{ const h={}; xs.forEach(x=>h[x]=(h[x]||0)+1); return h; };
+  const pctile=(xs,p)=>{ const s=xs.slice().sort((a,b)=>a-b); return s[Math.floor(p*(s.length-1))]; };
+  /* Bayes on a genetic test — the numbers a real report hides behind "positive". */
+  const bayes=(prev,sens,spec,N)=>{
+    const dis=Math.round(N*prev), well=N-dis;
+    const tp=Math.round(dis*sens), fn=dis-tp;
+    const fp=Math.round(well*(1-spec)), tn=well-fp;
+    return {N,dis,well,tp,fn,fp,tn,ppv:tp/(tp+fp)};
+  };
+  const P = punnett(["A","a"],["A","a"]);
+  const SCORES = polyscores(20, 4000, 7);
+  const H = hist(SCORES);
+  const TOPDEC = pctile(SCORES, 0.90);
+  /* Scores are DISCRETE, so a cut at the 90th percentile sweeps in everyone tied at
+     that value — here that is more than a tenth of the sample. Say the fraction the
+     picture actually shows rather than the one we asked for. */
+  const TAILN = SCORES.filter(s=>s>=TOPDEC).length;
+  const TAILPCT = Math.round(100*TAILN/SCORES.length);
+  const MEAN = SCORES.reduce((a,b)=>a+b,0)/SCORES.length;
+  const SCREEN = bayes(0.001, 0.99, 0.99, 100000);     // population screening, low prior
+  const DIAG   = bayes(0.50,  0.99, 0.99, 100000);     // strong family history, high prior
+  return {P,SCORES,H,TOPDEC,TAILN,TAILPCT,MEAN,SCREEN,DIAG};
+})();
+
+function genFrame(ctx,title){
+  const cv=ctx.canvas; clear(ctx,cv);
+  ctx.fillStyle=F.txt; ctx.font="600 15px system-ui,sans-serif"; ctx.textAlign="left";
+  ctx.fillText(title,20,26);
+  ctx.strokeStyle="rgba(124,141,165,.25)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(20,36); ctx.lineTo(880,36); ctx.stroke();
+}
+function genText(ctx,t,x,y,color,size,align){
+  ctx.fillStyle=color||F.txt; ctx.font=(size||13)+"px system-ui,sans-serif";
+  ctx.textAlign=align||"left"; ctx.fillText(t,x,y);
+}
+
+/* ── 1. central dogma: DNA → mRNA → protein ─────────────────────────────── */
+function drawDogma(ctx,cv,{stage=0,title}={}){
+  genFrame(ctx,title||"From gene to protein");
+  const bases=["A","T","G","C","A","G","T","C","A","T","G","C"], x0=60, dx=46, yTop=100, yBot=140;
+  // the double helix, drawn flat: two complementary strands
+  const comp={A:"T",T:"A",G:"C",C:"G"};
+  bases.forEach((b,i)=>{
+    const x=x0+i*dx, unzipped = stage>=1 && i < Math.min(bases.length, Math.round(stage>=1?bases.length:0));
+    ctx.strokeStyle="rgba(124,141,165,.5)"; ctx.beginPath();
+    ctx.moveTo(x, yTop+8); ctx.lineTo(x, unzipped? yTop+14 : yBot-8); ctx.stroke();
+    genText(ctx,b,x,yTop,F.prior,13,"center");
+    genText(ctx,comp[b],x,yBot+4,"rgba(124,141,165,.55)",13,"center");
+  });
+  genText(ctx,"DNA",24,yTop+2,F.txt,12);
+  if(stage>=1){                                    // transcription → mRNA (U replaces T)
+    const yR=196;
+    bases.forEach((b,i)=>{ genText(ctx, b==="T"?"U":b, x0+i*dx, yR, F.post,13,"center"); });
+    genText(ctx,"mRNA",20,yR,F.post,12);
+    genText(ctx,"transcription — T becomes U",x0,yR-22,"rgba(232,161,60,.75)",11);
+  }
+  if(stage>=2){                                    // translation → amino acids, 3 bases each
+    const yP=272, aa=["Met","Trp","Ser","His"];
+    aa.forEach((a,i)=>{
+      const x=x0+i*dx*3+dx;
+      ctx.fillStyle=F.ok; ctx.beginPath(); ctx.arc(x,yP,15,0,7); ctx.fill();
+      genText(ctx,a,x,yP+4,"#0d1117",11,"center");
+      if(i) { ctx.strokeStyle=F.ok; ctx.lineWidth=2; ctx.beginPath();
+              ctx.moveTo(x-15,yP); ctx.lineTo(x-dx*3+15,yP); ctx.stroke(); }
+    });
+    genText(ctx,"protein",20,yP+4,F.ok,12);
+    genText(ctx,"translation — every 3 bases (a codon) picks 1 amino acid",x0,yP-34,"rgba(95,191,149,.8)",11);
+  }
+  if(stage>=3){
+    genText(ctx,"12 bases ÷ 3 = 4 amino acids — the code is read in triplets, and it is nearly universal across life",
+            20,344,F.txt,12);
+  }
+}
+ANIMS.gen_dogma_static=(cv,ctx)=>drawDogma(ctx,cv,{stage:0});
+ANIMS.gen_dogma=async(cv,ctx)=>{
+  drawDogma(ctx,cv,{stage:0});
+  await narrate("A gene is a stretch of DNA — two strands whose letters pair off, A with T and G with C. Nothing about the molecule does anything on its own. It is an instruction, and it has to be read.");
+  drawDogma(ctx,cv,{stage:1});
+  await narrate("First the strands separate and one is copied into messenger RNA. It is almost the same sequence, with one substitution: where DNA writes T, RNA writes U. This is transcription, and it is where nearly all of the regulation happens — whether a gene is copied at all, and how often.");
+  drawDogma(ctx,cv,{stage:2});
+  await narrate("Then the message is read three letters at a time. Each triplet — a codon — specifies one amino acid, and the amino acids chain into a protein. Twelve bases here become four amino acids.");
+  drawDogma(ctx,cv,{stage:3});
+  await narrate("That is the central dogma. But notice what it does not say: it does not say one gene makes one protein. Splicing lets a single gene produce many different proteins, which is how twenty thousand genes build something as complicated as you.");
+};
+
+/* ── 2. Mendelian inheritance: the Punnett square, counted not claimed ──── */
+function drawPunnett(ctx,cv,{shown=0,title}={}){
+  genFrame(ctx,title||"Two carriers — what the odds actually are");
+  const x0=300,y0=90,s=76;
+  genText(ctx,"parent 1  (Aa — a carrier)",x0+s,72,F.txt,12,"center");
+  ctx.save(); ctx.translate(x0-58,y0+s); ctx.rotate(-Math.PI/2);
+  genText(ctx,"parent 2  (Aa — a carrier)",0,0,F.txt,12,"center"); ctx.restore();
+  ["A","a"].forEach((b,i)=>genText(ctx,b,x0+i*s+s/2,y0-8,F.prior,14,"center"));
+  ["A","a"].forEach((b,i)=>genText(ctx,b,x0-16,y0+i*s+s/2+5,F.prior,14,"center"));
+  GEN.P.cells.forEach((c,i)=>{
+    const cx=x0+(i%2)*s, cy=y0+Math.floor(i/2)*s;
+    const on = i < shown;
+    const col = c==="aa" ? F.wrong : (c==="Aa" ? F.post : F.ok);
+    ctx.fillStyle = on ? col+"33" : "rgba(124,141,165,.07)";
+    ctx.fillRect(cx,cy,s-6,s-6);
+    ctx.strokeStyle="rgba(124,141,165,.35)"; ctx.strokeRect(cx,cy,s-6,s-6);
+    if(on){ genText(ctx,c,cx+(s-6)/2,cy+34,col,17,"center");
+            genText(ctx, c==="aa"?"affected":(c==="Aa"?"carrier":"clear"),
+                    cx+(s-6)/2,cy+54,col,11,"center"); }
+  });
+  if(shown>=4){
+    const pc=n=>Math.round(100*n/GEN.P.n);
+    genText(ctx,"affected  "+GEN.P.aff+"/"+GEN.P.n+" = "+pc(GEN.P.aff)+"%",560,140,F.wrong,13);
+    genText(ctx,"carrier   "+GEN.P.car+"/"+GEN.P.n+" = "+pc(GEN.P.car)+"%",560,166,F.post,13);
+    genText(ctx,"clear     "+GEN.P.clear+"/"+GEN.P.n+" = "+pc(GEN.P.clear)+"%",560,192,F.ok,13);
+    genText(ctx,"Per pregnancy — independently, every time.",560,228,F.txt,12);
+    genText(ctx,"Three unaffected children do not 'use up' the risk.",560,248,"rgba(215,223,234,.7)",11);
+  }
+}
+ANIMS.gen_punnett_static=(cv,ctx)=>drawPunnett(ctx,cv,{shown:0});
+ANIMS.gen_punnett=async(cv,ctx)=>{
+  drawPunnett(ctx,cv,{shown:0});
+  await narrate("Both parents carry one working copy of a gene and one broken copy. Neither is ill — one good copy is enough. This is what a recessive carrier is.");
+  for(let i=1;i<=4;i++){ drawPunnett(ctx,cv,{shown:i}); await sleep(650); }
+  const pc=n=>Math.round(100*n/GEN.P.n);
+  await narrate("Each parent passes one copy at random, so there are four equally likely combinations. "+
+    pc(GEN.P.aff)+" percent of the time the child inherits both broken copies and is affected. "+
+    pc(GEN.P.car)+" percent of the time the child is a carrier like the parents. "+
+    pc(GEN.P.clear)+" percent of the time the child inherits neither.");
+  await narrate("The trap is the word chance. This resets at every pregnancy. Three healthy children do not use up the twenty-five percent — the fourth pregnancy carries exactly the same odds as the first. Coins have no memory, and neither does meiosis.");
+};
+
+/* ── 3. polygenic traits: the bell curve is a RESULT, and the PRS tail ──── */
+function drawPoly(ctx,cv,{reveal=0,tail=false,title}={}){
+  genFrame(ctx,title||"Why most traits are bell-shaped");
+  const ks=Object.keys(GEN.H).map(Number).sort((a,b)=>a-b);
+  const maxN=Math.max(...ks.map(k=>GEN.H[k])), x0=70,x1=830,yB=300;
+  const sx=k=>x0+(k-ks[0])/(ks[ks.length-1]-ks[0])*(x1-x0);
+  ctx.strokeStyle="rgba(124,141,165,.35)"; ctx.beginPath();
+  ctx.moveTo(x0-10,yB); ctx.lineTo(x1+10,yB); ctx.stroke();
+  const upto = ks[0] + reveal*(ks[ks.length-1]-ks[0]);
+  ks.forEach(k=>{
+    if(k>upto) return;
+    const h=(GEN.H[k]/maxN)*200, x=sx(k), w=(x1-x0)/ks.length*0.8;
+    const inTail = tail && k>=GEN.TOPDEC;
+    ctx.fillStyle = inTail ? F.wrong : "rgba(124,141,165,.55)";
+    ctx.fillRect(x-w/2, yB-h, w, h);
+  });
+  genText(ctx,"← fewer risk variants",x0,yB+22,"rgba(215,223,234,.6)",11);
+  genText(ctx,"more risk variants →",x1,yB+22,"rgba(215,223,234,.6)",11,"right");
+  genText(ctx,"20 genes, each contributing a little. 4,000 people.",x0,60,F.txt,12);
+  if(tail){
+    ctx.strokeStyle=F.wrong; ctx.setLineDash([4,4]); ctx.beginPath();
+    ctx.moveTo(sx(GEN.TOPDEC)-6,yB-215); ctx.lineTo(sx(GEN.TOPDEC)-6,yB); ctx.stroke(); ctx.setLineDash([]);
+    genText(ctx,"highest-scoring "+GEN.TAILPCT+"% — "+GEN.TAILN+" people",sx(GEN.TOPDEC)+8,yB-200,F.wrong,12);
+    genText(ctx,"A polygenic score just says where on this axis you sit.",x0,342,F.txt,12);
+  }
+}
+ANIMS.gen_polygenic_static=(cv,ctx)=>drawPoly(ctx,cv,{reveal:1});
+ANIMS.gen_polygenic=async(cv,ctx)=>{
+  drawPoly(ctx,cv,{reveal:0});
+  await narrate("Height, blood pressure, cholesterol, diabetes risk — none of these is one gene. Here are twenty genes, each nudging a trait by a tiny amount, across four thousand simulated people.");
+  await tween(1400,k=>drawPoly(ctx,cv,{reveal:k}));
+  await narrate("Nobody imposed a bell curve on this picture. It appeared. Add up many small independent effects and you get this shape every time — that is the whole reason most human traits are distributed the way they are, with almost everyone near the middle.");
+  drawPoly(ctx,cv,{reveal:1,tail:true});
+  await narrate("A polygenic risk score does one thing: it tells you where on this axis you sit. The "+GEN.TAILN+" people in the highest-scoring "+GEN.TAILPCT+" percent here carry meaningfully more risk variants than average.");
+  await narrate("But read that carefully. It is a position in a population, not a diagnosis. Most people in that red tail will never get the disease, and plenty of cases will come from the middle of the curve — which is exactly why these scores are useful for populations and weak for individuals.");
+};
+
+/* ── 4. reading a positive test: prior × penetrance, with real counts ───── */
+function drawBayesTest(ctx,cv,{which="screen",stage=0,title}={}){
+  const B = which==="screen" ? GEN.SCREEN : GEN.DIAG;
+  genFrame(ctx,title||"What a positive result actually means");
+  const lab = which==="screen" ? "Population screening — 1 in 1,000 carry it"
+                               : "Strong family history — 1 in 2 carry it";
+  genText(ctx,lab,20,60,F.txt,13);
+  genText(ctx,"Test: 99% sensitivity, 99% specificity. "+B.N.toLocaleString()+" people tested.",20,80,"rgba(215,223,234,.7)",12);
+  if(stage>=1){
+    genText(ctx,"truly have the variant",60,124,F.txt,12);
+    genText(ctx,B.dis.toLocaleString(),330,124,F.post,14,"right");
+    genText(ctx,"do not",60,148,F.txt,12);
+    genText(ctx,B.well.toLocaleString(),330,148,"rgba(215,223,234,.7)",14,"right");
+  }
+  if(stage>=2){
+    ctx.strokeStyle="rgba(124,141,165,.25)"; ctx.beginPath();
+    ctx.moveTo(20,168); ctx.lineTo(880,168); ctx.stroke();
+    genText(ctx,"TRUE positives  (have it, test says yes)",60,196,F.ok,12);
+    genText(ctx,B.tp.toLocaleString(),330,196,F.ok,14,"right");
+    genText(ctx,"FALSE positives (don't have it, test says yes)",60,220,F.wrong,12);
+    genText(ctx,B.fp.toLocaleString(),330,220,F.wrong,14,"right");
+  }
+  if(stage>=3){
+    const ppv=(B.ppv*100);
+    ctx.fillStyle="rgba(232,161,60,.10)"; ctx.fillRect(420,180,440,120);
+    genText(ctx,"If your result says POSITIVE:",440,210,F.txt,13);
+    ctx.fillStyle=F.post; ctx.font="700 34px system-ui,sans-serif"; ctx.textAlign="left";
+    ctx.fillText(ppv.toFixed(ppv<10?1:0)+"%",440,258);
+    genText(ctx,"chance you actually carry it",530,256,F.txt,13);
+    genText(ctx,B.tp.toLocaleString()+" true ÷ ("+B.tp.toLocaleString()+" + "+B.fp.toLocaleString()+" false)",440,286,"rgba(215,223,234,.75)",12);
+  }
+}
+ANIMS.gen_bayes_test_static=(cv,ctx)=>drawBayesTest(ctx,cv,{which:"screen",stage:0});
+ANIMS.gen_bayes_test=async(cv,ctx)=>{
+  drawBayesTest(ctx,cv,{which:"screen",stage:0});
+  await narrate("A genetic test comes back positive. The obvious question is what that means. The answer depends almost entirely on something the report does not print: how likely you were to carry it before you tested.");
+  drawBayesTest(ctx,cv,{which:"screen",stage:1});
+  await narrate("Screen a hundred thousand people for a variant that one in a thousand carries. A hundred people truly have it. Ninety-nine thousand nine hundred do not.");
+  drawBayesTest(ctx,cv,{which:"screen",stage:2});
+  await narrate("The test is excellent — ninety-nine percent both ways. It correctly flags "+GEN.SCREEN.tp+" of the hundred carriers. But one percent of that enormous healthy group is "+GEN.SCREEN.fp.toLocaleString()+" people, and they are flagged too.");
+  drawBayesTest(ctx,cv,{which:"screen",stage:3});
+  const s=(GEN.SCREEN.ppv*100), d=(GEN.DIAG.ppv*100);
+  await narrate("So a positive result in this setting means about a "+s.toFixed(0)+" percent chance you actually carry it. A ninety-nine percent accurate test, and the positive is wrong most of the time. Nothing is broken — the false positives are drawn from a far larger pool.");
+  drawBayesTest(ctx,cv,{which:"diag",stage:3});
+  await narrate("Now change one thing. Same test, but the person has a strong family history, so the odds before testing are one in two. The same positive result now means about "+d.toFixed(0)+" percent. The test did not change. The prior did. That is why who gets tested matters as much as the test.");
+};
+
+/* deterministic-math handle — the harness asserts the narration's numbers */
+ANIMS._gen_debug={punnettAff:GEN.P.aff, punnettCar:GEN.P.car, punnettClear:GEN.P.clear,
+  punnettN:GEN.P.n, polyTopDecile:GEN.TOPDEC, polyN:GEN.SCORES.length,
+  polyTailCount:GEN.TAILN, polyTailPct:GEN.TAILPCT,
+  screenPPV:GEN.SCREEN.ppv, screenTP:GEN.SCREEN.tp, screenFP:GEN.SCREEN.fp,
+  diagPPV:GEN.DIAG.ppv};
+
 </script>
 </body>
 </html>
