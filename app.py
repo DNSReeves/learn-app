@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import re
+import secrets
 import time
 
 import hmac
@@ -17,6 +18,7 @@ from pydantic import BaseModel
 
 import ai
 import db
+import mailer
 import mastery
 import packver
 
@@ -25,6 +27,18 @@ TOPIC_DIR = os.path.join(BASE, "topics")
 
 app = FastAPI(title="Learn")
 db.init()
+
+# Operator visibility. uvicorn configures ONLY its own loggers and leaves root
+# bare, so everything this app logs under "learn" (the registration audit line,
+# mail-transport warnings) silently died below the last-resort WARNING level.
+# Give the tree one stderr handler at INFO; propagation stays on, so pytest's
+# caplog still sees every record.
+_applog = logging.getLogger("learn")
+if not _applog.handlers:
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    _applog.addHandler(_h)
+    _applog.setLevel(logging.INFO)
 
 # ---------- topic packs (the extensible part: drop a JSON in topics/) ----------
 
@@ -80,12 +94,26 @@ def _lan_client(request) -> bool:
             and 16 <= int(host.split(".")[1]) <= 31)
 
 
+def _reg_mode() -> str:
+    """LEARN_REGISTRATION: open | invite | closed. Default `open` — the
+    operator's 2026-08-01 decision: anyone with a working email address may
+    register, the emailed code is the gate. `invite` additionally requires
+    LEARN_INVITE_CODE; `closed` refuses every path."""
+    m = (os.environ.get("LEARN_REGISTRATION") or "open").strip().lower()
+    return m if m in ("open", "invite", "closed") else "open"
+
+
 @app.post("/api/register")
 def register(c: Creds, request: Request = None):
     # Phase A: registration is INVITE-GATED (shared devices today, possibly the
     # internet tomorrow — an open /api/register is an account-creation hole).
     # LEARN_INVITE_CODE enables invites; without it registration is closed,
     # except the bootstrap case: a fresh install with zero users, from the LAN.
+    # NOTE this is the LEGACY password-only path. It stays invite-gated even
+    # when LEARN_REGISTRATION=open — `open` means "open via a verified EMAIL"
+    # (/api/register/start), never "open with no verification at all".
+    if _reg_mode() == "closed":
+        raise HTTPException(403, "Registration is closed.")
     code = os.environ.get("LEARN_INVITE_CODE", "")
     if code:
         if not c.invite or not hmac.compare_digest(c.invite, code):
@@ -122,6 +150,168 @@ def login(c: Creds):
 def do_logout(authorization: str | None = Header(default=None)):
     db.logout((authorization or "").removeprefix("Bearer ").strip())
     return {"ok": True}
+
+
+# ---------- email-verified self-registration (2026-08-01) ----------
+# Open registration for an internet-exposed install: anyone with a working
+# address may register, a 6-digit emailed code completes it. The account does
+# not exist until the code is verified.
+#
+# THE ENUMERATION RULE: /api/register/start returns ONE body — byte-identical —
+# whether the address is fresh, already registered, malformed, throttled, or
+# the send failed. Anything that varies with ACCOUNT STATE is an oracle that
+# tells a stranger who has an account here. The only non-neutral replies are
+# determined purely by the request or by operator configuration: a bad
+# username/password shape (400), registration closed / bad invite (403), and
+# an unconfigured mail transport (503, identical for every input).
+#
+# Mail never goes through the dnsr-agent's Gmail identity — see mailer.py.
+
+REG_TTL_MIN = 15
+REG_TTL_S = REG_TTL_MIN * 60
+REG_MAX_ATTEMPTS = 5              # 6th verify on a row is dead
+_HOUR = 3600
+_START_PER_EMAIL_HR = 3
+_START_PER_IP_HR = 10
+_VERIFY_PER_IP_HR = 20
+
+# The one and only /register/start body. A frozen constant on purpose: if a
+# future edit makes this vary by input, test_registration's byte-identity pin
+# fails loudly instead of quietly re-opening account enumeration.
+NEUTRAL_START = {
+    "ok": True,
+    "ttl_minutes": REG_TTL_MIN,
+    "detail": ("If that address can receive mail, a 6-digit code is on its way. "
+               "It expires in 15 minutes."),
+}
+
+# Deliberately permissive: shape only. Deliverability is decided by the code
+# actually arriving, not by a regex arguing with RFC 5322.
+_EMAIL_RE = re.compile(r"^[^@\s]{1,64}@[^@\s.]+(\.[^@\s.]+)+$")
+
+
+class RegStart(BaseModel):
+    username: str
+    email: str
+    password: str
+    invite: str | None = None
+
+
+class RegVerify(BaseModel):
+    email: str
+    token: str
+
+
+def _client_ip(request) -> str:
+    return (request.client.host if request and request.client else "") or "unknown"
+
+
+def _reg_gate(invite: str | None):
+    """Kill switch + invite gate, shared by the email path."""
+    mode = _reg_mode()
+    if mode == "closed":
+        raise HTTPException(403, "Registration is closed.")
+    if mode == "invite":
+        code = os.environ.get("LEARN_INVITE_CODE", "")
+        if not code:
+            raise HTTPException(403, "Registration is closed.")
+        if not invite or not hmac.compare_digest(invite, code):
+            raise HTTPException(403, "Registration needs a valid invite code.")
+
+
+@app.post("/api/register/start")
+def register_start(body: RegStart, request: Request = None):
+    _reg_gate(body.invite)
+
+    # Operator-facing, not account-facing: identical for every input, so it
+    # leaks nothing. Better a loud 503 than a silent "check your inbox" for
+    # mail that will never be sent.
+    if mailer.transport() == "off":
+        raise HTTPException(503, "Email delivery is not configured on this "
+                                 "server, so accounts cannot be created yet. "
+                                 "(Operator: set LEARN_MAIL_TRANSPORT.)")
+
+    # Input shape — same rules create_user enforces, checked before anything
+    # touches account state. Client-determined, so rejecting is not a leak.
+    try:
+        username = db.validate_credentials(body.username, body.password)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+    db.purge_pending()                       # cheap housekeeping, no cron
+    email = db.normalize_email(body.email)
+    ip = _client_ip(request)
+    log = logging.getLogger("learn")
+
+    # Everything below this line returns NEUTRAL_START, whatever happens.
+    def neutral():
+        return NEUTRAL_START
+
+    if not email or len(email) > 254 or not _EMAIL_RE.match(email):
+        return neutral()
+    if db.reg_count("start_ip", ip, _HOUR) >= _START_PER_IP_HR:
+        log.warning("registration start throttled: ip=%s", ip)
+        return neutral()
+    if db.reg_count("start_email", email, _HOUR) >= _START_PER_EMAIL_HR:
+        log.warning("registration start throttled: email=%s", mailer.mask(email))
+        return neutral()
+
+    # Count the attempt BEFORE the state checks, so a throttle can never be
+    # dodged by aiming at addresses that short-circuit.
+    db.reg_event("start_ip", ip)
+    db.reg_event("start_email", email)
+
+    if db.email_taken(email):
+        # Already has an account. Say nothing different; send nothing.
+        return neutral()
+
+    token = f"{secrets.randbelow(1_000_000):06d}"     # 6 digits: phone-typable
+    db.put_pending(username, email, body.password, token, REG_TTL_S, ip)
+    mailer.send_registration_token(email, token, ttl_minutes=REG_TTL_MIN)
+    return neutral()
+
+
+@app.post("/api/register/verify")
+def register_verify(body: RegVerify, request: Request = None):
+    if _reg_mode() == "closed":
+        raise HTTPException(403, "Registration is closed.")
+    ip = _client_ip(request)
+    if db.reg_count("verify_ip", ip, _HOUR) >= _VERIFY_PER_IP_HR:
+        raise HTTPException(429, "Too many attempts. Try again later.")
+    db.reg_event("verify_ip", ip)
+
+    email = db.normalize_email(body.email)
+    bad = HTTPException(400, "That code is not valid, or it has expired. "
+                             "Request a new one.")
+    row = db.get_pending(email)
+    # One message for no-row / expired / already-consumed / wrong code: a
+    # distinct "expired" vs "no such registration" is an enumeration oracle.
+    if not row or row["consumed_at"] is not None or row["expires_at"] <= time.time():
+        raise bad
+    if row["attempts"] >= REG_MAX_ATTEMPTS:
+        raise HTTPException(429, "Too many incorrect codes. Start again to get "
+                                 "a new one.")
+    if not db.check_pending_token(row, (body.token or "").strip()):
+        db.bump_pending_attempts(email)
+        raise bad
+
+    # Correct code. consume_pending is the atomic single-use guard: if a
+    # concurrent request already consumed the row, this one gets nothing.
+    if not db.consume_pending(email):
+        raise bad
+    try:
+        db.create_user_hashed(row["username"], row["pw_salt"], row["pw_hash"], email)
+    except ValueError as e:
+        # Username got taken between start and verify. The address is verified,
+        # so this is safe to say plainly — it is about the username the caller
+        # just typed, not about anyone else's account.
+        raise HTTPException(409, str(e))
+    token = db.issue_session(row["username"])
+    logging.getLogger("learn").info(
+        "registration complete: username=%s email=%s ip=%s",
+        row["username"], mailer.mask(email), _client_ip(request))
+    return {"token": token,
+            "role": (db.user_for_token(token) or {}).get("role", "learner")}
 
 
 # ---------- ANIM-TTS (operator, 2026-07-31: "the new voice system did not make it to the

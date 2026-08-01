@@ -241,33 +241,55 @@ $("#signout").onclick = async()=>{ try{await api("/logout",{method:"POST"});}cat
 /* ================= views ================= */
 function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else speechSynthesis.cancel(); try{ if(typeof cancelVoice==="function") cancelVoice(); }catch(_){} if(TOKEN) armIdleSignout(); TOKEN ? viewDash() : viewAuth(); }
 
+/* Sign the user in from a {token, role} payload — /login, /register and
+   /register/verify all return the same shape, so they all land here. */
+function acceptSession(d){
+  TOKEN=d.token; ROLE=d.role||"learner";
+  sessionStorage.setItem("learn_token",TOKEN); sessionStorage.setItem("learn_role",ROLE);
+  armIdleSignout(); route();
+}
+/* a***@example.com — mirrors the server's masking so the code screen can name
+   the address without the server ever having to echo it back (echoing it would
+   make the neutral /register/start body vary by input = account enumeration). */
+function maskEmail(e){ const s=String(e||"").trim(); const i=s.indexOf("@");
+  return i<1 ? s : s[0]+"***"+s.slice(i); }
+
 async function viewAuth(mode="login"){
   $("#who").textContent=""; $("#signout").hidden=true;
   main.innerHTML = `
   <div class="auth">
-    <h1>${mode==="login"?"Welcome back":"Create your profile"}</h1>
-    <p>Mastery-based learning. Your progress is stored privately, per profile.</p>
+    <h1>${mode==="login"?"Welcome back":"Create an account"}</h1>
+    <p>${mode==="login"?"Mastery-based learning. Your progress is stored privately, per profile."
+                       :"Pick a username and password, and we'll email you a 6-digit code to confirm your address."}</p>
     <div id="chooser"></div>
     <form id="af">
       <input id="u" placeholder="Username" autocomplete="username" required>
+      ${mode==="register"?`<input id="em" type="email" placeholder="Email address" autocomplete="email" required>`:""}
       <input id="p" type="password" placeholder="Password (6+ characters)" autocomplete="${mode==="login"?"current-password":"new-password"}" required>
-      ${mode==="register"?`<input id="inv" placeholder="Invite code (if your install requires one)" autocomplete="off">`:""}
+      ${mode==="register"?`<input id="inv" placeholder="Invite code (only if your install requires one)" autocomplete="off">`:""}
       <div class="err" id="err"></div>
-      <button class="btn" style="width:100%">${mode==="login"?"Sign in":"Create profile"}</button>
+      <button class="btn" style="width:100%" id="go">${mode==="login"?"Sign in":"Send me a code"}</button>
     </form>
-    <button class="swap" id="swap">${mode==="login"?"New here? Create a profile":"Have a profile? Sign in"}</button>
+    <button class="swap" id="swap">${mode==="login"?"New here? Create an account":"Have an account? Sign in"}</button>
   </div>`;
   $("#swap").onclick=()=>viewAuth(mode==="login"?"register":"login");
   $("#af").onsubmit=async e=>{
     e.preventDefault();
-    const body={username:$("#u").value, password:$("#p").value};
-    if(mode==="register"){ const inv=$("#inv"); if(inv && inv.value.trim()) body.invite=inv.value.trim(); }
+    const body={username:$("#u").value.trim(), password:$("#p").value};
+    const btn=$("#go"); $("#err").textContent="";
+    if(mode==="register"){
+      body.email=$("#em").value.trim();
+      const inv=$("#inv"); if(inv && inv.value.trim()) body.invite=inv.value.trim();
+    }
+    btn.disabled=true;
     try{
-      const d=await api("/"+mode,{method:"POST",body});
-      TOKEN=d.token; ROLE=d.role||"learner";
-      sessionStorage.setItem("learn_token",TOKEN); sessionStorage.setItem("learn_role",ROLE);
-      armIdleSignout(); route();
-    }catch(err){ $("#err").textContent=err.message; }   // surfaces the backend detail verbatim (e.g. invite required)
+      if(mode==="register"){
+        await api("/register/start",{method:"POST",body});
+        viewVerify(body);                       /* one neutral reply → always the code screen */
+      } else {
+        acceptSession(await api("/login",{method:"POST",body}));
+      }
+    }catch(err){ $("#err").textContent=err.message; btn.disabled=false; }   // surfaces the backend detail verbatim (invite required, delivery unconfigured, …)
   };
   /* Phase A profile chooser — LAN/tailnet only; /api/users 404s on a public install → plain form.
      Tapping a name prefills the username; a password is still always required. */
@@ -283,6 +305,70 @@ async function viewAuth(mode="login"){
       }
     }catch(_){ /* not LAN / no users → plain username+password form */ }
   }
+}
+
+/* Step 2 of self-registration: the emailed 6-digit code. The account does not
+   exist yet — it is created server-side only when this verifies. Credentials
+   live in `ctx` (memory only, never storage) so Resend can re-send without
+   asking the user to retype a password. */
+function viewVerify(ctx){
+  const ttlMs = 15*60*1000, deadline = Date.now()+ttlMs;
+  main.innerHTML = `
+  <div class="auth">
+    <h1>Check your email</h1>
+    <p>Enter the 6-digit code we sent to <strong>${esc(maskEmail(ctx.email))}</strong>.
+       It expires in <span id="ttl" class="mono">15:00</span>.</p>
+    <form id="vf">
+      <input id="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}"
+             maxlength="6" placeholder="123456" required
+             style="letter-spacing:.5em;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:22px">
+      <div class="err" id="err"></div>
+      <button class="btn" style="width:100%" id="vgo">Verify and sign in</button>
+    </form>
+    <div class="sub" style="color:var(--dim);font-size:14px;margin-top:6px">
+      No code? Check spam, then <button type="button" class="swap" id="resend" style="display:inline">resend it</button>.
+    </div>
+    <button class="swap" id="back">← use a different address</button>
+  </div>`;
+  const code=$("#code"), err=$("#err"), ttl=$("#ttl"), resend=$("#resend");
+  code.focus();
+  code.addEventListener("input",()=>{ code.value=code.value.replace(/\D/g,"").slice(0,6); });
+
+  /* live TTL; self-cancels once this view is off the DOM (no global timer state) */
+  const tick=setInterval(()=>{
+    if(!document.body.contains(ttl)){ clearInterval(tick); return; }
+    const left=Math.max(0,deadline-Date.now());
+    const m=Math.floor(left/60000), s=Math.floor(left%60000/1000);
+    ttl.textContent=`${m}:${String(s).padStart(2,"0")}`;
+    if(!left){ ttl.textContent="0:00"; err.textContent="That code has expired — resend to get a new one."; }
+  },1000);
+
+  $("#back").onclick=()=>{ clearInterval(tick); viewAuth("register"); };
+
+  /* Resend honors the server throttle (3 starts/hour per address) — the reply
+     is the same neutral body either way, so we can't report "sent" vs
+     "throttled"; a local 60s cooldown keeps people from burning the budget. */
+  resend.onclick=async()=>{
+    resend.disabled=true; err.textContent="";
+    try{
+      await api("/register/start",{method:"POST",body:ctx});
+      err.style.color="var(--dim)";
+      err.textContent="If your address can receive mail, a new code is on its way.";
+    }catch(e){ err.style.color="var(--wrong)"; err.textContent=e.message; }
+    let cd=60; const label=()=>resend.textContent=cd?`resend in ${cd}s`:"resend it";
+    label(); const cdt=setInterval(()=>{ cd--; label();
+      if(cd<=0){ clearInterval(cdt); resend.disabled=false; } },1000);
+  };
+
+  $("#vf").onsubmit=async e=>{
+    e.preventDefault();
+    const btn=$("#vgo"); btn.disabled=true; err.style.color="var(--wrong)"; err.textContent="";
+    try{
+      const d=await api("/register/verify",{method:"POST",
+        body:{email:ctx.email, token:code.value.trim()}});
+      clearInterval(tick); acceptSession(d);
+    }catch(ex){ err.textContent=ex.message; btn.disabled=false; code.select(); }
+  };
 }
 
 /* P5.20 (iss_e8b3bfb8): author UI — paste/load a draft pack, validate against the

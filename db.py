@@ -93,6 +93,35 @@ CREATE TABLE IF NOT EXISTS concept_state_archive (
     from_hash   TEXT,
     to_hash     TEXT
 );
+-- Email-verified self-registration (2026-08-01). A registration in flight: the
+-- account does NOT exist until the emailed code is verified. Password is hashed
+-- HERE, at start — plaintext never lands in a row. The token is stored only as
+-- a PBKDF2 hash with its own salt (same scheme as passwords).
+CREATE TABLE IF NOT EXISTS pending_registrations (
+    id          INTEGER PRIMARY KEY,
+    username    TEXT NOT NULL,
+    email       TEXT NOT NULL,          -- normalized: stripped + lowercased
+    pw_salt     BLOB NOT NULL,
+    pw_hash     BLOB NOT NULL,
+    token_salt  BLOB NOT NULL,
+    token_hash  BLOB NOT NULL,
+    created_at  REAL NOT NULL,
+    expires_at  REAL NOT NULL,
+    attempts    INTEGER NOT NULL DEFAULT 0,
+    ip          TEXT,
+    consumed_at REAL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_pending_email ON pending_registrations(email);
+CREATE INDEX IF NOT EXISTS idx_pending_expires ON pending_registrations(expires_at);
+-- Throttle/cap counters. In the DB, not memory: the app restarts, and a rate
+-- limit that a restart clears is not a rate limit.
+CREATE TABLE IF NOT EXISTS reg_events (
+    id   INTEGER PRIMARY KEY,
+    kind TEXT NOT NULL,     -- start_email | start_ip | verify_ip | mail_send
+    key  TEXT NOT NULL,     -- normalized email / client ip / '' for global
+    at   REAL NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_reg_events ON reg_events(kind, key, at);
 """
 
 _ITER = 240_000
@@ -145,22 +174,61 @@ def init():
                 c.execute(stmt)
             except sqlite3.OperationalError:
                 pass
+    # Email-verified registration (2026-08-01): users gain a verified address.
+    # Nullable — every pre-existing account (LAN bootstrap, invite era) has none,
+    # and the partial unique index tolerates that while still pinning one
+    # account per verified address.
+    with conn() as c:
+        try:
+            c.execute("ALTER TABLE users ADD COLUMN email TEXT")
+        except sqlite3.OperationalError:
+            pass
+        c.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email "
+                  "ON users(email) WHERE email IS NOT NULL")
 
 
 def _hash(pw: str, salt: bytes) -> bytes:
     return hashlib.pbkdf2_hmac("sha256", pw.encode(), salt, _ITER)
 
 
-def create_user(username: str, password: str):
-    username = username.strip().lower()
-    if not username or len(password) < 6:
+def validate_credentials(username: str, password: str) -> str:
+    """The single definition of 'is this a usable username/password'. Returns
+    the normalized username. create_user() and the email-registration path both
+    go through here so they can never drift apart."""
+    username = (username or "").strip().lower()
+    if not username or len(password or "") < 6:
         raise ValueError("Username required; password must be at least 6 characters.")
+    return username
+
+
+def create_user(username: str, password: str, email: str | None = None):
+    username = validate_credentials(username, password)
     salt = secrets.token_bytes(16)
     with conn() as c:
         try:
             c.execute(
-                "INSERT INTO users (username, pw_salt, pw_hash, created_at) VALUES (?,?,?,?)",
-                (username, salt, _hash(password, salt), time.time()),
+                "INSERT INTO users (username, pw_salt, pw_hash, created_at, email) "
+                "VALUES (?,?,?,?,?)",
+                (username, salt, _hash(password, salt), time.time(), email or None),
+            )
+        except sqlite3.IntegrityError:
+            raise ValueError("That username is taken.")
+
+
+def create_user_hashed(username: str, pw_salt: bytes, pw_hash: bytes,
+                       email: str | None = None):
+    """Same row as create_user(), but from an ALREADY-hashed password — the
+    email-verification path hashes at /register/start and never holds the
+    plaintext long enough to re-hash it here."""
+    username = (username or "").strip().lower()
+    if not username:
+        raise ValueError("Username required; password must be at least 6 characters.")
+    with conn() as c:
+        try:
+            c.execute(
+                "INSERT INTO users (username, pw_salt, pw_hash, created_at, email) "
+                "VALUES (?,?,?,?,?)",
+                (username, pw_salt, pw_hash, time.time(), email or None),
             )
         except sqlite3.IntegrityError:
             raise ValueError("That username is taken.")
@@ -245,6 +313,126 @@ def set_role(username: str, role: str) -> bool:
 def logout(token: str):
     with conn() as c:
         c.execute("DELETE FROM sessions WHERE token = ?", (token,))
+
+
+def issue_session(username: str) -> str | None:
+    """Mint a session for an already-authenticated identity. Used by the
+    email-verification path, which proves identity with the emailed code and
+    has no plaintext password to hand to authenticate()."""
+    with conn() as c:
+        row = c.execute("SELECT id FROM users WHERE username = ?",
+                        (username.strip().lower(),)).fetchone()
+        if not row:
+            return None
+        token = secrets.token_urlsafe(32)
+        now = time.time()
+        c.execute(
+            "INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?,?,?,?)",
+            (token, row["id"], now, now + SESSION_TTL_S),
+        )
+        return token
+
+
+# ---------- email-verified self-registration ----------
+
+def normalize_email(email: str) -> str:
+    return (email or "").strip().lower()
+
+
+def email_taken(email: str) -> bool:
+    with conn() as c:
+        return c.execute("SELECT 1 FROM users WHERE email = ? LIMIT 1",
+                         (normalize_email(email),)).fetchone() is not None
+
+
+def username_taken(username: str) -> bool:
+    with conn() as c:
+        return c.execute("SELECT 1 FROM users WHERE username = ? LIMIT 1",
+                         ((username or "").strip().lower(),)).fetchone() is not None
+
+
+def put_pending(username: str, email: str, password: str, token: str,
+                ttl_s: float, ip: str | None = None) -> None:
+    """Create-or-replace the in-flight registration for this address.
+
+    Both secrets are hashed here and the plaintexts are dropped: the row can
+    reconstruct neither the password nor the code. Replacing resets attempts —
+    a fresh code deserves a fresh budget."""
+    email = normalize_email(email)
+    username = (username or "").strip().lower()
+    pw_salt, tk_salt = secrets.token_bytes(16), secrets.token_bytes(16)
+    now = time.time()
+    with conn() as c:
+        c.execute(
+            """INSERT INTO pending_registrations
+                 (username, email, pw_salt, pw_hash, token_salt, token_hash,
+                  created_at, expires_at, attempts, ip, consumed_at)
+               VALUES (?,?,?,?,?,?,?,?,0,?,NULL)
+               ON CONFLICT(email) DO UPDATE SET
+                 username=excluded.username, pw_salt=excluded.pw_salt,
+                 pw_hash=excluded.pw_hash, token_salt=excluded.token_salt,
+                 token_hash=excluded.token_hash, created_at=excluded.created_at,
+                 expires_at=excluded.expires_at, attempts=0, ip=excluded.ip,
+                 consumed_at=NULL""",
+            (username, email, pw_salt, _hash(password, pw_salt),
+             tk_salt, _hash(token, tk_salt), now, now + ttl_s, ip),
+        )
+
+
+def get_pending(email: str):
+    with conn() as c:
+        row = c.execute("SELECT * FROM pending_registrations WHERE email = ?",
+                        (normalize_email(email),)).fetchone()
+        return dict(row) if row else None
+
+
+def check_pending_token(row: dict, token: str) -> bool:
+    """Constant-time compare of a candidate code against the stored hash."""
+    return hmac.compare_digest(_hash(token or "", row["token_salt"]), row["token_hash"])
+
+
+def bump_pending_attempts(email: str) -> int:
+    with conn() as c:
+        c.execute("UPDATE pending_registrations SET attempts = attempts + 1 "
+                  "WHERE email = ?", (normalize_email(email),))
+        r = c.execute("SELECT attempts FROM pending_registrations WHERE email = ?",
+                      (normalize_email(email),)).fetchone()
+        return r["attempts"] if r else 0
+
+
+def consume_pending(email: str) -> bool:
+    """Mark consumed. Returns False if it was ALREADY consumed — the atomic
+    single-use guard (a replayed code must never mint a second account)."""
+    with conn() as c:
+        cur = c.execute("UPDATE pending_registrations SET consumed_at = ? "
+                        "WHERE email = ? AND consumed_at IS NULL",
+                        (time.time(), normalize_email(email)))
+        return cur.rowcount == 1
+
+
+def purge_pending(older_than_s: float = 86400) -> int:
+    """Housekeeping on the cheap: drop spent/expired rows and stale counters on
+    each /register/start. No cron, no unbounded growth."""
+    cut = time.time() - older_than_s
+    with conn() as c:
+        n = c.execute(
+            "DELETE FROM pending_registrations WHERE (consumed_at IS NOT NULL "
+            "AND consumed_at < ?) OR expires_at < ?", (cut, cut)).rowcount
+        c.execute("DELETE FROM reg_events WHERE at < ?", (cut,))
+        return n
+
+
+def reg_event(kind: str, key: str) -> None:
+    with conn() as c:
+        c.execute("INSERT INTO reg_events (kind, key, at) VALUES (?,?,?)",
+                  (kind, key or "", time.time()))
+
+
+def reg_count(kind: str, key: str, window_s: float) -> int:
+    with conn() as c:
+        return c.execute(
+            "SELECT COUNT(*) FROM reg_events WHERE kind=? AND key=? AND at > ?",
+            (kind, key or "", time.time() - window_s)).fetchone()[0]
 
 
 # ---------- concept state ----------
