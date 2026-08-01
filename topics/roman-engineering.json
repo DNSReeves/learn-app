@@ -347,7 +347,8 @@
           "type": "interactive",
           "note": "Compute travel times and costs across the actual Roman network — the road system as a living graph."
         }
-      ]
+      ],
+      "anim": "rome_roads"
     },
     {
       "id": "c05-bridges",
@@ -598,7 +599,8 @@
           "type": "interactive",
           "note": "Play logistics officer: route a legion or a grain shipment across the network you just studied."
         }
-      ]
+      ],
+      "anim": "rome_machines"
     }
   ]
 }

@@ -209,7 +209,8 @@
           "type": "video",
           "note": "Worked problems if you want reps; skim at 2× — you knew this once."
         }
-      ]
+      ],
+      "anim": "newton_laws"
     },
     {
       "id": "c03-fbd",
@@ -322,7 +323,8 @@
           "type": "reading",
           "note": "What friction, tension, and 'force' itself really are, one level below the freshman story."
         }
-      ]
+      ],
+      "anim": "newton_fbd"
     },
     {
       "id": "c04-energy",
@@ -891,7 +893,8 @@
           "type": "reading",
           "note": "Mercury's 43″, light deflection, gravitational time dilation, GPS — the receipts for the third break."
         }
-      ]
+      ],
+      "anim": "newton_limits"
     }
   ]
 }

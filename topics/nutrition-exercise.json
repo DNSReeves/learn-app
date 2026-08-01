@@ -82,7 +82,8 @@
           "url": "https://www.niddk.nih.gov/health-information/weight-management/adult-overweight-obesity/factors-affecting-weight-health",
           "type": "reading"
         }
-      ]
+      ],
+      "anim": "nut_energy"
     },
     {
       "id": "intermittent-fasting",
@@ -275,7 +276,8 @@
           "url": "https://nutritionsource.hsph.harvard.edu/what-should-you-eat/protein/",
           "type": "reading"
         }
-      ]
+      ],
+      "anim": "nut_macros"
     },
     {
       "id": "muscle-growth-loss",
@@ -511,7 +513,8 @@
           "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
           "type": "reading"
         }
-      ]
+      ],
+      "anim": "nut_cardio_weights"
     },
     {
       "id": "exercise-metabolic-medicine",
@@ -747,7 +750,8 @@
           "url": "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
           "type": "reading"
         }
-      ]
+      ],
+      "anim": "nut_myths"
     }
   ]
 }
