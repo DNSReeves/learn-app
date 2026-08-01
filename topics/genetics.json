@@ -1,0 +1,1728 @@
+{
+ "id": "genetics",
+ "title": "Genetics",
+ "category": "Health & Medicine",
+ "tagline": "What a gene actually is, how variation works, and the parts that change decisions: what a polygenic score can and cannot tell you, how to read a positive test, which genes already change prescribing, and what gene editing can do today.",
+ "description": "From the molecule up to the clinic. The molecular half is the foundation — genes, transcription, the variation inventory, Mendelian patterns and the penetrance that breaks them. The quantitative half is where most public understanding goes wrong: heritability is a population variance ratio, not a verdict on an individual; a GWAS hit is an association with an odds ratio near 1.1, not a 'gene for' anything; and a polygenic score places you on a curve rather than diagnosing you. The clinical half is what is actionable now: pharmacogenomics that already changes prescribing, the germline/somatic split in cancer, and the gene-editing therapies that reached approval.",
+ "prereqs": [],
+ "concepts": [
+  {
+   "id": "what-is-a-gene",
+   "title": "What Is a Gene? — 3.1 billion letters, ~19,400 genes",
+   "summary": "The human genome is enormous, the protein-coding parts list is startlingly small, and the fight over what the rest does is not as settled as either side claims.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "3.1 billion letters, packed into 46 chromosomes",
+     "md": "Your genome is **~3.1 billion base pairs** (**Gb**, gigabases) per haploid set — the 23 chromosomes you inherited from one parent. You carry two sets, so ~6.2 Gb per nucleus, roughly **2 metres** of DNA if stretched end to end.\n\nThe reference genome was declared 'complete' in 2003 at about **92% coverage**. The missing ~8% was not random: centromeres, ribosomal DNA arrays and segmental duplications — highly repetitive sequence that short reads cannot be placed into uniquely. Those gaps were closed in 2022 by the Telomere-to-Telomere consortium: **T2T-CHM13 is 3.055 Gb with no gaps** (Nurk et al., *Science* 2022), adding ~200 **Mb** (megabases) of sequence nobody had ever read.\n\nScale is uneven — chromosome 1 is ~248 Mb, chromosome 21 only ~47 Mb.\n\nAnd 'the' human genome is a convenient fiction. The current standard is a **pangenome**: a graph of many independent assemblies, because a single linear reference systematically under-represents variation in the populations it was not built from."
+    },
+    {
+     "h": "Only ~19,400 protein-coding genes — and why that was a shock",
+     "md": "Before the Human Genome Project reported, the informal betting pool on gene count ran from **50,000 to 140,000**. The answer came in far lower and has only tightened since.\n\n**GENCODE release 50** — the reference annotation behind Ensembl and most clinical pipelines — lists:\n\n- **19,442 protein-coding genes**\n- **35,885 long non-coding RNA (lncRNA) genes** — transcribed, never translated into protein\n- **644,292 transcripts** in total\n\nProtein-coding **exon** (the retained, translated stretches) accounts for roughly **1.5% of the genome**.\n\nAnd ~19,400 is not a large number. *Caenorhabditis elegans*, a 1-mm nematode built from 959 cells, carries about 20,000. Rice has more genes than you do.\n\n**That is the organising fact for this whole pack.** If complexity does not live in the parts count, it lives in (a) how parts are **combined** — alternative splicing turns 19,442 coding genes into hundreds of thousands of distinct transcripts — and (b) **when and where** each is switched on. What distinguishes a neuron from a liver cell is overwhelmingly **regulatory** information, not coding information."
+    },
+    {
+     "h": "'Junk DNA' and what ENCODE actually established",
+     "md": "Susumu Ohno coined **'junk DNA'** in 1972 for the non-coding ~98.5%. About half the genome is **transposable elements** — mobile repeats, the vast majority long dead — which made the label plausible.\n\nAs a blanket claim it was wrong. Non-coding sequence holds promoters, enhancers, insulators, lncRNAs, microRNAs and structural elements, and **most disease associations found by genome-wide association studies (GWAS) fall in non-coding DNA**, not in genes.\n\nBut the correction over-shot. **ENCODE** (Encyclopedia of DNA Elements) announced in 2012 that **'80% of the genome is biochemically functional.'** That headline conflated *biochemical activity* — transcribed once, or bound by one protein, in one cell type — with *function*, meaning maintained by natural selection. Graur and colleagues (2013) and Doolittle (2013) attacked it hard and the criticism largely stuck. Comparative-genomics estimates of the fraction under **purifying selection** sit near **5–8%**, not 80%.\n\n**What ENCODE did establish is more useful than the slogan.** It built a coordinate-level registry of **candidate *cis*-regulatory elements (cCREs)**: ENCODE 3 (2020) published **926,535 human cCREs covering 7.9% of the genome**, and the 2025 expansion lists **~2.37 million**. That is a map you can look a patient's variant up in — which the 80% claim never was.\n\n**Honest state of play:** far more than 1.5% of the genome does something; far less than 80% shows evidence of selected function. Anyone quoting either extreme as settled is over-claiming."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A colleague argues humans must carry far more genes than a 1-mm nematode, because we are obviously more complex. What does the actual comparison show, and what does it imply?",
+     "options": [
+      "The counts are similar (~19,400 vs ~20,000) — so complexity must come from regulation and splicing, not from the size of the parts list",
+      "Humans carry roughly ten times as many genes, which is exactly what complexity predicts",
+      "The nematode genome is physically larger, so it carries more genes",
+      "Gene counts cannot be compared across species with current methods"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — the near-parity is the whole point: information about cell identity is regulatory, not a longer parts list.",
+      "No — the counts are close. That mismatch between complexity and gene number is precisely what forced the field toward regulation.",
+      "No — genome size and gene count decouple badly. Some amoebas and plants have genomes far larger than ours with no complexity to match.",
+      "No — annotation is imperfect at the margins, but both counts are solid to within a few percent."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A study reports that a stretch of intergenic DNA is transcribed at low level in one cell type. What has that established?",
+     "options": [
+      "Only that the region is biochemically active — activity in one assay is not evidence of selection-maintained function",
+      "That it is a protein-coding gene the annotation missed",
+      "That it is junk DNA, since it produces no protein",
+      "That it is under purifying selection and therefore functional"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — this is exactly the conflation that sank the ENCODE '80% functional' headline.",
+      "No — transcription alone does not make a coding gene; you would need an open reading frame and evidence of translation.",
+      "No — the opposite error. Producing no protein says nothing either way; plenty of non-coding transcripts are regulatory.",
+      "No — selection is inferred from cross-species conservation or population constraint, not from a single transcription assay."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Roughly what fraction of the human genome is protein-coding exon, and roughly what fraction shows evidence of purifying selection?",
+     "options": [
+      "~1.5% coding; ~5–8% under selection",
+      "~1.5% coding; ~80% under selection",
+      "~25% coding; ~50% under selection",
+      "~50% coding, with the rest inert"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — and the gap between the two numbers is the regulatory genome.",
+      "No — 80% was the biochemical-activity figure, not the selection figure. Conflating them was the 2012 over-claim.",
+      "No — coding sequence is far smaller than that; ~1.5% is the well-established figure.",
+      "No — roughly half the genome is transposable-element derived, and coding sequence is a small fraction of the rest."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Why did the last ~8% of the human genome stay unfinished from 2003 until 2022?",
+     "options": [
+      "It is highly repetitive — centromeres, ribosomal DNA arrays, segmental duplications — so short reads cannot be placed uniquely",
+      "It was under legal and patent restriction until the mid-2010s",
+      "It contains no genes, so nobody was motivated to finish it",
+      "It had been sequenced but the raw data were lost"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — long reads (tens of kilobases) spanning whole repeat arrays were the enabling technology.",
+      "No — gene patents were a real controversy, but the 8% gap was a sequencing-technology limit, not a legal one.",
+      "No — the finished regions include ribosomal RNA gene arrays and centromeric sequence with real biology in them.",
+      "No — the sequence had never been read; that is what 'gap' meant."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "NHGRI — Human Genome Project Fact Sheet",
+     "type": "reading",
+     "url": "https://www.genome.gov/about-genomics/educational-resources/fact-sheets/human-genome-project",
+     "note": "The official history, including what the 2003 '92% complete' and 2022 gap-closing milestones actually covered."
+    },
+    {
+     "label": "ENCODE Consortium — Expanded encyclopaedias of DNA elements (Nature, 2020)",
+     "type": "paper",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/32728249/",
+     "note": "The registry of 926,535 human cCREs covering 7.9% of the genome — the concrete deliverable underneath the over-claimed '80% functional' headline."
+    },
+    {
+     "label": "Nurk et al. — The complete sequence of a human genome (Science, 2022)",
+     "type": "paper",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/35357919/",
+     "note": "The T2T-CHM13 paper that closed the last 8%; the abstract carries the 3.055 Gb figure."
+    }
+   ]
+  },
+  {
+   "id": "gene-to-protein",
+   "title": "From Gene to Protein — the central dogma, done properly",
+   "summary": "Transcription, splicing, translation and folding — plus the part textbooks skip: where regulation actually lives, and why measuring mRNA does not tell you protein.",
+   "anim": "gen_dogma",
+   "cards": [
+    {
+     "h": "Transcription and splicing — one gene, many messages",
+     "md": "## DNA → *(transcription)* → pre-mRNA → *(splicing)* → mRNA → *(translation)* → polypeptide → *(folding)* → protein\n\n**Transcription.** RNA polymerase II copies one DNA strand into **pre-mRNA** (precursor messenger RNA). The transcript gains a 5′ cap and a 3′ poly(A) tail — stability and export tags, not ornament.\n\n**Splicing.** Human genes are interrupted. A typical gene spans **~27 kb** of DNA but contributes only **~1.3 kb** of protein-coding sequence, split across roughly 8–9 **exons** separated by **introns** — the intervening sequence, excised and discarded. The **spliceosome**, a large ribonucleoprotein machine, makes the cuts.\n\nThe crucial part: it does not always cut the same way. **~95% of human multi-exon genes are alternatively spliced** (Pan et al. and Wang et al., both 2008). Skip an exon, choose an alternative 5′ or 3′ splice site, retain an intron — and one gene yields many **isoforms**, sometimes with different or even opposing functions. That is how GENCODE gets **644,292 transcripts** out of ~19,400 coding genes.\n\nSplicing is also a major disease mechanism. A variant buried deep in an intron that creates a new splice site can be as damaging as a nonsense variant in an exon — and standard **exome** sequencing, which reads only exons and their immediate flanks, will never see it."
+    },
+    {
+     "h": "Translation and folding",
+     "md": "**Translation.** The ribosome reads mRNA in **codons** — three bases per amino acid. Sixty-four codons encode 20 amino acids plus stop, so the code is **redundant**: several codons specify the same amino acid. tRNAs deliver the amino acids; the chain elongates at roughly 5–10 residues per second in human cells.\n\n**Folding.** The chain is not a protein until it folds. Anfinsen's classic result — sequence determines structure — holds in the thermodynamic limit, but *in vivo* folding is **co-translational** (the N-terminal end begins folding before the C-terminal end exists) and **chaperone-assisted** (Hsp70, chaperonins). Rate matters: a **synonymous** codon change that alters translation speed can change the folded outcome without changing a single amino acid. 'Silent' variants are not reliably silent.\n\n**What changed in the 2020s.** AlphaFold2 (2021) and its successors predict folded structure from sequence at near-experimental accuracy for most single domains, and a predicted structure now exists for essentially every human protein. Be precise about what that solved: it predicts the **endpoint**, not the folding pathway, not misfolding kinetics, and it is weakest exactly where biology gets interesting — intrinsically disordered regions, multi-chain complexes, and the stability effect of a single point substitution. Structure prediction did not become variant-effect prediction."
+    },
+    {
+     "h": "Where regulation actually happens — and why protein ≠ mRNA",
+     "md": "Regulation is a stack, not a step:\n\n- **Promoter** — the launch pad immediately upstream where RNA Pol II assembles.\n- **Enhancers** — short regulatory elements that can sit **hundreds of kilobases** away and act on a promoter by DNA looping. Loops are corralled inside **TADs** (topologically associating domains) bounded by CTCF and cohesin; delete a boundary and an enhancer can hijack the wrong gene — a documented disease mechanism.\n- **Transcription factors (TFs)** — sequence-specific DNA-binding proteins. Humans have about **1,639** (Lambert et al., *Cell* 2018). Cell identity is a *combination* of TFs, not one master switch.\n- **Chromatin** — DNA methylation and histone modification determine what is physically accessible at all.\n- **Post-transcriptional** — splice choice, microRNA targeting, mRNA stability, translation-initiation rate.\n- **Post-translational** — phosphorylation, ubiquitination and degradation, subcellular localisation.\n\n**Hence: measuring mRNA does not tell you protein.** At steady state, mRNA abundance explains only about **40% of the variance** in protein abundance across genes (Liu, Beyer & Aebersold, *Cell* 2016), and considerably less during dynamic transitions. Median protein half-life (~46 h) far exceeds median mRNA half-life (~9 h) in mammalian cells, so protein levels integrate a history the transcript no longer reflects.\n\n**Flagged as contested:** Csárdi and colleagues (2015) argued that measurement error deflates that correlation and the true steady-state relationship is much tighter (R² near 0.8). The disagreement is unresolved. What is *not* disputed: transcriptomics is a proxy for proteomics, never a substitute."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A variant sits 200 bp deep inside an intron and changes no amino acid. A clinician calls it benign on that basis. What is the strongest counter-argument?",
+     "options": [
+      "It can create or destroy a splice site, changing which exons reach the mRNA — and exome sequencing would not even have looked there",
+      "Introns are translated too, so it changes the protein directly",
+      "All intronic variants should be presumed pathogenic until proven otherwise",
+      "It would shorten the poly(A) tail and destabilise the transcript"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — deep-intronic splice-creating variants are a well-documented pathogenic class and a known blind spot of exome-only testing.",
+      "No — introns are excised before translation. The mechanism is splice disruption, not direct coding change.",
+      "No — the overwhelming majority of intronic variants are inert. The point is that 'intronic' does not settle the question either way.",
+      "No — poly(A) tail length is set at the 3′ end during cleavage and polyadenylation, not by a deep-intronic base change."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "An RNA-seq experiment shows a gene's mRNA doubled after treatment. What can you conclude about its protein?",
+     "options": [
+      "Little on its own — mRNA explains only ~40% of the variance in protein levels at steady state, and less during transitions",
+      "The protein doubled as well, since translation output is proportional to message",
+      "The protein halved, because translational feedback inverts transcriptional changes",
+      "Nothing whatsoever can ever be inferred about protein from mRNA"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — it is evidence, not proof. Protein half-life, translation rate and degradation all sit between message and product.",
+      "No — proportionality is the assumption the proteomics data broke. Translation rate and protein turnover vary by orders of magnitude across genes.",
+      "No — there is no general inversion. Some genes are buffered, some track closely; direction is not systematically reversed.",
+      "No — this over-corrects. mRNA is genuinely informative, just far from sufficient; treat it as a proxy with a wide error bar."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "How do ~19,400 protein-coding genes produce hundreds of thousands of distinct transcripts?",
+     "options": [
+      "Alternative splicing — about 95% of multi-exon genes are spliced in more than one way",
+      "Each gene is physically present in hundreds of tandem copies",
+      "The genetic code is redundant, so one gene specifies many different proteins",
+      "Ribosomes randomly skip codons, generating variant products"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — exon skipping, alternative splice-site choice and intron retention multiply one locus into many isoforms.",
+      "No — with a few exceptions such as ribosomal RNA and histone gene clusters, genes are single-copy.",
+      "No — redundancy means several codons specify the *same* amino acid. It reduces variety, it does not create isoforms.",
+      "No — ribosomal frameshifting exists but is a rare, programmed event, not a general source of transcript diversity."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A synonymous ('silent') variant changes a codon but not the amino acid. Why might it still matter?",
+     "options": [
+      "It can shift translation speed and therefore co-translational folding, or disrupt a splicing regulatory element inside the exon",
+      "It changes the amino acid after all, once the protein folds",
+      "Synonymous variants are consistently pathogenic and should be reported as such",
+      "It alters DNA methylation across the whole chromosome"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — codon usage tunes elongation rate, and exonic splicing enhancers and silencers sit inside coding sequence.",
+      "No — the amino acid is unchanged by definition; the effect is on the process, not the sequence of the product.",
+      "No — most synonymous variants really are inert. The point is that 'synonymous' is not automatic proof of benignity.",
+      "No — a single synonymous substitution does not remodel chromosome-wide methylation."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "MedlinePlus — How do genes direct the production of proteins?",
+     "type": "reading",
+     "url": "https://medlineplus.gov/genetics/understanding/howgeneswork/makingprotein/",
+     "note": "Clean, non-specialist walkthrough of transcription and translation, from the US National Library of Medicine."
+    },
+    {
+     "label": "Liu, Beyer & Aebersold — On the dependency of cellular protein levels on mRNA abundance (Cell, 2016)",
+     "type": "paper",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/27104977/",
+     "note": "The review behind the '~40% of protein variance' figure, including why the number is lower during dynamic transitions."
+    },
+    {
+     "label": "GTEx Portal",
+     "type": "data",
+     "url": "https://gtexportal.org/home/",
+     "note": "Look up any human gene's expression across ~50 tissues — the empirical face of 'regulation, not gene count'."
+    }
+   ]
+  },
+  {
+   "id": "how-genomes-differ",
+   "title": "How Two Genomes Differ — the variation inventory",
+   "summary": "Any two people differ at 4–5 million sites; almost none of it is coding, the structural-variant count depends on your sequencing platform, and roughly 70 differences per person are brand new.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "The inventory: 4–5 million differences, and what kind they are",
+     "md": "Sequence any person and they differ from the reference at **4.1–5.0 million sites** (1000 Genomes Project, *Nature* 2015). That sounds enormous. It is about **0.1%** of 3.1 Gb.\n\nBy **count**, two classes dominate:\n\n- **SNPs** — single-nucleotide polymorphisms, one base swapped for another. Roughly **4–4.5 million** per genome.\n- **Indels** — short insertions or deletions under 50 bp. Roughly **600,000–800,000**.\n\nTogether those are **>99.9% of the differing sites**. But measured in **bases affected**, the picture inverts. **Structural variants (SVs)** — anything ≥50 bp: deletions, duplications, inversions, translocations, and **copy-number variants (CNVs)**, where a whole segment is present in a different number of copies — touch on the order of **20 Mb** per genome despite being a rounding error by site count.\n\n**Tandem repeats** are a category of their own: **short tandem repeats (STRs**, 2–6 bp motifs, ~1 million loci genome-wide) and **VNTRs** (variable-number tandem repeats, larger motifs). They mutate orders of magnitude faster than point sites, they are the basis of forensic DNA profiling, and pathological expansions cause roughly **60 known diseases** — Huntington's, fragile X, myotonic dystrophy, several ataxias and amyotrophic lateral sclerosis among them."
+    },
+    {
+     "h": "How much of it is coding — and why the SV count keeps moving",
+     "md": "**Coding is a sliver.** Of those 4–5 million differences, a typical genome carries roughly **10,000–12,000 sites that change a protein's amino-acid sequence**, and only **149–182 protein-truncating variants** — stop-gains, frameshifts, essential splice-site hits (1000 Genomes, 2015). So on the order of **0.3–0.5%** of your variants land in coding sequence at all, and only a couple of hundred are outright destructive.\n\nEverything else is non-coding. That is why the regulatory map from the previous concept is not an academic aside — it is where most of the variation, and most of the GWAS signal, actually is.\n\n**An honest caveat on the SV numbers.** They are as much a property of the instrument as of the biology. Short-read studies reported **~2,100–2,500 SVs per genome**. Haplotype-resolved **long-read** assemblies (Ebert et al., *Science* 2021) find **~23,000–31,000 per individual**, with roughly two-thirds invisible to short reads — overwhelmingly insertions in repetitive sequence, exactly where a 150-bp read cannot be anchored.\n\nRead that as a general discipline: **'how many variants does a person carry' is a measurement-limited quantity.** Anyone quoting it without naming the platform is quoting an artefact of the technology as though it were a fact about people."
+    },
+    {
+     "h": "'Mutation' became 'variant' — and where new ones come from",
+     "md": "**The vocabulary changed for a substantive reason.** The ACMG/AMP consensus standards (Richards et al., 2015 — American College of Medical Genetics and Genomics, with the Association for Molecular Pathology) recommended retiring both **'mutation'** and **'polymorphism'** in favour of **'variant'**, qualified by an explicit five-tier call: **pathogenic, likely pathogenic, uncertain significance (VUS), likely benign, benign.**\n\nThe old words smuggled in conclusions. 'Mutation' had come to imply *disease-causing*; 'polymorphism' implied *harmless* and was often defined by a ≥1% frequency cut-off with **no biological basis** — plenty of common variants affect risk, plenty of rare ones are inert. Uptake was fast: about **89% of clinical laboratories** now avoid 'mutation' in reports. The residual problem is the **VUS** — most rare variants seen in a patient have no confident classification. That is much of why **gnomAD** exists (**807,162 individuals**: 730,947 exomes plus 76,215 genomes). A variant found in thousands of healthy adults cannot be a highly penetrant cause of severe early-onset disease.\n\n**De novo variants.** Some of your differences are brand new — present in you and in neither parent. Across 1,548 Icelandic parent–offspring trios the average was **70.3 de novo point mutations per child** (Jónsson et al., *Nature* 2017). About **80% arise on the paternal chromosome**, because spermatogonial precursors keep dividing for life while oocytes do not.\n\nHence the **paternal-age effect**, quantified: **+1.51 mutations per year of the father's age** versus **+0.37 per year of the mother's** — roughly *doubling* the de novo count between a 20-year-old and a 40-year-old father. It is a real contributor to sporadic dominant disorders. Keep the magnitude honest, though: the *relative* increase for specific conditions is meaningful, while the *absolute* risk to any individual older father's child stays small."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Two labs sequence the same person. Lab A (short reads) reports ~2,300 structural variants; Lab B (long reads) reports ~27,000. Which is right?",
+     "options": [
+      "Both report what their platform can resolve — long reads detect insertions in repetitive sequence that short reads cannot anchor",
+      "Lab B is wrong; the established true figure is ~2,300 per genome",
+      "Lab A is wrong; it discarded real calls to hit a target number",
+      "Neither — the person's genome changed between the two runs"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — the ~3× discrepancy is a detection-sensitivity artefact, which is why the platform belongs in any quoted figure.",
+      "No — the ~2,300 figure was itself a floor set by short-read sensitivity, not a biological ceiling.",
+      "No — short-read pipelines are not discarding calls; they cannot place reads inside long repeats in the first place.",
+      "No — the germline genome is stable across a blood draw; somatic change is far too small to explain a 10× gap."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "You carry roughly 4–5 million variants. About how many change a protein's amino-acid sequence?",
+     "options": [
+      "About 10,000–12,000, of which only ~150–180 actually truncate a protein",
+      "Roughly half of them — coding sequence is where variation concentrates",
+      "About 2 million, split evenly between coding and non-coding",
+      "None — coding sequence is invariant between healthy people"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — on the order of 0.3–0.5% of your variants are coding, which is why non-coding interpretation is the hard problem.",
+      "No — coding sequence is only ~1.5% of the genome and is under stronger purifying selection, so it carries proportionally less variation.",
+      "No — that is off by roughly two orders of magnitude for amino-acid-altering sites.",
+      "No — healthy people routinely carry ~150 protein-truncating variants, most in genes tolerant of loss."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why did ACMG/AMP push the field from 'mutation' and 'polymorphism' to 'variant' plus a five-tier classification?",
+     "options": [
+      "Both old terms pre-judged pathogenicity, and the 1%-frequency line defining 'polymorphism' has no biological justification",
+      "The word 'mutation' tested badly with patients but the science was unaffected",
+      "Because variants are a distinct molecular class from mutations",
+      "Because the five tiers removed uncertainty from variant interpretation"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — the terminology was carrying a conclusion that the evidence had not yet earned.",
+      "No — patient communication mattered, but the driver was that the terms encoded unjustified claims about effect.",
+      "No — they describe the same molecular objects; the difference was only in the implied interpretation.",
+      "No — the opposite. The tiers made uncertainty explicit by creating the 'variant of uncertain significance' category."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A 45-year-old man and a 25-year-old man each father a child. Predict the difference in de novo point mutations, and what it does and does not mean.",
+     "options": [
+      "Roughly 30 more in the older father's child (~+1.5 per year) — a genuine contributor to sporadic dominant disease, but the absolute risk to any one child stays small",
+      "No difference — the de novo mutation rate per generation is constant",
+      "About 3,000 more, which makes fathering children after 40 medically inadvisable",
+      "Fewer, because ageing sperm undergo stronger selection before fertilisation"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — +1.51/year over 20 years is ~30 mutations, roughly doubling the paternal contribution, with a small absolute effect per child.",
+      "No — the rate rises measurably with paternal age because spermatogonia keep dividing throughout life.",
+      "No — the slope is ~1.5 per year, not ~150. Over-stating the magnitude is as misleading as denying the effect.",
+      "No — the effect runs the other way: more precursor cell divisions means more replication errors, not fewer."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "gnomAD — Genome Aggregation Database",
+     "type": "data",
+     "url": "https://gnomad.broadinstitute.org/",
+     "note": "Look up any variant's frequency across 807,162 individuals — the single most-used sanity check on a claimed pathogenic call."
+    },
+    {
+     "label": "1000 Genomes Project — A global reference for human genetic variation (Nature, 2015)",
+     "type": "paper",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/26432245/",
+     "note": "Source of the 4.1–5.0 million variants per genome and the per-genome coding and protein-truncating counts."
+    },
+    {
+     "label": "Jónsson et al. — Parental influence on human germline de novo mutations in 1,548 trios (Nature, 2017)",
+     "type": "paper",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/28959963/",
+     "note": "The 70.3 de novo mutations per child figure and the +1.51/year paternal vs +0.37/year maternal age slopes."
+    }
+   ]
+  },
+  {
+   "id": "mendelian-inheritance",
+   "title": "Mendelian Inheritance — and the two things that break it",
+   "summary": "Dominant, recessive and X-linked patterns predict transmission reliably; penetrance and expressivity are why they predict outcome only probabilistically.",
+   "anim": "gen_punnett",
+   "cards": [
+    {
+     "h": "The patterns you actually meet",
+     "md": "**Autosomal dominant** — one altered copy on an autosome (a non-sex chromosome) suffices. An affected parent transmits to **50%** of offspring, and the pedigree runs vertically through generations. Examples: **Huntington's disease** (a CAG repeat expansion in *HTT*); **familial hypercholesterolemia** (~**1 in 250** people — commoner than most clinicians assume).\n\n**Autosomal recessive** — **both** copies must be altered. Two unaffected carriers face a **25%** risk per pregnancy, and the pedigree looks horizontal: siblings affected, parents not. Example: **cystic fibrosis** (*CFTR*), carrier frequency ~1 in 25 in Northern European ancestry, ~1 in 2,500–3,500 births.\n\n**X-linked** — males are **hemizygous** (one X), so a single altered copy is fully expressed: **haemophilia A** (*F8*), **Duchenne muscular dystrophy** (*DMD*, ~1 in 5,000 male births). Female carriers are **mosaics**, because X-inactivation silences one X at random in each cell early in development. So 'carrier' is not a synonym for 'unaffected' — skewed inactivation leaves a minority of carriers genuinely symptomatic.\n\n**Mitochondrial** — transmitted only from the mother, and complicated by **heteroplasmy**: a mixture of normal and altered mitochondrial genomes within one cell. Severity tracks mutant load, not a clean genotype.\n\n**Compound heterozygosity** cuts across all of the recessive cases and is the common real-world situation: **two *different* pathogenic variants, one on each copy** of the gene. In cystic fibrosis, F508del homozygotes are only about **45%** of patients; most of the rest are compound heterozygotes. Practical consequence: a report saying 'one pathogenic *CFTR* variant found' has excluded one allele, not the disease."
+    },
+    {
+     "h": "Penetrance — and the BRCA1 number that fell",
+     "md": "**Penetrance** is the probability that a carrier of a genotype develops the phenotype. Naive Mendelism assumes 100%. Almost nothing is.\n\nEven Huntington's, the textbook fully penetrant dominant, is graded by repeat length: **≥40 CAG repeats** is effectively fully penetrant; **36–39** is *reduced* penetrance — carriers who may never manifest.\n\n**The instructive case is BRCA1, because the number moved a long way and the reason is methodological, not biological.**\n\n- **1990s, Breast Cancer Linkage Consortium** — families selected *because* they were loaded with cancer: breast-cancer risk **~85% by age 70**.\n- **Antoniou et al., 2003** — meta-analysis of 22 case series *unselected for family history*: **65% (BRCA1)**, **45% (BRCA2)** by 70.\n- **Kuchenbaecker et al., *JAMA* 2017** — prospective cohort: **72% (BRCA1)**, **69% (BRCA2)** by age **80**; ovarian 44% and 17%.\n- **Jackson et al., *eClinicalMedicine* 2023 — UK Biobank, population-ascertained:** BRCA1 breast-cancer penetrance by age 60 was **44.7% in women with a first-degree family history but only 22.8% in women without**.\n\nThe driver is **ascertainment bias**. You discover a gene by studying families full of the disease, so the founding penetrance estimate is implicitly *conditioned on* that family history — and it silently carries whatever shared modifier alleles and environment made those families conspicuous in the first place.\n\n**The clinical consequence is concrete:** a *BRCA1* pathogenic variant found incidentally in a healthy woman with no family history does **not** carry the 72% figure. Note also that this debate is live — the UK Biobank estimates themselves drew published rebuttals (*BJC Reports*, 2024) over healthy-volunteer bias and censoring. Here the honest answer is a range plus a statement of how the person was ascertained, not a single number."
+    },
+    {
+     "h": "Expressivity — and why 'Mendelian' is really a spectrum",
+     "md": "**Penetrance is *whether*. Expressivity is *how much*.** Two carriers of the *same* variant, in the *same* family, can differ enormously in severity and in which organs are involved.\n\n**Neurofibromatosis type 1** (*NF1*, ~1 in 3,000) is the standard illustration: penetrance is near-complete, yet one sibling has a few café-au-lait macules while the next has disfiguring plexiform neurofibromas, optic glioma and learning disability — same variant, same household.\n\nFour forces break the clean genotype→phenotype map:\n\n1. **Modifier genes.** In cystic fibrosis, lung-disease severity among identical *CFTR* genotypes tracks unlinked modifier loci.\n2. **Polygenic background.** Common-variant polygenic risk scores measurably shift risk *within* carrier groups — the same *BRCA2* variant means different things on different genomic backgrounds.\n3. **Somatic and stochastic events.** X-inactivation skew, a second somatic hit, developmental noise. Monozygotic twins discordant for a 'Mendelian' phenotype are the proof.\n4. **Environment and sex.** Hormonal milieu, diet, exposures, and sex-limited expression.\n\nRepeat-expansion disorders add **anticipation** — the repeat tends to grow on transmission, so onset comes earlier and severity worsens down a pedigree. The molecular phenomenon is real, but the historical clinical claims of anticipation were badly inflated by ascertainment bias, so treat the term with the same scepticism as a penetrance figure.\n\n**The usable summary:** Mendelian inheritance predicts **transmission** well — the 50%, 25% and X-linked ratios hold. It predicts **outcome** only probabilistically. Genotype is a strong prior, not a verdict."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Two unaffected parents have a child with cystic fibrosis. What is the recurrence risk for their next pregnancy, and why?",
+     "options": [
+      "25% — both parents must be carriers, and each pregnancy is an independent draw",
+      "0% — the family's risk was used up by the affected child",
+      "50%, as with any single-gene condition in a family",
+      "100%, since both parents are established carriers"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — carrier × carrier gives 25% affected, 50% carrier, 25% neither, independently at every conception.",
+      "No — this is the gambler's fallacy applied to meiosis. Prior outcomes do not change the next segregation.",
+      "No — 50% is the transmission risk for an affected parent with a dominant condition, not for two recessive carriers.",
+      "No — carriers each transmit the altered allele half the time, so both must coincide: 0.5 × 0.5 = 25%."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A symptomatic patient's panel reports one pathogenic CFTR variant. Has cystic fibrosis been excluded?",
+     "options": [
+      "No — most non-F508del patients are compound heterozygotes, and the second allele may be a variant the panel does not cover",
+      "Yes — one variant means carrier status by definition",
+      "Yes, because CFTR disease requires two copies of the same variant",
+      "No, because CFTR is X-linked and one copy is sufficient in males"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — targeted panels cover common variants; a rare second allele (including deep-intronic or structural) needs full gene sequencing to find.",
+      "No — that inference only holds if the second allele has actually been ruled out, which a limited panel cannot do.",
+      "No — the two pathogenic alleles need not be identical. Compound heterozygosity is the majority of non-F508del disease.",
+      "No — CFTR is on chromosome 7 and is autosomal recessive; the reasoning is wrong even though the conclusion is right."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A healthy 35-year-old woman with no family history of cancer learns incidentally that she carries a pathogenic BRCA1 variant. What risk figure should she be quoted?",
+     "options": [
+      "Lower than the clinic-cohort 72%-by-80 figure — population-ascertained data put risk by 60 near 23% without family history versus ~45% with one",
+      "72% by age 80 — the published figure applies to every carrier regardless of how she was found",
+      "The population baseline of ~13%, since she has no family history",
+      "Zero, because penetrance requires a family history to be expressed"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — this is the practical payoff of understanding ascertainment bias, and the honest answer is a range plus how she was ascertained.",
+      "No — that figure comes from cohorts enriched for family history; applying it to an incidental finding over-states her risk.",
+      "No — this over-corrects. Her risk is clearly elevated above baseline; it is the size of the elevation that shifts.",
+      "No — carriers without family history still show markedly elevated risk, roughly 23% by age 60 in UK Biobank."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Two brothers carry the identical NF1 variant. One has a few café-au-lait macules; the other has plexiform neurofibromas and optic glioma. What is this, and what explains it?",
+     "options": [
+      "Variable expressivity — modifier genes, polygenic background, somatic and stochastic events, and environment",
+      "Incomplete penetrance — the mildly affected brother must not actually carry the variant",
+      "Non-paternity, which is the usual explanation for discordant siblings",
+      "A misdiagnosis — identical variants necessarily produce identical phenotypes"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — both are affected (so penetrance is intact); the variation is in severity, which is expressivity.",
+      "No — he does carry it and he is affected, just mildly. Incomplete penetrance would mean no phenotype at all.",
+      "No — both brothers carry the same confirmed variant, so shared inheritance is not in question.",
+      "No — this is precisely the assumption that variable expressivity refutes; NF1 is the classic counterexample."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "MedlinePlus — What are the different ways a genetic condition can be inherited?",
+     "type": "reading",
+     "url": "https://medlineplus.gov/genetics/understanding/inheritance/inheritancepatterns/",
+     "note": "Side-by-side table of all eight inheritance patterns with worked examples — the cleanest reference for the non-specialist."
+    },
+    {
+     "label": "Kuchenbaecker et al. — Risks of breast, ovarian and contralateral breast cancer for BRCA1 and BRCA2 carriers (JAMA, 2017)",
+     "type": "paper",
+     "url": "https://jamanetwork.com/journals/jama/fullarticle/2632503",
+     "note": "The prospective-cohort penetrance estimates (72% / 69% by age 80) with confidence intervals — one end of the ascertainment story."
+    },
+    {
+     "label": "ClinVar",
+     "type": "data",
+     "url": "https://www.ncbi.nlm.nih.gov/clinvar/",
+     "note": "Public archive of variant classifications and their supporting evidence — see for yourself how often the answer is 'uncertain significance'."
+    }
+   ]
+  },
+  {
+   "id": "polygenic-traits",
+   "title": "Polygenic Traits and the Heritability Trap",
+   "summary": "Most human traits are built from thousands of loci of small additive effect, which is why they form bell curves instead of Mendel's discrete classes — and why heritability (h²), a population-level variance ratio, is the most misread number in all of genetics.",
+   "anim": "gen_polygenic",
+   "cards": [
+    {
+     "h": "Why Mendel's peas don't look like people",
+     "md": "Gregor Mendel picked traits governed by **one locus** (one position in the genome) with two clearly distinguishable alleles — round versus wrinkled, tall versus short. Those give **discrete classes** in fixed ratios. Human height, blood pressure, cholesterol and essentially every disease risk do not behave that way. They form smooth, roughly bell-shaped distributions.\n\n**Ronald Fisher** dissolved the apparent contradiction in 1918: a continuous distribution is exactly what you get from *adding up many* Mendelian loci of small effect.\n\nTake a toy trait with **3 loci**, two alleles each, every allele at frequency 0.5, each \"plus\" allele adding the same fixed increment. A person carries 6 alleles, so the genotype score *k* runs 0 to 6. Under independent assortment the class sizes are the binomial coefficients:\n\n## k = 0,1,2,3,4,5,6 → 1 : 6 : 15 : 20 : 15 : 6 : 1  out of 64\n\nThree loci already give seven classes and a hump in the middle: the modal class (*k* = 3) holds 20/64 ≈ 31% of people, each extreme holds 1/64 ≈ 1.6%. Go to 100 loci and you have 201 classes, spaced so finely that ordinary measurement error smears them into a continuum. The **central limit theorem** finishes the job: sums of many small independent contributions converge on the normal distribution whatever the shape of each contribution.\n\nWatch what happens to the tails. With *n* loci each contributing effect *a*, the full range is 2*na* while the standard deviation grows only as *a*√(n/2), so\n\n## range ÷ SD = 2√(2n)\n\nAt *n* = 100 that is 28 standard deviations. Carrying *every* plus allele is not merely rare, it is effectively impossible. Extremes in a polygenic trait come from the shoulders of a very wide distribution, never from one special genotype."
+    },
+    {
+     "h": "Heritability, defined the way a geneticist means it",
+     "md": "**Heritability** is a ratio of variances, not a property of a person. Partition the observed (phenotypic) variance in a population:\n\n## Vₚ = V_G + V_E    and    V_G = V_A + V_D + V_I\n\n- **V_A** — *additive* genetic variance: the part that behaves like the toy model above, where each allele contributes an increment that simply sums.\n- **V_D** — *dominance* variance: interaction between the two alleles at the same locus.\n- **V_I** — *epistatic* variance: interaction between loci.\n- **V_E** — environmental variance: everything non-genetic, including measurement noise and developmental accident.\n\nTwo heritabilities follow:\n\n## H² (broad-sense) = V_G / Vₚ        h² (narrow-sense) = V_A / Vₚ\n\n**h²** is the one that does practical work, because only additive variance is reliably transmitted parent to offspring. That is why the breeder's equation — response *R* to a selection differential *S* — is **R = h²S**, not H²S. A striking empirical regularity: even when the underlying biology is full of dominance and epistasis, *most* of the genetic variance in real populations turns out to be additive, because interaction effects at realistic allele frequencies mostly project onto the additive term.\n\nThe classical estimator from twins uses Falconer's formula, where *r* is the trait correlation within monozygotic (identical) and dizygotic (fraternal) twin pairs:\n\n## h² ≈ 2(r_MZ − r_DZ) = 2(0.90 − 0.45) = 0.90\n\nFor height, twin studies land near **0.7–0.8**. Molecular methods land lower: the 2022 saturated height map of 5.4 million people (Yengo et al., *Nature*) found **12,111** independent genome-wide-significant variants explaining about **40%** of height variance in European-ancestry samples.\n\nBe honest about the twin number. It assumes identical and fraternal twins share environments equally, and it quietly absorbs assortative mating and gene–environment correlation into the genetic bucket. Twin h² estimates are best read as **upper bounds**, not measurements."
+    },
+    {
+     "h": "★ Five things h² does not mean",
+     "md": "This is the most misused number in genetics. The negatives are where the teaching is.\n\n**1. Not \"how much of your trait is genetic.\"** h² = 0.8 for height does *not* mean 80% of your height came from genes and 20% from food. It means that in *this* population, in *these* environments, 80% of the *variance between people* tracks additive genetic differences. Any one person's height is 100% genes and 100% environment; neither is optional, and a variance ratio cannot be applied to an individual at all.\n\n**2. Not a constant of the trait.** Change the population or the environmental range and h² changes. Number of fingers is under near-total genetic specification, yet its heritability is close to **zero** — nearly all the variance in finger count comes from accidents, not alleles.\n\n**3. Not a limit on intervention.** Height's h² is high, and South Korean women born in 1996 were **20.2 cm** taller than those born in 1896 (NCD Risk Factor Collaboration, *eLife* 2016) — roughly three population standard deviations, from nutrition and infection control, with no change in allele frequencies. **Phenylketonuria (PKU)**, a single-gene disorder with heritability near 1, is almost entirely prevented by a low-phenylalanine diet.\n\nWorse for the intuition: a *successful, universal* intervention **raises** h², because it strips environmental variance out of the denominator.\n\n## h² = V_A / (V_A + V_E),  so  V_E ↓  ⇒  h² ↑\n\nEqualise schooling and the heritability of test scores goes *up*. High heritability is evidence that environments are already similar — not that they are powerless.\n\n**4. Says nothing about differences between groups.** Richard Lewontin's parable: split one bag of genetically variable seed between a rich pot and a poor pot. Within each pot every difference in plant height is genetic (h² = 1). Between pots every difference is soil. High within-group heritability is fully compatible with a 100%-environmental between-group gap. The two questions are logically independent.\n\n**5. Names no gene.** A heritability estimate is a variance accounting. It identifies no locus, no mechanism and no target."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "In the 3-locus toy model (two alleles per locus, every allele at frequency 0.5, each 'plus' allele adding the same increment), what fraction of the population carries the maximum score of 6 plus alleles?",
+     "options": [
+      "1 in 64 (about 1.6%)",
+      "1 in 8 (12.5%)",
+      "1 in 6 (about 17%)",
+      "20 in 64 (about 31%)"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — six alleles, each independently plus-or-minus at frequency 0.5, give 2⁶ = 64 equally likely combinations, and exactly one of them is all-plus. The weights 1:6:15:20:15:6:1 are a bell curve in embryo.",
+      "1 in 8 is the answer for three coin flips, not six. Each locus contributes two alleles, so the score runs 0 to 6 across 2⁶ = 64 equally likely combinations, only one of which is all-plus.",
+      "1 in 6 confuses a count of alleles with a probability. The all-plus genotype is one outcome out of the 2⁶ = 64 equally likely allele draws, not one out of six.",
+      "20 out of 64 is the modal class — three plus alleles, the middle of the distribution. The extreme is the opposite case, the rarest class at 1 in 64."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A country eliminates childhood malnutrition. Over two generations mean adult height rises 6 cm. What happens to the heritability of height in that country?",
+     "options": [
+      "It falls, because the environment has just proved it is doing the work",
+      "It rises, because removing environmental variance shrinks the denominator",
+      "It stays the same — heritability is a property of the trait",
+      "It becomes undefined once the population mean shifts"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This inverts the mechanism. Eliminating malnutrition removes a source of variation *between people*, so V_E falls. Since h² = V_A/(V_A+V_E), a smaller V_E makes the ratio larger, not smaller.",
+      "Correct, and this is the counterintuitive heart of the concept. h² = V_A/(V_A+V_E), so a successful universal intervention removes environmental variance and heritability rises — even though the environment just moved the population mean by 6 cm.",
+      "Heritability is not a property of the trait. It is a property of a particular population in a particular range of environments, and it moves whenever either one moves.",
+      "Heritability is a variance ratio and remains perfectly well defined after a shift in the mean. What changed here is the variance decomposition, not the definition."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A study reports h² = 0.75 for adult body mass index in a Danish cohort. Which statement is correct?",
+     "options": [
+      "In that population and environment, 75% of the variance in body mass index between people tracks additive genetic differences",
+      "75% of any given Dane's body mass index is caused by their genes",
+      "Diet and activity can change body mass index by at most 25%",
+      "75% of Danes carry an obesity-predisposing gene"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — heritability is a population-level variance ratio, conditional on the environments actually present in that sample. It is a statement about differences between people, never about the composition of one person.",
+      "This is the individual-level fallacy. A variance ratio cannot be applied to a single person; your body mass index does not decompose into a genetic 75% and an environmental 25%. Both causes are entirely necessary.",
+      "Heritability places no bound on what intervention can achieve. Height has a comparable h² and rose by roughly three population standard deviations in a century on nutrition alone.",
+      "Heritability names no gene and counts no carriers. It is a variance accounting, not an allele frequency."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Two groups are raised in systematically different environments. Within each group the heritability of a trait is 0.9. The group means differ by 5 points. What can you conclude about the cause of the between-group gap?",
+     "options": [
+      "Nothing — within-group heritability carries no information about between-group causes",
+      "That about 90% of the gap is genetic",
+      "That the gap must be entirely environmental",
+      "That the trait must be Mendelian"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — Lewontin's two-pots parable makes exactly this point: identical seed in rich and poor soil gives h² = 1 within each pot and a 100% environmental gap between them. Within-group and between-group questions are logically independent.",
+      "This is the most common misuse of heritability in public argument. A within-group variance decomposition is silent about between-group means; two pots can differ entirely because of soil while heritability inside each pot is 1.0.",
+      "Also unwarranted on this evidence. The data given cannot establish an environmental cause either — the honest answer is that within-group h² is simply uninformative here.",
+      "High heritability is entirely compatible with thousands of loci of tiny effect. Mendelian inheritance is a claim about one locus producing discrete classes, which nothing here implies."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Visscher, Hill & Wray (2008), \"Heritability in the genomics era — concepts and misconceptions,\" Nature Reviews Genetics",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/18319743/",
+     "type": "paper",
+     "note": "The canonical correction of every misconception on the third card, written by the people who build the estimators. If you read one thing after this concept, read this."
+    },
+    {
+     "label": "NCD Risk Factor Collaboration (2016), \"A century of trends in adult human height,\" eLife",
+     "url": "https://elifesciences.org/articles/13410",
+     "type": "paper",
+     "note": "1,472 studies, 18.6 million people, birth cohorts 1896–1996 — the source for the 20.2 cm gain in South Korean women, and the cleanest available proof that high h² does not bound intervention."
+    },
+    {
+     "label": "NHGRI Talking Glossary of Genomic and Genetic Terms",
+     "url": "https://www.genome.gov/genetics-glossary",
+     "type": "reading",
+     "note": "Audio and illustrated definitions for roughly 250 terms, written for a general audience — the right place to settle any vocabulary this pack introduces too quickly."
+    }
+   ]
+  },
+  {
+   "id": "gwas-and-effect-sizes",
+   "title": "GWAS: What a Million Regressions Can and Cannot Tell You",
+   "summary": "A genome-wide association study runs one regression per variant across the genome, which forces a significance threshold of 5×10⁻⁸ and yields thousands of hits with odds ratios near 1.1 — associations that are usually tags for something nearby, and almost never a 'gene for' anything.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "One regression per variant — and the price of that many tests",
+     "md": "A **genome-wide association study (GWAS)** genotypes a large cohort on an array reading roughly 500,000 to 1,000,000 pre-chosen **single-nucleotide polymorphisms (SNPs** — single-letter positions where people commonly differ), imputes up to ~10 million more from a reference panel, then runs one regression per variant:\n\n## y = μ + β·x + (ancestry covariates),   x ∈ {0, 1, 2}\n\nwhere *x* counts copies of the tested allele and *y* is the trait. Out comes one β and one p-value per variant. That is the whole method: a very large, very shallow scan for **association**.\n\nNow the price of that many tests. At the conventional α = 0.05, a million tests would deliver\n\n## 0.05 × 1,000,000 = 50,000 false positives\n\nburying any real signal. The **Bonferroni** correction divides α by the number of *independent* tests. Common SNPs are not independent — neighbours travel together — and empirical work put the effective number of independent common-variant tests in European-ancestry genomes at roughly one million. Hence the field-wide threshold:\n\n## α = 0.05 / 1,000,000 = 5 × 10⁻⁸   (|z| = 5.45, χ²₁ = 29.7)\n\nTwo honest caveats. **First**, African-ancestry genomes carry shorter blocks of co-inherited DNA and therefore *more* independent tests, so 5×10⁻⁸ is too lenient there; thresholds nearer 1×10⁻⁸ have been proposed. The \"universal\" threshold is calibrated to European ancestry, like much else in this field.\n\n**Second**, a stringent p-value buys you nothing against confounding. **Population stratification** — ancestry correlating with both allele frequency and trait — survives the standard defences of genotype principal components and mixed models. In 2019 two *eLife* papers (Berg et al.; Sohail et al.) showed the celebrated signal of natural selection on height across Europe largely dissolved once better-controlled data replaced the original consortium estimates. And within-sibship GWAS, which compares siblings and so controls ancestry exactly, found effect estimates for educational attainment roughly **40% smaller** than population estimates (Howe et al., 2022)."
+    },
+    {
+     "h": "Effect sizes are tiny, and that sets the sample size",
+     "md": "Typical common-variant hits are small. For disease, **odds ratios (OR** — the odds of disease in carriers divided by the odds in non-carriers) cluster in the **1.05 to 1.20** range. Translate one into absolute terms. Take a disease with 5% baseline risk and a variant with OR = 1.10:\n\n## odds = 0.05/0.95 = 0.0526 → ×1.10 = 0.0579 → risk = 0.0579/1.0579 = 5.5%\n\nA \"10% increase in odds\" moves absolute risk by **half a percentage point**. Headline-sized language, rounding-error consequences.\n\nFor a quantitative trait the arithmetic is just as sobering. A typical genome-wide-significant height variant shifts adult height by about **1 mm per allele**. Height's standard deviation is roughly 7 cm, so β ≈ 0.1/7 = 0.014 standard deviations. The variance explained by one such variant at minor allele frequency *p* = 0.3 is\n\n## V = 2pq·β² = 2(0.3)(0.7)(0.014²) = 0.42 × 1.96×10⁻⁴ ≈ 8×10⁻⁵\n\nThat is **0.008%** of the variance. You would need roughly 5,000 such variants to reach 40% — and Yengo et al. (2022) found 12,111.\n\nNow the power calculation that explains the entire history of the field. The chi-square test statistic's non-centrality parameter is λ = N·2pq·β². Clearing 5×10⁻⁸ requires χ²₁ > 29.7, and 80% power requires λ ≈ (5.45 + 0.84)² ≈ 39.6. Therefore\n\n## N = 39.6 / (8×10⁻⁵) ≈ 480,000 participants\n\nThat is why GWAS sample sizes marched from a few thousand in 2007 to 5.4 million by 2022. The threshold is not bureaucracy — it *is* the sample-size requirement. It is also why the pre-GWAS era of small candidate-gene studies produced a decade of claims that would not replicate: at N = 1,000 those studies had essentially no power to detect anything real, so almost everything they reported at p < 0.05 was noise."
+    },
+    {
+     "h": "The hit is a signpost, not the culprit — and where the heritability went",
+     "md": "**Linkage disequilibrium (LD)** is the tendency of alleles at nearby positions to be inherited together as a block, because recombination rarely separates them. An array does not test the causal variant; it tests whichever variant it happens to carry a probe for, and that variant lights up if it sits in the same LD block. The reported \"lead SNP\" is therefore usually a **tag** — correlated with the cause, not the cause.\n\nTwo consequences kill the \"gene for X\" headline:\n\n- More than **90%** of GWAS hits fall in non-coding DNA — regulatory sequence, not protein-coding genes. Reports name the *nearest* gene as a labelling convention, and that convention is often wrong. The famous obesity association inside an intron of **FTO** turned out to act on **IRX3** and **IRX5**, genes hundreds of kilobases away. Every headline that said \"the FTO obesity gene\" was naming the signpost, not the culprit.\n- Effect sizes are so small that no single variant is a \"gene for\" anything. Sitting in the top decile of a thousand-variant score is a claim about a distribution, not a diagnosis.\n\n**Missing heritability.** Twin studies put height's h² near 0.8. In 2010 the genome-wide-significant variants explained about 5%. Whole-genome methods that fit all common SNPs at once recovered roughly 45%; by 2022, with 5.4 million participants, the significant variants themselves reached 40% — in European-ancestry samples, and only 10–20% in others. The gap closed along four routes: thousands of real variants sitting *below* the threshold, imperfect tagging of causal variants by array SNPs, rare variants that arrays never see, and the uncomfortable fourth — that twin h² was **inflated to begin with** by assortative mating and shared environment.\n\nTreat the residual gap as unresolved. How much of it is real biology and how much is an overstated denominator is still argued in the literature, and anyone who quotes a tidy number is skipping the argument."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Why is the GWAS significance threshold 5×10⁻⁸ rather than the conventional 0.05?",
+     "options": [
+      "Because Bonferroni divides α = 0.05 by roughly one million effectively independent common-variant tests",
+      "Because genetics demands more certainty than other fields, by disciplinary convention",
+      "Because genetic effect sizes are unusually large and deserve a stricter bar",
+      "Because 5×10⁻⁸ is the measured false-discovery rate of the human genome"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — 0.05/10⁶ = 5×10⁻⁸. The count is one million rather than ten million because linkage disequilibrium makes neighbouring SNPs redundant, so the effective number of independent tests is far below the number of variants actually tested.",
+      "It is not a taste for rigour. Run a million tests at α = 0.05 and you expect 50,000 false positives — the threshold is arithmetic forced by the number of tests, and any field running a million tests would need the same correction.",
+      "The opposite is true: common-variant effect sizes are tiny (odds ratios near 1.1). Small effects plus a stringent threshold are exactly what forces GWAS sample sizes into the hundreds of thousands.",
+      "A false-discovery rate is a property of a study's results, not a constant of the genome. 5×10⁻⁸ is a family-wise error rate derived by Bonferroni correction."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A variant has an odds ratio of 1.10 for a disease whose baseline risk is 5%. A carrier's absolute risk is approximately:",
+     "options": [
+      "15%",
+      "5.5%",
+      "50%",
+      "10%"
+     ],
+     "answer": 1,
+     "feedback": [
+      "15% would require roughly a threefold increase in risk. An odds ratio of 1.10 is a 10% increase in the odds, not a tripling of the probability.",
+      "Correct — odds = 0.05/0.95 = 0.0526, times 1.10 = 0.0579, converted back to a probability = 0.0579/1.0579 ≈ 5.5%. A 10% relative bump on a small baseline is half a percentage point in absolute terms.",
+      "50% confuses the odds ratio with a probability. An odds ratio multiplies the odds; it is not itself a risk level.",
+      "10% would be a doubling of risk, corresponding to an odds ratio near 2.1, not 1.10. Multiplying the odds by 1.10 moves absolute risk from 5.0% to about 5.5%."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A GWAS reports a genome-wide-significant SNP inside an intron of the FTO gene, associated with body mass index. What is the most defensible interpretation?",
+     "options": [
+      "FTO is the obesity gene",
+      "The SNP tags a linkage-disequilibrium block; the causal element may be regulatory sequence acting on a different gene entirely",
+      "Carrying the allele causes obesity in most carriers",
+      "The finding is probably a false positive, because the variant is non-coding"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This is precisely the headline that follow-up work refuted. The FTO intronic signal was traced to a regulatory element acting on IRX3 and IRX5, hundreds of kilobases away. The nearest gene is a naming convention, not a mechanism.",
+      "Correct — over 90% of GWAS hits are non-coding, and the lead SNP is usually a tag correlated with the causal element through linkage disequilibrium. Fine-mapping and functional experiments are required to name the actual actor.",
+      "Common-variant effect sizes are tiny — this variant shifts body mass index by a fraction of a unit. The overwhelming majority of carriers are unaffected; the signal is a small shift in a population distribution.",
+      "Non-coding location is not evidence against a finding — it is the norm. Most of the genome's regulatory machinery lies outside protein-coding sequence, which is why so many hits land there."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Twin studies put height's heritability near 0.8, but by 2010 the genome-wide-significant variants explained only about 5% of the variance. Which is NOT a credible contributor to that gap?",
+     "options": [
+      "Thousands of real variants sitting just below the significance threshold",
+      "Rare variants that genotyping arrays do not cover",
+      "Twin-study heritability being inflated by assortative mating and shared environment",
+      "A small number of undiscovered large-effect common variants that determine height"
+     ],
+     "answer": 3,
+     "feedback": [
+      "This is a genuine contributor, and it turned out to be the largest. Raising the sample size to 5.4 million lifted the significant variants' share of height variance from 5% to about 40%.",
+      "Genuine — arrays genotype common variants by design, so rare and structural variation is largely invisible to them. Whole-genome sequencing recovers part of it.",
+      "Genuine, and the least comfortable of the four. Twin estimates assume identical and fraternal twins share environments equally and absorb assortative mating into the genetic term, so they behave as upper bounds.",
+      "Correct as the odd one out — this was the original hope and it failed. Two decades of scanning found no small set of large-effect common variants for height; the architecture is thousands of loci of very small effect."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "NHGRI — Genome-Wide Association Studies Fact Sheet",
+     "url": "https://www.genome.gov/about-genomics/fact-sheets/Genome-Wide-Association-Studies-Fact-Sheet",
+     "type": "reading",
+     "note": "Plain-language walkthrough of the method, the marker logic and the data-sharing infrastructure — the right orientation before touching the primary literature."
+    },
+    {
+     "label": "NHGRI-EBI GWAS Catalog",
+     "url": "https://www.ebi.ac.uk/gwas/",
+     "type": "data",
+     "note": "The curated registry of published associations, searchable by trait, gene or variant, with full summary statistics. Look up any 'gene for X' headline here and read the actual odds ratio."
+    },
+    {
+     "label": "Berg et al. (2019), \"Reduced signal for polygenic adaptation of height in UK Biobank,\" eLife",
+     "url": "https://elifesciences.org/articles/39725",
+     "type": "paper",
+     "note": "The cautionary tale in full: a celebrated selection signal that largely evaporated once residual population stratification was controlled. Read alongside its companion paper by Sohail et al. in the same issue."
+    }
+   ]
+  },
+  {
+   "id": "polygenic-risk-scores",
+   "title": "Polygenic Risk Scores: Real Signal, Small Print",
+   "summary": "A polygenic risk score is a weighted sum of risk alleles read as a percentile; it genuinely stratifies populations — a top-decile coronary score carries risk comparable to familial hypercholesterolemia — but it loses roughly fivefold accuracy outside European ancestry, ranks individuals barely better than a coin flip, and reports relative risks that usually mean small absolute changes.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "How the score is built, and what the number is",
+     "md": "A **polygenic risk score (PRS**, also called a polygenic score or PGS) collapses a whole genome into one number:\n\n## PRSᵢ = Σⱼ βⱼ · xᵢⱼ\n\nHere *xᵢⱼ* is the count (0, 1 or 2) of the effect allele at variant *j* in person *i*, and *βⱼ* is the effect estimate borrowed from a GWAS — a log-odds for disease traits. Early scores used only genome-wide-significant hits. Modern methods (LDpred, PRS-CS) use **millions** of variants with statistically shrunken weights, precisely because most of the signal sits below the significance threshold. As of mid-2026 the PGS Catalog lists roughly **7,000** published scores across about **800** traits.\n\nThe raw sum has no interpretable units — it is a sum of log-odds against an arbitrary reference. So it is standardised against a **reference panel** and reported as a percentile, or in standard deviations from that panel's mean.\n\nThat standardisation step carries the entire ancestry problem inside it. Your percentile is defined relative to whoever is in the panel. Allele frequencies differ systematically between populations, so comparing an African-ancestry genome against a European-ancestry panel produces a percentile that describes the mismatch between the two, not the person.\n\nBe clear about what a PRS is *not*. It is not a test for a variant — no specific allele is being reported as yours. It is not a diagnosis, and it has no defined positive predictive value for an individual. And it is not modifiable: your score is fixed at conception, while most of the risk it estimates is not."
+    },
+    {
+     "h": "What it genuinely does — and the relative-versus-absolute trap",
+     "md": "The real capability is **population stratification**: sorting a population into risk strata that clinical variables miss.\n\nKhera et al. (*Nature Genetics*, 2018) built a genome-wide score for coronary artery disease and found it identified **8.0% of the population** at more than **threefold** increased risk — comparable to carrying a **familial hypercholesterolemia (FH)** variant, the classic single-gene cause of premature heart disease. FH affects roughly 1 in 250 people. So the score flags about **twenty times more** high-risk individuals than FH screening does, including people whom family history and standard risk factors missed entirely. That result is real and it replicates.\n\nNow the trap. Relative risk is dimensionless; decisions live in absolute units.\n\nTake a 50-year-old man whose 10-year coronary event risk on standard clinical factors is 5%. Put him in a top-decile stratum carrying 2× relative risk:\n\n## 2.0 × 5% = 10%  →  absolute increase of 5 percentage points\n\nThat is a genuine conversation about a statin. Now take a 35-year-old whose 10-year baseline is 0.5% — same decile, same 2×:\n\n## 2.0 × 0.5% = 1.0%  →  absolute increase of 0.5 percentage points\n\nIdentical headline — \"your genetic risk is doubled\" — and one is worth acting on while the other is noise. Note also what the 10% figure implies for the 50-year-old: **90 of every 100 people in that top decile have no event in ten years.** A doubled risk is still, overwhelmingly, an uneventful decade. Always ask for the two absolute numbers, not the ratio between them."
+    },
+    {
+     "h": "★ Three limits, one of them severe",
+     "md": "**1. Ancestry portability — the severe one.** Scores are trained where the data are, and Martin et al. (*Nature Genetics*, 2019) reported that **79% of GWAS participants were of European descent**, a group that is 16% of the world's population. Their measured consequence, relative to European-ancestry performance:\n\n## accuracy 1.6× lower (Hispanic/Latino) · 1.7× (South Asian) · 2.5× (East Asian) · 4.9× lower (African ancestry)\n\nThe mechanism is not mysterious. Allele frequencies differ and linkage-disequilibrium blocks differ, so a tag variant that proxies a causal variant in one population may not proxy it in another. Concretely: the 12,111 height variants from the 2022 saturated map explain about **40%** of height variance in European-ancestry samples and only **10–20%** elsewhere. A 2023 *Nature* analysis (Ding et al.) showed accuracy decays **continuously** with genetic distance from the training sample — so \"ancestry-matched\" labelling is a crude patch on a continuous problem, and accuracy varies even inside a labelled group.\n\n**2. Individual discrimination is weak even where the population signal is real.** Elliott et al. (*JAMA*, 2020; N = 352,660) measured the C-statistic for incident coronary artery disease: **0.61** for the polygenic score alone, **0.76** for the clinical pooled cohort equations, **0.78** for both combined. A C-statistic of 0.61 means: draw one person who will have an event and one who will not, and the score ranks them in the right order **61%** of the time — against 50% for a coin flip. Its *incremental* value over cheap clinical variables was about **0.02**.\n\n**3. A population tool is being sold as an individual one.** A score that shifts a cohort's mean risk is not a score that tells one person what will happen. Commercial embryo-selection scores extrapolate far past this evidence base, and the major genetics societies do not support that use."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A 35-year-old woman's 10-year baseline risk of a coronary event is 0.5%. A polygenic score places her in a stratum with 2.5× the average risk. Her 10-year absolute risk becomes:",
+     "options": [
+      "1.25%, an increase of 0.75 percentage points",
+      "2.5%, an increase of 2 percentage points",
+      "25%",
+      "12.5%"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — 2.5 × 0.5% = 1.25%, so the absolute increase is 0.75 percentage points. The relative risk sounds alarming; the decision-relevant quantity is that 0.75-point difference, which at her age rarely changes management.",
+      "2.5% would be the answer if the baseline were 1%. Multiply the actual baseline: 2.5 × 0.5% = 1.25%, an absolute rise of 0.75 points.",
+      "25% mistakes the multiplier for a percentage. A relative risk of 2.5 multiplies the baseline risk; it is not itself a risk.",
+      "The arithmetic slipped by a factor of ten: 0.5% × 2.5 = 1.25%, not 12.5%. Watch the decimal — this is exactly the slip that turns a rounding error into a scare."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "European-trained polygenic risk scores applied to individuals of African ancestry lose roughly how much predictive accuracy, per Martin et al. (2019)?",
+     "options": [
+      "Essentially none — human genomes are 99.9% shared",
+      "About 1.2-fold lower",
+      "About 4.9-fold lower on average",
+      "They perform better, because African genomes carry more variation"
+     ],
+     "answer": 2,
+     "feedback": [
+      "Shared sequence is not the issue. What differs is allele frequency and linkage-disequilibrium structure, so the tag variants that proxy causal effects in one population stop proxying them in another.",
+      "Far too small. Martin et al. reported roughly 1.6-fold lower in Hispanic/Latino, 1.7-fold in South Asian and 2.5-fold in East Asian samples — and 4.9-fold lower in African ancestry.",
+      "Correct — an average 4.9-fold loss, driven by 79% of GWAS participants being of European descent. It is the largest equity problem in the field, and it makes current scores least useful in populations often carrying the heaviest cardiometabolic burden.",
+      "Greater African genetic diversity works against portability here, not for it: shorter linkage-disequilibrium blocks mean European-derived tag variants proxy the causal variants less well."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Elliott et al. reported a C-statistic of 0.61 for a coronary polygenic score used alone. What does that number mean?",
+     "options": [
+      "61% of people with a high score develop coronary disease",
+      "Given one future case and one non-case, the score ranks the case higher 61% of the time",
+      "The score explains 61% of coronary disease risk",
+      "61% of the variants in the score are causal"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The C-statistic is not an event rate. It is a ranking statistic and says nothing about the fraction of high scorers who go on to develop disease.",
+      "Correct — the C-statistic (equivalently the area under the ROC curve) is exactly this pairwise ranking probability. At 0.61 the score beats the 0.50 coin flip by a real but modest margin, and falls far short of the individual-level certainty marketing implies.",
+      "Variance explained and discrimination are different quantities. A C-statistic of 0.61 corresponds to a very modest share of variance on the liability scale, not 61% of it.",
+      "The C-statistic measures predictive discrimination, not the causal status of the variants. Most weighted variants in a modern score are tags, not causes."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A patient is told he sits in the top 5% of the polygenic distribution for type 2 diabetes. Which conclusion is warranted?",
+     "options": [
+      "He will almost certainly develop type 2 diabetes",
+      "His prior probability is shifted upward; most people in that stratum still never develop the disease, and nothing about his modifiable risk factors has changed",
+      "He can lower the score through diet and exercise",
+      "The result rules in a diagnosis and should trigger treatment"
+     ],
+     "answer": 1,
+     "feedback": [
+      "Even strong strata leave the majority unaffected. A polygenic score moves a distribution; it does not deliver an outcome to an individual.",
+      "Correct — a percentile is a shift in prior probability and nothing more. It also does not change what he can do: the score is fixed at conception while the absolute risk it estimates is substantially modifiable.",
+      "The score itself cannot change — it is a fixed function of his genotype. What diet and exercise change is the absolute risk, which is the number that actually matters.",
+      "A polygenic score is not diagnostic. It has no defined positive predictive value for an individual and does not on its own meet the standard for initiating treatment."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "NHGRI — Polygenic Risk Scores",
+     "url": "https://www.genome.gov/Health/Genomics-and-Medicine/Polygenic-risk-scores",
+     "type": "reading",
+     "note": "The federal genome institute's own explainer, and unusually candid: it states plainly that these scores measure relative rather than absolute risk and are most accurate in people of European ancestry."
+    },
+    {
+     "label": "PGS Catalog — open database of published polygenic scores",
+     "url": "https://www.pgscatalog.org/",
+     "type": "data",
+     "note": "Every published score with its variant weights, development metadata and reported performance across ancestry groups. If a company quotes you a score, its ancestry-specific performance is probably listed here."
+    },
+    {
+     "label": "Martin et al. (2019), \"Clinical use of current polygenic risk scores may exacerbate health disparities,\" Nature Genetics",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6563838/",
+     "type": "paper",
+     "note": "The source of the 1.6× / 1.7× / 2.5× / 4.9× portability figures and the 79%-European participation statistic. Free full text; the figures are worth more than the prose."
+    }
+   ]
+  },
+  {
+   "id": "reading-a-genetic-test",
+   "title": "Reading a Genetic Test: Bayes at the Bedside",
+   "summary": "A genetic result is a likelihood ratio, not an answer — the same 'pathogenic variant detected' supports about a 33% lifetime cancer probability under population screening and about 72% in a family with a strong history, and a consumer-array 'negative' rules out almost nothing.",
+   "anim": "gen_bayes_test",
+   "cards": [
+    {
+     "h": "Five tiers, one of which is not a result",
+     "md": "Clinical laboratories classify variants on the five-tier scale set by the American College of Medical Genetics and Genomics and the Association for Molecular Pathology (**ACMG/AMP**; Richards et al., *Genetics in Medicine*, 2015):\n\n**pathogenic · likely pathogenic · variant of uncertain significance (VUS) · likely benign · benign**\n\n\"Likely\" is calibrated, not casual: it means the laboratory is at least **90%** confident. A **VUS** is neither a weak positive nor a mild warning. It is a **no-result** — the evidence is insufficient in either direction — and the guidelines are explicit that a VUS must not drive clinical action. Risk-reducing surgery performed on a VUS is a documented and entirely preventable harm.\n\nWhat becomes of a VUS is quantifiable. Mersch et al. (*JAMA*, 2018) followed hereditary-cancer testing at one large laboratory from 2006 to 2016:\n\n## 2,048 of 26,670 unique VUS were reclassified = 7.7%\n## of those, 1,867 went to benign / likely benign = 91.2%\n\nOnly 8.7% were upgraded to pathogenic or likely pathogenic. Weighted by how many patients received each variant on a report, **24.9%** of all reported VUS were eventually reclassified; median time to an amended report was 1.17 years for downgrades. The base rate is unambiguous: a VUS on your report is roughly **ten times more likely** to end up benign than pathogenic.\n\n**The ancestry bias.** Classification leans heavily on population frequency — a variant common among healthy people cannot be a high-penetrance cause of disease. Reference databases are overwhelmingly European, so a variant that is common and harmless in an under-sequenced population looks rare and therefore suspicious. Manrai et al. (*NEJM*, 2016) found several variants previously reported as pathogenic for hypertrophic cardiomyopathy were significantly more common among Black Americans than white Americans and are in fact benign — patients and their relatives had been given genetic misdiagnoses. For the same structural reason, patients of non-European ancestry receive VUS results at substantially higher rates."
+    },
+    {
+     "h": "★ The same positive, two very different answers",
+     "md": "A genetic result updates a prior. Work it in natural frequencies rather than formulas.\n\n**Scenario A — population screening, no family history.** A woman receives a report of a pathogenic BRCA1 variant. Say the variant's carrier frequency in her population is 1 in 2,000 (0.05%), assay sensitivity is 99%, and the per-variant false-positive rate is 1 in 1,000 (specificity 99.9%). Among 100,000 women:\n\n## carriers: 50 → true positives = 0.99 × 50 = 49.5\n## non-carriers: 99,950 → false positives = 0.001 × 99,950 = 100.0\n## PPV = 49.5 / (49.5 + 100.0) = 33%\n\nTwo of every three positives are wrong. Not hypothetical: Tandy-Connor et al. (*Genetics in Medicine*, 2018) found **40%** of variants flagged \"increased risk\" in direct-to-consumer raw data were false positives on clinical confirmation.\n\nNow layer in **penetrance** — the probability a true carrier develops the disease. Kuchenbaecker et al. (*JAMA*, 2017; 9,856 carriers, prospective) put cumulative breast-cancer risk to age 80 at **72%** for BRCA1. Baseline United States female lifetime risk is about **13%**.\n\n## P(cancer | positive) = 0.331×0.72 + 0.669×0.13 = 0.238 + 0.087 ≈ 33%\n\nThe number on the report is 72%. The number true of her is about **33%** — elevated, roughly 2.5× baseline, and less than half the headline.\n\n**Scenario B — diagnostic, strong family history.** Same variant, same letter, but her mother and maternal aunt had breast cancer before 50, so a risk model puts her prior at 10%; and the laboratory sequenced the gene and confirmed the call by a second method (specificity 99.99%). Among 10,000 such women:\n\n## carriers: 1,000 → 990 true positives; non-carriers: 9,000 → 0.9 false positives\n## PPV = 990 / 990.9 = 99.9%  →  P(cancer) ≈ 0.999 × 0.72 ≈ 72%\n\nIdentical words on the page. **33% versus 72%** — decided entirely by the prior and the assay, not by the DNA."
+    },
+    {
+     "h": "Arrays ask fixed questions; a negative may answer none of them",
+     "md": "A consumer genotyping array is a fixed panel of probes. At each of several hundred thousand chosen positions it asks \"is this letter an A or a G?\" It cannot see a variant it has no probe for, and it does not read the rest of the gene at all. **Clinical sequencing** reads every base of the target genes, and adds deletion/duplication analysis for the large rearrangements that neither arrays nor plain sequencing detect.\n\nThe gap is enormous, and the numbers are public. 23andMe's FDA-authorised BRCA report covers **44** variants. More than **4,000** BRCA1/BRCA2 variants are known to raise cancer risk. The original 2018 authorisation covered **three** Ashkenazi founder variants, which account for roughly 87% of BRCA1 and 93% of BRCA2 pathogenic variants in Ashkenazi Jewish people — and a small minority of them in everyone else.\n\nSo read a consumer \"variants not detected\" result for what it literally is:\n\n## P(none of the 44 tested variants), NOT P(no pathogenic BRCA variant)\n\nIn odds terms the negative likelihood ratio for a non-Ashkenazi woman is close to **1** — the result barely moves her prior at all. A woman with three relatives who had early breast cancer, who reads a consumer-array \"negative\" and skips clinical testing, has been actively harmed by a technically correct report. The FDA authorisation letter states this limitation in writing; almost nobody reads it.\n\nTwo further distinctions worth carrying:\n\n- A **true negative** means the family's specific, already-identified pathogenic variant was tested for and is absent. That is genuinely reassuring.\n- An **uninformative negative** means no pathogenic variant was found in a family where none was ever identified. That is not reassurance; it is the absence of information.\n\nThe practical rule runs in both directions: **never act on a consumer-array positive without clinical confirmation, and never take reassurance from a consumer-array negative.**"
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Screen 100,000 women for a variant carried by 1 in 2,000, using an assay with 99% sensitivity and a 1-in-1,000 false-positive rate. What is the positive predictive value of a positive result?",
+     "options": [
+      "About 99%",
+      "About 33%",
+      "About 50%",
+      "About 5%"
+     ],
+     "answer": 1,
+     "feedback": [
+      "99% is the sensitivity, not the positive predictive value. Sensitivity asks P(positive | carrier); PPV asks P(carrier | positive). With a rare variant those two quantities diverge dramatically.",
+      "Correct — 50 carriers give 49.5 true positives, while 99,950 non-carriers at a 0.1% error rate give 100 false positives. PPV = 49.5/149.5 ≈ 33%. When the prior is tiny, even a very specific assay produces more false positives than true ones.",
+      "50% would require true and false positives to be equal. Here the false positives (100) outnumber the true positives (49.5) by about two to one, pulling the answer below half.",
+      "5% understates it. The assay is genuinely informative — it lifts the probability from 0.05% to about 33%, a roughly 660-fold update. It just is not the near-certainty the report implies."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A report returns a variant of uncertain significance (VUS) in BRCA2. What is the appropriate reading?",
+     "options": [
+      "A weak positive — begin enhanced surveillance on the basis of the variant",
+      "A no-result that must not drive clinical action; if it is ever reclassified, roughly 9 times in 10 it is downgraded to benign",
+      "Proof that the gene is normal",
+      "Sufficient grounds to consider risk-reducing surgery"
+     ],
+     "answer": 1,
+     "feedback": [
+      "A VUS is not a graded positive. The evidence is insufficient in both directions, and treating it as a weak positive imports risk and anxiety that the data do not support.",
+      "Correct — ACMG/AMP guidance is that a VUS must not be used for clinical decisions, and Mersch et al. found that among reclassified VUS 91.2% were downgraded to benign or likely benign versus 8.7% upgraded. The base rate strongly favours benign.",
+      "A VUS is not a normal result either. It is the explicit absence of a conclusion: the laboratory found something it cannot classify in either direction.",
+      "This is the documented harm case. Risk-reducing surgery has been performed on the basis of a VUS, and preventing exactly that is why the classification tier exists."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A woman of Northern European ancestry with three first-degree relatives who developed breast cancer before 50 receives a consumer-array report reading 'BRCA variants not detected.' What should she conclude?",
+     "options": [
+      "Her BRCA risk is ruled out",
+      "Essentially nothing — the array tests 44 of more than 4,000 known pathogenic variants, so the negative likelihood ratio is near 1 and clinical sequencing is still indicated",
+      "Her family history must be coincidental",
+      "The array is defective and the test should be repeated"
+     ],
+     "answer": 1,
+     "feedback": [
+      "This is the dangerous misreading the concept exists to prevent. The array answered a far narrower question than the one she is actually asking.",
+      "Correct — the result is P(none of the 44 tested variants), not P(no pathogenic BRCA variant). Her prior is high on family history, and a test that barely shifts the odds leaves it high. Clinical sequencing with deletion/duplication analysis is the correct next step.",
+      "An early-onset pattern across three first-degree relatives is far from coincidental, and in any case the test performed cannot speak to it in either direction.",
+      "The array worked exactly as designed. The failure is interpretive: a small fixed panel of probes cannot deliver an informative negative for a gene with thousands of pathogenic variants."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Why does the identical laboratory sentence — 'pathogenic BRCA1 variant detected' — support about a 33% lifetime breast-cancer probability in one woman and about 72% in another?",
+     "options": [
+      "Because the penetrance of the variant differs between the two women",
+      "Because the pre-test probability and the assay's error rate differ, changing the probability that the call is a true positive",
+      "Because one of the two reports is simply wrong",
+      "Because lifetime risk in carriers is not really knowable"
+     ],
+     "answer": 1,
+     "feedback": [
+      "The variant and its 72% penetrance are the same in both scenarios. What differs is the probability that she actually carries it — about 33% under screening, 99.9% in the diagnostic setting.",
+      "Correct — this is Bayes. Under screening (prior 1 in 2,000, array-class error rate) the positive predictive value is only about 33%, so expected risk is 0.33×72% + 0.67×13% ≈ 33%. With a strong family history and a confirmed sequencing call the PPV is 99.9% and the answer collapses to the penetrance itself.",
+      "Neither report is wrong. Both correctly state what was observed; the difference lies entirely in what that observation implies given the prior.",
+      "Carrier lifetime risk is well characterised — Kuchenbaecker et al. measured 72% cumulative breast-cancer risk to age 80 for BRCA1 carriers in a prospective cohort of 9,856 women."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "ClinVar — NCBI's public archive of variant–phenotype interpretations",
+     "url": "https://www.ncbi.nlm.nih.gov/clinvar/",
+     "type": "data",
+     "note": "Look up any variant on your report and see how many laboratories classified it, whether they agreed, and when the classification last changed — the single most useful reality check on a genetic result."
+    },
+    {
+     "label": "Mersch et al. (2018), \"Prevalence of Variant Reclassification Following Hereditary Cancer Genetic Testing,\" JAMA",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/30264118/",
+     "type": "paper",
+     "note": "Source of the 7.7% / 24.9% reclassification rates and the 91.2%-downgraded figure. The base rates that should govern how anyone reacts to a VUS."
+    },
+    {
+     "label": "Manrai et al. (2016), \"Genetic Misdiagnoses and the Potential for Health Disparities,\" NEJM",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/27532831/",
+     "type": "paper",
+     "note": "The concrete case: benign variants common in Black Americans were reported as causing hypertrophic cardiomyopathy because control databases were European. The mechanism behind ancestry-skewed VUS rates, in one study."
+    }
+   ]
+  },
+  {
+   "id": "pharmacogenomics",
+   "title": "Pharmacogenomics — the genetics that changes a prescription today",
+   "summary": "A handful of gene–drug pairs already carry enough evidence to change the dose or the drug at the bedside, and the direction of the effect flips depending on whether the enzyme clears the drug or activates it.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "What pharmacogenomics is — star alleles and the metaboliser ladder",
+     "md": "**Pharmacogenomics (PGx)** is the study of how inherited variation changes drug response. It is not polygenic risk scoring: the clinically useful signals are a small number of **large-effect variants in single genes** — drug-metabolising enzymes (the **cytochrome P450** family, written *CYP*), membrane transporters, and immune **HLA** (human leukocyte antigen) types.\n\nVariants are named as **star alleles**. `CYP2C19*1` is the reference (\"normal function\"), `*2` and `*3` are **loss-of-function (LOF)**, `*17` is increased-function. Your two inherited alleles form a **diplotype**; each allele carries an activity value, and the sum maps onto a **metaboliser phenotype**:\n\n- **Poor metaboliser (PM)** — two no-function alleles; essentially no enzyme activity.\n- **Intermediate (IM)** — one no-function allele, or two reduced-function ones.\n- **Normal (NM)** — the reference state (older papers call this \"extensive\").\n- **Rapid / Ultrarapid (RM/UM)** — increased-function alleles, or an outright duplication of the gene.\n\nThis ladder is the unit of clinical action: a laboratory reports a diplotype, and a guideline acts on the phenotype. Note what is *not* being measured. The assay reads DNA, not enzyme activity, so the phenotype it assigns is a prediction — a good one for the well-characterised alleles, and a blank for the rare or novel ones the panel was never designed to call."
+    },
+    {
+     "h": "Why the effect flips direction — plus CPIC and phenoconversion",
+     "md": "**The direction of the clinical effect flips depending on the drug.** For an *active* drug cleared by the enzyme, a poor metaboliser accumulates drug and gets toxicity. For a **prodrug** the enzyme must *activate*, a poor metaboliser makes too little active compound and gets treatment failure.\n\nCodeine is the clean illustration. **CYP2D6** converts codeine to morphine, so poor metabolisers get no analgesia at all, while **ultrarapid** metabolisers generate a morphine spike — which is why the FDA carries a boxed warning against codeine in children and contraindicates it after tonsillectomy. Same gene, same drug, opposite ends of the ladder, opposite harms.\n\nThe rules for acting on a result come from **CPIC** — the **Clinical Pharmacogenetics Implementation Consortium** (now part of **ClinPGx**, which merged CPIC, PharmGKB and PharmCAT into one resource in 2025). Read its remit precisely: CPIC deliberately does *not* tell you whether to order a test. It tells you what to do with a genotype **you already have**. That distinction is the entire pre-emptive-testing argument, and it returns in the companion lesson.\n\nOne trap breaks the whole model: **phenoconversion**. A genotypic normal metaboliser co-prescribed a strong enzyme inhibitor behaves like a poor metaboliser — a patient on fluoxetine or paroxetine, both potent CYP2D6 inhibitors, is functionally CYP2D6-deficient no matter what the genotype says. Genotype is fixed for life; phenotype is genotype *plus* the current medication list, and it changes every time that list does."
+    },
+    {
+     "h": "CYP2C19 and clopidogrel — certain mechanism, uncertain benefit",
+     "md": "**CYP2C19 → clopidogrel.** Clopidogrel (Plavix) is a **prodrug**; CYP2C19 performs the activating oxidation. Poor and intermediate metabolisers form less active thiol metabolite, achieve less platelet inhibition, and suffer more stent thrombosis after **PCI** (percutaneous coronary intervention). The FDA added a **boxed warning** in 2010; CPIC recommends prasugrel or ticagrelor instead for PM/IM patients with **ACS** (acute coronary syndrome) or undergoing PCI.\n\nLOF alleles are common and unevenly distributed by ancestry: poor metabolisers run on the order of 2% of Europeans but well over 10% of East Asians. That single fact is why a genotype-blind default of \"everyone gets clopidogrel\" fails differently in different populations.\n\nNow the honest part — what the outcome trials actually showed. **TAILOR-PCI** (2020) found roughly a one-third relative reduction in ischaemic events under genotype guidance but *narrowly missed statistical significance*. **POPular Genetics** showed genotype-guided de-escalation was non-inferior for thrombotic events while producing **less bleeding**. The pharmacological mechanism is not in doubt; the magnitude of the outcome benefit — and therefore whether routine testing pays for itself — still is."
+    },
+    {
+     "h": "Warfarin and simvastatin — the biggest effect size, and the transporter",
+     "md": "**CYP2C9 + VKORC1 → warfarin.** *VKORC1* encodes warfarin's actual **target**, vitamin K epoxide reductase — not an enzyme that metabolises it. Its −1639G>A promoter variant lowers expression of the target, so less drug is needed to inhibit it. *CYP2C9\\*2* and *\\*3* act on the other side of the problem, slowing clearance of the potent S-enantiomer. Combined with age, body size and interacting drugs, genotype explains roughly **half** of the between-patient dose variance — the largest effect size in all of pharmacogenomics.\n\nWhich makes the trial record instructive: **COAG** (2013) was negative, **EU-PACT** positive, **GIFT** (2017) positive on a composite endpoint. A large, well-replicated pharmacological effect did not translate cleanly into better outcomes, partly because attentive INR monitoring already corrects the dose empirically within days. And **DOACs** (direct oral anticoagulants) have since taken most of warfarin's indications, shrinking the practical footprint of the whole question.\n\n**SLCO1B1 → simvastatin.** *SLCO1B1* encodes **OATP1B1**, the hepatic uptake transporter that pulls statins out of portal blood into liver cells. The `c.521T>C` (*\\*5*) variant reduces uptake, so more drug stays in the systemic circulation and reaches muscle. The **SEARCH** genome-wide study (2008) found an odds ratio near **4.5 per copy** for myopathy on simvastatin 80 mg, with the majority of cases in that trial attributable to the variant. CPIC's guidance is drug- and dose-specific — strong for simvastatin, weaker for atorvastatin, minimal for fluvastatin — so the action is usually \"pick a different statin\", not \"abandon statins\". The FDA separately restricted the 80 mg simvastatin dose in 2011."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A 62-year-old is undergoing PCI for acute coronary syndrome. Pre-emptive genotyping returns CYP2C19 *2/*2 (poor metaboliser). What does CPIC guidance support?",
+     "options": [
+      "Use prasugrel or ticagrelor instead of clopidogrel",
+      "Prescribe clopidogrel at double the usual maintenance dose",
+      "Switch the antiplatelet to warfarin",
+      "Proceed with standard clopidogrel — genotype affects only bleeding risk"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — clopidogrel is a prodrug that CYP2C19 must activate, so a poor metaboliser gets inadequate platelet inhibition; CPIC recommends an alternative agent that does not depend on CYP2C19.",
+      "No — dose escalation was tested and does not reliably overcome a *2/*2 genotype; the activating enzyme is essentially absent, so more prodrug does not fix it.",
+      "No — warfarin is an anticoagulant, not an antiplatelet agent, and does not substitute for P2Y12 inhibition after stenting.",
+      "No — the direction is the opposite: poor metabolisers get too LITTLE active drug, and the documented harm is stent thrombosis, not bleeding."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why is a CYP2D6 ULTRARAPID metaboliser at risk from codeine, when for most drugs the risk sits with poor metabolisers?",
+     "options": [
+      "Codeine is a prodrug — CYP2D6 converts it to morphine, so extra enzyme produces a morphine surge",
+      "Ultrarapid metabolisers cannot clear codeine, so it accumulates",
+      "Codeine is toxic only in its unmetabolised form",
+      "Ultrarapid metabolisers have an allergic reaction to codeine"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — for a prodrug the direction flips: more enzyme means more ACTIVE drug. This drove the FDA boxed warning and the contraindication in children after tonsillectomy.",
+      "No — ultrarapid means faster conversion, not impaired clearance; the problem is too much morphine, not retained codeine.",
+      "No — codeine itself is a weak opioid; the risk comes from the morphine it is converted into.",
+      "No — this is a dose-related pharmacological effect on respiration, not an immune hypersensitivity reaction."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A patient genotyped as a CYP2D6 normal metaboliser has been taking paroxetine, a potent CYP2D6 inhibitor, for two years. How should you interpret their CYP2D6 phenotype for a new prescription?",
+     "options": [
+      "Functionally poor — this is phenoconversion, and the drug list overrides the genotype",
+      "Normal — genotype is fixed, so the phenotype cannot change",
+      "Ultrarapid — inhibitors upregulate the enzyme over time",
+      "Indeterminate — CYP2D6 genotype has no clinical meaning"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — a strong inhibitor converts a genotypic normal metaboliser into a functional poor metaboliser. Phenotype is genotype plus the current medication list, and it changes whenever that list does.",
+      "No — the genotype is indeed fixed, but the phenotype it predicts is not. Enzyme inhibition is exactly the case where the prediction fails.",
+      "No — inhibitors reduce activity. Enzyme induction, by rifampin for example, is a separate phenomenon and does not apply to paroxetine on CYP2D6.",
+      "No — CYP2D6 genotype is clinically meaningful for codeine, tamoxifen and several antidepressants; the point here is that co-medication modifies its interpretation."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A patient develops myopathy on simvastatin 80 mg and is found to carry SLCO1B1 c.521T>C. What is the most appropriate action?",
+     "options": [
+      "Switch to a statin less dependent on OATP1B1 uptake, or use a lower-intensity alternative",
+      "Stop all statins permanently — the variant contraindicates the whole class",
+      "Continue simvastatin 80 mg with monthly creatine kinase monitoring",
+      "Increase the simvastatin dose to overcome reduced hepatic uptake"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — CPIC's statin guidance is drug- and dose-specific. The effect is strongest for simvastatin and minimal for fluvastatin, so the action is usually to change statin rather than to abandon the class.",
+      "No — that forfeits a proven cardiovascular benefit. The variant modifies risk for particular statins at particular doses, not for lipid-lowering as a whole.",
+      "No — the FDA restricted the 80 mg simvastatin dose in 2011, and continuing the offending drug and dose after a myopathy event is the one option clearly to avoid.",
+      "No — reduced hepatic uptake means MORE drug in the systemic circulation reaching muscle, not less drug at the target. Raising the dose worsens the exposure that caused the problem."
+     ]
+    },
+    {
+     "id": "q5",
+     "type": "mcq",
+     "prompt": "VKORC1 variants affect warfarin dosing by a different mechanism from CYP2C9 variants. What is the difference?",
+     "options": [
+      "VKORC1 encodes warfarin's target enzyme, so the variant changes how much target there is to inhibit; CYP2C9 variants change how fast warfarin is cleared",
+      "VKORC1 is a transporter and CYP2C9 is a receptor",
+      "VKORC1 affects absorption from the gut; CYP2C9 affects renal excretion",
+      "They act by the same mechanism — both are metabolising enzymes"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — this is a pharmacodynamic versus pharmacokinetic distinction. VKORC1 is vitamin K epoxide reductase, the drug target itself, and its promoter variant lowers target expression, so less warfarin is needed.",
+      "No — VKORC1 is an enzyme and is the drug's target, not a transporter; CYP2C9 is a metabolising enzyme, not a receptor.",
+      "No — neither gene acts on absorption or renal excretion; warfarin is well absorbed and cleared hepatically.",
+      "No — only CYP2C9 is a metabolising enzyme. Treating them as equivalent hides the reason genotype explains so much dose variance: the two genes act on opposite sides of the dose–response relationship."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "CPIC gene–drug guidelines (ClinPGx)",
+     "url": "https://www.clinpgx.org/cpic/guidelines",
+     "type": "docs",
+     "note": "The primary source: peer-reviewed, per-pair dosing recommendations with strength-of-evidence ratings. CPIC, PharmGKB and PharmCAT merged into ClinPGx in 2025, so older cpicpgx.org and pharmgkb.org links now redirect here."
+    },
+    {
+     "label": "FDA — Table of Pharmacogenetic Associations",
+     "url": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
+     "type": "reading",
+     "note": "FDA's own list of associations it considers sufficiently supported, split by whether the evidence bears on drug levels, on efficacy, or on adverse events. Note FDA's explicit caveat: inclusion does not mean FDA recommends testing before prescribing."
+    }
+   ]
+  },
+  {
+   "id": "pharmacogenomics-safety",
+   "title": "Pharmacogenomics II — the tests that exist to prevent a catastrophe",
+   "summary": "DPYD, HLA-B*57:01 and TPMT/NUDT15 are the pairs where a genotype prevents a life-threatening reaction rather than fine-tuning a dose — and they are also where the field's ancestry gap and its evidence limits show most clearly.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "DPYD and the fluoropyrimidines — when a standard dose is an overdose",
+     "md": "**DPYD → fluoropyrimidines.** **DPD** (dihydropyrimidine dehydrogenase) catabolises well over 80% of a dose of **5-fluorouracil (5-FU)** or capecitabine. If DPD is missing, a standard dose behaves like a massive overdose.\n\nFour well-characterised *DPYD* variants (\\*2A, c.2846A>T, c.1236G>A/HapB3, \\*13) cause severe — sometimes fatal — mucositis, diarrhoea and myelosuppression. CPIC assigns a **gene activity score** from 0 to 2 and acts on it directly: halve the starting dose at an activity score of 1–1.5, avoid the drug entirely at 0, then titrate upward if the patient tolerates it. Roughly 3–8% of people of European ancestry carry a reduced-function allele; complete deficiency is rare.\n\nThis is also the clearest example of regulators diverging on the *same* evidence. The **EMA** (European Medicines Agency) has recommended pre-treatment DPD testing since 2020 and the UK NHS made it routine; US adoption has been slower and remains uneven institution by institution. If you need the current US position, read the current label rather than a textbook — this one has been moving."
+    },
+    {
+     "h": "HLA-B*57:01 and abacavir — the pair that became standard of care",
+     "md": "**HLA-B\\*57:01 → abacavir.** This is the case where testing did not merely get recommended — it *became* the standard of care, and the pair is now the field's proof of concept.\n\nCarriers of the **HLA-B\\*57:01** allele develop a potentially fatal hypersensitivity reaction to the HIV drug abacavir. The mechanism is immunological rather than metabolic: the drug alters the peptide-binding groove of that specific HLA molecule, so the immune system sees self-peptides as foreign. The prospective **PREDICT-1** trial (2008) drove immunologically confirmed hypersensitivity to **zero** by screening before the first dose — a negative predictive value of essentially 100%. Testing is in the label and is done universally.\n\nThree features made this pair uniquely tractable, and they explain why most gene–drug pairs never get here: the outcome is severe and unambiguous, the allele is a near-perfect predictor rather than a modest risk factor, and an equally good alternative drug exists. When all three hold, universal screening is easy to justify.\n\nSame logic, different allele: **HLA-B\\*15:02** and carbamazepine-induced **Stevens–Johnson syndrome** in patients of Southeast Asian ancestry, where the FDA label recommends testing before starting the drug."
+    },
+    {
+     "h": "TPMT, NUDT15, and the ancestry gap in every panel",
+     "md": "**TPMT and NUDT15 → thiopurines.** Azathioprine, mercaptopurine and thioguanine — used in inflammatory bowel disease, autoimmune disease and childhood leukaemia — are inactivated by **thiopurine methyltransferase (TPMT)**. A poor metaboliser given a standard dose can develop life-threatening myelosuppression, so CPIC recommends starting at a small fraction of the usual dose or choosing another agent.\n\nThen comes the part that should change how you read every pharmacogenomic panel. **NUDT15** (nudix hydrolase 15) was identified only in **2014**, and it matters enormously: *TPMT* variants are rare in East Asian and Hispanic populations, while *NUDT15* variants are not. A panel built on European data therefore under-protects exactly the patients who most need protecting, and it does so silently — the result comes back \"normal\".\n\nThis is the field's central equity problem stated in a single gene pair. Reference allele frequencies, variant classifications and even the star-allele definitions were derived largely from European cohorts. When a panel returns a reassuring result for a patient whose ancestry is poorly represented in those cohorts, the correct reading is *\"no known variant was found on this panel\"* — not *\"this patient has normal enzyme function\"*."
+    },
+    {
+     "h": "Where the evidence actually stops",
+     "md": "**Where the evidence actually stops.** Acting on a genotype you already have is well supported. **Pre-emptive panel testing of everyone**, before any drug is prescribed, is a different claim and is not settled.\n\nThe strongest evidence for it is **PREPARE** (2023), a roughly 7,000-patient European study of a 12-gene panel that reported about a **30% reduction in clinically relevant adverse drug reactions**. That is a real and important result. It is also open-label, with outcome ascertainment that depends partly on subjective reporting, and no trial has demonstrated a mortality benefit.\n\nThe remaining objections are practical rather than biological:\n\n- **Cost-effectiveness depends on the drug mix.** A panel pays for itself in a population that will actually receive clopidogrel, thiopurines or fluoropyrimidines; much less so otherwise.\n- **US reimbursement is patchy**, and coverage decisions differ by payer and by pair.\n- **A result nobody sees does nothing.** Without hard-wired clinical decision support firing at the moment of prescribing, a genotype filed in a chart years earlier is invisible.\n- **Panels age.** Alleles get reclassified, and *NUDT15* is the standing reminder that the relevant gene may not have been discovered yet.\n\nReasonable clinicians disagree about pre-emptive panels. Nobody serious disagrees about DPYD before a fluoropyrimidine or HLA-B\\*57:01 before abacavir. Hold those two claims apart — anyone selling certainty across the whole field is overselling."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A patient is due to start capecitabine. DPYD genotyping returns an activity score of 1. What does CPIC guidance support?",
+     "options": [
+      "Start at roughly half the standard dose and titrate upward if tolerated",
+      "Give the standard dose and monitor closely for mucositis",
+      "Avoid fluoropyrimidines entirely",
+      "Increase the dose, since reduced DPD means less drug reaches the tumour"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — an activity score of 1 or 1.5 indicates an intermediate metaboliser: halve the starting dose, then titrate upward guided by toxicity. Complete avoidance is reserved for an activity score of 0.",
+      "No — 5-FU toxicity in a DPD-deficient patient can be fatal and can develop faster than monitoring catches it. The dose reduction is the intervention.",
+      "No — that is the recommendation for an activity score of 0. An intermediate metaboliser can usually receive the drug safely at a reduced starting dose.",
+      "No — DPD catabolises the drug, so less DPD means higher systemic exposure, not lower. Raising the dose is precisely the fatal error this test exists to prevent."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "For which gene–drug pair has pre-treatment testing become genuinely universal standard of care, backed by a prospective trial that drove confirmed reactions to zero?",
+     "options": [
+      "HLA-B*57:01 before abacavir",
+      "CYP2C9 before warfarin",
+      "SLCO1B1 before simvastatin",
+      "CYP2C19 before every proton pump inhibitor"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — PREDICT-1 (2008) showed screening eliminated immunologically confirmed abacavir hypersensitivity; testing is in the label and is done everywhere.",
+      "No — warfarin genotyping has the biggest effect on dose variance but the outcome trials conflicted (COAG negative, EU-PACT and GIFT positive), so it never became universal.",
+      "No — SLCO1B1 guidance is real but is used to pick a statin and a dose, not as a mandatory pre-prescription screen.",
+      "No — CYP2C19 affects PPI exposure, but that is an efficacy-tuning question rather than a safety screen, and it is not routine practice."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Three features made HLA-B*57:01 screening easy to justify where most gene–drug pairs fail. Which set is correct?",
+     "options": [
+      "A severe unambiguous outcome, an allele that is a near-perfect predictor, and an equally good alternative drug",
+      "A common allele, a cheap assay, and a drug with no alternative",
+      "A mild reversible outcome, a rare allele, and strong patient demand",
+      "A metabolic mechanism, a dose-dependent effect, and a wide therapeutic index"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — when the harm is severe and unmistakable, the test is close to deterministic rather than probabilistic, and switching costs the patient nothing therapeutically, universal screening follows almost automatically.",
+      "No — having no alternative drug undercuts the case for screening, because a positive result would leave you with nothing useful to do about it.",
+      "No — a mild reversible outcome is exactly the situation where pre-treatment screening is hard to justify clinically or economically.",
+      "No — the abacavir reaction is immunological, not metabolic, and it is not dose-dependent. A wide therapeutic index would argue against needing a test at all."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A patient of Korean ancestry has a normal TPMT result but develops profound myelosuppression on azathioprine. What is the most likely explanation?",
+     "options": [
+      "A NUDT15 loss-of-function variant — common in East Asian populations and absent from TPMT-only testing",
+      "The TPMT assay is unreliable in people of East Asian ancestry",
+      "Azathioprine has no genetic determinants of toxicity beyond TPMT",
+      "Poor metaboliser status for CYP2C19"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — NUDT15, identified in 2014, is the dominant thiopurine toxicity gene in East Asian and Hispanic populations, where TPMT variants are rare. A European-derived panel systematically under-protects these patients.",
+      "No — the TPMT assay works fine; the problem is that the relevant variant is in a different gene the panel never looked at.",
+      "No — NUDT15 is a second, independently established determinant, now in the FDA labelling alongside TPMT.",
+      "No — CYP2C19 has no established role in thiopurine metabolism; it matters for clopidogrel, PPIs and some antidepressants."
+     ]
+    },
+    {
+     "id": "q5",
+     "type": "mcq",
+     "prompt": "Which statement most accurately describes the state of evidence for pre-emptive multi-gene pharmacogenomic panel testing in everyone?",
+     "options": [
+      "One large open-label study (PREPARE, 2023) reported roughly a 30% reduction in clinically relevant adverse drug reactions, but no trial has shown a mortality benefit and cost-effectiveness remains contested",
+      "Randomised trials have established a clear survival benefit, and panels are now standard of care",
+      "There is no evidence of any benefit, and no professional body supports pre-emptive testing",
+      "It is settled science — CPIC guidelines instruct clinicians to genotype every patient before prescribing"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — the signal is real but the study was open-label with subjective ADR ascertainment; honest practice is to describe both the finding and its limits.",
+      "No — no trial has demonstrated a survival benefit, and pre-emptive panels are not standard of care in most health systems.",
+      "No — that overstates the negative case; PREPARE reported a meaningful reduction in adverse reactions and several health systems run pre-emptive programmes.",
+      "No — CPIC deliberately does NOT tell clinicians whom to test. It states what to do with a genotype you already have."
+     ]
+    },
+    {
+     "id": "q6",
+     "type": "mcq",
+     "prompt": "A pharmacogenomic panel returns 'no variants detected' for a patient whose ancestry is poorly represented in the reference databases. What is the correct reading?",
+     "options": [
+      "No known variant was found on this panel — which is a weaker claim than 'enzyme function is normal'",
+      "Enzyme function is confirmed normal, so standard dosing is safe",
+      "The result is invalid and the test should be repeated",
+      "The patient almost certainly carries an undetected variant"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — a panel can only report what it interrogates. Allele definitions and frequency data were derived largely from European cohorts, so a negative result carries less information in an under-represented population.",
+      "No — this is the specific inference the NUDT15 story warns against. 'Not found' and 'not present' are different claims, and conflating them is how patients get hurt.",
+      "No — the assay performed correctly. The limitation is in panel content and reference data, not in the run.",
+      "No — that overcorrects. Most such patients have no relevant variant; the point is calibrated uncertainty, not assumed positivity."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "FDA — Table of Pharmacogenomic Biomarkers in Drug Labeling",
+     "url": "https://www.fda.gov/drugs/science-and-research-drugs/table-pharmacogenomic-biomarkers-drug-labeling",
+     "type": "reading",
+     "note": "The authoritative answer to 'is this actually on the label?' — including the clopidogrel boxed warning and the TPMT/NUDT15 and DPYD entries. Check here before quoting any regulatory claim, because the labels move."
+    },
+    {
+     "label": "ClinPGx — pharmacogenomic knowledge base (formerly PharmGKB)",
+     "url": "https://www.clinpgx.org/",
+     "type": "docs",
+     "note": "Variant-level annotations, allele frequencies by population, and clinical annotation levels of evidence. The population-frequency tables are the fastest way to check whether a panel is likely to be informative for a given patient's ancestry."
+    }
+   ]
+  },
+  {
+   "id": "cancer-genetics-germline",
+   "title": "Cancer Genetics I — germline predisposition and the question it answers",
+   "summary": "A germline test asks who else in the family is at risk; Knudson's two-hit model explains why carriers present earlier, and BRCA and Lynch show why the answer is a gene-specific range rather than a single number.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "Two words, two different questions",
+     "md": "Two words do most of the work in cancer genetics, and conflating them causes real harm.\n\n- **Germline** variants are inherited. They are present in every nucleated cell from conception, they can be passed to children, and they are detected from **blood or saliva**.\n- **Somatic** mutations are acquired during life inside a cell lineage. They are present only in the tumour and its descendants, they are **not heritable**, and they are detected by sequencing **tumour tissue** or tumour DNA shed into plasma.\n\nHold onto the practical consequence, because it decides which test you order:\n\n- A **germline** test answers *\"who else in this family is at risk, and what surveillance or risk-reducing surgery does this person need?\"*\n- A **tumour** test answers *\"what drug might work against this cancer right now?\"*\n\nTwo cautions about the sample itself. In a patient with leukaemia, a \"germline\" blood sample is contaminated with tumour, so skin fibroblasts or buccal cells are used instead. And a few percent of **tumour-only** panels turn up a variant that is in fact germline — a finding that obliges a confirmatory germline test and genetic counselling, not a shrug. Allele fraction is the usual clue: a germline variant sits near 50% (or 100%) in every tissue, while a somatic one sits wherever the tumour clone puts it."
+    },
+    {
+     "h": "Knudson's two hits — a model derived from arithmetic",
+     "md": "**Knudson's two-hit model (1971)** explains why inherited predisposition behaves the way it does — and it was derived from arithmetic, not from a sequencer.\n\nAlfred Knudson analysed the age-of-onset distribution of retinoblastoma and saw that hereditary cases appeared earlier and were frequently **bilateral and multifocal**, while sporadic cases appeared later and singly. The sporadic curve fitted a two-event process; the hereditary curve fitted a one-event process. His inference: a **tumour suppressor gene** needs *both* copies knocked out to release the brake. A germline carrier is born with the first hit already present in every retinal cell, so only one further somatic event is needed — near-certain across millions of cells. A non-carrier needs two independent hits in the same cell, which is rare. *RB1* was cloned years later and proved him right.\n\nTwo refinements matter in practice:\n\n- The two-hit rule applies to **tumour suppressors** — *RB1*, *TP53*, *BRCA1/2*, the mismatch repair genes. **Oncogenes** such as *KRAS*, *BRAF* and *EGFR* are gain-of-function and act dominantly at the cellular level: one hit is enough.\n- \"The second hit\" is often not a point mutation at all, but **loss of heterozygosity**, promoter methylation, or a structural deletion. This is why a panel looking only for point mutations can miss the second event entirely."
+    },
+    {
+     "h": "BRCA1 and BRCA2 — why the numbers are ranges",
+     "md": "**BRCA1 and BRCA2** are the canonical example, and the numbers deserve care. The NCI currently states that **more than 60%** of women carrying a harmful *BRCA1* or *BRCA2* variant develop breast cancer in their lifetime, against about **13%** in the general population. Ovarian risk splits by gene: about **39–58%** for *BRCA1* and **13–29%** for *BRCA2*, against roughly **1.1%** at baseline. Large prospective cohort studies published in 2017 put cumulative breast cancer risk to age 80 near **72%** for *BRCA1* and **69%** for *BRCA2*.\n\nThe ranges are real biology, not sloppiness. **Penetrance is modified** by family history burden, by common polygenic background, and by where the variant sits in the gene. The same pathogenic variant carries materially different risk in a family with many early cancers than in one with none — which is part of why prospective estimates from ascertained cohorts run higher than population-level figures. Quoting a single percentage to a patient overstates the precision of what is actually known.\n\nTwo further points. *BRCA2* raises male breast and prostate cancer risk, and both genes raise pancreatic risk — so \"the breast/ovarian genes\" undersells them. And germline *BRCA* status is now also a **treatment** biomarker: PARP inhibitors exploit synthetic lethality in homologous-recombination-deficient tumours. The clean germline-versus-somatic division of labour therefore blurs at the edges. A germline test can, these days, change the drug too."
+    },
+    {
+     "h": "Lynch syndrome, and why family history still counts",
+     "md": "**Lynch syndrome** arises from germline variants in the **mismatch repair (MMR)** genes *MLH1*, *MSH2*, *MSH6* and *PMS2*, or from *EPCAM* deletions that silence *MSH2*. Losing MMR produces **microsatellite instability (MSI)** — slippage in short repeat tracts that the repair machinery would normally correct.\n\nIt is the commonest inherited colorectal cancer syndrome, and in women **endometrial cancer is often the sentinel cancer**, appearing first. Risk is strongly **gene-specific**: colorectal risk to age 70 runs roughly 40–50% for *MLH1* and *MSH2*, but is substantially lower for *MSH6* and *PMS2* (on the order of 10–20%). Manage per gene, not per syndrome — a *PMS2* carrier and an *MLH1* carrier do not need the same colonoscopy interval.\n\nLynch is also where somatic testing points *back* to the germline. **Universal reflex screening** of colorectal and endometrial tumours by MMR immunohistochemistry or MSI testing is standard, with *BRAF* V600E or *MLH1* promoter methylation used to separate sporadic MLH1 loss (common, age-related, not inherited) from true Lynch.\n\n**Why family history still counts.** A negative panel is not an all-clear. Most strong family clusters remain genetically unexplained, panels miss deep intronic and structural variants, and **variants of uncertain significance (VUS)** are reported far more often in people of non-European ancestry because the reference databases are skewed — the same equity problem that shows up in pharmacogenomics. A striking pedigree justifies intensified surveillance whether or not a gene is found. The pedigree is data."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A 44-year-old woman has triple-negative breast cancer; her mother and maternal aunt had ovarian cancer. Her oncologist has already sent the tumour for a somatic panel. Her sister asks whether she should be screened. Which test answers the sister's question?",
+     "options": [
+      "A germline test on the patient's blood or saliva",
+      "The tumour panel already sent — it will report any BRCA variant",
+      "A liquid biopsy for circulating tumour DNA",
+      "Repeat mammography on the sister; genetic testing adds nothing"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — only a germline test on non-tumour DNA establishes an inherited, heritable variant. That is the result the sister can be tested for, and it drives her surveillance and risk-reducing options.",
+      "No — a tumour panel reports mutations present in the cancer, which may be somatic-only. Without a matched normal sample it cannot separate inherited from acquired, so it cannot answer a family-risk question.",
+      "No — ctDNA is tumour-derived by definition. It is a treatment-selection and disease-monitoring tool, not a heritability test.",
+      "No — this pedigree (early-onset triple-negative breast cancer plus two ovarian cancers) is a textbook indication for germline testing, and the result changes management for the whole family."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Under Knudson's two-hit model, why does hereditary retinoblastoma present earlier and more often bilaterally than the sporadic form?",
+     "options": [
+      "The carrier is born with one hit already present in every retinal cell, so only one further somatic event is needed",
+      "The inherited mutation is more damaging than an acquired one",
+      "Hereditary tumours grow faster because they arise in younger tissue",
+      "Carriers inherit an oncogene that is active from birth"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — one germline hit plus one somatic hit is far likelier, across millions of cells, than two independent somatic hits in the same cell. That is exactly what Knudson inferred from the age-of-onset curves in 1971.",
+      "No — the variants are often identical; what differs is that the carrier starts one step further along in every single cell.",
+      "No — growth rate is not the mechanism. The model is about the probability of accumulating the required number of hits.",
+      "No — RB1 is a tumour suppressor requiring loss of both copies. Oncogenes act dominantly with a single gain-of-function hit and follow different logic."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why is it misleading to tell a BRCA1 carrier that her lifetime breast cancer risk is a single fixed percentage?",
+     "options": [
+      "Penetrance is modified by family history burden, polygenic background and variant position, so the same variant carries different risk in different families",
+      "Because the published estimates are known to be fabricated",
+      "Because BRCA1 is not actually associated with breast cancer risk",
+      "Because risk cannot be estimated at all without whole-genome sequencing"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — this is why published figures appear as ranges, and why estimates from ascertained prospective cohorts run higher than population-level ones. A single number implies precision the evidence does not support.",
+      "No — the estimates are sound; the issue is that penetrance genuinely varies between families, not that the data are unreliable.",
+      "No — the association is among the best established in cancer genetics. The uncertainty concerns magnitude in an individual, not existence.",
+      "No — useful risk estimation is routine from a targeted test plus a pedigree. Whole-genome sequencing is not required and would not resolve the modifier problem."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A colorectal tumour shows loss of MLH1 protein on immunohistochemistry. What is the appropriate next step before concluding the patient has Lynch syndrome?",
+     "options": [
+      "Test for MLH1 promoter methylation or BRAF V600E, which indicate sporadic rather than inherited MLH1 loss",
+      "Proceed straight to risk-reducing colectomy",
+      "Conclude Lynch syndrome and test all first-degree relatives immediately",
+      "Repeat the immunohistochemistry on a second tissue block"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — sporadic MLH1 loss from age-related promoter hypermethylation is far commoner than Lynch syndrome, and BRAF V600E points the same way. This reflex step is why universal tumour screening works without flooding genetics clinics.",
+      "No — surgery cannot be justified before the germline question is resolved, and MLH1 loss alone does not establish an inherited syndrome.",
+      "No — cascade testing of relatives on an unconfirmed result generates substantial unnecessary anxiety and cost; most MLH1-deficient tumours are sporadic.",
+      "No — the immunohistochemistry result is not in doubt. The question is what caused the loss, which requires a different assay."
+     ]
+    },
+    {
+     "id": "q5",
+     "type": "mcq",
+     "prompt": "A patient with a striking family history of early colorectal cancer has a negative multi-gene panel. What is the correct interpretation?",
+     "options": [
+      "Intensified surveillance is still warranted — most strong family clusters remain genetically unexplained",
+      "The family history can now be disregarded and standard screening applies",
+      "The panel result proves the cancers were environmental in origin",
+      "The patient should be retested annually until a variant appears"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — panels miss deep intronic and structural variants, polygenic contributions are not captured, and much heritability remains unaccounted for. The pedigree is data in its own right and should drive management.",
+      "No — this is the most consequential misreading of a negative panel. Empiric family-history-based screening exists precisely for this situation.",
+      "No — a negative panel tests only the genes on the panel. It says nothing about whether an unmeasured genetic factor is present.",
+      "No — annual retesting is not useful. Periodic reanalysis as panels and variant classifications are updated is reasonable; yearly repeat testing is not."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "NCI — BRCA gene changes: cancer risk and genetic testing",
+     "url": "https://www.cancer.gov/about-cancer/causes-prevention/genetics/brca-fact-sheet",
+     "type": "reading",
+     "note": "The source for the penetrance figures quoted in the cards, updated as the evidence moves. Read the ranges as ranges — risk is modified by family history and polygenic background, which is part of why the 2017 prospective estimates run higher."
+    },
+    {
+     "label": "NCI PDQ — Genetics of colorectal cancer (health professional version)",
+     "url": "https://www.cancer.gov/types/colorectal/hp/colorectal-genetics-pdq",
+     "type": "reading",
+     "note": "The rigorous treatment of Lynch syndrome: gene-specific penetrance for MLH1/MSH2/MSH6/PMS2, universal tumour screening algorithms, and the MLH1-methylation and BRAF reflex that separates sporadic from inherited MMR loss."
+    },
+    {
+     "label": "NCI — Genetic testing for inherited cancer risk",
+     "url": "https://www.cancer.gov/about-cancer/causes-prevention/genetics/genetic-testing-fact-sheet",
+     "type": "reading",
+     "note": "The practical framing: who should be offered testing, what a variant of uncertain significance means, and how cascade testing of relatives works. Useful before a first genetics appointment."
+    }
+   ]
+  },
+  {
+   "id": "cancer-genetics-somatic",
+   "title": "Cancer Genetics II — tumour sequencing, liquid biopsy and the CHIP trap",
+   "summary": "A tumour test asks which drug might work — but the same mutation behaves differently by tissue lineage, a negative liquid biopsy proves nothing, and blood-derived clonal mutations routinely masquerade as tumour findings.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "What tumour sequencing is for — and why lineage still decides",
+     "md": "**Tumour sequencing exists to choose drugs.** The established, label-backed examples:\n\n- **EGFR** mutations (exon 19 deletion, L858R) in non-small-cell lung cancer → osimertinib.\n- **ALK** rearrangements → alectinib, lorlatinib.\n- **BRAF V600E** → dabrafenib plus trametinib.\n- **HER2** amplification or overexpression → trastuzumab, trastuzumab deruxtecan.\n\nNow the judgment point, and it is what separates a biomarker list from actual understanding. The *same* **BRAF V600E** allele in **colorectal** cancer responds poorly to a BRAF inhibitor given alone. Inhibiting BRAF in colorectal cells releases a feedback loop that reactivates **EGFR** signalling upstream, restoring flux through the pathway you just blocked; the effective regimen therefore adds an anti-EGFR antibody. Melanoma cells express far less EGFR and lack that escape route.\n\nA biomarker is not a promise. The tissue lineage — the wiring around the mutated node — still decides whether blocking that node accomplishes anything."
+    },
+    {
+     "h": "Tumour-agnostic approvals — when the molecule replaces the organ",
+     "md": "**Tumour-agnostic approvals** invert the usual logic of oncology: the drug is approved for a *molecular feature* rather than for an organ.\n\n- **Pembrolizumab** for **MSI-high / mismatch-repair-deficient** solid tumours (2017) was the first. The rationale is mechanistic: defective mismatch repair generates a high mutational burden, which generates neoantigens, which makes the tumour visible to a checkpoint-released immune system.\n- The **NTRK fusion** inhibitors **larotrectinib** (2018) and **entrectinib** (2019) followed. Those fusions are vanishingly rare in common cancers but near-defining in a few rare ones, and response rates run around three-quarters — a striking figure for a population selected on molecule rather than organ.\n- **Dabrafenib plus trametinib** gained a tumour-agnostic **BRAF V600E** indication in 2022.\n\nNote the tension with the previous card. BRAF V600E has both a tumour-agnostic approval *and* a documented lineage-specific failure mode in colorectal cancer. Both statements are true: the approval reflects activity across many lineages, and the colorectal exception is handled by combining drugs. \"Tumour-agnostic\" means the organ is no longer the entry criterion — not that the organ has stopped mattering.\n\nNote also what MSI-high is doing here. In Lynch syndrome it was a germline clue; in this setting it is a drug-selection biomarker. The same molecular finding answers different questions depending on why you went looking for it."
+    },
+    {
+     "h": "Liquid biopsy — what a negative result does and does not mean",
+     "md": "**Liquid biopsy / ctDNA.** Circulating tumour DNA is the tumour-derived fraction of cell-free DNA in plasma — often well under 1% of the total. FDA-approved comprehensive plasma panels have existed since 2020, and the operational rule is unambiguous:\n\n**A negative plasma result does not rule out the mutation.**\n\nSensitivity depends on shedding, and shedding is low in early-stage disease, in some indolent tumours, and behind the blood–brain barrier. Specificity is generally good, so a *positive* plasma finding is usually actionable; a *negative* one is uninformative rather than reassuring. Plasma-first is a reasonable strategy when tissue is scarce, the biopsy is risky, or the patient is deteriorating and you need an answer this week — but a negative must reflex to tissue.\n\nThe second use is **molecular residual disease (MRD)**: looking for ctDNA after curative-intent surgery. Detectable post-operative ctDNA is strongly prognostic, and MRD-guided strategies have been used in trials to safely *de-escalate* adjuvant chemotherapy — sparing toxicity without worsening recurrence. Whether *escalating* treatment in response to a positive MRD result improves survival is a different question and is still being tested. Prognostic and predictive are not the same property, and this is the commonest place the two get conflated."
+    },
+    {
+     "h": "Clonal haematopoiesis — the mutation that was never in the tumour",
+     "md": "**Clonal haematopoiesis is the trap.** With age, individual blood stem cell clones acquire mutations and expand — most often in *DNMT3A*, *TET2*, *ASXL1*, *PPM1D* and *TP53*. Prevalence exceeds 10% in people past 70. This state is called **CHIP** (clonal haematopoiesis of indeterminate potential), and by itself it is not leukaemia.\n\nHere is why it matters for a liquid biopsy. Those expanded white-cell clones shed DNA into the very plasma you are sequencing. A CHIP mutation therefore arrives in the assay looking exactly like a tumour mutation — same gene, same read pileup, plausible allele fraction. It is a documented cause of spurious *TP53* and *ATM* calls, and of patients being considered for targeted therapy on the strength of a mutation their cancer never had.\n\nThe fix is mechanical rather than clever: **sequence matched white blood cells in parallel** and subtract anything present in both. A plasma-only assay without a matched normal cannot make this distinction, and its low-allele-fraction calls should be read in that light.\n\nThree features raise suspicion before any confirmatory test comes back: the patient is older, the variant allele fraction is low and inconsistent with the estimated tumour fraction, and the gene is one of the recurrent CHIP genes — *PPM1D* and *TP53* especially. CHIP is also independently associated with cardiovascular risk and with later myeloid neoplasm, so an incidental finding is not always nothing. It is simply not evidence about the solid tumour in front of you."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "A colorectal tumour carries BRAF V600E. Why does a BRAF inhibitor alone underperform here, when it works well in BRAF V600E melanoma?",
+     "options": [
+      "Blocking BRAF in colorectal cells releases feedback that reactivates EGFR signalling, so an anti-EGFR agent must be combined",
+      "The V600E allele is a different mutation in colon tissue",
+      "Colorectal tumours do not express BRAF protein",
+      "BRAF inhibitors cannot reach the colon at therapeutic concentrations"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — this is the classic demonstration that lineage context modifies a biomarker. Melanoma cells express far less EGFR and lack that escape route; the effective colorectal regimen pairs a BRAF inhibitor with EGFR blockade.",
+      "No — it is the identical amino acid substitution; the difference lies in the surrounding signalling network, not in the mutation.",
+      "No — BRAF is expressed and mutated; the failure is pathway reactivation through EGFR feedback.",
+      "No — the limitation is biological resistance, not drug distribution."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A rare salivary gland tumour with no standard systemic option is found to carry an NTRK fusion. What does this finding support?",
+     "options": [
+      "Treatment with a TRK inhibitor under a tumour-agnostic approval, with response rates historically around three-quarters",
+      "Nothing — NTRK inhibitors are approved only for lung cancer",
+      "Immediate germline testing of the patient's children",
+      "Checkpoint immunotherapy, since fusions generate neoantigens"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — larotrectinib (2018) and entrectinib (2019) are approved on the molecular feature rather than the organ, and NTRK fusions are near-defining in a handful of rare tumours including secretory carcinomas.",
+      "No — these are tumour-agnostic approvals precisely because the fusion predicts response across many organ sites.",
+      "No — NTRK fusions are somatic rearrangements in the tumour, not inherited variants, so there is nothing for relatives to be tested for.",
+      "No — the immunotherapy rationale applies to MSI-high/dMMR tumours through high mutational burden. A single fusion does not create that neoantigen load."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A never-smoker with metastatic lung adenocarcinoma has a plasma ctDNA panel showing no EGFR mutation. What is the appropriate next step?",
+     "options": [
+      "Obtain tissue for sequencing — a negative plasma result does not rule out the mutation",
+      "Conclude the tumour is EGFR wild-type and start chemotherapy",
+      "Repeat the same plasma test in two weeks",
+      "Order germline testing for EGFR"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — ctDNA has good specificity but imperfect sensitivity, because shedding varies with tumour burden and site. Plasma-negative must reflex to tissue, particularly in a never-smoker where the pre-test probability of a targetable driver is high.",
+      "No — this is the single most common ctDNA error in practice, and it can cost a patient an effective targeted therapy.",
+      "No — repeating a test with the same sensitivity limitation on unchanged disease does not resolve the question; change the sample type.",
+      "No — EGFR-mutant lung cancer is overwhelmingly somatic. Germline EGFR variants exist but are rare and would not be the first move here."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "A liquid biopsy in a 78-year-old reports a TP53 mutation at 3% variant allele frequency, while the tumour tissue panel shows no TP53 mutation. What is the most likely explanation?",
+     "options": [
+      "Clonal haematopoiesis — a blood stem cell clone shedding DNA into the same plasma sample",
+      "The tumour tissue panel produced a false negative and the plasma result is correct",
+      "The patient has a germline TP53 variant (Li-Fraumeni syndrome)",
+      "Laboratory contamination from another patient's sample"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — CHIP mutations in TP53, DNMT3A, TET2, ASXL1 and PPM1D are present in over 10% of people past 70, and white cells shed DNA into the same plasma. Sequencing matched white blood cells resolves it.",
+      "No — tissue false negatives happen, but a low-frequency TP53 call in an elderly patient with negative tissue fits the well-documented CHIP artefact far better.",
+      "No — a germline variant would appear at roughly 50% allele frequency in every sample, not at 3% in plasma alone.",
+      "No — cross-contamination is rare and would not preferentially produce exactly the recurrent CHIP genes; this pattern is a recognised biological artefact, not a handling error."
+     ]
+    },
+    {
+     "id": "q5",
+     "type": "mcq",
+     "prompt": "Detectable ctDNA after curative-intent surgery is strongly prognostic. Why does that not automatically justify escalating adjuvant chemotherapy on a positive result?",
+     "options": [
+      "Prognostic and predictive are different properties — knowing who will relapse does not establish that more chemotherapy changes their outcome",
+      "Because post-operative ctDNA results are usually false positives",
+      "Because adjuvant chemotherapy has no effect on any solid tumour",
+      "Because ctDNA cannot be measured after surgery"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — MRD-guided de-escalation has trial support because withholding treatment from a low-risk group is directly testable. Whether escalation helps the high-risk group is a separate hypothesis still under study.",
+      "No — post-operative ctDNA positivity is fairly specific for residual disease. The uncertainty is about what to do with it, not whether it is real.",
+      "No — adjuvant chemotherapy has established benefit in several settings; the open question is whether MRD status should redirect it.",
+      "No — post-operative ctDNA measurement is exactly what MRD assays do, and it is the basis of the de-escalation trials."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "NCI — Biomarker testing for cancer treatment",
+     "url": "https://www.cancer.gov/about-cancer/treatment/types/biomarker-testing-cancer-treatment",
+     "type": "reading",
+     "note": "The clinical framing of what somatic tumour testing is for, including liquid biopsy and its limits. A good companion for a learner who wants the decision logic without the molecular detail."
+    },
+    {
+     "label": "NCI — Targeted cancer therapies",
+     "url": "https://www.cancer.gov/about-cancer/treatment/types/targeted-therapies",
+     "type": "reading",
+     "note": "Background on how targeted agents work and why a matching mutation is necessary but not sufficient — the same point the BRAF-in-colorectal example makes."
+    }
+   ]
+  },
+  {
+   "id": "crispr-mechanism",
+   "title": "CRISPR I — how the editors work, and why delivery is the hard part",
+   "summary": "Cas9 makes a programmable break and lets the cell improvise; base and prime editing rewrite sequence without breaking it — and getting any of them into the right tissue, then proving what else they hit, is the real work.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "Cas9 — a programmable break, and the PAM that licenses it",
+     "md": "**CRISPR** — *clustered regularly interspaced short palindromic repeats* — is a bacterial adaptive immune system: fragments of past viral invaders stored as a genetic memory, transcribed into RNA that guides a nuclease to matching DNA. The 2012 insight was that the *Streptococcus pyogenes* Cas9 system could be reprogrammed with a synthetic **single guide RNA (sgRNA)** to cut any chosen sequence.\n\nThree components determine where it cuts:\n\n- **The 20-nucleotide spacer** in the sgRNA, which base-pairs with the target strand.\n- **The PAM** — *protospacer adjacent motif*, `5'-NGG-3'` for SpCas9 — a short sequence that must sit immediately 3' of the target. **No PAM, no cut.**\n- **Two nuclease domains** — HNH cuts the target strand, RuvC cuts the other — producing a blunt **double-strand break (DSB)** roughly three base pairs upstream of the PAM.\n\nThe PAM deserves more attention than it usually gets. Recognition happens **PAM-first**: Cas9 collides with DNA, interrogates PAM sites, and only then unwinds the adjacent duplex to test whether the guide matches. This is also how the bacterium avoids destroying its own CRISPR array, which stores the spacer sequences *without* an adjacent PAM — self-versus-non-self discrimination built into the geometry.\n\nThe practical consequence is a hard constraint on targeting. If no PAM sits at the right distance from the base you want to change, that site is not addressable by SpCas9 at all. This drove the search for Cas variants with relaxed or alternative PAM requirements, now a routine part of designing an edit."
+    },
+    {
+     "h": "What the cell does with the break — NHEJ, HDR, and collateral damage",
+     "md": "**Cas9 does not edit. It breaks.** What happens next is decided by the cell's own repair machinery, and steering that choice is most of the craft.\n\n- **NHEJ** (*non-homologous end joining*) is active throughout the cell cycle and rejoins the broken ends sloppily, leaving small insertions or deletions. Land one in a coding exon and you get a frameshift and a **gene knockout**. NHEJ is efficient and reliable, which is why Cas9 nuclease is excellent at *disabling* a gene.\n- **HDR** (*homology-directed repair*) copies from a supplied donor template and can install a precise sequence — but it is restricted to **S and G2 phase** and is inefficient even there. It therefore barely works in the non-dividing cells (neurons, hepatocytes, mature muscle) where most genetic disease actually lives.\n\nThat asymmetry is the whole problem. Breaking a gene is easy; fixing one is not.\n\nThe break itself is also not innocent. Work from 2018 onward documented **large deletions and complex rearrangements** at cut sites, **chromothripsis and whole-chromosome loss** following cutting, and **p53 activation** that preferentially selects for p53-deficient cells in culture — an uncomfortable selection pressure to have inside a therapeutic product. Every one of those findings motivated the break-free tools in the next card."
+    },
+    {
+     "h": "Editing without breaking — base editors and prime editors",
+     "md": "**Base editing** (Liu lab, 2016–2017) removes the double-strand break entirely. A catalytically impaired Cas9 fused to a deaminase chemically rewrites a base within a small window of the exposed single strand:\n\n- **CBE** — *cytosine base editor*: C•G → T•A.\n- **ABE** — *adenine base editor*: A•T → G•C, using a laboratory-evolved TadA deaminase, since no natural DNA adenine deaminase exists.\n\nNo break, no donor template, and it works in **non-dividing cells** — precisely the gap HDR could not fill. The limits are equally specific: only **transition** substitutions (never transversions), **bystander editing** of other same-letter bases inside the roughly 4–8-nucleotide activity window, and the same PAM constraint on where that window can be placed.\n\n**Prime editing** (2019) solves what base editing cannot. A Cas9 **nickase** is fused to a **reverse transcriptase**, and the guide is replaced by a **pegRNA** carrying a primer binding site plus an RT template encoding the desired sequence. The nicked strand primes reverse transcription of that edit directly into the genome. It can make **all twelve base-to-base substitutions plus small insertions and deletions**, with no DSB and no donor template.\n\nThe price is real: lower editing efficiency and a substantially larger construct. Which lands you squarely on the actual bottleneck — getting the machine into the cell."
+    },
+    {
+     "h": "Delivery is the bottleneck — and how off-targets are measured",
+     "md": "**Delivery is the bottleneck, not editing.** Two regimes:\n\n- **Ex vivo** — remove the patient's cells, edit them outside the body with ribonucleoprotein, quality-control the product, and reinfuse. Maximum control, and you can sequence what you made before dosing it. Limited to transplantable tissue (blood stem cells, T cells), and it requires conditioning chemotherapy to make room.\n- **In vivo** — inject the editor and let it find the tissue. **Lipid nanoparticles (LNPs)** acquire an ApoE coat in circulation and are taken up by hepatocytes via the LDL receptor. That is precisely why liver targets went first, and why extrahepatic delivery — muscle, brain, lung — remains the unsolved problem. **AAV** (adeno-associated virus) delivers durably but has a ~4.7 kb cargo ceiling that SpCas9 barely fits and prime editors do not, plus pre-existing neutralising immunity in much of the population and persistent expression that prolongs off-target exposure.\n\nProof of concept arrived in **2025**: an infant with a lethal urea-cycle disorder (**CPS1 deficiency**, carbamoyl phosphate synthetase 1) received a **bespoke, patient-specific in vivo base-editing therapy**, LNP-delivered to the liver, designed and dosed within roughly six months of diagnosis and reported in the *New England Journal of Medicine*. Follow-up is short and n = 1 — but the precedent that matters is the manufacturing and regulatory path for an *n*-of-1 edit.\n\n**Measuring off-targets.** Computational prediction alone is insufficient. Credible programmes pair *unbiased* empirical nomination — **GUIDE-seq** in cells, **CHANGE-seq** on genomic DNA, **DISCOVER-seq** via repair-factor capture — with deep amplicon sequencing of the nominated sites in the actual clinical product. Two blind spots persist: amplicon sequencing misses **large deletions and translocations** by design, because the allele simply drops out of the amplification; and a **donor's own variants** can create an off-target site that does not exist in the reference genome."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "You want to correct a single pathogenic A•T base pair to G•C in hepatocytes, which are largely non-dividing. Why is a base editor preferable to Cas9 nuclease plus a homology donor?",
+     "options": [
+      "HDR requires S/G2 phase and a donor template, so it barely works in non-dividing cells; a base editor needs neither and makes no double-strand break",
+      "Base editors cut DNA more precisely than Cas9",
+      "Cas9 cannot be delivered to the liver at all",
+      "HDR would introduce the wrong base at that position"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — cell-cycle restriction is the core limitation of HDR, and it is precisely why base editing (an adenine base editor here, A•T to G•C) became the tool of choice for post-mitotic tissue.",
+      "No — base editors do not cut at all; that is the point. Precision of cutting is not the distinction.",
+      "No — lipid nanoparticles deliver Cas9 to hepatocytes efficiently via ApoE and the LDL receptor. The liver is the easiest in-vivo target, not the hardest.",
+      "No — HDR installs whatever the donor encodes; its problem is efficiency and cell-cycle dependence, not fidelity of the template."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "A pathogenic variant requires a G-to-C transversion plus deletion of two adjacent bases. Which tool is capable of this, and why?",
+     "options": [
+      "Prime editing — its reverse transcriptase writes an arbitrary templated sequence, covering all twelve substitutions plus small insertions and deletions",
+      "A cytosine base editor, because it edits cytosines",
+      "Cas9 nuclease with NHEJ, because indels are what NHEJ produces",
+      "An adenine base editor, since any base editor can make any change"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — base editors only make transitions within a narrow window; prime editing removes both restrictions by templating the edit in the pegRNA. Its costs are lower efficiency and a much bigger construct to deliver.",
+      "No — a CBE performs C•G to T•A, a transition. It cannot make a transversion, and it cannot delete bases.",
+      "No — NHEJ indels are stochastic and uncontrolled. You would get a mixture of alleles, not a specified two-base deletion.",
+      "No — an ABE performs A•T to G•C only. Base editors are restricted to transitions by their deaminase chemistry."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Your target base has no NGG motif anywhere near it. What does that mean for editing with standard SpCas9?",
+     "options": [
+      "The site is not addressable — PAM recognition is what licenses unwinding, so without a correctly positioned PAM there is no cut",
+      "Nothing — the PAM only affects efficiency, not whether the site can be targeted",
+      "You should lengthen the guide RNA to compensate",
+      "You should raise the Cas9 concentration until it cuts"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — Cas9 interrogates PAMs first and only then unwinds the adjacent duplex to test the guide. This hard constraint is why Cas variants with relaxed or alternative PAM requirements were developed.",
+      "No — the PAM is a requirement, not a modifier. It is also how the bacterium avoids cutting its own CRISPR array, which stores spacers without an adjacent PAM.",
+      "No — guide length does not substitute for the PAM; the two serve different steps in target recognition.",
+      "No — more enzyme cannot create a recognition motif that is not there, and raising the concentration mainly increases off-target activity."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Why did in vivo CRISPR therapies target the liver before any other organ?",
+     "options": [
+      "Lipid nanoparticles acquire an ApoE coat in circulation and are taken up by hepatocytes through the LDL receptor",
+      "The liver regenerates, so HDR works efficiently there",
+      "Hepatocytes provoke no immune response to Cas9",
+      "Liver diseases are the only monogenic diseases known"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — the delivery biology, not the disease biology, chose the organ. Extrahepatic targeting of muscle, brain and lung remains the unsolved problem and the main constraint on which diseases are reachable.",
+      "No — hepatocytes in an adult liver are largely quiescent, which is exactly why HDR does not work well there and base editing was needed.",
+      "No — immune responses to Cas9, including pre-existing antibodies and T cells, are a genuine concern including for liver-directed therapy.",
+      "No — monogenic disease affects every organ system. The liver went first because LNPs go there, not because the diseases are there."
+     ]
+    },
+    {
+     "id": "q5",
+     "type": "mcq",
+     "prompt": "Why is deep amplicon sequencing of computationally predicted off-target sites, on its own, an inadequate safety assessment?",
+     "options": [
+      "It misses unpredicted sites and is designed in a way that drops out large deletions, translocations and chromosome loss",
+      "Amplicon sequencing is not sensitive enough to detect any off-target editing",
+      "Prediction algorithms are perfect, so the sequencing adds nothing",
+      "Off-target effects only occur with base editors, not with Cas9"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — you need unbiased empirical nomination (GUIDE-seq, CHANGE-seq, DISCOVER-seq) plus assays that can see large structural events, and you must consider donor-specific variants that create off-target sites absent from the reference genome.",
+      "No — amplicon sequencing is highly sensitive for small indels at the sites it interrogates. The problem is which sites and which event types it can see at all.",
+      "No — in-silico prediction is a useful filter but demonstrably incomplete; empirically discovered off-targets frequently fall outside the predicted set.",
+      "No — Cas9 nuclease has the broader off-target problem, including the structural events base editors largely avoid by not cutting."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "NHGRI — What is genome editing?",
+     "url": "https://www.genome.gov/about-genomics/policy-issues/what-is-Genome-Editing",
+     "type": "reading",
+     "note": "The National Human Genome Research Institute's plain-language primer on genome editing and the somatic-versus-germline distinction. The best starting point for a reader meeting this material for the first time."
+    },
+    {
+     "label": "NHGRI — CRISPR (genetics glossary)",
+     "url": "https://www.genome.gov/genetics-glossary/CRISPR",
+     "type": "reading",
+     "note": "Short definition with an audio explainer, useful for pinning down the terminology (guide RNA, Cas9, PAM) before reading anything denser."
+    }
+   ]
+  },
+  {
+   "id": "crispr-in-the-clinic",
+   "title": "CRISPR II — the approved reality and the germline line",
+   "summary": "Two sickle cell therapies were approved on the same day in 2023 and only one is gene editing; what limits who benefits is cost, conditioning and access rather than editing chemistry — and the heritable-editing line sits where it does for reasons that are shifting.",
+   "anim": null,
+   "cards": [
+    {
+     "h": "What is actually approved — Casgevy, Lyfgenia, and the difference",
+     "md": "**What is actually approved.** On **8 December 2023** the FDA approved two one-time therapies for severe sickle cell disease — and only one of them is gene editing. The distinction is routinely lost in press coverage, and it matters.\n\n- **Casgevy** (*exagamglogene autotemcel*) **is** CRISPR-Cas9. The patient's own CD34+ blood stem cells are edited **ex vivo** at the erythroid-specific enhancer of **BCL11A** — the repressor that switches off fetal haemoglobin after birth. Disabling that enhancer de-represses **HbF**, which interferes with sickle polymerisation and substitutes functionally for missing or defective beta-globin. The UK MHRA cleared it in **November 2023**, making it the first approved CRISPR medicine anywhere. The FDA added **transfusion-dependent beta-thalassemia** in **January 2024**, and extended sickle cell eligibility down to **age 2 in July 2026**.\n- **Lyfgenia** (*lovotibeglogene autotemcel*) is **not** editing. It is **lentiviral gene addition**: a modified beta-globin gene (HbA-T87Q) inserted semi-randomly into the genome. It carries a boxed warning for haematologic malignancy.\n\nNotice the design choice in Casgevy. It does not correct the sickle mutation. It knocks out a repressor — an easy, NHEJ-style disabling edit of exactly the kind Cas9 does well — to reawaken a developmental programme the patient already has. That is a far more tractable engineering problem than precisely repairing *HBB* inside a stem cell, and it is why this indication reached approval first."
+    },
+    {
+     "h": "The caveats: cost, conditioning, access",
+     "md": "**The caveats are large, and they are not about the editing.**\n\n- **Cost.** List prices sit near **$2–3 million**, before the surrounding episode of care — apheresis, conditioning, inpatient stay and monitoring are additional.\n- **Conditioning.** Both products require **myeloablative busulfan conditioning** to clear marrow niches for the edited cells. That means infertility risk, prolonged cytopenia with infection and bleeding risk, weeks of inpatient care, and a procedure only specialised transplant centres can deliver. A patient must be well enough to survive the conditioning in order to receive the cure.\n- **Access.** Most of the world's sickle cell disease burden is in sub-Saharan Africa, where none of that infrastructure exists. A therapy reaching hundreds of people is simultaneously a scientific triumph and a delivery failure.\n\nHold the honest summary. The editing chemistry works, and the results in treated patients are genuinely impressive. What limits the benefit is transplant medicine, manufacturing and money — the same constraints that limited allogeneic bone marrow transplant, which could already cure sickle cell disease in the minority of patients with a matched donor. CRISPR removed the donor-matching problem. It did not remove the conditioning, the cost, or the hospital.\n\nWhich is why **in vivo** editing of blood stem cells, if it can be made to work, would change who gets treated far more than any further improvement in editing precision."
+    },
+    {
+     "h": "The germline line — 2018, 2025, and where the debate sits now",
+     "md": "**The germline line.** In **November 2018**, He Jiankui announced twin girls born from embryos edited at *CCR5*, intended to confer HIV resistance. He was convicted in China in 2019.\n\nThe objections were substantive, not procedural. There was **no medical necessity** — established methods already prevent vertical HIV transmission with near-complete reliability. The embryos were **mosaic**, meaning different cells carried different edits. And the induced indels were **novel variants**, not the protective natural CCR5-Δ32 allele, so their functional consequences were simply unknown. Consent and oversight failures came on top of all that.\n\nEverything described in this lesson so far is **somatic**: the change is confined to the treated patient's own cells and is not inherited by their children. That is the line. In **May 2025**, the American Society of Gene & Cell Therapy, the International Society for Cell & Gene Therapy and the Alliance for Regenerative Medicine jointly called for a **ten-year global moratorium** on clinical heritable human genome editing.\n\nThe debate has shifted since, because the technical objection is eroding. A **2026** preprint reported efficient base editing of pathogenic variants in human embryos with fewer chromosomal alterations than earlier nuclease work — while still showing mosaicism and off-target edits. The honest reading: \"it is too dangerous\" is a weaker argument every year, and it was never the strongest one. If safety keeps improving, what remains is governance, equity and enhancement — plus the awkward fact that **preimplantation genetic testing** already lets most at-risk couples select an unaffected embryo without editing anything, which leaves the genuinely unavoidable cases a very small set."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Casgevy treats sickle cell disease without correcting the sickle mutation itself. What does it actually edit, and why does that work?",
+     "options": [
+      "The erythroid enhancer of BCL11A — disabling the repressor de-represses fetal haemoglobin, which blocks sickle polymerisation",
+      "The HBB gene, converting the sickle allele back to the normal sequence",
+      "The bone marrow stroma, so it stops producing sickled cells",
+      "A liver gene that clears sickled red cells from circulation"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — it is an elegant piece of indirection: knock out a repressor with an easy NHEJ-style disabling edit and restore a fetal programme, rather than attempt the much harder precise correction of HBB in a stem cell.",
+      "No — direct HBB correction would require precise repair in haematopoietic stem cells and is not what Casgevy does; approaches of that kind are still in development.",
+      "No — the edit is performed on the patient's own CD34+ haematopoietic stem cells outside the body, not on stromal tissue.",
+      "No — the mechanism is intrinsic to the red cell lineage: raising HbF prevents polymerisation in the first place."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Casgevy and Lyfgenia were approved on the same day in December 2023 for sickle cell disease. What is the key technical difference?",
+     "options": [
+      "Casgevy is CRISPR-Cas9 gene editing; Lyfgenia is lentiviral gene addition of a modified beta-globin, not editing",
+      "They use the same editing platform but different guide RNAs",
+      "Casgevy is given in vivo; Lyfgenia is given ex vivo",
+      "Lyfgenia is a base editor and Casgevy is a nuclease"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — Lyfgenia inserts an HbA-T87Q transgene semi-randomly via lentivirus and carries a boxed warning for haematologic malignancy. Press coverage routinely conflates the two products.",
+      "No — Lyfgenia involves no guide RNA and no nuclease; it is a viral vector delivering an added gene.",
+      "No — both are ex vivo autologous stem cell products requiring apheresis and myeloablative conditioning.",
+      "No — neither is a base editor. Casgevy uses Cas9 nuclease; Lyfgenia uses a lentiviral vector."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A patient with severe sickle cell disease asks why an approved one-time cure is still reaching so few people worldwide. What is the most accurate answer?",
+     "options": [
+      "Cost, myeloablative conditioning and the need for specialised transplant infrastructure — not limitations of the editing itself",
+      "The editing frequently fails, so most treated patients see no benefit",
+      "Regulators have restricted it to research use only",
+      "Sickle cell disease is too rare for manufacturing to scale"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — the binding constraints are transplant medicine and economics. Most of the global disease burden is in sub-Saharan Africa, where apheresis, busulfan conditioning and prolonged inpatient care are unavailable.",
+      "No — editing efficiency and clinical results in treated patients have been strong. The gap is between who could benefit and who can access the procedure.",
+      "No — both products hold full FDA approval, and Casgevy's sickle cell eligibility was broadened down to age 2 in July 2026.",
+      "No — sickle cell disease is one of the commonest monogenic diseases in the world, affecting millions. Scarcity of patients is not the problem."
+     ]
+    },
+    {
+     "id": "q4",
+     "type": "mcq",
+     "prompt": "Which statement best describes the scientific community's current position on heritable (germline) human genome editing?",
+     "options": [
+      "Major professional societies called in May 2025 for a ten-year global moratorium on clinical use, while somatic editing proceeds under normal regulation",
+      "Germline editing is now permitted for serious monogenic disease in most jurisdictions",
+      "The approved sickle cell therapies are germline edits, so the line has already been crossed",
+      "The 2018 He Jiankui case was condemned purely because it lacked regulatory paperwork"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — ASGCT, ISCT and ARM issued that joint call in May 2025, aimed squarely at clinical heritable editing. Somatic therapies such as Casgevy are unaffected because their changes are not inherited.",
+      "No — clinical heritable editing is prohibited in most jurisdictions and is not permitted anywhere as routine practice.",
+      "No — Casgevy edits a patient's own blood stem cells. Those changes are somatic and are not passed to children.",
+      "No — the substantive objections were scientific and ethical: no medical necessity, mosaic embryos, and novel indels rather than the protective natural allele."
+     ]
+    },
+    {
+     "id": "q5",
+     "type": "mcq",
+     "prompt": "A 2026 preprint reported efficient base editing of pathogenic variants in human embryos with fewer chromosomal alterations than earlier nuclease work. What does this most directly change about the germline debate?",
+     "options": [
+      "It weakens the safety-based objection over time, leaving governance, equity and enhancement as the arguments that remain",
+      "It settles the debate — germline editing is now demonstrably safe",
+      "It has no bearing, because base editing cannot be used in embryos",
+      "It proves germline editing is the only option for couples at risk of a monogenic disease"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — the work still showed mosaicism and off-target edits, so it does not establish safety. But it erodes the argument that the technique is inherently too crude, which shifts the burden onto the ethical and governance questions that were always harder.",
+      "No — mosaicism and off-target edits persisted, and a preprint in embryos is a long way from evidence of safety across a lifetime, let alone across generations.",
+      "No — the study is precisely a demonstration of base editing in human embryos; that is why it drew both praise and alarm.",
+      "No — preimplantation genetic testing already lets most at-risk couples select an unaffected embryo, which is why the set of genuinely unavoidable cases is very small."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "FDA — first gene therapies to treat patients with sickle cell disease (December 2023)",
+     "url": "https://www.fda.gov/news-events/press-announcements/fda-approves-first-gene-therapies-treat-patients-sickle-cell-disease",
+     "type": "article",
+     "note": "The primary regulatory record for both Casgevy and Lyfgenia, including the distinction between CRISPR editing and lentiviral gene addition that most press coverage blurs."
+    },
+    {
+     "label": "FDA — first gene therapy for young children with sickle cell disease (2026)",
+     "url": "https://www.fda.gov/news-events/press-announcements/fda-approves-first-gene-therapy-young-children-sickle-cell-disease",
+     "type": "article",
+     "note": "The July 2026 supplemental approval extending Casgevy down to age 2 — the clearest marker of how fast the label has moved since 2023. Check it for the current age and indication before quoting either."
+    },
+    {
+     "label": "ASGCT / ISCT / ARM — international call for a 10-year moratorium on heritable human genome editing (May 2025)",
+     "url": "https://www.asgct.org/advocacy/policy-statements/international-call-for-a-10-year-moratorium-on-heritable-human-genome-editing-a-multi-stakeholder-initiative-to-ensure-safe-and-responsible-use-of-genetic-technologies-may-2025",
+     "type": "reading",
+     "note": "The current consensus statement on the germline line, and the reference point for the 2026 embryo base-editing debate. Note that it targets heritable editing only — somatic gene therapy is explicitly not in scope."
+    }
+   ]
+  }
+ ]
+}
