@@ -76,7 +76,8 @@
      ]
     }
    ],
-   "resources": []
+   "resources": [],
+   "anim": "med_homeostasis"
   },
   {
    "id": "membrane-potential",
@@ -148,7 +149,8 @@
      ]
     }
    ],
-   "resources": []
+   "resources": [],
+   "anim": "med_membranepotential"
   },
   {
    "id": "action-potential",
@@ -518,7 +520,8 @@
      ]
     }
    ],
-   "resources": []
+   "resources": [],
+   "anim": "med_o2curve"
   },
   {
    "id": "scaling-biophysics",

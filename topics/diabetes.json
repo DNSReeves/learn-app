@@ -1,679 +1,680 @@
 {
-  "id": "diabetes",
-  "title": "Diabetes — How Blood Sugar Works, and How It Breaks",
-  "tagline": "The insulin system from the inside: how the β-cell fires, what insulin does, why type 1 and type 2 differ, why it looks different across the world, and how every drug plugs in.",
-  "description": "A plain-language, in-depth tour of diabetes: glucose control, the β-cell's stimulus–secretion relay, insulin action and resistance, type 1 vs type 2, the often-missed variants (LADA, MODY), why type 2 appears at much lower weights in East and South Asian populations, and a receptor map of how every drug works — cross-linked to the GLP-1 module. Educational only — not medical advice.",
-  "category": "Health & Medicine",
-  "prereqs": [],
-  "concepts": [
+ "id": "diabetes",
+ "title": "Diabetes — How Blood Sugar Works, and How It Breaks",
+ "tagline": "The insulin system from the inside: how the β-cell fires, what insulin does, why type 1 and type 2 differ, why it looks different across the world, and how every drug plugs in.",
+ "description": "A plain-language, in-depth tour of diabetes: glucose control, the β-cell's stimulus–secretion relay, insulin action and resistance, type 1 vs type 2, the often-missed variants (LADA, MODY), why type 2 appears at much lower weights in East and South Asian populations, and a receptor map of how every drug works — cross-linked to the GLP-1 module. Educational only — not medical advice.",
+ "category": "Health & Medicine",
+ "prereqs": [],
+ "concepts": [
+  {
+   "id": "blood-sugar-tightrope",
+   "title": "Blood Sugar on a Tightrope",
+   "summary": "Your body holds blood glucose in a remarkably narrow band. Diabetes is what happens when that control system fails.",
+   "cards": [
     {
-      "id": "blood-sugar-tightrope",
-      "title": "Blood Sugar on a Tightrope",
-      "summary": "Your body holds blood glucose in a remarkably narrow band. Diabetes is what happens when that control system fails.",
-      "cards": [
-        {
-          "h": "A teaspoon of sugar in five litres of blood",
-          "md": "At any moment your whole bloodstream holds only about **a teaspoon of glucose** — roughly **4–5 grams** dissolved in five litres. Your body defends that level fiercely, keeping it near **70–100 mg/dL** (about 4–5.5 mmol/L) whether you've just eaten a feast or fasted overnight.\n\nWhy so strict? Too **high**, and glucose slowly sugar-coats your proteins and damages blood vessels, nerves, kidneys and eyes. Too **low**, and your brain — which runs almost entirely on glucose — starves within minutes. **Diabetes is the disease of losing that control.**"
-        },
-        {
-          "h": "Two hormones, pulling in opposite directions",
-          "md": "The balance is run by the **pancreas**, using two hormones that oppose each other:\n\n- **Insulin** (from **beta-cells**) — the *lower-it* hormone. Released when sugar rises; it moves glucose out of the blood into cells.\n- **Glucagon** (from **alpha-cells**) — the *raise-it* hormone. Released when sugar falls; it tells the liver to release stored glucose.\n\nThink of a thermostat with both a cooler and a heater. In diabetes the *cooling* side — insulin — either **isn't made** (type 1) or **isn't heeded** (type 2). The next lessons show exactly how each half works, and how it breaks."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "Roughly how much glucose is in the entire bloodstream at once?",
-          "options": [
-            "About a teaspoon (4–5 grams)",
-            "About a kilogram",
-            "About half a litre",
-            "None — blood carries no sugar"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — only ~4–5 g total, which is why control must be precise.",
-            "No — that's vastly too much; it's only a few grams.",
-            "No — glucose is dissolved in tiny amounts, not litres.",
-            "No — blood always carries some glucose; the body defends a narrow level."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "Why is chronically HIGH blood sugar harmful?",
-          "options": [
-            "Glucose gradually damages vessels, nerves, kidneys and eyes by 'sugar-coating' proteins",
-            "It makes blood too thin",
-            "It has no harmful effect",
-            "It instantly stops the heart"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — glycation and vascular damage are how diabetes injures organs over years.",
-            "No — the harm is glycation/vascular damage, not thinning.",
-            "No — sustained highs cause the classic diabetic complications.",
-            "No — the damage is slow and cumulative, not instant."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Which hormone LOWERS blood sugar, and from which cells?",
-          "options": [
-            "Insulin, from beta-cells",
-            "Glucagon, from alpha-cells",
-            "Adrenaline, from the gut",
-            "Insulin, from the liver"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — beta-cell insulin is the glucose-lowering hormone.",
-            "No — glucagon RAISES blood sugar.",
-            "No — adrenaline raises sugar and comes from the adrenal glands.",
-            "No — insulin comes from pancreatic beta-cells, not the liver."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "NIDDK — What is diabetes?",
-          "type": "reading",
-          "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes"
-        }
-      ]
+     "h": "A teaspoon of sugar in five litres of blood",
+     "md": "At any moment your whole bloodstream holds only about **a teaspoon of glucose** — roughly **4–5 grams** dissolved in five litres. Your body defends that level fiercely, keeping it near **70–100 mg/dL** (about 4–5.5 mmol/L) whether you've just eaten a feast or fasted overnight.\n\nWhy so strict? Too **high**, and glucose slowly sugar-coats your proteins and damages blood vessels, nerves, kidneys and eyes. Too **low**, and your brain — which runs almost entirely on glucose — starves within minutes. **Diabetes is the disease of losing that control.**"
     },
     {
-      "id": "betacell-insulin",
-      "title": "Inside the β-Cell — how insulin is released",
-      "summary": "A rise in blood sugar is turned into a squirt of insulin by an elegant chain of events — the same chain several diabetes drugs act on.",
-      "anim": "med_betacell",
-      "cards": [
-        {
-          "h": "Sugar in, insulin out — the five-step relay",
-          "md": "The beta-cell is a tiny glucose meter wired to a release trigger. The animation walks the relay:\n\n1. **Glucose enters** through a door called **GLUT2**.\n2. Burning it raises **ATP** (the cell's fuel gauge).\n3. High ATP **closes a potassium (K⁺) channel**, so the cell's voltage flips (**depolarises**).\n4. That opens **calcium gates**; calcium floods in.\n5. Calcium makes **insulin granules** fuse with the membrane and dump insulin into the blood.\n\nThe beauty: insulin release is *proportional to glucose*. More sugar, more insulin — automatically."
-        },
-        {
-          "h": "Where the drugs grab the wheel",
-          "md": "This relay is a drug target map:\n\n- **Sulfonylureas** (e.g. glipizide) jam the **K⁺ channel** shut — forcing insulin out *regardless* of glucose (which is why they *can* cause lows).\n- **GLP-1 drugs** and **DPP-4 inhibitors** amplify step 5 — but **only when glucose is already high** (glucose-dependent), so they rarely cause lows.\n\nIn **type 1** diabetes these beta-cells are destroyed, so there's no relay at all. In **type 2**, they overwork for years and slowly wear out. Understanding this one cell explains half of diabetes treatment."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "What is the immediate trigger that makes insulin granules release?",
-          "options": [
-            "Calcium flooding into the cell",
-            "Oxygen",
-            "Sodium leaving the cell",
-            "Sunlight"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — calcium influx is the universal 'release now' signal.",
-            "No — oxygen isn't the trigger here.",
-            "No — it's calcium ENTRY that triggers release.",
-            "No — beta-cells aren't light-sensitive."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "Why do GLP-1 drugs rarely cause low blood sugar, while sulfonylureas can?",
-          "options": [
-            "GLP-1 amplifies insulin release only when glucose is high; sulfonylureas force it regardless",
-            "GLP-1 contains sugar",
-            "Sulfonylureas block insulin entirely",
-            "They act on different organs, not the β-cell"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — glucose-dependence is the safety difference.",
-            "No — GLP-1 doesn't contain sugar.",
-            "No — sulfonylureas force insulin OUT, not block it.",
-            "No — both act on the β-cell relay, at different steps."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "In the relay, closing the K⁺ channel does what?",
-          "options": [
-            "Flips the cell's voltage (depolarises it), opening calcium gates",
-            "Stops insulin forever",
-            "Lets glucose out",
-            "Raises oxygen"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — depolarisation opens voltage-gated calcium channels.",
-            "No — it triggers release, not stops it.",
-            "No — glucose entered earlier via GLUT2.",
-            "No — it changes voltage, not oxygen."
-          ]
-        }
-      ],
-      "resources": []
-    },
-    {
-      "id": "insulin-action",
-      "title": "What Insulin Does — the key that opens the cell",
-      "summary": "Insulin's headline job is to unlock cells so glucose can leave the blood. The 'lock' is a receptor; the 'doors' are GLUT4 transporters.",
-      "anim": "med_insulin_action",
-      "cards": [
-        {
-          "h": "Insulin is a key; GLUT4 is the door",
-          "md": "Glucose can't just drift into muscle and fat cells — it needs a door opened. Insulin is the **key**:\n\n1. Insulin binds its **receptor** (a spanning-the-membrane protein) on a muscle or fat cell.\n2. The receptor fires a signal cascade inside (**IRS → PI3K → Akt** — you don't need the letters, just that it's a relay).\n3. The signal orders **GLUT4** transporters — the glucose doors — to move from inside the cell up to the surface.\n4. Glucose pours through the open doors, and **blood sugar falls**.\n\nInsulin also tells the **liver** to stop making glucose and to store it, and tells **fat** to store energy. It's the body's master *'store it away'* signal."
-        },
-        {
-          "h": "A neat trick: exercise opens the doors too",
-          "md": "Here's a hopeful detail. Muscle can move **GLUT4** doors to the surface in a *second, insulin-independent* way: **muscle contraction itself**. When you exercise, working muscle pulls glucose out of the blood **without needing insulin**.\n\nThat's why a walk after a meal lowers blood sugar, and why exercise is powerful medicine in diabetes — it opens the doors when insulin can't. It's also part of why **muscle mass matters** (see the GLP-1 module): more muscle means more glucose-clearing capacity."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "What are GLUT4 transporters?",
-          "options": [
-            "Glucose 'doors' that insulin moves to the cell surface so sugar can enter",
-            "Enzymes that destroy insulin",
-            "Hormones from the gut",
-            "Fat-storage droplets"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — GLUT4 is the insulin-responsive glucose transporter in muscle and fat.",
-            "No — they transport glucose, not destroy insulin.",
-            "No — they're transporters in the cell membrane, not gut hormones.",
-            "No — they move glucose, not store fat."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "How can muscle take up glucose WITHOUT insulin?",
-          "options": [
-            "Muscle contraction (exercise) moves GLUT4 doors to the surface on its own",
-            "It can't — insulin is always required",
-            "By making its own insulin",
-            "By raising blood pressure"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — contraction is a separate, insulin-independent route for GLUT4.",
-            "No — exercise provides an insulin-independent path.",
-            "No — muscle doesn't make insulin.",
-            "No — blood pressure isn't the mechanism."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Besides opening muscle/fat doors, insulin tells the liver to:",
-          "options": [
-            "Stop making glucose and store it instead",
-            "Dump all its glucose",
-            "Make glucagon",
-            "Shut down"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — insulin suppresses hepatic glucose output and promotes storage.",
-            "No — that's the opposite; insulin suppresses glucose release.",
-            "No — glucagon comes from pancreatic alpha-cells.",
-            "No — the liver keeps working, just switching to storage mode."
-          ]
-        }
-      ],
-      "resources": []
-    },
-    {
-      "id": "type-1",
-      "title": "Type 1 — the immune system attacks the factory",
-      "summary": "In type 1 diabetes the body's own defences destroy the insulin-making β-cells. Without insulin to replace them, it's rapidly life-threatening.",
-      "cards": [
-        {
-          "h": "Friendly fire on the β-cells",
-          "md": "**Type 1 diabetes** is an **autoimmune** disease: the immune system mistakes the insulin-making **beta-cells** for invaders and destroys them, usually over months to years. The tell-tale sign in the blood is **autoantibodies** (against proteins like GAD65 and IA-2).\n\nThe result is **absolute insulin deficiency** — the factory is gone. It's only **5–10%** of all diabetes, classically appears in **children and young adults** (though it can start at any age), and is **not** caused by diet or weight. A slower adult-onset form is called **LADA** (latent autoimmune diabetes in adults)."
-        },
-        {
-          "h": "Why type 1 needs insulin — and can turn dangerous fast",
-          "md": "With no insulin, two things go wrong at once: glucose can't get into cells (so it piles up in the blood), and the body, thinking it's starving, **burns fat for fuel**. Burning fat that fast produces acidic **ketones**, which can flood the blood into **diabetic ketoacidosis (DKA)** — a medical emergency.\n\nThat's why people with type 1 **must take insulin for life** — by injection or pump — carefully matched to food and activity. It's a demanding, 24/7 balancing act. GLP-1 drugs, which rely on working beta-cells, are **not** a treatment for type 1's core problem."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "What is the root cause of type 1 diabetes?",
-          "options": [
-            "The immune system destroys the insulin-making β-cells (autoimmune)",
-            "Eating too much sugar",
-            "The cells ignore insulin",
-            "The liver stops working"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — autoimmune β-cell destruction causes absolute insulin deficiency.",
-            "No — type 1 isn't caused by diet or sugar.",
-            "No — that's insulin resistance (type 2).",
-            "No — the problem is the pancreas's β-cells, not the liver."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "Why can untreated type 1 rapidly cause ketoacidosis (DKA)?",
-          "options": [
-            "With no insulin, the body burns fat for fuel, producing acidic ketones that flood the blood",
-            "Too much insulin",
-            "The blood becomes too alkaline",
-            "Excess muscle breakdown only"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — uncontrolled fat-burning acidifies the blood.",
-            "No — DKA comes from a LACK of insulin.",
-            "No — ketones make the blood too ACIDIC.",
-            "No — the core driver is ketone acid from fat metabolism."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Why won't a GLP-1 drug fix the core problem in type 1?",
-          "options": [
-            "GLP-1 works by boosting β-cells — but in type 1 the β-cells are destroyed",
-            "GLP-1 is only for children",
-            "GLP-1 raises blood sugar",
-            "Type 1 has too much insulin"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — no β-cells means nothing for GLP-1 to amplify.",
-            "No — age isn't the reason.",
-            "No — GLP-1 lowers, not raises, glucose.",
-            "No — type 1 has too LITTLE insulin."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "American Diabetes Association — about diabetes",
-          "type": "reading",
-          "url": "https://diabetes.org/about-diabetes"
-        }
-      ]
-    },
-    {
-      "id": "type-2-resistance",
-      "title": "Type 2 — when the locks rust (insulin resistance)",
-      "summary": "Type 2 diabetes usually starts not with too little insulin, but with cells that stop listening to it.",
-      "anim": "med_insulin_resistance",
-      "cards": [
-        {
-          "h": "Plenty of insulin, but the cells won't answer",
-          "md": "**Type 2 diabetes** — about **90–95%** of all cases — usually begins the opposite way from type 1. Early on there's *plenty* of insulin; the problem is that **muscle, liver and fat stop responding to it**. This is **insulin resistance** — the locks have rusted.\n\nThe animation shows it: insulin knocks on the receptor, but the signal barely gets through, so few **GLUT4** doors open and glucose stays stuck in the blood. Deep down the defect is often *inside* the cell — fatty molecules (like diacylglycerol and ceramides) and low-grade **inflammation** jam the signalling relay."
-        },
-        {
-          "h": "The vicious compensation — and why it eventually fails",
-          "md": "At first the pancreas simply shouts louder: it pumps out **extra insulin** to force the rusted locks. Blood sugar stays near-normal — but insulin runs **high** for years (a state linked to weight gain and fatty liver). This is *pre-diabetes*.\n\nEventually the overworked **beta-cells wear out** and can no longer keep up. *Now* insulin falls, blood sugar climbs, and type 2 diabetes is diagnosed. So type 2 is really a **two-part failure**: resistance first, beta-cell burnout later — which is the subject of the next lesson."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "What defines insulin RESISTANCE?",
-          "options": [
-            "Cells respond poorly to insulin, so glucose isn't cleared even when insulin is present",
-            "The pancreas makes no insulin",
-            "The immune system attacks β-cells",
-            "Too few red blood cells"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — the signal fails downstream; the cells don't answer insulin.",
-            "No — that's type 1's absolute deficiency.",
-            "No — that's the autoimmune mechanism of type 1.",
-            "No — that's anaemia, unrelated."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "In early type 2, why is blood sugar often near-normal for years despite resistance?",
-          "options": [
-            "The pancreas compensates by pumping out extra insulin to force the rusted locks",
-            "The kidneys make insulin",
-            "Resistance fixes itself daily",
-            "The liver stores all the sugar permanently"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — compensatory hyperinsulinemia holds glucose down until β-cells tire.",
-            "No — kidneys don't make insulin.",
-            "No — resistance persists; the pancreas compensates.",
-            "No — the liver can't absorb it all, especially when it's also resistant."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Type 2 diabetes is best described as:",
-          "options": [
-            "A two-part failure: insulin resistance first, then β-cell burnout",
-            "Purely a lack of insulin from birth",
-            "An infection",
-            "An allergy to sugar"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — resistance plus progressive β-cell decline.",
-            "No — that's closer to type 1.",
-            "No — it's metabolic, not infectious.",
-            "No — it's not an allergy."
-          ]
-        }
-      ],
-      "resources": []
-    },
-    {
-      "id": "type-2-twin-engine",
-      "title": "The Twin Engines of Type 2",
-      "summary": "Fat in the wrong places — the liver and the pancreas — drives both halves of type 2, which is why major weight loss can put it into remission.",
-      "cards": [
-        {
-          "h": "Fat where it shouldn't be",
-          "md": "Why do the locks rust and the beta-cells tire? A leading explanation (Roy Taylor's **twin-cycle** model) points to **fat stored in the wrong organs**:\n\n- **Liver fat** makes the liver insulin-resistant, so it over-produces glucose — especially overnight (high morning sugars).\n- **Pancreas fat** poisons the beta-cells (*lipotoxicity*), blunting insulin release.\n\nIt's not *total* weight that matters most, but **where** the fat sits. This is why some people develop type 2 at a modest weight if their liver and pancreas are fatty — and why the next lesson, on different populations, matters so much."
-        },
-        {
-          "h": "The hopeful flip side: remission",
-          "md": "If the twin cycle drives type 2, then *reversing* it should help — and it does. In the landmark **DiRECT** trial, an intensive **weight-loss programme** put nearly **half** of people with type 2 into **drug-free remission**, especially those who lost the most and were diagnosed more recently. Losing the liver and pancreas fat let the beta-cells recover.\n\nThe lesson: type 2 is often **not** a one-way street. Weight loss (by diet, surgery, or now the GLP-1 drugs) can pull the engines back — though the earlier it's caught, the better the odds."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "In the twin-cycle model, fat in which two organs drives type 2?",
-          "options": [
-            "The liver and the pancreas",
-            "The skin and the spleen",
-            "The lungs and the heart",
-            "The brain and the kidney"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — liver fat drives glucose over-production; pancreas fat blunts insulin release.",
-            "No — those aren't the twin-cycle organs.",
-            "No — the model centres on liver and pancreas fat.",
-            "No — it's liver and pancreas."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "What did the DiRECT trial show?",
-          "options": [
-            "Intensive weight loss put nearly half of type 2 patients into drug-free remission",
-            "Type 2 is always permanent",
-            "Only surgery can help",
-            "Diet has no effect on type 2"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — losing organ fat let β-cells recover in many.",
-            "No — DiRECT showed remission is possible.",
-            "No — a diet programme achieved remission without surgery.",
-            "No — diet-driven weight loss was the intervention."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Why can someone develop type 2 at only a modest body weight?",
-          "options": [
-            "Where fat sits (fatty liver/pancreas) matters more than total weight",
-            "It's impossible — type 2 needs severe obesity",
-            "They must have type 1",
-            "Their kidneys failed"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — organ (ectopic) fat, not just total mass, drives the disease.",
-            "No — type 2 occurs across a wide weight range.",
-            "No — this is still type 2, driven by ectopic fat.",
-            "No — kidney failure isn't the cause."
-          ]
-        }
-      ],
-      "resources": []
-    },
-    {
-      "id": "not-one-disease",
-      "title": "Not One Disease — the diabetes family",
-      "summary": "'Type 1' and 'type 2' are the big two, but several other forms are commonly missed — and getting the label right changes the treatment.",
-      "cards": [
-        {
-          "h": "The forms hiding between the big two",
-          "md": "Diabetes is really a **family** of diseases that share one symptom (high blood sugar):\n\n- **LADA** — slow autoimmune diabetes in adults; looks like type 2 but has type-1 antibodies and eventually needs insulin.\n- **MODY** (maturity-onset diabetes of the young) — a **single-gene**, inherited form (runs strongly in families). Some kinds need *no* treatment; others respond beautifully to **cheap sulfonylurea pills** rather than insulin — so the diagnosis genuinely changes the treatment.\n- **Ketosis-prone type 2** — presents dramatically like type 1 (even with DKA) but then behaves like type 2.\n- **Gestational diabetes** — brought on by the insulin resistance of pregnancy.\n- **Secondary** — from pancreas damage, steroids, or other hormone diseases."
-        },
-        {
-          "h": "Why the label is worth getting right",
-          "md": "Mislabelling is common and costly. A slim adult with MODY may be put on insulin they don't need; someone with LADA may be treated as type 2 until they crash. Roughly **1 in 20** people labelled 'type 2' actually has a **different** form.\n\nThe practical point for a general audience: diabetes isn't a single box. If a diagnosis doesn't fit the usual story — very young, very slim, strong family pattern, or an unusual course — it's worth asking whether it's one of these other forms, because the **right label unlocks the right, sometimes much simpler, treatment**."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "MODY is unusual among diabetes types because it is:",
-          "options": [
-            "Caused by a single inherited gene, and some forms respond to sulfonylurea pills instead of insulin",
-            "Caused by a virus",
-            "Always the most severe form",
-            "Only found in newborns"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — monogenic, strongly familial, and often treatable with pills.",
-            "No — it's genetic, not viral.",
-            "No — some MODY forms are mild or need no treatment.",
-            "No — it typically presents in youth/young adulthood, not only newborns."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "LADA is easy to mistake for which type, and why?",
-          "options": [
-            "Type 2 — it appears in adults and starts slowly, but it's actually autoimmune",
-            "Type 1 — because it needs insulin immediately",
-            "Gestational — because of pregnancy",
-            "MODY — because it's genetic"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — LADA masquerades as type 2 but carries type-1 antibodies.",
-            "No — LADA progresses slowly, unlike classic type 1.",
-            "No — LADA isn't pregnancy-related.",
-            "No — LADA is autoimmune, not single-gene."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Why does getting the exact diabetes label right matter?",
-          "options": [
-            "Different forms need different treatments — the right label can unlock a simpler one",
-            "It doesn't — all diabetes is treated identically",
-            "Only for insurance",
-            "Labels are purely academic"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — e.g. MODY on pills vs needless insulin; LADA caught before a crash.",
-            "No — treatments differ substantially by type.",
-            "No — the medical treatment itself changes.",
-            "No — it directly affects care."
-          ]
-        }
-      ],
-      "resources": [
-        {
-          "label": "Exeter — genetic (monogenic) diabetes / MODY",
-          "type": "reading",
-          "url": "https://www.diabetesgenes.org/"
-        }
-      ]
-    },
-    {
-      "id": "population-phenotypes",
-      "title": "★ Why Diabetes Looks Different Across Populations",
-      "summary": "The same diagnosis can have different biology in different ancestries — nowhere clearer than East and South Asian populations, who get type 2 at much lower body weights.",
-      "cards": [
-        {
-          "h": "East Asian 'thin diabetes': the tank is smaller",
-          "md": "In people of **East Asian** ancestry (Chinese, Japanese, Korean), type 2 often appears at a **much lower body weight** than in Europeans — a pattern sometimes called **'thin diabetes.'** The reason is a shift in *which half* of the machinery fails.\n\nEuropeans typically fail on the **resistance** side (rusted locks) and compensate with big insulin surges. Many East Asians instead have a **smaller insulin-secretion reserve** — the beta-cells simply **can't ramp up** as much. With less spare capacity, even modest weight gain or resistance tips them into diabetes. It's less 'rusted locks' and more 'a smaller fuel tank.' (This is why Asian BMI thresholds for risk are set **lower** — overweight from ~23 rather than 25.)"
-        },
-        {
-          "h": "South Asian 'thin-fat', and the thrifty idea",
-          "md": "**South Asians** (people from India, Pakistan, Bangladesh) show a *different* twist: very high **insulin resistance** with lots of **hidden visceral fat** and relatively low muscle — the **'thin-fat'** phenotype. They develop type 2 younger and at low BMI, with among the world's highest rates.\n\nOne popular explanation is the **'thrifty phenotype'**: bodies primed by scarcity to store energy efficiently struggle when food becomes abundant. The takeaways for a global, public course: **BMI cut-offs and 'looking healthy' can badly under-estimate risk** in Asian populations — screening and prevention should start earlier and at lower weights. Diabetes is one disease name over **many** underlying biologies."
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "Why do many East Asians develop type 2 at a LOWER body weight than Europeans?",
-          "options": [
-            "Their dominant defect is a smaller insulin-secretion reserve, so β-cells can't compensate as much",
-            "They eat more sugar",
-            "They have no insulin receptors",
-            "They can't produce glucagon"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — reduced β-cell secretory capacity tips them over at lower BMI.",
-            "No — the driver is β-cell reserve, not diet stereotypes.",
-            "No — they have receptors; secretion capacity is the key difference.",
-            "No — glucagon isn't the issue."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "The South Asian 'thin-fat' phenotype features:",
-          "options": [
-            "High insulin resistance with hidden visceral fat and low muscle, at low BMI",
-            "No body fat at all",
-            "Only β-cell failure",
-            "Immunity to diabetes"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — visceral adiposity and low muscle drive resistance despite a lean look.",
-            "No — the fat is visceral/hidden, not absent.",
-            "No — the hallmark is resistance, not just secretion failure.",
-            "No — South Asians have among the highest type 2 rates."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "A practical public-health lesson from these differences is:",
-          "options": [
-            "Standard BMI cut-offs under-estimate diabetes risk in Asian populations — screen earlier and at lower weights",
-            "Everyone should use the same weight threshold",
-            "Ancestry never affects risk",
-            "Only weight, never biology, matters"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — Asian-specific lower thresholds catch risk that standard BMI misses.",
-            "No — one threshold misses high-risk lean individuals.",
-            "No — ancestry meaningfully shifts the biology.",
-            "No — the underlying biology (secretion vs resistance) differs."
-          ]
-        }
-      ],
-      "resources": []
-    },
-    {
-      "id": "receptor-toolkit",
-      "title": "The Receptor Toolkit — how the drugs plug in",
-      "summary": "Every diabetes drug works by pushing on one specific molecular lever. Here's the map — and how it connects to the GLP-1 story.",
-      "cards": [
-        {
-          "h": "A handful of levers",
-          "md": "Almost every diabetes medicine acts on one part you've now met:\n\n- **Insulin receptor** — *insulin itself* (injected) binds here to open GLUT4 doors.\n- **K⁺/sulfonylurea receptor** on the β-cell — **sulfonylureas** jam it shut to force insulin out.\n- **Incretin receptors (GLP-1R, GIPR)** — the **GLP-1 drugs** (Ozempic, Mounjaro…) and, indirectly, **DPP-4 inhibitors** act here (see the GLP-1 module).\n- **SGLT2** in the kidney — **'flozin' drugs** block glucose reabsorption so you pee sugar out.\n- **The liver's glucose output** — **metformin**, the classic first pill, quiets it and improves insulin sensitivity.\n\nDifferent levers, one goal: get glucose out of the blood safely."
-        },
-        {
-          "h": "Why this map is the whole point",
-          "md": "Notice how the pieces connect. The **β-cell relay** (glucose→ATP→K⁺→Ca²⁺→insulin) is where sulfonylureas and GLP-1 drugs act. **Insulin action** (receptor→GLUT4) is where injected insulin and, indirectly, metformin and exercise help. **Insulin resistance** is the wall the newer combos try to get around.\n\nThat's the reward for learning the biology first: the drug names stop being a jumble and become a **map of levers on a system you understand**. And it's why the GLP-1 revolution grew straight out of diabetes research — the incretin receptors were a lever hiding in plain sight.\n\n*(Educational only — not medical advice. Treatment choices belong to you and your clinician.)*"
-        }
-      ],
-      "questions": [
-        {
-          "id": "q1",
-          "type": "mcq",
-          "prompt": "'Flozin' drugs (SGLT2 inhibitors) lower blood sugar by:",
-          "options": [
-            "Blocking glucose reabsorption in the kidney, so glucose leaves in the urine",
-            "Forcing the β-cell to release insulin",
-            "Blocking the insulin receptor",
-            "Destroying GLUT4"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — SGLT2 inhibition dumps excess glucose into the urine.",
-            "No — that's sulfonylureas.",
-            "No — they act in the kidney, not on the insulin receptor.",
-            "No — they don't destroy GLUT4."
-          ]
-        },
-        {
-          "id": "q2",
-          "type": "mcq",
-          "prompt": "Which drug class acts on the SAME β-cell relay as sulfonylureas but only when glucose is high?",
-          "options": [
-            "GLP-1 receptor agonists (incretin drugs)",
-            "Metformin",
-            "SGLT2 inhibitors",
-            "Injected insulin"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — GLP-1 amplifies glucose-dependent insulin release.",
-            "No — metformin acts mainly on the liver.",
-            "No — flozins act on the kidney.",
-            "No — injected insulin bypasses the β-cell entirely."
-          ]
-        },
-        {
-          "id": "q3",
-          "type": "mcq",
-          "prompt": "Metformin, the classic first-line pill, mainly works by:",
-          "options": [
-            "Quieting the liver's glucose output and improving insulin sensitivity",
-            "Forcing insulin release",
-            "Blocking the kidney",
-            "Replacing insulin"
-          ],
-          "answer": 0,
-          "feedback": [
-            "Correct — it lowers hepatic glucose production and helps sensitivity.",
-            "No — it doesn't force β-cell insulin release.",
-            "No — that's the flozins.",
-            "No — it isn't insulin replacement."
-          ]
-        }
-      ],
-      "resources": []
+     "h": "Two hormones, pulling in opposite directions",
+     "md": "The balance is run by the **pancreas**, using two hormones that oppose each other:\n\n- **Insulin** (from **beta-cells**) — the *lower-it* hormone. Released when sugar rises; it moves glucose out of the blood into cells.\n- **Glucagon** (from **alpha-cells**) — the *raise-it* hormone. Released when sugar falls; it tells the liver to release stored glucose.\n\nThink of a thermostat with both a cooler and a heater. In diabetes the *cooling* side — insulin — either **isn't made** (type 1) or **isn't heeded** (type 2). The next lessons show exactly how each half works, and how it breaks."
     }
-  ]
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Roughly how much glucose is in the entire bloodstream at once?",
+     "options": [
+      "About a teaspoon (4–5 grams)",
+      "About a kilogram",
+      "About half a litre",
+      "None — blood carries no sugar"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — only ~4–5 g total, which is why control must be precise.",
+      "No — that's vastly too much; it's only a few grams.",
+      "No — glucose is dissolved in tiny amounts, not litres.",
+      "No — blood always carries some glucose; the body defends a narrow level."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why is chronically HIGH blood sugar harmful?",
+     "options": [
+      "Glucose gradually damages vessels, nerves, kidneys and eyes by 'sugar-coating' proteins",
+      "It makes blood too thin",
+      "It has no harmful effect",
+      "It instantly stops the heart"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — glycation and vascular damage are how diabetes injures organs over years.",
+      "No — the harm is glycation/vascular damage, not thinning.",
+      "No — sustained highs cause the classic diabetic complications.",
+      "No — the damage is slow and cumulative, not instant."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Which hormone LOWERS blood sugar, and from which cells?",
+     "options": [
+      "Insulin, from beta-cells",
+      "Glucagon, from alpha-cells",
+      "Adrenaline, from the gut",
+      "Insulin, from the liver"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — beta-cell insulin is the glucose-lowering hormone.",
+      "No — glucagon RAISES blood sugar.",
+      "No — adrenaline raises sugar and comes from the adrenal glands.",
+      "No — insulin comes from pancreatic beta-cells, not the liver."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "NIDDK — What is diabetes?",
+     "type": "reading",
+     "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes"
+    }
+   ]
+  },
+  {
+   "id": "betacell-insulin",
+   "title": "Inside the β-Cell — how insulin is released",
+   "summary": "A rise in blood sugar is turned into a squirt of insulin by an elegant chain of events — the same chain several diabetes drugs act on.",
+   "anim": "med_betacell",
+   "cards": [
+    {
+     "h": "Sugar in, insulin out — the five-step relay",
+     "md": "The beta-cell is a tiny glucose meter wired to a release trigger. The animation walks the relay:\n\n1. **Glucose enters** through a door called **GLUT2**.\n2. Burning it raises **ATP** (the cell's fuel gauge).\n3. High ATP **closes a potassium (K⁺) channel**, so the cell's voltage flips (**depolarises**).\n4. That opens **calcium gates**; calcium floods in.\n5. Calcium makes **insulin granules** fuse with the membrane and dump insulin into the blood.\n\nThe beauty: insulin release is *proportional to glucose*. More sugar, more insulin — automatically."
+    },
+    {
+     "h": "Where the drugs grab the wheel",
+     "md": "This relay is a drug target map:\n\n- **Sulfonylureas** (e.g. glipizide) jam the **K⁺ channel** shut — forcing insulin out *regardless* of glucose (which is why they *can* cause lows).\n- **GLP-1 drugs** and **DPP-4 inhibitors** amplify step 5 — but **only when glucose is already high** (glucose-dependent), so they rarely cause lows.\n\nIn **type 1** diabetes these beta-cells are destroyed, so there's no relay at all. In **type 2**, they overwork for years and slowly wear out. Understanding this one cell explains half of diabetes treatment."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "What is the immediate trigger that makes insulin granules release?",
+     "options": [
+      "Calcium flooding into the cell",
+      "Oxygen",
+      "Sodium leaving the cell",
+      "Sunlight"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — calcium influx is the universal 'release now' signal.",
+      "No — oxygen isn't the trigger here.",
+      "No — it's calcium ENTRY that triggers release.",
+      "No — beta-cells aren't light-sensitive."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why do GLP-1 drugs rarely cause low blood sugar, while sulfonylureas can?",
+     "options": [
+      "GLP-1 amplifies insulin release only when glucose is high; sulfonylureas force it regardless",
+      "GLP-1 contains sugar",
+      "Sulfonylureas block insulin entirely",
+      "They act on different organs, not the β-cell"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — glucose-dependence is the safety difference.",
+      "No — GLP-1 doesn't contain sugar.",
+      "No — sulfonylureas force insulin OUT, not block it.",
+      "No — both act on the β-cell relay, at different steps."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "In the relay, closing the K⁺ channel does what?",
+     "options": [
+      "Flips the cell's voltage (depolarises it), opening calcium gates",
+      "Stops insulin forever",
+      "Lets glucose out",
+      "Raises oxygen"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — depolarisation opens voltage-gated calcium channels.",
+      "No — it triggers release, not stops it.",
+      "No — glucose entered earlier via GLUT2.",
+      "No — it changes voltage, not oxygen."
+     ]
+    }
+   ],
+   "resources": []
+  },
+  {
+   "id": "insulin-action",
+   "title": "What Insulin Does — the key that opens the cell",
+   "summary": "Insulin's headline job is to unlock cells so glucose can leave the blood. The 'lock' is a receptor; the 'doors' are GLUT4 transporters.",
+   "anim": "med_insulin_action",
+   "cards": [
+    {
+     "h": "Insulin is a key; GLUT4 is the door",
+     "md": "Glucose can't just drift into muscle and fat cells — it needs a door opened. Insulin is the **key**:\n\n1. Insulin binds its **receptor** (a spanning-the-membrane protein) on a muscle or fat cell.\n2. The receptor fires a signal cascade inside (**IRS → PI3K → Akt** — you don't need the letters, just that it's a relay).\n3. The signal orders **GLUT4** transporters — the glucose doors — to move from inside the cell up to the surface.\n4. Glucose pours through the open doors, and **blood sugar falls**.\n\nInsulin also tells the **liver** to stop making glucose and to store it, and tells **fat** to store energy. It's the body's master *'store it away'* signal."
+    },
+    {
+     "h": "A neat trick: exercise opens the doors too",
+     "md": "Here's a hopeful detail. Muscle can move **GLUT4** doors to the surface in a *second, insulin-independent* way: **muscle contraction itself**. When you exercise, working muscle pulls glucose out of the blood **without needing insulin**.\n\nThat's why a walk after a meal lowers blood sugar, and why exercise is powerful medicine in diabetes — it opens the doors when insulin can't. It's also part of why **muscle mass matters** (see the GLP-1 module): more muscle means more glucose-clearing capacity."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "What are GLUT4 transporters?",
+     "options": [
+      "Glucose 'doors' that insulin moves to the cell surface so sugar can enter",
+      "Enzymes that destroy insulin",
+      "Hormones from the gut",
+      "Fat-storage droplets"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — GLUT4 is the insulin-responsive glucose transporter in muscle and fat.",
+      "No — they transport glucose, not destroy insulin.",
+      "No — they're transporters in the cell membrane, not gut hormones.",
+      "No — they move glucose, not store fat."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "How can muscle take up glucose WITHOUT insulin?",
+     "options": [
+      "Muscle contraction (exercise) moves GLUT4 doors to the surface on its own",
+      "It can't — insulin is always required",
+      "By making its own insulin",
+      "By raising blood pressure"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — contraction is a separate, insulin-independent route for GLUT4.",
+      "No — exercise provides an insulin-independent path.",
+      "No — muscle doesn't make insulin.",
+      "No — blood pressure isn't the mechanism."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Besides opening muscle/fat doors, insulin tells the liver to:",
+     "options": [
+      "Stop making glucose and store it instead",
+      "Dump all its glucose",
+      "Make glucagon",
+      "Shut down"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — insulin suppresses hepatic glucose output and promotes storage.",
+      "No — that's the opposite; insulin suppresses glucose release.",
+      "No — glucagon comes from pancreatic alpha-cells.",
+      "No — the liver keeps working, just switching to storage mode."
+     ]
+    }
+   ],
+   "resources": []
+  },
+  {
+   "id": "type-1",
+   "title": "Type 1 — the immune system attacks the factory",
+   "summary": "In type 1 diabetes the body's own defences destroy the insulin-making β-cells. Without insulin to replace them, it's rapidly life-threatening.",
+   "cards": [
+    {
+     "h": "Friendly fire on the β-cells",
+     "md": "**Type 1 diabetes** is an **autoimmune** disease: the immune system mistakes the insulin-making **beta-cells** for invaders and destroys them, usually over months to years. The tell-tale sign in the blood is **autoantibodies** (against proteins like GAD65 and IA-2).\n\nThe result is **absolute insulin deficiency** — the factory is gone. It's only **5–10%** of all diabetes, classically appears in **children and young adults** (though it can start at any age), and is **not** caused by diet or weight. A slower adult-onset form is called **LADA** (latent autoimmune diabetes in adults)."
+    },
+    {
+     "h": "Why type 1 needs insulin — and can turn dangerous fast",
+     "md": "With no insulin, two things go wrong at once: glucose can't get into cells (so it piles up in the blood), and the body, thinking it's starving, **burns fat for fuel**. Burning fat that fast produces acidic **ketones**, which can flood the blood into **diabetic ketoacidosis (DKA)** — a medical emergency.\n\nThat's why people with type 1 **must take insulin for life** — by injection or pump — carefully matched to food and activity. It's a demanding, 24/7 balancing act. GLP-1 drugs, which rely on working beta-cells, are **not** a treatment for type 1's core problem."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "What is the root cause of type 1 diabetes?",
+     "options": [
+      "The immune system destroys the insulin-making β-cells (autoimmune)",
+      "Eating too much sugar",
+      "The cells ignore insulin",
+      "The liver stops working"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — autoimmune β-cell destruction causes absolute insulin deficiency.",
+      "No — type 1 isn't caused by diet or sugar.",
+      "No — that's insulin resistance (type 2).",
+      "No — the problem is the pancreas's β-cells, not the liver."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Why can untreated type 1 rapidly cause ketoacidosis (DKA)?",
+     "options": [
+      "With no insulin, the body burns fat for fuel, producing acidic ketones that flood the blood",
+      "Too much insulin",
+      "The blood becomes too alkaline",
+      "Excess muscle breakdown only"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — uncontrolled fat-burning acidifies the blood.",
+      "No — DKA comes from a LACK of insulin.",
+      "No — ketones make the blood too ACIDIC.",
+      "No — the core driver is ketone acid from fat metabolism."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why won't a GLP-1 drug fix the core problem in type 1?",
+     "options": [
+      "GLP-1 works by boosting β-cells — but in type 1 the β-cells are destroyed",
+      "GLP-1 is only for children",
+      "GLP-1 raises blood sugar",
+      "Type 1 has too much insulin"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — no β-cells means nothing for GLP-1 to amplify.",
+      "No — age isn't the reason.",
+      "No — GLP-1 lowers, not raises, glucose.",
+      "No — type 1 has too LITTLE insulin."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "American Diabetes Association — about diabetes",
+     "type": "reading",
+     "url": "https://diabetes.org/about-diabetes"
+    }
+   ]
+  },
+  {
+   "id": "type-2-resistance",
+   "title": "Type 2 — when the locks rust (insulin resistance)",
+   "summary": "Type 2 diabetes usually starts not with too little insulin, but with cells that stop listening to it.",
+   "anim": "med_insulin_resistance",
+   "cards": [
+    {
+     "h": "Plenty of insulin, but the cells won't answer",
+     "md": "**Type 2 diabetes** — about **90–95%** of all cases — usually begins the opposite way from type 1. Early on there's *plenty* of insulin; the problem is that **muscle, liver and fat stop responding to it**. This is **insulin resistance** — the locks have rusted.\n\nThe animation shows it: insulin knocks on the receptor, but the signal barely gets through, so few **GLUT4** doors open and glucose stays stuck in the blood. Deep down the defect is often *inside* the cell — fatty molecules (like diacylglycerol and ceramides) and low-grade **inflammation** jam the signalling relay."
+    },
+    {
+     "h": "The vicious compensation — and why it eventually fails",
+     "md": "At first the pancreas simply shouts louder: it pumps out **extra insulin** to force the rusted locks. Blood sugar stays near-normal — but insulin runs **high** for years (a state linked to weight gain and fatty liver). This is *pre-diabetes*.\n\nEventually the overworked **beta-cells wear out** and can no longer keep up. *Now* insulin falls, blood sugar climbs, and type 2 diabetes is diagnosed. So type 2 is really a **two-part failure**: resistance first, beta-cell burnout later — which is the subject of the next lesson."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "What defines insulin RESISTANCE?",
+     "options": [
+      "Cells respond poorly to insulin, so glucose isn't cleared even when insulin is present",
+      "The pancreas makes no insulin",
+      "The immune system attacks β-cells",
+      "Too few red blood cells"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — the signal fails downstream; the cells don't answer insulin.",
+      "No — that's type 1's absolute deficiency.",
+      "No — that's the autoimmune mechanism of type 1.",
+      "No — that's anaemia, unrelated."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "In early type 2, why is blood sugar often near-normal for years despite resistance?",
+     "options": [
+      "The pancreas compensates by pumping out extra insulin to force the rusted locks",
+      "The kidneys make insulin",
+      "Resistance fixes itself daily",
+      "The liver stores all the sugar permanently"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — compensatory hyperinsulinemia holds glucose down until β-cells tire.",
+      "No — kidneys don't make insulin.",
+      "No — resistance persists; the pancreas compensates.",
+      "No — the liver can't absorb it all, especially when it's also resistant."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Type 2 diabetes is best described as:",
+     "options": [
+      "A two-part failure: insulin resistance first, then β-cell burnout",
+      "Purely a lack of insulin from birth",
+      "An infection",
+      "An allergy to sugar"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — resistance plus progressive β-cell decline.",
+      "No — that's closer to type 1.",
+      "No — it's metabolic, not infectious.",
+      "No — it's not an allergy."
+     ]
+    }
+   ],
+   "resources": []
+  },
+  {
+   "id": "type-2-twin-engine",
+   "title": "The Twin Engines of Type 2",
+   "summary": "Fat in the wrong places — the liver and the pancreas — drives both halves of type 2, which is why major weight loss can put it into remission.",
+   "cards": [
+    {
+     "h": "Fat where it shouldn't be",
+     "md": "Why do the locks rust and the beta-cells tire? A leading explanation (Roy Taylor's **twin-cycle** model) points to **fat stored in the wrong organs**:\n\n- **Liver fat** makes the liver insulin-resistant, so it over-produces glucose — especially overnight (high morning sugars).\n- **Pancreas fat** poisons the beta-cells (*lipotoxicity*), blunting insulin release.\n\nIt's not *total* weight that matters most, but **where** the fat sits. This is why some people develop type 2 at a modest weight if their liver and pancreas are fatty — and why the next lesson, on different populations, matters so much."
+    },
+    {
+     "h": "The hopeful flip side: remission",
+     "md": "If the twin cycle drives type 2, then *reversing* it should help — and it does. In the landmark **DiRECT** trial, an intensive **weight-loss programme** put nearly **half** of people with type 2 into **drug-free remission**, especially those who lost the most and were diagnosed more recently. Losing the liver and pancreas fat let the beta-cells recover.\n\nThe lesson: type 2 is often **not** a one-way street. Weight loss (by diet, surgery, or now the GLP-1 drugs) can pull the engines back — though the earlier it's caught, the better the odds."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "In the twin-cycle model, fat in which two organs drives type 2?",
+     "options": [
+      "The liver and the pancreas",
+      "The skin and the spleen",
+      "The lungs and the heart",
+      "The brain and the kidney"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — liver fat drives glucose over-production; pancreas fat blunts insulin release.",
+      "No — those aren't the twin-cycle organs.",
+      "No — the model centres on liver and pancreas fat.",
+      "No — it's liver and pancreas."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "What did the DiRECT trial show?",
+     "options": [
+      "Intensive weight loss put nearly half of type 2 patients into drug-free remission",
+      "Type 2 is always permanent",
+      "Only surgery can help",
+      "Diet has no effect on type 2"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — losing organ fat let β-cells recover in many.",
+      "No — DiRECT showed remission is possible.",
+      "No — a diet programme achieved remission without surgery.",
+      "No — diet-driven weight loss was the intervention."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why can someone develop type 2 at only a modest body weight?",
+     "options": [
+      "Where fat sits (fatty liver/pancreas) matters more than total weight",
+      "It's impossible — type 2 needs severe obesity",
+      "They must have type 1",
+      "Their kidneys failed"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — organ (ectopic) fat, not just total mass, drives the disease.",
+      "No — type 2 occurs across a wide weight range.",
+      "No — this is still type 2, driven by ectopic fat.",
+      "No — kidney failure isn't the cause."
+     ]
+    }
+   ],
+   "resources": [],
+   "anim": "med_type2_engine"
+  },
+  {
+   "id": "not-one-disease",
+   "title": "Not One Disease — the diabetes family",
+   "summary": "'Type 1' and 'type 2' are the big two, but several other forms are commonly missed — and getting the label right changes the treatment.",
+   "cards": [
+    {
+     "h": "The forms hiding between the big two",
+     "md": "Diabetes is really a **family** of diseases that share one symptom (high blood sugar):\n\n- **LADA** — slow autoimmune diabetes in adults; looks like type 2 but has type-1 antibodies and eventually needs insulin.\n- **MODY** (maturity-onset diabetes of the young) — a **single-gene**, inherited form (runs strongly in families). Some kinds need *no* treatment; others respond beautifully to **cheap sulfonylurea pills** rather than insulin — so the diagnosis genuinely changes the treatment.\n- **Ketosis-prone type 2** — presents dramatically like type 1 (even with DKA) but then behaves like type 2.\n- **Gestational diabetes** — brought on by the insulin resistance of pregnancy.\n- **Secondary** — from pancreas damage, steroids, or other hormone diseases."
+    },
+    {
+     "h": "Why the label is worth getting right",
+     "md": "Mislabelling is common and costly. A slim adult with MODY may be put on insulin they don't need; someone with LADA may be treated as type 2 until they crash. Roughly **1 in 20** people labelled 'type 2' actually has a **different** form.\n\nThe practical point for a general audience: diabetes isn't a single box. If a diagnosis doesn't fit the usual story — very young, very slim, strong family pattern, or an unusual course — it's worth asking whether it's one of these other forms, because the **right label unlocks the right, sometimes much simpler, treatment**."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "MODY is unusual among diabetes types because it is:",
+     "options": [
+      "Caused by a single inherited gene, and some forms respond to sulfonylurea pills instead of insulin",
+      "Caused by a virus",
+      "Always the most severe form",
+      "Only found in newborns"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — monogenic, strongly familial, and often treatable with pills.",
+      "No — it's genetic, not viral.",
+      "No — some MODY forms are mild or need no treatment.",
+      "No — it typically presents in youth/young adulthood, not only newborns."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "LADA is easy to mistake for which type, and why?",
+     "options": [
+      "Type 2 — it appears in adults and starts slowly, but it's actually autoimmune",
+      "Type 1 — because it needs insulin immediately",
+      "Gestational — because of pregnancy",
+      "MODY — because it's genetic"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — LADA masquerades as type 2 but carries type-1 antibodies.",
+      "No — LADA progresses slowly, unlike classic type 1.",
+      "No — LADA isn't pregnancy-related.",
+      "No — LADA is autoimmune, not single-gene."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Why does getting the exact diabetes label right matter?",
+     "options": [
+      "Different forms need different treatments — the right label can unlock a simpler one",
+      "It doesn't — all diabetes is treated identically",
+      "Only for insurance",
+      "Labels are purely academic"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — e.g. MODY on pills vs needless insulin; LADA caught before a crash.",
+      "No — treatments differ substantially by type.",
+      "No — the medical treatment itself changes.",
+      "No — it directly affects care."
+     ]
+    }
+   ],
+   "resources": [
+    {
+     "label": "Exeter — genetic (monogenic) diabetes / MODY",
+     "type": "reading",
+     "url": "https://www.diabetesgenes.org/"
+    }
+   ]
+  },
+  {
+   "id": "population-phenotypes",
+   "title": "★ Why Diabetes Looks Different Across Populations",
+   "summary": "The same diagnosis can have different biology in different ancestries — nowhere clearer than East and South Asian populations, who get type 2 at much lower body weights.",
+   "cards": [
+    {
+     "h": "East Asian 'thin diabetes': the tank is smaller",
+     "md": "In people of **East Asian** ancestry (Chinese, Japanese, Korean), type 2 often appears at a **much lower body weight** than in Europeans — a pattern sometimes called **'thin diabetes.'** The reason is a shift in *which half* of the machinery fails.\n\nEuropeans typically fail on the **resistance** side (rusted locks) and compensate with big insulin surges. Many East Asians instead have a **smaller insulin-secretion reserve** — the beta-cells simply **can't ramp up** as much. With less spare capacity, even modest weight gain or resistance tips them into diabetes. It's less 'rusted locks' and more 'a smaller fuel tank.' (This is why Asian BMI thresholds for risk are set **lower** — overweight from ~23 rather than 25.)"
+    },
+    {
+     "h": "South Asian 'thin-fat', and the thrifty idea",
+     "md": "**South Asians** (people from India, Pakistan, Bangladesh) show a *different* twist: very high **insulin resistance** with lots of **hidden visceral fat** and relatively low muscle — the **'thin-fat'** phenotype. They develop type 2 younger and at low BMI, with among the world's highest rates.\n\nOne popular explanation is the **'thrifty phenotype'**: bodies primed by scarcity to store energy efficiently struggle when food becomes abundant. The takeaways for a global, public course: **BMI cut-offs and 'looking healthy' can badly under-estimate risk** in Asian populations — screening and prevention should start earlier and at lower weights. Diabetes is one disease name over **many** underlying biologies."
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "Why do many East Asians develop type 2 at a LOWER body weight than Europeans?",
+     "options": [
+      "Their dominant defect is a smaller insulin-secretion reserve, so β-cells can't compensate as much",
+      "They eat more sugar",
+      "They have no insulin receptors",
+      "They can't produce glucagon"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — reduced β-cell secretory capacity tips them over at lower BMI.",
+      "No — the driver is β-cell reserve, not diet stereotypes.",
+      "No — they have receptors; secretion capacity is the key difference.",
+      "No — glucagon isn't the issue."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "The South Asian 'thin-fat' phenotype features:",
+     "options": [
+      "High insulin resistance with hidden visceral fat and low muscle, at low BMI",
+      "No body fat at all",
+      "Only β-cell failure",
+      "Immunity to diabetes"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — visceral adiposity and low muscle drive resistance despite a lean look.",
+      "No — the fat is visceral/hidden, not absent.",
+      "No — the hallmark is resistance, not just secretion failure.",
+      "No — South Asians have among the highest type 2 rates."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "A practical public-health lesson from these differences is:",
+     "options": [
+      "Standard BMI cut-offs under-estimate diabetes risk in Asian populations — screen earlier and at lower weights",
+      "Everyone should use the same weight threshold",
+      "Ancestry never affects risk",
+      "Only weight, never biology, matters"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — Asian-specific lower thresholds catch risk that standard BMI misses.",
+      "No — one threshold misses high-risk lean individuals.",
+      "No — ancestry meaningfully shifts the biology.",
+      "No — the underlying biology (secretion vs resistance) differs."
+     ]
+    }
+   ],
+   "resources": []
+  },
+  {
+   "id": "receptor-toolkit",
+   "title": "The Receptor Toolkit — how the drugs plug in",
+   "summary": "Every diabetes drug works by pushing on one specific molecular lever. Here's the map — and how it connects to the GLP-1 story.",
+   "cards": [
+    {
+     "h": "A handful of levers",
+     "md": "Almost every diabetes medicine acts on one part you've now met:\n\n- **Insulin receptor** — *insulin itself* (injected) binds here to open GLUT4 doors.\n- **K⁺/sulfonylurea receptor** on the β-cell — **sulfonylureas** jam it shut to force insulin out.\n- **Incretin receptors (GLP-1R, GIPR)** — the **GLP-1 drugs** (Ozempic, Mounjaro…) and, indirectly, **DPP-4 inhibitors** act here (see the GLP-1 module).\n- **SGLT2** in the kidney — **'flozin' drugs** block glucose reabsorption so you pee sugar out.\n- **The liver's glucose output** — **metformin**, the classic first pill, quiets it and improves insulin sensitivity.\n\nDifferent levers, one goal: get glucose out of the blood safely."
+    },
+    {
+     "h": "Why this map is the whole point",
+     "md": "Notice how the pieces connect. The **β-cell relay** (glucose→ATP→K⁺→Ca²⁺→insulin) is where sulfonylureas and GLP-1 drugs act. **Insulin action** (receptor→GLUT4) is where injected insulin and, indirectly, metformin and exercise help. **Insulin resistance** is the wall the newer combos try to get around.\n\nThat's the reward for learning the biology first: the drug names stop being a jumble and become a **map of levers on a system you understand**. And it's why the GLP-1 revolution grew straight out of diabetes research — the incretin receptors were a lever hiding in plain sight.\n\n*(Educational only — not medical advice. Treatment choices belong to you and your clinician.)*"
+    }
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "type": "mcq",
+     "prompt": "'Flozin' drugs (SGLT2 inhibitors) lower blood sugar by:",
+     "options": [
+      "Blocking glucose reabsorption in the kidney, so glucose leaves in the urine",
+      "Forcing the β-cell to release insulin",
+      "Blocking the insulin receptor",
+      "Destroying GLUT4"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — SGLT2 inhibition dumps excess glucose into the urine.",
+      "No — that's sulfonylureas.",
+      "No — they act in the kidney, not on the insulin receptor.",
+      "No — they don't destroy GLUT4."
+     ]
+    },
+    {
+     "id": "q2",
+     "type": "mcq",
+     "prompt": "Which drug class acts on the SAME β-cell relay as sulfonylureas but only when glucose is high?",
+     "options": [
+      "GLP-1 receptor agonists (incretin drugs)",
+      "Metformin",
+      "SGLT2 inhibitors",
+      "Injected insulin"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — GLP-1 amplifies glucose-dependent insulin release.",
+      "No — metformin acts mainly on the liver.",
+      "No — flozins act on the kidney.",
+      "No — injected insulin bypasses the β-cell entirely."
+     ]
+    },
+    {
+     "id": "q3",
+     "type": "mcq",
+     "prompt": "Metformin, the classic first-line pill, mainly works by:",
+     "options": [
+      "Quieting the liver's glucose output and improving insulin sensitivity",
+      "Forcing insulin release",
+      "Blocking the kidney",
+      "Replacing insulin"
+     ],
+     "answer": 0,
+     "feedback": [
+      "Correct — it lowers hepatic glucose production and helps sensitivity.",
+      "No — it doesn't force β-cell insulin release.",
+      "No — that's the flozins.",
+      "No — it isn't insulin replacement."
+     ]
+    }
+   ],
+   "resources": []
+  }
+ ]
 }

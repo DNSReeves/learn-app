@@ -6841,6 +6841,1082 @@ ANIMS._med_pump_debug = {
   apLines: AP_LINES
 };
 
+
+/* ── METABOLIC visuals (operator visual-aid batch, 2026-08-01) ─────────────── */
+/* ===== METABOLIC TRIO — Diabetes + GLP-1 Medicines (2026-08-01) ===============
+   Three bespoke canvas animations filling real gaps in two packs:
+     med_incretin      → glp1-medicines · incretin-effect   (oral vs IV glucose)
+     med_glp1_actions  → glp1-medicines · four-actions      (the four jobs)
+     med_type2_engine  → diabetes       · type-2-twin-engine (resistance + β-cell)
+
+   House rules obeyed: append-only fragment, canvas 900×380, MED/F palettes,
+   _t()/_lerp()/clear() helpers, narrate() for the spoken beat, REDUCED-motion
+   safe via tween()/sleep(), and both ANIMS.<name>_static + ANIMS.<name>.
+
+   HARD RULE honoured (the lesson the TA + genetics modules taught): every number
+   spoken in narration is COMPUTED from the arrays that are actually drawn — see
+   ANIMS._med_metabolic_debug at the foot of this block. Retune a constant and the
+   narration follows; it cannot be left lying.
+
+   Physiology kept to what is well established. Where a magnitude genuinely varies
+   between drugs, people or studies (gastric emptying, food intake, years to
+   diagnosis) the narration speaks it as a range or names it as a model. */
+
+/* ---- tiny shared plotting kit (local to this block) ---- */
+function _mmPanel(x,y,w,h,x0,x1,y0,y1){
+  return {x,y,w,h,x0,x1,y0,y1,
+    X:v=>x+(v-x0)/(x1-x0)*w,
+    Y:v=>Math.max(y-2,Math.min(y+h+2, y+h-(v-y0)/(y1-y0)*h))};
+}
+function _mmAxes(ctx,p,o){
+  const {yticks=[],xticks=[],fmtY=v=>String(v),fmtX=v=>String(v),
+         xlab="",ylab="",grid=true}=o||{};
+  ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x,p.y+p.h);
+  ctx.lineTo(p.x+p.w,p.y+p.h); ctx.stroke();
+  for(const v of yticks){ const y=p.Y(v);
+    if(grid){ ctx.strokeStyle="#22314a"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(p.x,y); ctx.lineTo(p.x+p.w,y); ctx.stroke(); }
+    _t(ctx,p.x-7,y+4,fmtY(v),{align:"right",col:"#5A6E8C",size:11}); }
+  for(const v of xticks) _t(ctx,p.X(v),p.y+p.h+16,fmtX(v),{align:"center",col:"#5A6E8C",size:11});
+  if(xlab) _t(ctx,p.x+p.w,p.y+p.h+32,xlab,{align:"right",col:MED.dim,size:12});
+  if(ylab) _t(ctx,p.x-2,p.y-9,ylab,{align:"left",col:MED.dim,size:12});
+}
+function _mmLine(ctx,p,T,V,upto,col,lw,dash){
+  ctx.strokeStyle=col; ctx.lineWidth=lw; if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); let n=0;
+  for(let i=0;i<T.length;i++){ if(T[i]>upto) break;
+    const X=p.X(T[i]),Y=p.Y(V[i]); n++? ctx.lineTo(X,Y):ctx.moveTo(X,Y); }
+  if(n>1) ctx.stroke();
+  ctx.setLineDash([]);
+  return n;
+}
+function _mmBand(ctx,p,T,hi,lo,upto,fill){
+  const idx=[]; for(let i=0;i<T.length;i++){ if(T[i]>upto) break; idx.push(i); }
+  if(idx.length<2) return;
+  ctx.fillStyle=fill; ctx.beginPath();
+  idx.forEach((i,j)=>{ const X=p.X(T[i]),Y=p.Y(hi[i]); j?ctx.lineTo(X,Y):ctx.moveTo(X,Y); });
+  for(let j=idx.length-1;j>=0;j--){ const i=idx[j]; ctx.lineTo(p.X(T[i]),p.Y(lo[i])); }
+  ctx.closePath(); ctx.fill();
+}
+const _mmTrap=(T,V)=>{ let s=0; for(let i=1;i<T.length;i++) s+=(V[i]+V[i-1])/2*(T[i]-T[i-1]); return s; };
+const _mmCross=(T,V,thr,rising)=>{            // first t where V crosses thr (linear interp)
+  for(let i=1;i<T.length;i++){
+    const a=V[i-1],b=V[i];
+    if(rising? (a<thr&&b>=thr) : (a>thr&&b<=thr)){
+      const f=(thr-a)/(b-a); return T[i-1]+f*(T[i]-T[i-1]); } }
+  return null; };
+
+/* ============================================================================
+   1) med_incretin — the incretin effect: same glucose, two routes
+   ========================================================================== */
+const MINCR=(()=>{
+  const T=[]; for(let t=0;t<=180;t+=2) T.push(t);
+  const Gb=90;                      // fasting glucose, mg/dL
+  const Ib=8;                       // fasting insulin, µU/mL
+  const gam=(t,tt)=> t<=0?0:(t/tt)*Math.exp(1-t/tt);   // unit-peak gamma-ish pulse
+  const A=62, tauG=32;              // glucose excursion: peak +62 mg/dL at 32 min
+  const s=0.35, lag=5;              // β-cell response to glucose ALONE (the IV arm)
+  const b=47.3, tauI=22;            // extra secretion driven by the gut incretins
+  // BOTH arms are given the identical glucose curve by construction — that is the
+  // whole point of the isoglycaemic clamp, so we literally share one array.
+  const G   = T.map(t=>Gb+A*gam(t,tauG));
+  const ivI = T.map(t=>s*A*gam(t-lag,tauG));                 // incremental insulin, IV arm
+  const boost=T.map(t=>b*gam(t,tauI));                       // incretin-driven extra
+  const orI = T.map((t,i)=>ivI[i]+boost[i]);                 // incremental insulin, oral arm
+  const IV  = ivI.map(v=>Ib+v), OR = orI.map(v=>Ib+v);
+  const aucIV=_mmTrap(T,ivI), aucOR=_mmTrap(T,orI);          // incremental AUCs
+  const effect=100*(aucOR-aucIV)/aucOR;                      // the incretin effect, %
+  const ratio=aucOR/aucIV;
+  const gPeak=Math.max.apply(null,G);
+  const ivPeak=Math.max.apply(null,IV), orPeak=Math.max.apply(null,OR);
+  // the two glucose curves are the SAME array — prove it rather than assert it
+  const gDiff=Math.max.apply(null,G.map((v,i)=>Math.abs(v-G[i])));
+  return {T,G,IV,OR,ivI,orI,Gb,Ib,aucIV,aucOR,effect,ratio,gPeak,ivPeak,orPeak,gDiff,
+          tPeak:T[OR.indexOf(orPeak)]};
+})();
+
+function drawIncretin(ctx,cv,st){
+  const {iv=0,or=0,shade=0,gut=0,title=""}=st;
+  const M=MINCR;
+  clear(ctx,cv);
+  _t(ctx,cv.width/2,26,title,{size:17,bold:true,align:"center"});
+
+  /* -- glucose mini-panel: the two arms are MATCHED, so one curve serves both -- */
+  const gp=_mmPanel(78,60,232,86, 0,180, 80,170);
+  _mmAxes(ctx,gp,{yticks:[90,130,170],xticks:[0,90,180],
+    ylab:"blood glucose (mg/dL)"});
+  _mmLine(ctx,gp,M.T,M.G,180,MED.blocker,4.2);                 // by vein
+  _mmLine(ctx,gp,M.T,M.G,180,MED.post,2,[5,5]);                // by mouth, dashed on top
+  _t(ctx,gp.x+gp.w,gp.y+gp.h+16,"minutes",{align:"right",col:"#5A6E8C",size:11});
+  _t(ctx,gp.x,gp.y+gp.h+32,"both days: the SAME glucose curve",
+     {col:MED.good,size:12,bold:true});
+
+  /* -- insulin main panel -- */
+  const ip=_mmPanel(400,66,440,196, 0,180, 0,90);
+  _mmAxes(ctx,ip,{yticks:[0,30,60,90],xticks:[0,60,120,180],
+    ylab:"blood insulin (µU/mL)", xlab:"minutes after the glucose load"});
+  if(shade>0){
+    _mmBand(ctx,ip,M.T,M.OR,M.IV,180,"rgba(232,161,60,"+(0.30*shade).toFixed(3)+")");
+  }
+  if(iv>0){
+    _mmLine(ctx,ip,M.T,M.IV,180*iv,MED.blocker,2.8);
+    if(iv>=1) _t(ctx,ip.X(120),ip.Y(M.IV[60])-10,"75 g glucose BY VEIN",
+                 {col:MED.blocker,size:12,bold:true});
+  }
+  if(or>0){
+    _mmLine(ctx,ip,M.T,M.OR,180*or,MED.post,3);
+    if(or>=1) _t(ctx,ip.X(38),ip.Y(M.orPeak)-12,"75 g glucose BY MOUTH",
+                 {col:MED.post,size:12,bold:true});
+  }
+  if(shade>=1){
+    const eff=M.effect.toFixed(0), rat=M.ratio.toFixed(1);
+    _t(ctx,ip.x,ip.y+ip.h+52,"area above baseline:  by mouth = "+rat+"× by vein",
+       {col:MED.txt,size:13});
+    _t(ctx,ip.x,ip.y+ip.h+72,"→ "+eff+"% of the meal insulin response is NOT from the glucose",
+       {col:MED.post,size:14,bold:true});
+  }
+
+  /* -- gut → pancreas schematic (lower left) -- */
+  if(gut>0){
+    const rel=Math.min(1,gut), amp=Math.max(0,gut-1);
+    // stomach
+    ctx.strokeStyle=MED.dim; ctx.lineWidth=2; ctx.fillStyle="rgba(132,150,171,0.12)";
+    ctx.beginPath(); ctx.ellipse(96,206,22,17,0,0,7); ctx.fill(); ctx.stroke();
+    _t(ctx,68,210,"stomach",{align:"right",col:MED.dim,size:11});
+    // gut tube: upper limb (K-cells) then lower limb (L-cells)
+    ctx.strokeStyle=MED.membrane; ctx.lineWidth=9; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(96,224); ctx.lineTo(96,258); ctx.lineTo(244,258);
+    ctx.lineTo(244,296); ctx.lineTo(88,296); ctx.stroke();
+    ctx.lineWidth=1; ctx.lineCap="butt";
+    _t(ctx,250,262,"upper gut",{col:MED.dim,size:10});
+    _t(ctx,60,312,"lower gut",{col:MED.dim,size:10});
+    // the two enteroendocrine cell types
+    ctx.fillStyle=MED.lean;
+    for(const x of [150,180,210]){ ctx.beginPath(); ctx.arc(x,258,4,0,7); ctx.fill(); }
+    ctx.fillStyle=MED.fat;
+    for(const x of [130,160,190]){ ctx.beginPath(); ctx.arc(x,296,4,0,7); ctx.fill(); }
+    _t(ctx,150,246,"K-cells → GIP",{col:MED.lean,size:11,bold:true});
+    _t(ctx,120,316,"L-cells → GLP-1",{col:MED.fat,size:11,bold:true});
+    // pancreas
+    const px=308,py=210, glow=amp;
+    ctx.fillStyle="rgba(95,191,149,"+(0.10+0.22*glow).toFixed(3)+")";
+    ctx.strokeStyle=MED.membrane; ctx.lineWidth=2+1.5*glow;
+    ctx.beginPath(); ctx.ellipse(px,py,40,27,0,0,7); ctx.fill(); ctx.stroke();
+    _t(ctx,px,py+4,"β-cell",{align:"center",col:MED.membrane,size:12,bold:true});
+    _t(ctx,px,py-34,"pancreas",{align:"center",col:MED.dim,size:11});
+    // hormone particles riding the blood from gut to pancreas
+    const bez=(p0,p1,p2,k)=>[ (1-k)*(1-k)*p0[0]+2*(1-k)*k*p1[0]+k*k*p2[0],
+                              (1-k)*(1-k)*p0[1]+2*(1-k)*k*p1[1]+k*k*p2[1] ];
+    const paths=[{from:[210,258],ctl:[276,236],col:MED.lean},
+                 {from:[190,296],ctl:[268,286],col:MED.fat}];
+    for(const pa of paths){ for(let j=0;j<3;j++){
+      const k=Math.max(0,Math.min(1, rel*1.35 - j*0.16));
+      if(k<=0) continue;
+      const [x,y]=bez(pa.from,pa.ctl,[px-38,py+8],k);
+      ctx.fillStyle=pa.col; ctx.globalAlpha=0.55+0.45*k;
+      ctx.beginPath(); ctx.arc(x,y,5,0,7); ctx.fill(); ctx.globalAlpha=1; } }
+    if(amp>0){                                  // insulin out, drawn BELOW the gland
+      ctx.fillStyle=MED.post;                   // (keeps clear of the insulin panel at x=400)
+      for(let j=0;j<4;j++){ if(j/4>amp) break;
+        ctx.beginPath(); ctx.arc(px-27+j*18,py+44,5,0,7); ctx.fill(); }
+      _t(ctx,px,py+68,"insulin AMPLIFIED",{align:"center",col:MED.post,size:12,bold:true});
+    }
+  } else {
+    _t(ctx,78,250,"press play — same sugar, two routes",{col:MED.dim,size:13});
+  }
+}
+
+ANIMS.med_incretin_static=(cv,ctx)=>drawIncretin(ctx,cv,
+  {iv:0,or:0,shade:0,gut:0,title:"The incretin effect — sugar by mouth beats sugar by vein"});
+ANIMS.med_incretin=async(cv,ctx)=>{
+  const M=MINCR, TT="The incretin effect — sugar by mouth beats sugar by vein";
+  const S=o=>drawIncretin(ctx,cv,Object.assign({title:TT},o));
+  S({});
+  await narrate("The same person, two mornings, seventy five grams of glucose each time. On day one he swallows it. On day two it goes straight into a vein, dripped at whatever rate is needed to reproduce day one's blood sugar exactly. Look at the small panel — the two glucose curves lie on top of each other, so the pancreas sees the identical sugar signal both days.");
+  await tween(1400,k=>S({iv:k}));
+  S({iv:1});
+  await narrate("Day two first, the vein. Sugar rises, the beta-cells respond, insulin peaks around "+M.ivPeak.toFixed(0)+" microunits per millilitre. That is what glucose on its own can do.");
+  await tween(1400,k=>S({iv:1,or:k}));
+  S({iv:1,or:1});
+  await narrate("Now day one, the same sugar, swallowed. Identical glucose curve — and insulin peaks near "+M.orPeak.toFixed(0)+", about "+(M.orPeak/M.ivPeak).toFixed(1)+" times as high, and it rises earlier.");
+  await tween(1000,k=>S({iv:1,or:1,shade:k}));
+  await narrate("Shade the gap and measure the area under each curve above the fasting line. By mouth the pancreas released about "+M.ratio.toFixed(1)+" times as much insulin, which means roughly "+M.effect.toFixed(0)+" percent of the after-meal insulin response came from something other than the blood sugar itself. That share is the incretin effect, and in real experiments it lands in the same fifty to seventy percent band.");
+  await tween(1200,k=>S({iv:1,or:1,shade:1,gut:k}));
+  await narrate("Here is what does it. Food touching the intestine makes K-cells in the upper gut release GIP, glucose-dependent insulinotropic polypeptide, and L-cells further down release GLP-1, glucagon-like peptide-1. Both are incretins — gut hormones that travel in the blood to the pancreas.");
+  await tween(1000,k=>S({iv:1,or:1,shade:1,gut:1+k}));
+  await narrate("They do not create insulin out of nothing. They amplify what the beta-cell is already doing with the glucose in front of it. That is the punch line: this is a gut-to-pancreas telegram, sent by food arriving in the intestine. Glucose delivered into a vein never touches the gut, so the telegram is never sent. In type 2 diabetes this effect is blunted — which is exactly what a GLP-1 medicine puts back.");
+};
+
+/* ============================================================================
+   2) med_glp1_actions — the four jobs GLP-1 does
+   ========================================================================== */
+const MGLP=(()=>{
+  /* (a) glucose-DEPENDENT insulin release, as a computed relationship.
+     Secretion is a sigmoid in prevailing glucose; the drug multiplies it through a
+     GATE that is itself a function of glucose — so at low sugar the drug does
+     almost nothing. That gate is the whole hypoglycaemia-safety argument. */
+  const GG=[]; for(let g=50;g<=250;g+=2) GG.push(g);
+  const isr =g=>100/(1+Math.exp(-(g-150)/22));
+  const gate=g=>1/(1+Math.exp(-(g-100)/7));
+  const AMP=1.6;
+  const isrOn=g=>isr(g)*(1+AMP*gate(g));
+  const OFF=GG.map(isr), ON=GG.map(isrOn);
+  const GLO=70, GHI=180;
+  const rLo=isrOn(GLO)/isr(GLO), rHi=isrOn(GHI)/isr(GHI);
+
+  /* (b) glucagon suppression — also glucose-dependent (drawn bar heights) */
+  const GLUC={hiOff:100,hiOn:58,loOff:185,loOn:178};
+  const supHi=100*(GLUC.hiOff-GLUC.hiOn)/GLUC.hiOff;
+  const supLo=100*(GLUC.loOff-GLUC.loOn)/GLUC.loOff;
+
+  /* (c) gastric emptying — % of the meal still in the stomach vs time */
+  const ST=[]; for(let t=0;t<=300;t+=2) ST.push(t);
+  const emp=(t,tau)=>100*Math.exp(-Math.pow(t/tau,1.4));
+  const EOFF=ST.map(t=>emp(t,130)), EON=ST.map(t=>emp(t,208));
+  const t50Off=_mmCross(ST,EOFF,50,false), t50On=_mmCross(ST,EON,50,false);
+
+  /* (d) appetite — energy eaten at a free-access meal, drawn as a RANGE band
+         because the trial numbers genuinely vary */
+  const EAT={off:100,onHi:80,onLo:65};
+  const cutLo=100-EAT.onHi, cutHi=100-EAT.onLo;
+
+  return {GG,OFF,ON,GLO,GHI,rLo,rHi,isr,isrOn,GLUC,supHi,supLo,
+          ST,EOFF,EON,t50Off,t50On,t50Mult:t50On/t50Off,EAT,cutLo,cutHi};
+})();
+
+function _mmBody(ctx,stage){
+  // head + torso
+  ctx.strokeStyle="#43536b"; ctx.lineWidth=2; ctx.fillStyle="rgba(132,150,171,0.07)";
+  ctx.beginPath(); ctx.ellipse(150,86,30,34,0,0,7); ctx.fill(); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(106,150); ctx.quadraticCurveTo(150,128,194,150);
+  ctx.lineTo(198,286); ctx.quadraticCurveTo(150,300,102,286);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  // brain
+  const on=i=>stage===i;
+  ctx.strokeStyle=on(3)?MED.post:"#54657f"; ctx.lineWidth=on(3)?2.4:1.6;
+  ctx.beginPath(); ctx.ellipse(150,82,19,15,0,0,7); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(133,82); ctx.quadraticCurveTo(150,72,167,82); ctx.stroke();
+  // stomach (J-shaped blob)
+  ctx.fillStyle=on(2)?"rgba(232,161,60,0.28)":"rgba(132,150,171,0.14)";
+  ctx.strokeStyle=on(2)?MED.post:"#54657f"; ctx.lineWidth=on(2)?2.4:1.6;
+  ctx.beginPath(); ctx.ellipse(143,183,26,19,-0.35,0,7); ctx.fill(); ctx.stroke();
+  // pancreas
+  ctx.fillStyle=(on(0)||on(1))?"rgba(95,191,149,0.30)":"rgba(132,150,171,0.14)";
+  ctx.strokeStyle=(on(0)||on(1))?MED.membrane:"#54657f"; ctx.lineWidth=(on(0)||on(1))?2.4:1.6;
+  ctx.beginPath(); ctx.ellipse(152,222,34,11,-0.16,0,7); ctx.fill(); ctx.stroke();
+  // numbered badges
+  const badge=(x,y,n,live)=>{
+    ctx.fillStyle=live?MED.post:"#2b3849"; ctx.beginPath(); ctx.arc(x,y,11,0,7); ctx.fill();
+    _t(ctx,x,y+5,String(n),{align:"center",col:live?"#101822":MED.dim,size:13,bold:true}); };
+  badge(200,214,1,stage===0);
+  badge(200,240,2,stage===1);
+  badge(196,176,3,stage===2);
+  badge(190,74,4,stage===3);
+  _t(ctx,150,314,"one hormone, four places",{align:"center",col:MED.dim,size:12});
+}
+
+function drawGlp1Actions(ctx,cv,st){
+  const {stage=-1,k=0,title=""}=st, M=MGLP;
+  clear(ctx,cv);
+  _t(ctx,cv.width/2,26,title,{size:17,bold:true,align:"center"});
+  _mmBody(ctx,stage);
+
+  if(stage<0){
+    _t(ctx,330,150,"① pancreas — insulin UP, but only when sugar is high",{col:MED.dim,size:14});
+    _t(ctx,330,180,"② pancreas — glucagon DOWN",{col:MED.dim,size:14});
+    _t(ctx,330,210,"③ stomach — empties more slowly",{col:MED.dim,size:14});
+    _t(ctx,330,240,"④ brain — appetite turned down",{col:MED.dim,size:14});
+    _t(ctx,330,282,"press play",{col:MED.post,size:13,bold:true});
+    return;
+  }
+
+  if(stage===0){
+    _t(ctx,300,52,"① insulin release is GLUCOSE-DEPENDENT",{col:MED.membrane,size:14,bold:true});
+    const p=_mmPanel(348,72,486,196, 50,250, 0,280);
+    _mmAxes(ctx,p,{yticks:[0,100,200],xticks:[70,100,150,200,250],
+      ylab:"insulin secretion (relative)", xlab:"prevailing blood glucose (mg/dL)"});
+    _mmLine(ctx,p,M.GG,M.OFF,250,MED.blocker,2.6);
+    _mmLine(ctx,p,M.GG,M.ON,50+200*k,MED.post,3);
+    _t(ctx,p.X(232),p.Y(M.isr(232))+18,"no drug",{align:"right",col:MED.blocker,size:12,bold:true});
+    if(k>0.55) _t(ctx,p.X(196),p.Y(M.isrOn(196))-10,"on GLP-1",{align:"center",col:MED.post,size:12,bold:true});
+    for(const g of [M.GLO,M.GHI]){
+      const live = g===M.GLO ? k>0.2 : k>0.75; if(!live) continue;
+      const r = g===M.GLO ? M.rLo : M.rHi;
+      ctx.strokeStyle="rgba(215,223,234,0.35)"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(p.X(g),p.y+p.h); ctx.lineTo(p.X(g),p.Y(M.isrOn(g))); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=MED.post; ctx.beginPath(); ctx.arc(p.X(g),p.Y(M.isrOn(g)),5,0,7); ctx.fill();
+      ctx.fillStyle=MED.blocker; ctx.beginPath(); ctx.arc(p.X(g),p.Y(M.isr(g)),5,0,7); ctx.fill();
+      const lab=r.toFixed(2)+"×";
+      _t(ctx,p.X(g)+ (g===M.GLO?10:-10), p.Y(M.isrOn(g))-12, lab,
+         {align:g===M.GLO?"left":"right",col:MED.post,size:14,bold:true}); }
+    if(k>=1) _t(ctx,300,352,"at 70 mg/dL the two lines nearly coincide → little hypoglycaemia risk alone",
+                {col:MED.good,size:13,bold:true});
+    return;
+  }
+
+  if(stage===1){
+    _t(ctx,300,52,"② glucagon — the raise-it hormone — is turned DOWN",{col:MED.membrane,size:14,bold:true});
+    const p=_mmPanel(392,80,420,188, 0,4, 0,200);
+    _mmAxes(ctx,p,{yticks:[0,100,200],ylab:"glucagon released (relative)"});
+    const bars=[{x:0.45,v:M.GLUC.hiOff,to:M.GLUC.hiOff,col:MED.blocker,lab:"no drug"},
+                {x:1.25,v:M.GLUC.hiOff,to:M.GLUC.hiOn ,col:MED.post,lab:"on GLP-1"},
+                {x:2.45,v:M.GLUC.loOff,to:M.GLUC.loOff,col:MED.blocker,lab:"no drug"},
+                {x:3.25,v:M.GLUC.loOff,to:M.GLUC.loOn ,col:MED.post,lab:"on GLP-1"}];
+    for(const b of bars){
+      const h=_lerp(b.v,b.to,k), X=p.X(b.x)-26;
+      ctx.fillStyle=b.col; ctx.fillRect(X,p.Y(h),52,p.y+p.h-p.Y(h));
+      _t(ctx,X+26,p.y+p.h+16,b.lab,{align:"center",col:MED.dim,size:11});
+      _t(ctx,X+26,p.Y(h)-6,h.toFixed(0),{align:"center",col:b.col,size:12,bold:true}); }
+    _t(ctx,p.X(0.85),p.y+p.h+36,"blood sugar HIGH",{align:"center",col:MED.txt,size:12,bold:true});
+    _t(ctx,p.X(2.85),p.y+p.h+36,"blood sugar LOW",{align:"center",col:MED.txt,size:12,bold:true});
+    if(k>=1){
+      _t(ctx,p.X(0.85),p.y-8,"−"+M.supHi.toFixed(0)+"%",{align:"center",col:MED.post,size:15,bold:true});
+      _t(ctx,p.X(2.85),p.y-8,"−"+M.supLo.toFixed(0)+"%",{align:"center",col:MED.good,size:15,bold:true});
+      _t(ctx,300,362,"the same glucose gate — the rescue hormone is left alone when sugar is low",
+         {col:MED.good,size:13,bold:true}); }
+    return;
+  }
+
+  if(stage===2){
+    _t(ctx,300,52,"③ the stomach empties more slowly",{col:MED.post,size:14,bold:true});
+    const p=_mmPanel(360,74,462,188, 0,300, 0,100);
+    _mmAxes(ctx,p,{yticks:[0,50,100],xticks:[0,100,200,300],fmtY:v=>v+"%",
+      ylab:"meal still in the stomach", xlab:"minutes after eating"});
+    ctx.strokeStyle="rgba(215,223,234,0.30)"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(p.x,p.Y(50)); ctx.lineTo(p.x+p.w,p.Y(50)); ctx.stroke();
+    ctx.setLineDash([]);
+    _t(ctx,p.x+4,p.Y(50)-6,"half emptied",{col:MED.dim,size:11});
+    const upto=300*k;
+    _mmLine(ctx,p,M.ST,M.EOFF,upto,MED.blocker,2.6);
+    _mmLine(ctx,p,M.ST,M.EON ,upto,MED.post,3);
+    // the stomach itself, draining at the two rates
+    const fill=(cx,cy,frac,col)=>{
+      ctx.save(); ctx.beginPath(); ctx.ellipse(cx,cy,30,24,-0.3,0,7); ctx.clip();
+      ctx.fillStyle=col; ctx.fillRect(cx-32,cy+24-48*frac,64,48*frac); ctx.restore();
+      ctx.strokeStyle="#54657f"; ctx.lineWidth=1.8;
+      ctx.beginPath(); ctx.ellipse(cx,cy,30,24,-0.3,0,7); ctx.stroke(); };
+    const iOff=Math.min(M.ST.length-1,Math.round(upto/2)), iOn=iOff;
+    fill(300,318,M.EOFF[iOff]/100,"rgba(111,168,220,0.55)");
+    fill(392,318,M.EON [iOn ]/100,"rgba(232,161,60,0.55)");
+    _t(ctx,300,352,"no drug",{align:"center",col:MED.blocker,size:11});
+    _t(ctx,392,352,"on GLP-1",{align:"center",col:MED.post,size:11});
+    if(k>=1){
+      ctx.fillStyle=MED.blocker; ctx.beginPath(); ctx.arc(p.X(M.t50Off),p.Y(50),5,0,7); ctx.fill();
+      ctx.fillStyle=MED.post;    ctx.beginPath(); ctx.arc(p.X(M.t50On ),p.Y(50),5,0,7); ctx.fill();
+      _t(ctx,p.X(M.t50Off),p.Y(50)+22,M.t50Off.toFixed(0)+" min",{align:"center",col:MED.blocker,size:12,bold:true});
+      _t(ctx,p.X(M.t50On ),p.Y(50)+22,M.t50On .toFixed(0)+" min",{align:"center",col:MED.post,size:12,bold:true});
+      _t(ctx,470,352,"fuller for longer — and the commonest side effect, nausea",
+         {col:MED.post,size:13,bold:true}); }
+    return;
+  }
+
+  _t(ctx,300,52,"④ the brain — the hypothalamus turns hunger down",{col:MED.post,size:14,bold:true});
+  const p=_mmPanel(430,84,330,180, 0,2, 0,120);
+  _mmAxes(ctx,p,{yticks:[0,50,100],fmtY:v=>v+"%",ylab:"food eaten at a free meal"});
+  const bOff=MGLP.EAT.off;
+  ctx.fillStyle=MED.blocker;
+  ctx.fillRect(p.X(0.45)-38,p.Y(bOff),76,p.y+p.h-p.Y(bOff));
+  _t(ctx,p.X(0.45),p.y+p.h+16,"no drug",{align:"center",col:MED.dim,size:12});
+  const hi=_lerp(bOff,MGLP.EAT.onHi,k), lo=_lerp(bOff,MGLP.EAT.onLo,k);
+  ctx.fillStyle="rgba(232,161,60,0.35)";
+  ctx.fillRect(p.X(1.35)-38,p.Y(hi),76,p.y+p.h-p.Y(hi));
+  ctx.fillStyle=MED.post;
+  ctx.fillRect(p.X(1.35)-38,p.Y(lo),76,p.y+p.h-p.Y(lo));
+  ctx.strokeStyle=MED.post; ctx.lineWidth=2;
+  ctx.strokeRect(p.X(1.35)-38,p.Y(hi),76,p.Y(lo)-p.Y(hi));
+  _t(ctx,p.X(1.35),p.y+p.h+16,"on GLP-1",{align:"center",col:MED.dim,size:12});
+  if(k>0.5) _t(ctx,p.X(1.35)+46,p.Y(hi)+2,"typical range",{col:MED.dim,size:11});
+  if(k>=1){
+    _t(ctx,p.X(1.35),p.Y(hi)-12,"−"+MGLP.cutLo.toFixed(0)+"% to −"+MGLP.cutHi.toFixed(0)+"%",
+       {align:"center",col:MED.post,size:15,bold:true});
+    _t(ctx,300,352,"appetite is a brain signal — GLP-1 reaches it directly",
+       {col:MED.post,size:13,bold:true}); }
+}
+
+ANIMS.med_glp1_actions_static=(cv,ctx)=>drawGlp1Actions(ctx,cv,
+  {stage:-1,title:"The four jobs GLP-1 does"});
+ANIMS.med_glp1_actions=async(cv,ctx)=>{
+  const M=MGLP, TT="The four jobs GLP-1 does";
+  const S=(stage,k)=>drawGlp1Actions(ctx,cv,{stage,k,title:TT});
+  S(-1,0);
+  await narrate("GLP-1 — glucagon-like peptide-1 — is one hormone with four jobs, in three places: the pancreas twice, the stomach, and the brain. Take them one at a time.");
+  S(0,0);
+  await tween(1800,k=>S(0,k));
+  S(0,1);
+  await narrate("Job one, the pancreas. The blue line is how much insulin the beta-cells release at each level of blood sugar. Add the drug and the amber line lifts — but look WHERE it lifts. At a blood sugar of "+M.GHI+" milligrams per decilitre, secretion is "+M.rHi.toFixed(1)+" times as high. At "+M.GLO+" — a perfectly normal fasting reading — the two lines are almost on top of each other: the drug adds only about "+((M.rLo-1)*100).toFixed(0)+" percent. The amplification is glucose-dependent, it switches itself off, and that is why these drugs on their own rarely cause hypoglycaemia — dangerously low blood sugar.");
+  S(1,0);
+  await tween(1400,k=>S(1,k));
+  S(1,1);
+  await narrate("Job two, still the pancreas, the other cell. Glucagon is insulin's opposite — it tells the liver to pour glucose out. When blood sugar is high, GLP-1 cuts glucagon release by about "+M.supHi.toFixed(0)+" percent here. When blood sugar is low, the same gate applies and glucagon is barely touched, down only about "+M.supLo.toFixed(0)+" percent — so the body's own rescue reflex is left intact.");
+  S(2,0);
+  await tween(2200,k=>S(2,k));
+  S(2,1);
+  await narrate("Job three, the stomach. Watch the meal drain. Without the drug the stomach is half empty by about "+M.t50Off.toFixed(0)+" minutes; with it, about "+M.t50On.toFixed(0)+" — roughly "+M.t50Mult.toFixed(1)+" times as long. You feel full for longer and sugar enters the blood more gently. The same slowed stomach is the commonest side effect: nausea. How big the slowing is varies a lot between the drugs and fades with some of them.");
+  S(3,0);
+  await tween(1400,k=>S(3,k));
+  S(3,1);
+  await narrate("Job four, the brain. GLP-1 reaches the hypothalamus, the appetite control centre, and dials hunger down. Put someone in front of a free meal and they eat somewhere between "+M.cutLo.toFixed(0)+" and "+M.cutHi.toFixed(0)+" percent less — the range, not a single number, because it differs by drug and dose.");
+  await narrate("Four actions, one hormone: more insulin and less glucagon when sugar is high, a slower stomach, and a quieter appetite. The first two lower blood sugar; the last two are why the weight comes off. And the glucose gate in the first two is what makes it a safe lever to pull.");
+};
+
+/* ============================================================================
+   3) med_type2_engine — the two-engine failure of type 2 diabetes
+   ========================================================================== */
+const MT2=(()=>{
+  /* A deliberately simple, transparent model of the two engines.
+       sensitivity  S(t)  — falls as insulin resistance rises
+       demand       1/S   — the insulin needed to hold glucose at baseline
+       capacity     Cap(t)— the most the β-cells can still make (falls later)
+       secretion    I     = min(demand, capacity)      ← compensation, then failure
+       glucose      G     = 90 / (I·S)                 ← the CONSEQUENCE, not a drawing
+     Glucose only moves when secretion can no longer meet demand — which is exactly
+     the clinical story: years of silence, then a climb. */
+  const T=[]; for(let t=0;t<=25;t+=0.25) T.push(Number(t.toFixed(2)));
+  const Sraw=t=>0.34+0.66/(1+Math.exp((t-9)/3.2));
+  const Fraw=t=>1-0.62/(1+Math.exp(-(t-13)/3.5));
+  const CAP0=3.0, GB=90;
+  const S  =T.map(t=>Sraw(t)/Sraw(0));
+  const CAP=T.map(t=>CAP0*Fraw(t)/Fraw(0));
+  const DEM=S.map(s=>1/s);
+  const INS=T.map((t,i)=>Math.min(DEM[i],CAP[i]));
+  const G  =T.map((t,i)=>GB/(INS[i]*S[i]));
+  const RES=S.map(s=>1/s);                       // resistance = 1/sensitivity
+  const peakIns=Math.max.apply(null,INS);
+  const peakYr =T[INS.indexOf(peakIns)];
+  const preYr  =_mmCross(T,G,100,true);          // impaired fasting glucose
+  const dxYr   =_mmCross(T,G,126,true);          // diabetes threshold
+  const capPct = dxYr==null?null:100*(CAP0*Fraw(dxYr)/Fraw(0))/CAP0;
+  const resAtDx= dxYr==null?null:Sraw(0)/Sraw(dxYr);
+  const gEnd=G[G.length-1];
+  return {T,S,CAP,DEM,INS,G,RES,peakIns,peakYr,preYr,dxYr,capPct,resAtDx,gEnd,
+          years:T[T.length-1],capMax:CAP0,GB};
+})();
+
+function drawT2Engine(ctx,cv,st){
+  const {yr=0,title=""}=st, M=MT2;
+  clear(ctx,cv);
+  _t(ctx,cv.width/2,26,title,{size:17,bold:true,align:"center"});
+  const i=Math.max(0,Math.min(M.T.length-1,Math.round(yr/0.25)));
+
+  /* --- the two dials --- */
+  const dial=(x,frac,col,lab1,lab2,read)=>{
+    const y0=76,h=214,w=42;
+    ctx.strokeStyle="#3A4C68"; ctx.lineWidth=1.4; ctx.strokeRect(x,y0,w,h);
+    const f=Math.max(0,Math.min(1,frac));
+    ctx.fillStyle=col; ctx.fillRect(x+1,y0+h-(h-2)*f,w-2,(h-2)*f);
+    _t(ctx,x+w/2,y0+h+20,lab1,{align:"center",col:MED.dim,size:11});
+    _t(ctx,x+w/2,y0+h+34,lab2,{align:"center",col:MED.dim,size:11});
+    _t(ctx,x+w/2,y0-10,read,{align:"center",col:col,size:13,bold:true}); };
+  const resFrac=(M.RES[i]-1)/(Math.max.apply(null,M.RES)-1);
+  dial(58,resFrac,MED.wrong,"insulin","resistance",M.RES[i].toFixed(1)+"×");
+  dial(150,M.CAP[i]/M.capMax,MED.good,"β-cell","capacity",
+       (100*M.CAP[i]/M.capMax).toFixed(0)+"%");
+
+  /* --- upper panel: insulin demand vs capacity vs what is actually secreted --- */
+  const up=_mmPanel(300,64,540,104, 0,M.years, 0,3.4);
+  _mmAxes(ctx,up,{yticks:[0,1,2,3],fmtY:v=>v+"×",ylab:"insulin (× normal)",grid:true});
+  _mmLine(ctx,up,M.T,M.DEM,yr,"rgba(212,106,98,0.85)",2,[5,4]);
+  _mmLine(ctx,up,M.T,M.CAP,yr,MED.good,2);
+  _mmLine(ctx,up,M.T,M.INS,yr,MED.post,3);
+  if(yr>2){
+    const lx=Math.min(up.X(yr)+6,742);                    // never let a label run off-canvas
+    _t(ctx,lx,up.Y(M.DEM[i])-6,"insulin NEEDED",{col:MED.lean,size:11});
+    _t(ctx,lx,up.Y(M.CAP[i])+14,"β-cell ceiling",{col:MED.good,size:11}); }
+
+  /* --- lower panel: glucose as the CONSEQUENCE --- */
+  const lo=_mmPanel(300,208,540,108, 0,M.years, 70,200);
+  _mmAxes(ctx,lo,{yticks:[80,100,126,160,200],xticks:[0,5,10,15,20,25],
+    ylab:"fasting blood glucose (mg/dL)", xlab:"years"});
+  if(M.preYr!=null){
+    const w=lo.X(Math.min(yr,M.preYr))-lo.x;
+    if(w>0){ ctx.fillStyle="rgba(95,191,149,0.12)"; ctx.fillRect(lo.x,lo.y,w,lo.h); } }
+  ctx.strokeStyle="rgba(212,106,98,0.55)"; ctx.lineWidth=1.4; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(lo.x,lo.Y(126)); ctx.lineTo(lo.x+lo.w,lo.Y(126)); ctx.stroke();
+  ctx.setLineDash([]);
+  _t(ctx,lo.x+lo.w-4,lo.Y(126)-6,"126 = diabetes",{align:"right",col:MED.wrong,size:11,bold:true});
+  _mmLine(ctx,lo,M.T,M.G,yr,MED.post,3);
+  if(M.preYr!=null && yr>=M.preYr)
+    _t(ctx,lo.X(M.preYr/2),lo.Y(112),"SILENT: normal sugar for "+M.preYr.toFixed(0)+" years",
+       {align:"center",col:MED.good,size:12,bold:true});
+  if(M.dxYr!=null && yr>=M.dxYr){
+    ctx.fillStyle=MED.wrong; ctx.beginPath(); ctx.arc(lo.X(M.dxYr),lo.Y(126),6,0,7); ctx.fill();
+    _t(ctx,lo.X(M.dxYr)+10,lo.Y(126)+18,"diagnosed, year "+M.dxYr.toFixed(1),
+       {col:MED.wrong,size:12,bold:true}); }
+
+  /* time cursor */
+  ctx.strokeStyle="rgba(215,223,234,0.35)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(up.X(yr),up.y); ctx.lineTo(up.X(yr),up.y+up.h); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(lo.X(yr),lo.y); ctx.lineTo(lo.X(yr),lo.y+lo.h); ctx.stroke();
+  _t(ctx,840,up.y-9,"year "+yr.toFixed(0),{align:"right",col:MED.txt,size:12,bold:true});
+  _t(ctx,cv.width/2,372,"glucose here is COMPUTED as 90 ÷ (secretion × sensitivity) — it moves only when compensation fails",
+     {align:"center",col:MED.dim,size:11});
+}
+
+ANIMS.med_type2_engine_static=(cv,ctx)=>drawT2Engine(ctx,cv,
+  {yr:0,title:"Type 2 — two engines failing, years apart"});
+ANIMS.med_type2_engine=async(cv,ctx)=>{
+  const M=MT2, TT="Type 2 — two engines failing, years apart";
+  const S=yr=>drawT2Engine(ctx,cv,{yr,title:TT});
+  S(0);
+  await narrate("Type 2 diabetes is not one broken thing, it is two. The left dial is insulin resistance — how hard the tissues have become to open. The right dial is beta-cell capacity — the most insulin the pancreas can still make. Both start normal. Watch "+M.years.toFixed(0)+" years run.");
+  await tween(2600,k=>S(_lerp(0,12,k)));
+  S(12);
+  await narrate("Resistance moves first. The dashed red line is how much insulin is now NEEDED to do the same job, and the amber line is what the pancreas actually delivers — it simply keeps up, on its way to a peak near "+M.peakIns.toFixed(1)+" times normal secretion. That is compensation, and it is the reason the disease can hide.");
+  await narrate("Because look at the glucose panel: flat. Normal. For about "+M.preYr.toFixed(0)+" years a fasting blood sugar tells you nothing is wrong, while the pancreas quietly pays the bill by working nearly twice as hard. That silent stretch is the clinically important part — the resistance is already there, and it is already doing damage.");
+  await tween(1800,k=>S(_lerp(12,17,k)));
+  S(17);
+  await narrate("Now the second engine gives way. The green ceiling — what the beta-cells can still produce — drops below what the resistance demands. Compensation breaks. Secretion turns over and starts to FALL, even though the need is higher than ever.");
+  await tween(2000,k=>S(_lerp(17,M.years,k)));
+  S(M.years);
+  await narrate("Only now does glucose climb. It crosses one hundred, then reaches the diabetes threshold of one hundred and twenty six around year "+M.dxYr.toFixed(1)+" — the first day anyone would call it diabetes. By then beta-cell capacity is down to about "+M.capPct.toFixed(0)+" percent of where it started, close to the roughly half that the large diabetes trials measure at the moment of diagnosis. This is a simple model, and real timelines vary a lot; the shape is what to remember.");
+  await narrate("Two engines, two levers. Weight loss and exercise pull the left dial down. Catching it early — before the right dial has fallen far — is what gives the beta-cells a chance to recover. Treating the sugar number alone treats neither engine.");
+};
+
+/* deterministic-math handle — every number the three narrations speak */
+ANIMS._med_metabolic_debug={
+  /* 1 — incretin */
+  incretinEffectPct:MINCR.effect, incretinAucRatio:MINCR.ratio,
+  incretinAucOral:MINCR.aucOR, incretinAucIV:MINCR.aucIV,
+  incretinIvPeak:MINCR.ivPeak, incretinOralPeak:MINCR.orPeak,
+  incretinPeakRatio:MINCR.orPeak/MINCR.ivPeak,
+  incretinGlucosePeak:MINCR.gPeak, incretinGlucoseArmDiff:MINCR.gDiff,
+  /* 2 — the four actions */
+  glp1LowGlucose:MGLP.GLO, glp1HighGlucose:MGLP.GHI,
+  glp1RatioLow:MGLP.rLo, glp1RatioHigh:MGLP.rHi,
+  glp1LowAddedPct:(MGLP.rLo-1)*100,
+  glp1GlucagonSuppHighPct:MGLP.supHi, glp1GlucagonSuppLowPct:MGLP.supLo,
+  glp1T50Off:MGLP.t50Off, glp1T50On:MGLP.t50On, glp1T50Mult:MGLP.t50Mult,
+  glp1IntakeCutLoPct:MGLP.cutLo, glp1IntakeCutHiPct:MGLP.cutHi,
+  /* 3 — two engines */
+  t2Years:MT2.years, t2PeakInsulinMult:MT2.peakIns, t2PeakInsulinYear:MT2.peakYr,
+  t2SilentYears:MT2.preYr, t2DxYear:MT2.dxYr, t2CapAtDxPct:MT2.capPct,
+  t2ResistanceAtDx:MT2.resAtDx, t2GlucoseAt25:MT2.gEnd
+};
+
+
+/* ── PHYSIOLOGY visuals, part 2 (operator visual-aid batch, 2026-08-01) ────── */
+/* ===== Physiology & Biophysics — pack gap-fill visuals (2026-08-01) ==========
+   Fills the three concepts in topics/physiology-biophysics.json that had anim:null
+     · membrane-potential  → ANIMS.med_membranepotential
+     · oxygen-transport    → ANIMS.med_o2curve
+     · homeostasis         → ANIMS.med_homeostasis
+   House rules followed: one parameterized draw fn per visual + a thin ANIMS
+   wrapper; canvas 900x380; MED palette + _t/_lerp/clear/tween/sleep/narrate.
+   HARD RULE: every number spoken in narration is COMPUTED from the data drawn
+   (Nernst/GHK, the Hill equation, the difference equation) — nothing hardcoded.
+   All computed values are exported on ANIMS._med_physio2_debug at the bottom. */
+
+/* ---------- tiny shared helpers (namespaced _p2* to avoid collisions) ---------- */
+const _P2 = {k:"#6FA8DC", na:"#E8A13C", neg:"#D46A62", pos:"#E8A13C",
+             curve:"#5FBF95", shifted:"#D46A62", ghost:"#8496AB", hi:"#E8A13C"};
+const _p2c01  = v => Math.max(0, Math.min(1, v));
+const _p2ease = k => k*k*(3-2*k);
+const _p2rand = i => { const x = Math.sin(i*127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+function _p2arrow(ctx, ax, ay, bx, by, col, lw, head){
+  lw = lw || 2.5; head = head || 9;
+  ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+  const a = Math.atan2(by - ay, bx - ax);
+  ctx.beginPath(); ctx.moveTo(bx, by);
+  ctx.lineTo(bx - head*Math.cos(a - 0.42), by - head*Math.sin(a - 0.42));
+  ctx.lineTo(bx - head*Math.cos(a + 0.42), by - head*Math.sin(a + 0.42));
+  ctx.closePath(); ctx.fill();
+}
+function _p2dot(ctx, x, y, r, col){ ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); }
+
+/* ============================================================================
+   7) MEMBRANE POTENTIAL — why a cell rests near −70 mV
+   Concentrations are the ones actually drawn; E_K comes from Nernst on them,
+   the resting voltage from Goldman–Hodgkin–Katz on them + the pump term.
+   ========================================================================== */
+const _P2MP = {kIn:140, kOut:5, naIn:12, naOut:145, pNaOverPK:0.04, pumpMv:-2.5, slope:61.5};
+const _p2nernst = (out, inn) => _P2MP.slope * Math.log10(out / inn);
+const _p2ghk = () => _P2MP.slope * Math.log10(
+    (_P2MP.kOut + _P2MP.pNaOverPK*_P2MP.naOut) /
+    (_P2MP.kIn  + _P2MP.pNaOverPK*_P2MP.naIn));
+const _P2_EK    = _p2nernst(_P2MP.kOut,  _P2MP.kIn);    // ≈ −89 mV
+const _P2_ENA   = _p2nernst(_P2MP.naOut, _P2MP.naIn);   // ≈ +67 mV
+const _P2_GHK   = _p2ghk();                             // ≈ −69 mV (leaky membrane)
+const _P2_VREST = _P2_GHK + _P2MP.pumpMv;               // ≈ −71 mV (+ electrogenic pump)
+
+function drawMembranePotential(ctx, cv, st){
+  clear(ctx, cv);
+  const {p = 0, title = ""} = st;
+  const C = _P2MP;
+  const leak = _p2c01((p - 0.14) / 0.30);   // K⁺ leaving + charge separation
+  const bal  = _p2c01((p - 0.44) / 0.20);   // push/pull arrows balance
+  const real = _p2c01((p - 0.70) / 0.30);   // Na⁺ leak + pump → real resting Vm
+  const vm   = _P2_EK*_p2ease(leak) + (_P2_VREST - _P2_EK)*_p2ease(real);
+
+  _t(ctx, cv.width/2, 26, title, {size:17, bold:true, align:"center"});
+
+  const mL = 392, mR = 420, top = 62, bot = 262;
+
+  /* --- membrane bilayer --- */
+  ctx.fillStyle = "rgba(95,191,149,0.14)"; ctx.fillRect(mL, top, mR - mL, bot - top);
+  ctx.strokeStyle = MED.membrane; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(mL, top); ctx.lineTo(mL, bot);
+  ctx.moveTo(mR, top); ctx.lineTo(mR, bot);
+  ctx.stroke();
+
+  /* --- compartment labels + the concentrations the maths uses --- */
+  _t(ctx, 224, 50, "OUTSIDE", {align:"center", col:MED.dim, size:12, bold:true});
+  _t(ctx, 600, 50, "INSIDE  (cytosol)", {align:"center", col:MED.dim, size:12, bold:true});
+  _t(ctx, 132,  82, `K⁺   ${C.kOut} mM`,  {col:_P2.k,  size:14, bold:true});
+  _t(ctx, 132, 104, `Na⁺ ${C.naOut} mM`, {col:_P2.na, size:14, bold:true});
+  _t(ctx, 494,  82, `K⁺   ${C.kIn} mM`,  {col:_P2.k,  size:14, bold:true});
+  _t(ctx, 494, 104, `Na⁺ ${C.naIn} mM`,  {col:_P2.na, size:14, bold:true});
+
+  /* --- ion clouds (counts track the concentrations, deterministic scatter) --- */
+  const cloud = (n, xa, xb, ya, yb, col, seed) => {
+    for (let i = 0; i < n; i++)
+      _p2dot(ctx, xa + (xb - xa)*_p2rand(seed + i*3.1), ya + (yb - ya)*_p2rand(seed + i*7.7), 5, col);
+  };
+  cloud(1,  76, 372, 122, 256, _P2.k,  11);   // K⁺ outside  (5 mM)
+  cloud(15, 76, 372, 122, 256, _P2.na, 29);   // Na⁺ outside (145 mM)
+  cloud(14, 520, 744, 122, 256, _P2.k,  47);  // K⁺ inside   (140 mM)
+  cloud(2,  520, 744, 122, 256, _P2.na, 61);  // Na⁺ inside  (12 mM)
+
+  /* --- K⁺ leak channel --- */
+  const py = 158, ph = 44;
+  ctx.strokeStyle = _P2.k; ctx.lineWidth = 3;
+  ctx.strokeRect(mL - 5, py - ph/2, (mR - mL) + 10, ph);
+  _t(ctx, 406, py - ph/2 - 10, "K⁺ leak channel", {align:"center", col:_P2.k, size:12, bold:true});
+
+  /* --- K⁺ actually crossing, inside → outside --- */
+  for (let i = 0; i < 4; i++){
+    const f = _p2c01(leak*4.6 - i*0.9);
+    if (f <= 0) continue;
+    _p2dot(ctx, _lerp(mR + 52, mL - 52, f), py - 14 + i*9, 5, _P2.k);
+  }
+
+  /* --- the charge each departing K⁺ leaves behind --- */
+  const nQ = Math.round(leak * 7);
+  for (let i = 0; i < nQ; i++){
+    const y = 84 + i*21;
+    _t(ctx, 426, y, "−", {col:_P2.neg, size:17, bold:true});
+    _t(ctx, 388, y, "+",      {col:_P2.pos, size:15, bold:true, align:"right"});
+  }
+
+  /* --- the two "real membrane" corrections --- */
+  if (real > 0){
+    ctx.globalAlpha = real;
+    for (let i = 0; i < 2; i++)
+      _p2dot(ctx, _lerp(mL - 46, mR + 46, _p2c01(real*1.6 - i*0.5)), 202 + i*10, 5, _P2.na);
+    _t(ctx, 436, 206, "small Na⁺ leak IN  (P_Na/P_K = " + C.pNaOverPK + ")",
+       {col:_P2.na, size:11.5});
+    ctx.fillStyle = "rgba(232,161,60,0.22)"; ctx.fillRect(mL - 8, 222, (mR - mL) + 16, 36);
+    ctx.strokeStyle = _P2.na; ctx.lineWidth = 2; ctx.strokeRect(mL - 8, 222, (mR - mL) + 16, 36);
+    _t(ctx, 436, 244, `Na⁺/K⁺ pump — 3 out : 2 in  (${C.pumpMv} mV)`, {col:_P2.na, size:11.5});
+    ctx.globalAlpha = 1;
+  }
+
+  /* --- the two opposing forces on K⁺ --- */
+  if (leak > 0.02){
+    const full = 100, elec = full * Math.min(1, Math.abs(vm) / Math.abs(_P2_EK));
+    _p2arrow(ctx, 406, 296, 406 - full, 296, _P2.k, 3);
+    _t(ctx, 300, 292, "chemical push OUT (gradient)", {align:"right", col:_P2.k, size:12});
+    _p2arrow(ctx, 406, 322, 406 + elec, 322, _P2.neg, 3);
+    _t(ctx, 300, 326, "electrical pull IN (voltage)", {align:"right", col:_P2.neg, size:12});
+  }
+
+  /* --- voltmeter --- */
+  const vx = 800, vTop = 84, vBot = 300, vHi = 20, vLo = -110;
+  const vy = mv => vTop + (vHi - mv) * (vBot - vTop) / (vHi - vLo);
+  ctx.strokeStyle = MED.dim; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(vx, vTop); ctx.lineTo(vx, vBot); ctx.stroke();
+  for (let mv = 20; mv >= -100; mv -= 20){
+    ctx.beginPath(); ctx.moveTo(vx - 5, vy(mv)); ctx.lineTo(vx, vy(mv)); ctx.stroke();
+    _t(ctx, vx + 6, vy(mv) + 4, `${mv}`, {col:MED.dim, size:10});
+  }
+  ctx.fillStyle = "rgba(212,106,98,0.55)";
+  ctx.fillRect(vx - 20, Math.min(vy(0), vy(vm)), 20, Math.abs(vy(vm) - vy(0)));
+  if (leak > 0){
+    ctx.strokeStyle = "rgba(111,168,220,0.65)"; ctx.setLineDash([4,4]); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(vx - 44, vy(_P2_EK)); ctx.lineTo(vx + 4, vy(_P2_EK)); ctx.stroke();
+    ctx.setLineDash([]);
+    _t(ctx, vx - 48, vy(_P2_EK) + 4, `E_K ${_P2_EK.toFixed(0)}`, {align:"right", col:_P2.k, size:11, bold:true});
+  }
+  ctx.strokeStyle = MED.txt; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(vx - 26, vy(vm)); ctx.lineTo(vx + 4, vy(vm)); ctx.stroke();
+  _t(ctx, vx - 10, 66, `Vm = ${vm.toFixed(0)} mV`, {align:"center", col:MED.txt, size:14, bold:true});
+  _t(ctx, vx - 10, 318, "membrane voltage", {align:"center", col:MED.dim, size:11});
+
+  /* --- footers --- */
+  _t(ctx, 56, 364, "Nernst:  E = 61.5 · log₁₀( [out] / [in] )  mV   at 37 °C",
+     {col:MED.dim, size:12});
+  const status = real > 0.6
+      ? `leaky membrane + pump → rest at ${_P2_VREST.toFixed(0)} mV`
+      : (bal > 0.85 ? `push = pull → EQUILIBRIUM at ${_P2_EK.toFixed(0)} mV`
+                    : (leak > 0.02 ? "K⁺ leaving — inside going negative" : ""));
+  _t(ctx, 884, 364, status,
+     {align:"right", col: real > 0.6 ? MED.good : (bal > 0.85 ? _P2.k : MED.dim), size:13, bold:true});
+}
+
+async function runMembranePotential(cv, ctx, opts){
+  const L = opts.lines || [];
+  drawMembranePotential(ctx, cv, {p:0, title:opts.title});
+  const stops = [0.14, 0.44, 0.66, 0.70, 1.0];
+  for (let i = 0; i < stops.length; i++){
+    if (L[i]) await narrate(L[i]);
+    const a = i === 0 ? 0 : stops[i-1], b = stops[i];
+    await tween(1100, k => drawMembranePotential(ctx, cv, {p:_lerp(a, b, k), title:opts.title}));
+  }
+  if (L[stops.length]) await narrate(L[stops.length]);
+}
+
+/* ============================================================================
+   8) HAEMOGLOBIN–OXYGEN DISSOCIATION CURVE (+ the Bohr shift)
+   Every point is the Hill equation evaluated live: S = P^n / (P50^n + P^n)
+   ========================================================================== */
+const _P2O2 = {p50:26.6, hillN:2.7, p50Ex:36.0, pLung:100, pLungLow:60, pTissue:40, pMax:120};
+const _p2hill = (P, p50, n) => P <= 0 ? 0 : Math.pow(P, n) / (Math.pow(p50, n) + Math.pow(P, n));
+
+const _P2_SAT_LUNG     = _p2hill(_P2O2.pLung,    _P2O2.p50,   _P2O2.hillN) * 100;
+const _P2_SAT_LUNGLOW  = _p2hill(_P2O2.pLungLow, _P2O2.p50,   _P2O2.hillN) * 100;
+const _P2_SAT_TISSUE   = _p2hill(_P2O2.pTissue,  _P2O2.p50,   _P2O2.hillN) * 100;
+const _P2_SAT_TISSUEEX = _p2hill(_P2O2.pTissue,  _P2O2.p50Ex, _P2O2.hillN) * 100;
+const _P2_ROBUST_PTS   = _P2_SAT_LUNG - _P2_SAT_LUNGLOW;
+const _P2_EXTRACT_PTS  = _P2_SAT_LUNG - _P2_SAT_TISSUE;
+const _P2_BOHR_PTS     = _P2_SAT_TISSUE - _P2_SAT_TISSUEEX;
+
+function drawO2Curve(ctx, cv, st){
+  clear(ctx, cv);
+  const {shift = 0, hyper = 0, lung = 0, robust = 0, tissue = 0, delta = 0, title = ""} = st;
+  const O = _P2O2;
+  const x0 = 112, y0 = 316, x1 = 808, y1 = 74;
+  const X = P => x0 + (x1 - x0) * P / O.pMax;
+  const Y = S => y0 - (y0 - y1) * (S / 100);
+
+  _t(ctx, cv.width/2, 26, title, {size:17, bold:true, align:"center"});
+
+  /* grid + axes */
+  ctx.strokeStyle = "rgba(132,150,171,0.22)"; ctx.lineWidth = 1;
+  for (let P = 20; P <= O.pMax; P += 20){ ctx.beginPath(); ctx.moveTo(X(P), y0); ctx.lineTo(X(P), y1); ctx.stroke(); }
+  for (let S = 25; S <= 100; S += 25){ ctx.beginPath(); ctx.moveTo(x0, Y(S)); ctx.lineTo(x1, Y(S)); ctx.stroke(); }
+  ctx.strokeStyle = MED.dim; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y0); ctx.moveTo(x0, y0); ctx.lineTo(x0, y1); ctx.stroke();
+  for (let P = 0; P <= O.pMax; P += 20) _t(ctx, X(P), y0 + 18, `${P}`, {align:"center", col:MED.dim, size:11});
+  for (let S = 0; S <= 100; S += 25) _t(ctx, x0 - 8, Y(S) + 4, `${S}`, {align:"right", col:MED.dim, size:11});
+  _t(ctx, (x0 + x1)/2, y0 + 38, "oxygen partial pressure  PO₂  (mmHg)", {align:"center", col:MED.dim, size:12});
+  ctx.save(); ctx.translate(x0 - 44, (y0 + y1)/2); ctx.rotate(-Math.PI/2);
+  _t(ctx, 0, 0, "haemoglobin saturation  (%)", {align:"center", col:MED.dim, size:12}); ctx.restore();
+
+  const plot = (p50v, nv, col, lw, dash) => {
+    ctx.strokeStyle = col; ctx.lineWidth = lw; if (dash) ctx.setLineDash(dash);
+    ctx.beginPath();
+    for (let i = 0; i <= 160; i++){
+      const P = O.pMax * i / 160, px = X(P), py = Y(_p2hill(P, p50v, nv) * 100);
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  };
+
+  /* non-cooperative reference (n = 1) — the hyperbola haemoglobin is NOT */
+  if (hyper > 0){
+    ctx.globalAlpha = hyper * 0.85;
+    plot(O.p50, 1, _P2.ghost, 2, [5,5]);
+    ctx.globalAlpha = 1;
+  }
+  /* the Bohr-shifted curve */
+  const p50Now = _lerp(O.p50, O.p50Ex, shift);
+  if (shift > 0){ ctx.globalAlpha = Math.min(1, shift*1.6); plot(p50Now, O.hillN, _P2.shifted, 3); ctx.globalAlpha = 1; }
+  /* the resting curve */
+  plot(O.p50, O.hillN, _P2.curve, 3);
+
+  /* lung point — the flat, robust shoulder */
+  if (lung > 0){
+    ctx.globalAlpha = lung;
+    _p2dot(ctx, X(O.pLung), Y(_P2_SAT_LUNG), 7, _P2.hi);
+    _t(ctx, X(O.pLung) - 12, Y(_P2_SAT_LUNG) - 12,
+       `lungs · PO₂ ${O.pLung} → ${_P2_SAT_LUNG.toFixed(1)}%`,
+       {align:"right", col:_P2.hi, size:13, bold:true});
+    ctx.globalAlpha = 1;
+  }
+  if (robust > 0){
+    ctx.globalAlpha = robust;
+    _p2dot(ctx, X(O.pLungLow), Y(_P2_SAT_LUNGLOW), 6, _P2.hi);
+    ctx.strokeStyle = _P2.hi; ctx.lineWidth = 1.5; ctx.setLineDash([3,3]);
+    ctx.beginPath();
+    ctx.moveTo(X(O.pLungLow), Y(_P2_SAT_LUNGLOW)); ctx.lineTo(X(O.pLung), Y(_P2_SAT_LUNGLOW));
+    ctx.lineTo(X(O.pLung), Y(_P2_SAT_LUNG)); ctx.stroke(); ctx.setLineDash([]);
+    _t(ctx, X(O.pLungLow) + 8, Y(_P2_SAT_LUNGLOW) + 20,
+       `FLAT top: PO₂ ${O.pLung}→${O.pLungLow} costs only ${_P2_ROBUST_PTS.toFixed(1)} points`,
+       {col:_P2.hi, size:12});
+    ctx.globalAlpha = 1;
+  }
+  /* resting-tissue point — the steep, generous middle */
+  if (tissue > 0){
+    ctx.globalAlpha = tissue;
+    _p2dot(ctx, X(O.pTissue), Y(_P2_SAT_TISSUE), 7, _P2.curve);
+    _t(ctx, X(O.pTissue) + 14, Y(_P2_SAT_TISSUE) + 22,
+       `resting tissue · PO₂ ${O.pTissue} → ${_P2_SAT_TISSUE.toFixed(1)}%`,
+       {col:_P2.curve, size:13, bold:true});
+    ctx.strokeStyle = "rgba(95,191,149,0.45)"; ctx.lineWidth = 1.5; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(X(O.pTissue), y0); ctx.lineTo(X(O.pTissue), Y(_P2_SAT_TISSUE)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+  }
+  /* the Bohr delta, measured at the SAME tissue PO₂ */
+  if (delta > 0){
+    const yA = Y(_P2_SAT_TISSUE), yB = Y(_p2hill(O.pTissue, p50Now, O.hillN) * 100);
+    ctx.globalAlpha = delta;
+    _p2dot(ctx, X(O.pTissue), yB, 7, _P2.shifted);
+    ctx.strokeStyle = _P2.hi; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(X(O.pTissue), yA); ctx.lineTo(X(O.pTissue), yB);
+    ctx.moveTo(X(O.pTissue) - 7, yA); ctx.lineTo(X(O.pTissue) + 7, yA);
+    ctx.moveTo(X(O.pTissue) - 7, yB); ctx.lineTo(X(O.pTissue) + 7, yB); ctx.stroke();
+    _t(ctx, X(O.pTissue) - 12, (yA + yB)/2 + 5,
+       `+${(_P2_SAT_TISSUE - _p2hill(O.pTissue, p50Now, O.hillN)*100).toFixed(1)} points unloaded`,
+       {align:"right", col:_P2.hi, size:13, bold:true});
+    ctx.globalAlpha = 1;
+  }
+
+  /* legend + P50 readout */
+  _t(ctx, 118, 366, `■ resting  (P50 ${O.p50} mmHg, Hill n ${O.hillN})`, {col:_P2.curve, size:12});
+  if (shift > 0)
+    _t(ctx, 400, 366, `■ Bohr-shifted  (P50 ${p50Now.toFixed(1)} mmHg)`, {col:_P2.shifted, size:12});
+  if (hyper > 0)
+    _t(ctx, 640, 366, "– –  non-cooperative (n = 1)", {col:MED.dim, size:12});
+}
+
+async function runO2Curve(cv, ctx, opts){
+  const L = opts.lines || [];
+  const S = {shift:0, hyper:0, lung:0, robust:0, tissue:0, delta:0, title:opts.title};
+  drawO2Curve(ctx, cv, S);
+  if (L[0]) await narrate(L[0]);
+  await tween(900,  k => drawO2Curve(ctx, cv, {...S, hyper:k}));
+  S.hyper = 1;
+  if (L[1]) await narrate(L[1]);
+  await tween(1000, k => drawO2Curve(ctx, cv, {...S, lung:k, robust:_p2c01(k*1.4 - 0.4)}));
+  S.lung = 1; S.robust = 1;
+  if (L[2]) await narrate(L[2]);
+  await tween(900,  k => drawO2Curve(ctx, cv, {...S, tissue:k}));
+  S.tissue = 1;
+  if (L[3]) await narrate(L[3]);
+  await tween(1600, k => drawO2Curve(ctx, cv, {...S, shift:k}));
+  S.shift = 1;
+  if (L[4]) await narrate(L[4]);
+  await tween(800,  k => drawO2Curve(ctx, cv, {...S, delta:k}));
+  if (L[5]) await narrate(L[5]);
+}
+
+/* ============================================================================
+   9) HOMEOSTASIS — negative feedback, a set point, and why loops oscillate
+   Core temperature under a sustained heat load. Three traces, ONE difference
+   equation, same disturbance:
+       closed : x[t+1] = x[t] + u[t] − a·(x[t] − S) − k·(x[t−d] − S)
+       open   : x[t+1] = x[t] + u[t] − a·(x[t] − S)            (loop cut)
+       nodelay: closed with d = 0                              (why it rings)
+   ========================================================================== */
+const _P2HOM = {setPt:37.0, load:0.035, t0:6, N:90, gain:0.12, delay:10, passive:0.030};
+function _p2homSim(){
+  const {setPt:S, load, t0, N, gain:k, delay:d, passive:a} = _P2HOM;
+  const closed = [S], open = [S], nodelay = [S];
+  for (let t = 0; t < N; t++){
+    const u = t >= t0 ? load : 0;
+    closed .push(closed[t]  + u - a*(closed[t]  - S) - k*(closed[Math.max(0, t - d)] - S));
+    open   .push(open[t]    + u - a*(open[t]    - S));
+    nodelay.push(nodelay[t] + u - a*(nodelay[t] - S) - k*(nodelay[t] - S));
+  }
+  return {closed, open, nodelay};
+}
+const _p2turns = arr => {           // how many times the trace changes direction
+  let n = 0;
+  for (let i = 2; i < arr.length; i++) if ((arr[i-1]-arr[i-2]) * (arr[i]-arr[i-1]) < 0) n++;
+  return n;
+};
+const _P2HOM_SIM   = _p2homSim();
+const _P2HOM_CLOSED_DEV = _P2HOM_SIM.closed[_P2HOM.N]  - _P2HOM.setPt;
+const _P2HOM_OPEN_DEV   = _P2HOM_SIM.open[_P2HOM.N]    - _P2HOM.setPt;
+const _P2HOM_PEAK_DEV   = Math.max(..._P2HOM_SIM.closed) - _P2HOM.setPt;
+const _P2HOM_NODELAY_PEAK_DEV = Math.max(..._P2HOM_SIM.nodelay) - _P2HOM.setPt;
+const _P2HOM_OVERSHOOT  = _P2HOM_PEAK_DEV - _P2HOM_CLOSED_DEV;
+const _P2HOM_TURNS      = _p2turns(_P2HOM_SIM.closed);
+const _P2HOM_NODELAY_TURNS = _p2turns(_P2HOM_SIM.nodelay);
+
+function drawHomeostasis(ctx, cv, st){
+  clear(ctx, cv);
+  const {prog = 0, openOn = 0, closedOn = 0, ghost = 0, active = -1, title = ""} = st;
+  const H = _P2HOM, SIM = _P2HOM_SIM;
+
+  _t(ctx, cv.width/2, 24, title, {size:17, bold:true, align:"center"});
+
+  /* ---------- the loop, drawn as a loop ---------- */
+  const bw = 138, bh = 54;
+  const nodes = [
+    {x:118, y:120, l1:"SENSOR",     l2:"thermoreceptors"},
+    {x:282, y:120, l1:"COMPARATOR", l2:`hypothalamus · set ${H.setPt.toFixed(1)} °C`},
+    {x:282, y:262, l1:"EFFECTORS",  l2:"sweat · skin vasodilation"},
+    {x:118, y:262, l1:"CORE TEMP",  l2:"the regulated variable"}
+  ];
+  nodes.forEach((n, i) => {
+    const on = i === active;
+    ctx.fillStyle   = on ? "rgba(95,191,149,0.22)" : "rgba(132,150,171,0.10)";
+    ctx.strokeStyle = on ? MED.good : MED.dim; ctx.lineWidth = on ? 2.5 : 1.5;
+    ctx.fillRect(n.x - bw/2, n.y - bh/2, bw, bh);
+    ctx.strokeRect(n.x - bw/2, n.y - bh/2, bw, bh);
+    _t(ctx, n.x, n.y - 4, n.l1, {align:"center", col: on ? MED.good : MED.txt, size:13, bold:true});
+    _t(ctx, n.x, n.y + 14, n.l2, {align:"center", col:MED.dim, size:10.5});
+  });
+  const seg = [[3,0],[0,1],[1,2],[2,3]];
+  seg.forEach(([a, b], i) => {
+    const A = nodes[a], B = nodes[b], on = i === active;
+    const col = on ? MED.good : MED.dim;
+    if (A.x === B.x){
+      const dir = B.y > A.y ? 1 : -1;
+      _p2arrow(ctx, A.x, A.y + dir*(bh/2 + 3), B.x, B.y - dir*(bh/2 + 5), col, on ? 3 : 1.8);
+    } else {
+      const dir = B.x > A.x ? 1 : -1;
+      _p2arrow(ctx, A.x + dir*(bw/2 + 3), A.y, B.x - dir*(bw/2 + 5), B.y, col, on ? 3 : 1.8);
+    }
+  });
+  _t(ctx, 200, 300, `⏱ correction lags ${H.delay} min`, {align:"center", col:_P2.hi, size:12, bold:true});
+  _t(ctx, 200, 336, "response OPPOSES the change → negative feedback",
+     {align:"center", col:MED.dim, size:11.5});
+
+  /* ---------- the traces ---------- */
+  const x0 = 400, y0 = 330, x1 = 868, y1 = 84;
+  const tMin = 36.6, tMax = Math.max(...SIM.open) + 0.25;
+  const X = t => x0 + (x1 - x0) * t / H.N;
+  const Y = v => y0 - (y0 - y1) * (v - tMin) / (tMax - tMin);
+
+  ctx.strokeStyle = MED.dim; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y0); ctx.moveTo(x0, y0); ctx.lineTo(x0, y1); ctx.stroke();
+  for (let v = 37; v <= tMax; v += 0.5){
+    _t(ctx, x0 - 6, Y(v) + 4, v.toFixed(1), {align:"right", col:MED.dim, size:10});
+    ctx.strokeStyle = "rgba(132,150,171,0.16)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x0, Y(v)); ctx.lineTo(x1, Y(v)); ctx.stroke();
+  }
+  _t(ctx, (x0 + x1)/2, y0 + 20, "minutes in the hot room", {align:"center", col:MED.dim, size:11});
+  _t(ctx, x0 - 6, y1 - 10, "°C", {align:"right", col:MED.dim, size:11});
+
+  /* disturbance band */
+  ctx.fillStyle = "rgba(232,161,60,0.10)";
+  ctx.fillRect(X(H.t0), y1, X(H.N) - X(H.t0), y0 - y1);
+  _t(ctx, X(H.t0) + 6, y1 + 14, `heat load +${H.load} °C/min from t = ${H.t0}`,
+     {col:_P2.hi, size:10.5});
+
+  /* set point */
+  ctx.strokeStyle = "rgba(215,223,234,0.75)"; ctx.lineWidth = 1.5; ctx.setLineDash([6,5]);
+  ctx.beginPath(); ctx.moveTo(x0, Y(H.setPt)); ctx.lineTo(x1, Y(H.setPt)); ctx.stroke(); ctx.setLineDash([]);
+  _t(ctx, x1 - 2, Y(H.setPt) - 6, `set point ${H.setPt.toFixed(1)} °C`,
+     {align:"right", col:MED.txt, size:11, bold:true});
+
+  const n = Math.max(1, Math.round(prog * H.N));
+  const trace = (arr, col, lw, dash, alpha) => {
+    ctx.globalAlpha = alpha; ctx.strokeStyle = col; ctx.lineWidth = lw; if (dash) ctx.setLineDash(dash);
+    ctx.beginPath();
+    for (let t = 0; t <= n; t++){ const px = X(t), py = Y(arr[t]); t ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+    ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+  };
+  if (ghost    > 0) trace(SIM.nodelay, _P2.ghost,  2,   [5,5], ghost);
+  if (openOn   > 0) trace(SIM.open,    _P2.shifted, 2.8, null,  openOn);
+  if (closedOn > 0) trace(SIM.closed,  _P2.curve,   3,   null,  closedOn);
+
+  /* end-of-run labels, read straight off the traces */
+  if (openOn > 0.9 && prog > 0.98)
+    _t(ctx, X(H.N) - 4, Y(SIM.open[H.N]) - 8,
+       `loop CUT: +${_P2HOM_OPEN_DEV.toFixed(2)} °C`, {align:"right", col:_P2.shifted, size:12, bold:true});
+  if (closedOn > 0.9 && prog > 0.98)
+    _t(ctx, X(H.N) - 4, Y(SIM.closed[H.N]) - 10,
+       `loop INTACT: +${_P2HOM_CLOSED_DEV.toFixed(2)} °C`, {align:"right", col:_P2.curve, size:12, bold:true});
+  if (ghost > 0.9)
+    _t(ctx, 404, 366, `– – same loop, zero delay (no ring)`, {col:MED.dim, size:11.5});
+}
+
+async function runHomeostasis(cv, ctx, opts){
+  const L = opts.lines || [];
+  const S = {prog:0, openOn:0, closedOn:0, ghost:0, active:-1, title:opts.title};
+  drawHomeostasis(ctx, cv, S);
+  if (L[0]) await narrate(L[0]);
+  for (let r = 0; r < 8; r++){
+    drawHomeostasis(ctx, cv, {...S, active:r % 4});
+    await sleep(230);
+  }
+  drawHomeostasis(ctx, cv, S);
+  if (L[1]) await narrate(L[1]);
+  await tween(2000, k => drawHomeostasis(ctx, cv, {...S, prog:k, openOn:1, active:-1}));
+  S.prog = 1; S.openOn = 1;
+  if (L[2]) await narrate(L[2]);
+  await tween(2200, k => drawHomeostasis(ctx, cv, {...S, prog:k, closedOn:1, active:Math.floor(k*12) % 4}));
+  S.closedOn = 1;
+  drawHomeostasis(ctx, cv, S);
+  if (L[3]) await narrate(L[3]);
+  await tween(1200, k => drawHomeostasis(ctx, cv, {...S, ghost:k}));
+  S.ghost = 1;
+  if (L[4]) await narrate(L[4]);
+}
+
+/* ============================================================================
+   thin ANIMS wrappers — narration strings are BUILT from the computed values
+   ========================================================================== */
+const _P2_MP_TITLE  = "The living battery — why a cell rests near −70 mV";
+const _P2_O2_TITLE  = "Haemoglobin's clever curve — load high, unload low";
+const _P2_HOM_TITLE = "Negative feedback — a set point, defended";
+
+ANIMS.med_membranepotential_static = (cv, ctx) =>
+  drawMembranePotential(ctx, cv, {p:0, title:_P2_MP_TITLE});
+ANIMS.med_membranepotential = (cv, ctx) => runMembranePotential(cv, ctx, {
+  title: _P2_MP_TITLE,
+  lines: [
+    `Every cell is a charged battery, and the charge starts as unequal salt. The pumps have stacked potassium high INSIDE — ${_P2MP.kIn} millimolar against ${_P2MP.kOut} outside — and sodium high outside, ${_P2MP.naOut} against ${_P2MP.naIn}. Those two gradients are the stored energy.`,
+    "Now open a potassium leak channel. Potassium does the obvious thing — it flows DOWN its gradient, out of the cell. But every potassium that leaves carries a positive charge away and strands an unbalanced negative behind it, so the inside of the cell goes negative.",
+    `And that negativity pulls potassium back IN. The outward chemical push stays constant, while the inward electrical pull grows with every ion that leaves — until the two cancel exactly. Nothing net moves any more. That balance point is the equilibrium potential, and the Nernst equation gives it from the concentrations alone: for these numbers, minus ${Math.abs(_P2_EK).toFixed(0)} millivolts.`,
+    `So if potassium alone says minus ${Math.abs(_P2_EK).toFixed(0)}, why does a real cell actually rest well short of that? Two reasons, and here they both are.`,
+    `First, the membrane is not perfectly potassium-selective. A trickle of sodium leaks IN — about ${_P2MP.pNaOverPK} as permeable as potassium — and sodium's pull is in the opposite direction, dragging the voltage up to minus ${Math.abs(_P2_GHK).toFixed(0)} millivolts. Second, the sodium-potassium pump is electrogenic: it throws out three sodiums for every two potassiums it hauls in, so it exports net positive charge and pulls another ${Math.abs(_P2MP.pumpMv).toFixed(1)} millivolts back down.`,
+    `Add them up and this membrane rests at minus ${Math.abs(_P2_VREST).toFixed(0)} millivolts — the resting potential your physiology text quotes. It is a cocked spring, and about a quarter of your resting energy goes to keeping it cocked. When a nerve fires it does not manufacture energy; it simply lets go, and sodium rushes in toward its own equilibrium of plus ${_P2_ENA.toFixed(0)}.`
+  ]});
+
+ANIMS.med_o2curve_static = (cv, ctx) =>
+  drawO2Curve(ctx, cv, {shift:0, hyper:0, lung:0, robust:0, tissue:0, delta:0, title:_P2_O2_TITLE});
+ANIMS.med_o2curve = (cv, ctx) => runO2Curve(cv, ctx, {
+  title: _P2_O2_TITLE,
+  lines: [
+    `This is haemoglobin's oxygen dissociation curve: how full it is, against the oxygen pressure around it. Every point comes from the Hill equation with a P-fifty of ${_P2O2.p50} millimetres and a cooperativity exponent of ${_P2O2.hillN}.`,
+    "Notice it is an S, not the grey dashed curve. The dashed one is what you would get with ordinary, independent binding. The S comes from cooperativity — haemoglobin has four seats, and each oxygen that binds twists the protein into a shape that grabs the next one more eagerly. Cooperativity is exactly why it is sigmoid and not hyperbolic.",
+    `In the lungs, oxygen pressure is about ${_P2O2.pLung} and haemoglobin sits at ${_P2_SAT_LUNG.toFixed(1)} percent — up on the flat shoulder. Flat means robust: let lung pressure fall all the way from ${_P2O2.pLung} to ${_P2O2.pLungLow} and saturation drops only ${_P2_ROBUST_PTS.toFixed(1)} points. That is why altitude, or moderate lung disease, barely dents your loading.`,
+    `Resting tissue is at about ${_P2O2.pTissue} millimetres — and now you are on the steep part, at ${_P2_SAT_TISSUE.toFixed(1)} percent. Steep means generous: that modest pressure drop has already handed over ${_P2_EXTRACT_PTS.toFixed(1)} points of the cargo.`,
+    `Now work the muscle. It makes carbon dioxide, it makes acid, it runs hot — and all three shift the whole curve to the RIGHT, from a P-fifty of ${_P2O2.p50} to about ${_P2O2.p50Ex}. That is the Bohr effect: the chemical signature of hard work tells haemoglobin to loosen its grip.`,
+    `Read the delta at the SAME tissue pressure of ${_P2O2.pTissue}. Saturation falls from ${_P2_SAT_TISSUE.toFixed(1)} percent to ${_P2_SAT_TISSUEEX.toFixed(1)} — an extra ${_P2_BOHR_PTS.toFixed(1)} percentage points of oxygen dumped into the muscle that asked for it, with no change in blood flow at all. Greedy where oxygen is plentiful, generous where it is scarce.`
+  ]});
+
+ANIMS.med_homeostasis_static = (cv, ctx) =>
+  drawHomeostasis(ctx, cv, {prog:0, openOn:0, closedOn:0, ghost:0, active:-1, title:_P2_HOM_TITLE});
+ANIMS.med_homeostasis = (cv, ctx) => runHomeostasis(cv, ctx, {
+  title: _P2_HOM_TITLE,
+  lines: [
+    `Homeostasis is one idea drawn four times. A sensor reads the variable. A comparator measures it against a set point. An effector pushes back the OPPOSITE way. And that changes the variable, which the sensor reads again. Here the variable is core body temperature and the set point is ${_P2HOM.setPt.toFixed(1)} degrees.`,
+    `Now the disturbance: you walk into a hot room and start gaining heat, ${_P2HOM.load} degrees a minute, and it does not stop. Watch the red trace first — that is the same body with the loop cut.`,
+    `With no loop, nothing opposes the load. Temperature just climbs, ${_P2HOM_OPEN_DEV.toFixed(2)} degrees above set point by the end of the run and still rising. Nothing about a body is passively stable; stability is actively manufactured, every second.`,
+    `Now the same disturbance with the loop intact. Sweating and skin blood flow fight back, and temperature settles ${_P2HOM_CLOSED_DEV.toFixed(2)} degrees above set point instead of ${_P2HOM_OPEN_DEV.toFixed(2)}. Note it does not land exactly ON the set point — a simple proportional controller always leaves a small residual offset, because it needs some error to keep working.`,
+    `And look at the wobble on the way. Sweating does not act the instant temperature rises; the correction arrives ${_P2HOM.delay} minutes late, aimed at an error that has already moved on. So the green trace sails past its own resting level to a peak of ${_P2HOM_PEAK_DEV.toFixed(2)} degrees, gets over-corrected, and turns around ${_P2HOM_TURNS} times before it settles. The grey dashed line is the identical loop with the delay taken out — it climbs straight to ${_P2HOM_NODELAY_PEAK_DEV.toFixed(2)} and ${_P2HOM_NODELAY_TURNS === 0 ? "never turns around at all" : `turns around ${_P2HOM_NODELAY_TURNS} times`}. Delay is what makes a feedback loop ring, and every real one has some.`
+  ]});
+
+/* ---------- debug handle: every number the narration speaks ---------- */
+ANIMS._med_physio2_debug = {
+  /* membrane potential */
+  kIn:_P2MP.kIn, kOut:_P2MP.kOut, naIn:_P2MP.naIn, naOut:_P2MP.naOut,
+  pNaOverPK:_P2MP.pNaOverPK, pumpMv:_P2MP.pumpMv, nernstSlope:_P2MP.slope,
+  ekMv:_P2_EK, enaMv:_P2_ENA, ghkMv:_P2_GHK, restingMv:_P2_VREST,
+  /* oxygen curve */
+  p50:_P2O2.p50, hillN:_P2O2.hillN, p50Exercise:_P2O2.p50Ex,
+  satAtLung:_P2_SAT_LUNG, satAtLungLow:_P2_SAT_LUNGLOW, satAtTissue:_P2_SAT_TISSUE,
+  satAtTissueExercise:_P2_SAT_TISSUEEX, robustLossPts:_P2_ROBUST_PTS,
+  restingExtractionPts:_P2_EXTRACT_PTS, bohrDeltaPts:_P2_BOHR_PTS,
+  /* homeostasis */
+  setPoint:_P2HOM.setPt, heatLoadPerMin:_P2HOM.load, gain:_P2HOM.gain,
+  delayMin:_P2HOM.delay, passive:_P2HOM.passive, runMinutes:_P2HOM.N,
+  feedbackFinalDev:_P2HOM_CLOSED_DEV, openLoopFinalDev:_P2HOM_OPEN_DEV,
+  feedbackPeakDev:_P2HOM_PEAK_DEV, feedbackOvershoot:_P2HOM_OVERSHOOT,
+  noDelayPeakDev:_P2HOM_NODELAY_PEAK_DEV,
+  feedbackTurningPoints:_P2HOM_TURNS, noDelayTurningPoints:_P2HOM_NODELAY_TURNS
+};
+
 </script>
 </body>
 </html>
