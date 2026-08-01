@@ -1321,6 +1321,46 @@ ANIMS.med_insulin_resistance=(cv,ctx)=>runInsulinAction(cv,ctx,{
     "But the receptor's signal barely gets through — the locks have rusted. Only a couple of GLUT4 doors reach the surface no matter how hard insulin knocks.",
     "So glucose stays stuck in the blood. The pancreas responds by making even MORE insulin to force the doors — until, years later, the exhausted beta-cells can't keep up. That two-part story — resistance plus beta-cell burnout — is type 2 diabetes."]});
 
+/* --- 6) FRANK–STARLING curve (cardiac length–tension, whole-organ) — shared --- */
+function drawStarling(ctx,cv,st){
+  clear(ctx,cv);
+  const {preload:pl=0, contractility:k=1, showFailing=false, title=""}=st;
+  _t(ctx,cv.width/2,30,title,{size:17,bold:true,align:"center"});
+  const x0=130,y0=318,x1=790,y1=72;
+  ctx.strokeStyle=MED.dim; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.moveTo(x0,y0); ctx.lineTo(x0,y1); ctx.stroke();
+  _t(ctx,(x0+x1)/2,y0+34,"how full the heart is  (preload / filling →)",{align:"center",col:MED.dim,size:13});
+  ctx.save(); ctx.translate(x0-42,(y0+y1)/2); ctx.rotate(-Math.PI/2);
+  _t(ctx,0,0,"how much it pumps  (stroke volume →)",{align:"center",col:MED.dim,size:13}); ctx.restore();
+  const curve=(p,c)=> (y0 - (y0-y1)*c*(1-Math.exp(-p*3.0)));
+  const drawCurve=(c,col,lw)=>{ ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.beginPath();
+    for(let i=0;i<=100;i++){ const p=i/100,px=x0+(x1-x0)*p,py=curve(p,c); i?ctx.lineTo(px,py):ctx.moveTo(px,py);} ctx.stroke(); };
+  if(showFailing) drawCurve(0.5,MED.wrong,2.5);
+  drawCurve(k,MED.good,3);
+  const dpx=x0+(x1-x0)*pl, dpy=curve(pl,k);
+  ctx.strokeStyle="rgba(232,161,60,0.5)"; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(dpx,y0); ctx.lineTo(dpx,dpy); ctx.lineTo(x0,dpy); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=MED.post; ctx.beginPath(); ctx.arc(dpx,dpy,8,0,7); ctx.fill();
+  _t(ctx,x1-6,curve(1,k)-12,"healthy heart",{align:"right",col:MED.good,size:12,bold:true});
+  if(showFailing) _t(ctx,x1-6,curve(1,0.5)+18,"failing heart",{align:"right",col:MED.wrong,size:12,bold:true});
+  _t(ctx,cv.width/2,y0+56, pl<0.3?"low filling → weak beat":(pl<0.78?"more filling → stronger beat (Frank–Starling)":"optimal filament overlap → maximal force"),
+     {align:"center",col:MED.post,size:13,bold:true}); }
+async function runStarling(cv,ctx,opts){
+  const L=opts.lines||[];
+  drawStarling(ctx,cv,{preload:0.05,contractility:1,title:opts.title});
+  if(L[0]) await narrate(L[0]);
+  await tween(2200,k=>drawStarling(ctx,cv,{preload:_lerp(0.05,0.95,k),contractility:1,title:opts.title}));
+  if(L[1]) await narrate(L[1]);
+  await tween(900,k=>drawStarling(ctx,cv,{preload:0.95,contractility:1,showFailing:true,title:opts.title}));
+  if(L[2]) await narrate(L[2]); }
+ANIMS.med_starling_static=(cv,ctx)=>drawStarling(ctx,cv,{preload:0.05,contractility:1,title:"Frank–Starling — fill it more, it pumps harder"});
+ANIMS.med_starling=(cv,ctx)=>runStarling(cv,ctx,{
+  title:"Frank–Starling — fill it more, it pumps harder",
+  lines:[
+    "This curve is the heart's signature. Along the bottom: how full the heart is before it beats — its preload. Up the side: how much blood it pumps out.",
+    "Watch the dot climb. As more blood returns and fills the heart, each beat gets STRONGER and ejects more — automatically, no nerves needed. That rising line IS the Frank–Starling law, and underneath it is simply the sarcomere's length–tension curve: more stretch, better filament overlap, more force.",
+    "Now the clinical punch line. A failing heart sits on a lower, flatter curve — the red line. For the same filling it pumps far less, and piling in more volume barely helps. Reading this one graph is reading the mechanics of heart failure."]});
+
 function drawSquare(ctx,cv,pH,lH,lN,split,shade){
   clear(ctx,cv);
   const x=140,y=40,W=420,Hh=300, sx=x+W*pH;

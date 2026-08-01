@@ -371,7 +371,8 @@
           "type": "reading",
           "url": "https://www.ncbi.nlm.nih.gov/books/NBK470295/"
         }
-      ]
+      ],
+      "anim": "med_starling"
     },
     {
       "id": "transport",
