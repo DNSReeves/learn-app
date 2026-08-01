@@ -2,6 +2,7 @@
   "id": "ai-agents",
   "title": "AI Agents",
   "tagline": "What happens when a language model gets hands.",
+  "category": "AI & Machine Learning",
   "description": "From a model that can only talk to a system that acts: tools, loops, plans, memory, coordination — and the guardrails that keep an acting system honest. The running case study is a real production agent.",
   "concepts": [
     {

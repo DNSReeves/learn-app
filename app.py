@@ -352,6 +352,7 @@ def topics(authorization: str | None = Header(default=None)):
                   and s.get("due_at") and s["due_at"] < time.time())
         out.append({"id": tid, "title": pack["title"], "tagline": pack.get("tagline", ""),
                     "description": pack.get("description", ""),
+                    "category": pack.get("category", "More Topics"),
                     "prereqs": [packs[p]["title"] for p in pack.get("prereqs", []) if p in packs],
                     "concepts": n, "mastered": mastered, "review_due": due})
     return {"user": user["username"], "topics": out, "ai": ai.available()}

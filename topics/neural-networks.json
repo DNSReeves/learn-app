@@ -2,6 +2,7 @@
   "id": "neural-networks",
   "title": "Neural Networks",
   "tagline": "Functions that learn from being wrong.",
+  "category": "AI & Machine Learning",
   "description": "From a single neuron to backpropagation to why deep learning works. Root of the AI chain: LLMs, AI agents, and AGI build on this.",
   "prereqs": [
     "calculus"

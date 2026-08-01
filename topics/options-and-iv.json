@@ -2,6 +2,7 @@
   "id": "options-and-iv",
   "title": "Trading Options & Implied Volatility",
   "tagline": "The heat equation went to Wall Street — payoffs diffuse, uncertainty gets a quoted price, and theta pays for gamma.",
+  "category": "Investing & Finance",
   "description": "From the kinked payoff to the volatility surface. The centerpiece: Black–Scholes IS the heat equation under a change of variables — log-price as space, time-to-expiry as time, σ² as the diffusion coefficient, the payoff as the initial condition. Then the Greeks as the PDE's own identity, implied volatility as the market's quoted diffusion coefficient, the smile/skew as the model's error ledger, and the structures and failure modes of actually trading it.",
   "prereqs": [
     "calculus",

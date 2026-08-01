@@ -69,6 +69,9 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 .dash h1{font-size:34px;margin-bottom:2px}
 .dash .sub{color:var(--dim);margin-bottom:26px}
 .tcard{display:block;width:100%;text-align:left;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:16px;color:var(--ink);border:1.5px solid transparent}
+.cat-head{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+.cat-head:first-of-type{margin-top:6px}
+.cat-count{font-weight:600;font-size:11px;color:var(--lock)}
 .tcard:hover{border-color:var(--post)}
 .tcard h2{font-size:23px}
 .tcard .tag{color:var(--dim);font-size:15px;margin:2px 0 14px}
@@ -354,7 +357,13 @@ async function viewDash(){
     <h1>Choose a topic</h1>
     ${sessionCard}
     <p class="sub">Advance when the evidence says you know it. Come back when reviews fall due.</p>
-    ${d.topics.map(t=>`
+    ${(()=>{
+      /* CATEGORY GROUPING (2026-08-01): group topics by pack.category, ordered. Cards are
+         unchanged (same data-t click target, meter, review pill) — only sectioned. */
+      const ORDER=["Health & Medicine","Investing & Finance","AI & Machine Learning","Mathematics","Physics & Engineering","More Topics"];
+      const g={}; d.topics.forEach(t=>{const c=t.category||"More Topics";(g[c]=g[c]||[]).push(t);});
+      const cats=Object.keys(g).sort((a,b)=>{const ia=ORDER.indexOf(a),ib=ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
+      const tcard=t=>`
       <button class="tcard" data-t="${t.id}">
         <h2>${esc(t.title)}${t.review_due?`<span class="due-pill">${t.review_due} review${t.review_due>1?"s":""} due</span>`:""}</h2>
         <div class="tag">${esc(t.tagline)}${t.prereqs&&t.prereqs.length?` <span class="mono" style="font-size:12px">· builds on ${t.prereqs.map(esc).join(", ")}</span>`:""}</div>
@@ -362,7 +371,11 @@ async function viewDash(){
           <div class="bar"><i style="width:${100*t.mastered/t.concepts}%"></i></div>
           <span class="num">${t.mastered}/${t.concepts} mastered</span>
         </div>
-      </button>`).join("")}
+      </button>`;
+      return cats.map(cat=>`
+        <div class="cat-head">${esc(cat)}<span class="cat-count">${g[cat].length}</span></div>
+        ${g[cat].map(tcard).join("")}`).join("");
+    })()}
     <p class="sub" style="margin-top:18px;font-size:13px">
       <a href="#" id="an-open">📈 my analytics</a> ·
       <a href="#" id="prog-export">⬇ export progress</a> ·
@@ -1104,6 +1117,120 @@ ANIMS.med_sarcomere=(cv,ctx)=>runSarcomere(cv,ctx,{
     "This is a sarcomere — the tiny repeating engine inside every muscle, from your biceps to your heart. Thin filaments called actin are anchored to the Z-lines at each end; a thick filament called myosin sits in the middle.",
     "To contract, the myosin heads grab the actin and ratchet it inward. The filaments slide past each other and the Z-lines are pulled together — nothing shortens except the overlap. Line up billions of these and the whole muscle shortens.",
     "Lose muscle — through ageing, disuse, or rapid weight loss — and you lose these engines in parallel: fewer sarcomeres, less force. That is why protecting lean mass matters far beyond the mirror."]});
+
+/* ===== Diabetes — two more SHARED reusable visuals (2026-08-01) =====
+   β-cell insulin secretion + insulin action/resistance. Reused by Diabetes, GLP-1
+   (incretins amplify secretion), and Physiology. Same one-fn-per-visual pattern. */
+
+/* --- 4) β-CELL: stimulus–secretion coupling (glucose → insulin out) --- */
+function drawBetaCell(ctx,cv,st){
+  clear(ctx,cv);
+  const {p=0,title=""}=st;
+  _t(ctx,cv.width/2,32,title,{size:17,bold:true,align:"center"});
+  const cx=450,cy=205,cw=520,ch=210;
+  ctx.fillStyle="rgba(95,191,149,0.10)"; ctx.strokeStyle=MED.membrane; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.ellipse(cx,cy,cw/2,ch/2,0,0,7); ctx.fill(); ctx.stroke();
+  _t(ctx,cx,cy-ch/2-10,"β-cell (pancreas)",{align:"center",col:MED.dim,size:12});
+  const gx=cx-cw/2+10;
+  _t(ctx,gx-2,cy+66,"GLUT2",{align:"center",col:MED.dim,size:11});
+  ctx.fillStyle=MED.fat;
+  const nGlu=Math.round(Math.min(1,p/0.22)*4);
+  for(let i=0;i<nGlu;i++){ ctx.beginPath(); ctx.arc(gx+34+i*22,cy+42,7,0,7); ctx.fill(); }
+  const atp=Math.max(0,Math.min(1,(p-0.15)/0.28));
+  ctx.strokeStyle=MED.dim; ctx.lineWidth=1; ctx.strokeRect(cx-46,cy-64,120,16);
+  ctx.fillStyle=MED.post; ctx.fillRect(cx-46,cy-64,120*atp,16);
+  _t(ctx,cx+84,cy-52,"ATP",{col:MED.post,size:12,bold:true});
+  const kClosed=p>0.45;
+  _t(ctx,cx,cy-ch/2+18,kClosed?"K⁺ channel CLOSED → cell depolarizes":"K⁺ channel open",
+     {align:"center",col:kClosed?MED.good:MED.dim,size:12,bold:kClosed});
+  const caIn=Math.max(0,Math.min(1,(p-0.6)/0.2));
+  ctx.fillStyle=MED.membrane;
+  for(let i=0;i<Math.round(caIn*3);i++){ ctx.beginPath(); ctx.arc(cx-18+i*22,cy+ch/2-16,6,0,7); ctx.fill(); }
+  if(caIn>0) _t(ctx,cx+66,cy+ch/2-12,"Ca²⁺ in",{col:MED.membrane,size:11});
+  const rel=Math.max(0,Math.min(1,(p-0.78)/0.22));
+  ctx.fillStyle=MED.lean;
+  const rx=cx+cw/2-10;
+  for(let i=0;i<4;i++){ const out=i<rel*4; const x=out?rx+18+i*6:rx-70-i*18;
+    ctx.beginPath(); ctx.arc(x,cy-30+i*20,7,0,7); ctx.fill(); }
+  _t(ctx,rx+30,cy-40,"insulin",{col:MED.lean,size:12,bold:true});
+  _t(ctx,cv.width/2,362,"glucose → ATP → close K⁺ → Ca²⁺ in → insulin out",{align:"center",col:MED.dim,size:12}); }
+async function runBetaCell(cv,ctx,opts){
+  const lines=opts.lines||[];
+  drawBetaCell(ctx,cv,{p:0,title:opts.title});
+  const stops=[0.12,0.35,0.55,0.72,1.0];
+  for(let i=0;i<stops.length;i++){
+    if(lines[i]) await narrate(lines[i]);
+    const a=i===0?0:stops[i-1], b=stops[i];
+    await tween(900,k=>drawBetaCell(ctx,cv,{p:_lerp(a,b,k),title:opts.title})); }
+  if(lines[stops.length]) await narrate(lines[stops.length]); }
+
+/* --- 5) INSULIN ACTION / RESISTANCE (the key that opens the cell) --- */
+function drawInsulinAction(ctx,cv,st){
+  clear(ctx,cv);
+  const {insulin:ins=0,resistance:res=0,title=""}=st;
+  _t(ctx,cv.width/2,32,title,{size:17,bold:true,align:"center"});
+  const signal=ins*(1-res);
+  const cx=490,cy=205,cw=440,ch=210;
+  ctx.fillStyle="rgba(212,106,98,0.10)"; ctx.strokeStyle=MED.muscle; ctx.lineWidth=2;
+  ctx.fillRect(cx-cw/2,cy-ch/2,cw,ch); ctx.strokeRect(cx-cw/2,cy-ch/2,cw,ch);
+  _t(ctx,cx,cy-ch/2-10,"muscle / fat cell",{align:"center",col:MED.dim,size:12});
+  const mx=cx-cw/2;
+  ctx.strokeStyle=MED.membrane; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(mx,cy-34); ctx.lineTo(mx,cy+34); ctx.stroke();
+  _t(ctx,mx+2,cy-46,"insulin receptor",{align:"center",col:MED.dim,size:11});
+  ctx.fillStyle=MED.lean;
+  for(let i=0;i<Math.round(ins*3);i++){ ctx.beginPath(); ctx.arc(mx-22,cy-24+i*24,7,0,7); ctx.fill(); }
+  const n=Math.round(signal*4);
+  ctx.fillStyle=MED.good;
+  for(let i=0;i<4;i++){ const atMem=i<n; const x=atMem?mx+10:cx; ctx.fillRect(x,cy-40+i*22,16,11); }
+  _t(ctx,cx,cy+ch/2-10,`GLUT4 doors at the surface: ${n} of 4`,{align:"center",col:MED.good,size:12});
+  const bg = 1 - signal*0.72;
+  _t(ctx,86,cy-72,"blood",{align:"center",col:MED.dim,size:12});
+  _t(ctx,86,cy-58,"glucose",{align:"center",col:MED.dim,size:12});
+  ctx.strokeStyle=MED.dim; ctx.lineWidth=1; ctx.strokeRect(66,cy-44,44,150);
+  ctx.fillStyle = bg>0.6?MED.wrong:MED.good; ctx.fillRect(66,cy+106-150*bg,44,150*bg);
+  const resistant = res>0.5;
+  _t(ctx,cv.width/2,362, resistant
+      ? "insulin knocks, but the signal is weak → few doors open → glucose stays HIGH (resistance)"
+      : "insulin opens the doors → GLUT4 lets glucose in → blood sugar falls",
+     {align:"center",col:resistant?MED.wrong:MED.good,size:13,bold:true}); }
+async function runInsulinAction(cv,ctx,opts){
+  const lines=opts.lines||[];
+  const res=opts.resistance||0;
+  const seq=opts.seq||[{insulin:0,resistance:res},{insulin:1,resistance:res}];
+  drawInsulinAction(ctx,cv,{...seq[0],title:opts.title});
+  for(let i=0;i<seq.length;i++){
+    if(lines[i]) await narrate(lines[i]);
+    const a=seq[i], b=seq[Math.min(i+1,seq.length-1)];
+    await tween(1100,k=>drawInsulinAction(ctx,cv,{insulin:_lerp(a.insulin,b.insulin,k),resistance:_lerp(a.resistance,b.resistance,k),title:opts.title})); }
+  if(lines[seq.length]) await narrate(lines[seq.length]); }
+
+/* --- thin wrappers --- */
+ANIMS.med_betacell_static=(cv,ctx)=>drawBetaCell(ctx,cv,{p:0,title:"How the β-cell releases insulin"});
+ANIMS.med_betacell=(cv,ctx)=>runBetaCell(cv,ctx,{
+  title:"How the β-cell releases insulin",
+  lines:[
+    "This is a beta-cell in your pancreas — the only cell that makes insulin. Watch how a rise in blood sugar becomes a squirt of insulin.",
+    "Glucose flows in through a door called GLUT2 and gets burned for energy. That raises ATP — the cell's fuel gauge — which is the key signal.",
+    "High ATP snaps shut a potassium channel. With potassium trapped inside, the cell's voltage flips — it depolarises.",
+    "That voltage change throws open calcium gates. Calcium floods in — the universal 'release now' trigger inside cells.",
+    "Calcium makes the insulin storage granules fuse with the membrane and dump insulin into the blood. Sugar in, insulin out — and this is exactly the step GLP-1 drugs and sulfonylureas amplify."]});
+ANIMS.med_insulin_action_static=(cv,ctx)=>drawInsulinAction(ctx,cv,{insulin:0,resistance:0,title:"What insulin does — the key that opens the cell"});
+ANIMS.med_insulin_action=(cv,ctx)=>runInsulinAction(cv,ctx,{
+  title:"What insulin does — the key that opens the cell",
+  resistance:0,
+  lines:[
+    "Insulin's main job is to let sugar OUT of the blood and INTO your cells. Here is a muscle cell with blood glucose running high on the left.",
+    "Insulin docks onto its receptor and sends a signal inside. That signal orders GLUT4 transporters — glucose doors — to move to the cell surface.",
+    "With the doors open, glucose pours in and blood sugar falls back to normal. That is healthy insulin action."]});
+ANIMS.med_insulin_resistance_static=(cv,ctx)=>drawInsulinAction(ctx,cv,{insulin:0,resistance:0.8,title:"Insulin resistance — the locks have rusted"});
+ANIMS.med_insulin_resistance=(cv,ctx)=>runInsulinAction(cv,ctx,{
+  title:"Insulin resistance — the locks have rusted",
+  resistance:0.8,
+  lines:[
+    "Now the same cell in type 2 diabetes. Blood glucose is high and the pancreas is pumping out plenty of insulin.",
+    "But the receptor's signal barely gets through — the locks have rusted. Only a couple of GLUT4 doors reach the surface no matter how hard insulin knocks.",
+    "So glucose stays stuck in the blood. The pancreas responds by making even MORE insulin to force the doors — until, years later, the exhausted beta-cells can't keep up. That two-part story — resistance plus beta-cell burnout — is type 2 diabetes."]});
 
 function drawSquare(ctx,cv,pH,lH,lN,split,shade){
   clear(ctx,cv);

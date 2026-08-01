@@ -2,6 +2,7 @@
   "id": "calculus",
   "title": "Calculus",
   "tagline": "The mathematics of change and accumulation.",
+  "category": "Mathematics",
   "description": "Limits to derivatives to integrals to the theorem that ties them together. Root of the mathematics chain: ODEs, Fourier, and PDEs all build on this.",
   "prereqs": [],
   "concepts": [

@@ -2,6 +2,7 @@
   "id": "quant-finance",
   "title": "Quantitative Finance",
   "tagline": "Edges, error bars, and the discipline that keeps you from fooling yourself.",
+  "category": "Investing & Finance",
   "description": "From return arithmetic to the honest-research loop. The through-line: every number you compute is a noisy estimate, most published edges are selection artifacts, and the machinery that survives is the machinery built to catch its own errors — pre-registered gates, trial accounting, and drawdown-first verdicts.",
   "prereqs": [
     "calculus",

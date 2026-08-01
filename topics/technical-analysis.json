@@ -1,850 +1,851 @@
 {
- "id": "technical-analysis",
- "title": "Technical Analysis",
- "tagline": "Reading price — and knowing when the chart is lying to you",
- "description": "What technical analysis (TA) can and cannot tell you, built moving-average-first: simple and exponential averages, crossovers, momentum oscillators, bands and volume. Why the same tools read cleaner on exchange-traded funds (ETFs) than on single stocks, exactly how naive TA loses money (whipsaws, costs, overfitting), and what disciplined use looks like — slow rules, pre-committed, on diversified vehicles.",
- "concepts": [
-  {
-   "id": "price-as-information",
-   "title": "Price as information — and why ETFs read cleaner",
-   "summary": "Technical analysis (TA) studies price and volume history to characterize the current regime. On a single stock the chart mixes trend with one company's news; an exchange-traded fund (ETF) averages 500 stories into one, so the same tools read a much cleaner signal.",
-   "anim": "ta_noise_vs_trend",
-   "cards": [
+  "id": "technical-analysis",
+  "title": "Technical Analysis",
+  "tagline": "Reading price — and knowing when the chart is lying to you",
+  "category": "Investing & Finance",
+  "description": "What technical analysis (TA) can and cannot tell you, built moving-average-first: simple and exponential averages, crossovers, momentum oscillators, bands and volume. Why the same tools read cleaner on exchange-traded funds (ETFs) than on single stocks, exactly how naive TA loses money (whipsaws, costs, overfitting), and what disciplined use looks like — slow rules, pre-committed, on diversified vehicles.",
+  "concepts": [
     {
-     "h": "What TA actually is",
-     "md": "**Technical analysis (TA)** is the study of price and volume history to make decisions — as opposed to **fundamental analysis**, which studies the business behind the ticker (earnings, balance sheets, valuations).\n\nStrip away the mystique and TA makes one defensible claim: *prices move in persistent trends more often than pure chance would allow, and crowd behavior leaves footprints in price and volume.* A century of academic momentum and trend-following literature backs a **weak version** of that claim. The strong version — that chart patterns predict specific future prices — does not survive testing.\n\nTreat TA as a **regime detector**, not a crystal ball: it is good at characterizing what the market is *currently doing* (trending up, trending down, chopping) and bad at predicting what it will do next."
+      "id": "price-as-information",
+      "title": "Price as information — and why ETFs read cleaner",
+      "summary": "Technical analysis (TA) studies price and volume history to characterize the current regime. On a single stock the chart mixes trend with one company's news; an exchange-traded fund (ETF) averages 500 stories into one, so the same tools read a much cleaner signal.",
+      "anim": "ta_noise_vs_trend",
+      "cards": [
+        {
+          "h": "What TA actually is",
+          "md": "**Technical analysis (TA)** is the study of price and volume history to make decisions — as opposed to **fundamental analysis**, which studies the business behind the ticker (earnings, balance sheets, valuations).\n\nStrip away the mystique and TA makes one defensible claim: *prices move in persistent trends more often than pure chance would allow, and crowd behavior leaves footprints in price and volume.* A century of academic momentum and trend-following literature backs a **weak version** of that claim. The strong version — that chart patterns predict specific future prices — does not survive testing.\n\nTreat TA as a **regime detector**, not a crystal ball: it is good at characterizing what the market is *currently doing* (trending up, trending down, chopping) and bad at predicting what it will do next."
+        },
+        {
+          "h": "One stock = trend + one company's story",
+          "md": "A single stock's chart is two things layered on top of each other: the market trend, and the company's **idiosyncratic** story — earnings surprises, lawsuits, product news, analyst moves.\n\nThe story part routinely arrives as an **overnight gap**: the price jumps or drops 10–20% between yesterday's close and today's open, while markets were closed. No moving average, no support line, no oscillator sees a gap coming — the information did not pass *through* the chart, it landed *on* it.\n\nThis is the structural weakness of stock-level TA: a large fraction of single-stock risk is news-shaped, and news is exactly what price history cannot contain."
+        },
+        {
+          "h": "An ETF averages away the stories",
+          "md": "An **exchange-traded fund (ETF)** holding 500 stocks dilutes each company's story to a 0.2% footnote. Idiosyncratic shocks — one CEO resigning, one earnings miss — largely cancel across holdings. What survives in the ETF's price is the **shared component**: the trend, the regime, the risk appetite of the whole market.\n\nThat is precisely the component TA tools are built to read. Same indicator, same math — dramatically better signal-to-noise.\n\nBroad ETFs also remove the single-name catastrophe: a diversified fund cannot go to zero on one fraud or one bankruptcy, so a trend rule on an ETF is never one headline away from a −60% gap. **This module is ETF-first for exactly these reasons** — every technique here works on stocks, but the honest odds are better on funds."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What is the most defensible claim technical analysis can make?",
+          "options": [
+            "Chart patterns predict specific future prices with reliable accuracy",
+            "Prices trend more persistently than chance allows, and TA can characterize the current regime",
+            "Price history contains all future information, so charts anticipate news",
+            "TA identifies the intrinsic fair value of an asset"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That is the strong claim, and it fails testing — pattern-based price targets have no robust predictive record. The defensible version is weaker and regime-shaped.",
+            "Right. The momentum and trend literature supports persistence beyond chance, which makes TA a useful regime detector — while specific price prediction remains out of reach.",
+            "Backwards — news that has not happened cannot be in price history. Overnight gaps are the standing proof: information lands ON the chart, it does not pass through it first.",
+            "Intrinsic value is fundamental analysis's department (earnings, assets, discount rates). TA deliberately ignores the business and studies only price and volume behavior."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why does the same moving-average rule tend to work better on a broad ETF than on a single stock?",
+          "options": [
+            "ETFs are managed by professionals who keep prices trending",
+            "ETF prices update less frequently, giving the average time to catch up",
+            "Idiosyncratic company news largely cancels across holdings, leaving the shared trend the indicator is built to read",
+            "Regulators dampen ETF volatility by rule"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Most broad ETFs are passive index trackers — nobody is steering the price. The advantage is statistical (diversification), not managerial.",
+            "ETF prices tick all day exactly like stocks. Update frequency is not the difference; composition is.",
+            "Correct. One company's earnings shock is ~0.2% of a 500-stock fund, so the fund's chart is mostly the shared regime component — exactly what trend tools measure.",
+            "There is no such volatility rule. ETF prices are set by the same open market; their smoothness comes from averaging 500 stories, not from regulation."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A stock gaps down 18% overnight on an earnings miss. What does this illustrate about stock-level TA?",
+          "options": [
+            "The trader should have used a faster moving average to catch it",
+            "A stop-loss order at −5% would have fully protected the position",
+            "The chart was wrong but the next pattern will compensate",
+            "A large share of single-stock risk arrives as news that price history cannot contain"
+          ],
+          "answer": 3,
+          "feedback": [
+            "No average of PAST prices — however fast — can react to information that arrives while markets are closed. The gap skips over every indicator level at once.",
+            "A stop-loss executes at the next available price. After an overnight gap, that is −18%, not −5% — stops do not protect through gaps, which is a nasty surprise the first time it happens.",
+            "Charts are not owed compensation. The gap is not an indicator error to be reversed; it is information arriving through a channel price history does not carry.",
+            "Exactly. Earnings, lawsuits, and announcements land ON the chart from outside. Diversified ETFs shrink this channel to near-irrelevance, which is why this module prefers them."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Investor.gov — Technical analysis (the regulator's sober framing)",
+          "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary/technical-analysis",
+          "type": "reading",
+          "note": "The regulator's two-paragraph framing — usefully unexcited about what TA can claim."
+        },
+        {
+          "label": "StockCharts ChartSchool — Overview of technical analysis",
+          "url": "https://school.stockcharts.com/doku.php?id=overview:technical_analysis",
+          "type": "docs",
+          "note": "The standard free reference for every indicator in this module; start here when a term is fuzzy."
+        }
+      ]
     },
     {
-     "h": "One stock = trend + one company's story",
-     "md": "A single stock's chart is two things layered on top of each other: the market trend, and the company's **idiosyncratic** story — earnings surprises, lawsuits, product news, analyst moves.\n\nThe story part routinely arrives as an **overnight gap**: the price jumps or drops 10–20% between yesterday's close and today's open, while markets were closed. No moving average, no support line, no oscillator sees a gap coming — the information did not pass *through* the chart, it landed *on* it.\n\nThis is the structural weakness of stock-level TA: a large fraction of single-stock risk is news-shaped, and news is exactly what price history cannot contain."
+      "id": "moving-averages",
+      "title": "Moving averages — smoothing bought with lag",
+      "summary": "The simple moving average (SMA) replaces each day's price with the average of the last N closes. Longer windows mean smoother lines and later turns: every choice of N is a position on the noise-versus-lag dial, and choosing it IS the strategy decision.",
+      "anim": "ta_sma",
+      "cards": [
+        {
+          "h": "The mechanic",
+          "md": "A **simple moving average (SMA)** of length N is the arithmetic mean of the last N closing prices, recomputed each day as the window slides forward. SMA-10 averages two trading weeks; SMA-50 about a quarter; SMA-200 about a year.\n\nAveraging is a **low-pass filter**: day-to-day noise (which flips sign constantly) cancels against itself inside the window, while the trend (which points one way for months) survives. The longer the window, the more noise dies — and the more slowly the line responds when the trend genuinely changes.\n\nThat is the entire trade-off, and there is no third dial: **smoothness and responsiveness are the same budget spent two ways.**"
+        },
+        {
+          "h": "The canonical periods — and what each is for",
+          "md": "- **SMA-10/20** — tactical: hugs price, turns quickly, whipsaws constantly. Readable only in strong trends.\n- **SMA-50** — the intermediate trend line traders quote; a reasonable compromise for position management.\n- **SMA-200** — the **regime line**. Price above it = bull regime odds; below = bear regime odds. This is the average the long academic studies use, because at 200 days most of what remains is signal.\n\nNote what the period really encodes: **your holding horizon**. A 10-day average asks 'what happened these two weeks?' — a question only a short-term trader should care about. If your horizon is years, indicators built on days are answering someone else's question."
+        },
+        {
+          "h": "Lag is the price of truth",
+          "md": "At every genuine turn, a moving average is **late by design** — roughly half its window. SMA-200 confirms a top ~4–5 months after the top. This feels like a defect; it is actually the fee for filtering.\n\nThe useful reframe: a moving average never tells you what price *will* do. It tells you, with a chosen confidence, what price *has been* doing — and persistent trends make 'has been' informative about 'is'.\n\nOur own 99-year monthly study uses exactly one such line (a 10-**month** average, close cousin of SMA-200) as its trend gate. Slow, unfashionable — and it defended every major crash since 1929. The fashionably fast averages did not survive their own trading costs, as you will see in the whipsaw lesson."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What is the fundamental trade-off in choosing a moving-average period?",
+          "options": [
+            "Longer averages are more accurate in every respect",
+            "Smoothness and responsiveness are one budget: less noise necessarily means more lag",
+            "Shorter averages are better for long-term investors because they update faster",
+            "The period only affects how the line looks, not any decision it drives"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Longer windows are smoother but LATER — a 200-day average confirms a turn months after it happens. 'Accurate' depends on which error you care about: noise or lag.",
+            "Correct. Averaging is a low-pass filter: each extra day of window cancels more noise and adds more delay. Every period choice is a position on that single dial.",
+            "Backwards pairing. A fast average asks a two-week question; a long-horizon investor needs the year-scale question. Matching the window to your holding horizon is the point.",
+            "The period changes WHEN the line crosses price — which is exactly the event trading rules key on. It is the single most consequential parameter in trend-following."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why does the SMA-200 earn the name 'regime line'?",
+          "options": [
+            "It reacts fastest to regime changes among common averages",
+            "Exchanges use it to classify bull and bear markets officially",
+            "It equals the market's average annual return",
+            "At ~200 days of smoothing, mostly trend survives — so which side price is on describes the prevailing regime"
+          ],
+          "answer": 3,
+          "feedback": [
+            "It is the SLOWEST of the common set — that is precisely why its verdict is trustworthy. Speed and trustworthiness point opposite ways here.",
+            "No official body classifies regimes by moving average. The name is earned statistically: above/below SMA-200 historically separates very different return and volatility environments.",
+            "The SMA-200 is an average of PRICES over ~a year, not a return figure. Its level means nothing alone; price's position relative to it is the signal.",
+            "Right. With a year of smoothing, daily and weekly noise is nearly gone. What remains — and which side of it price trades on — is a fair one-line summary of the regime."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A 200-day SMA confirms a market top roughly how long after the actual top, and why?",
+          "options": [
+            "Months later — an average lags by about half its window; that delay is the cost of its noise filtering",
+            "The same day, if computed correctly",
+            "It anticipates tops slightly, because institutions front-run it",
+            "About two weeks later, regardless of window length"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — call it 4–5 months. The window still contains months of pre-top prices, which hold the average up. That lag is not a bug; it is the fee for ignoring noise.",
+            "Impossible by construction: the day after a top, 199 of the 200 window days are still pre-top prices. The average CANNOT turn immediately.",
+            "An average of past prices anticipates nothing. Front-running behavior around popular levels exists but does not change the arithmetic of lag.",
+            "Lag scales with the window — that is the entire smoothing trade-off. A 10-day average lags days; a 200-day average lags months."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "StockCharts ChartSchool — Moving averages (SMA/EMA mechanics)",
+          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages",
+          "type": "docs",
+          "note": "SMA vs EMA mechanics with worked examples — the arithmetic behind the smoothing-vs-lag dial."
+        },
+        {
+          "label": "Meb Faber — A Quantitative Approach to Tactical Asset Allocation (the 10-month SMA study)",
+          "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461",
+          "type": "paper",
+          "note": "The 10-month SMA study this module's slow-cadence doctrine descends from; short, readable, replicated."
+        }
+      ]
     },
     {
-     "h": "An ETF averages away the stories",
-     "md": "An **exchange-traded fund (ETF)** holding 500 stocks dilutes each company's story to a 0.2% footnote. Idiosyncratic shocks — one CEO resigning, one earnings miss — largely cancel across holdings. What survives in the ETF's price is the **shared component**: the trend, the regime, the risk appetite of the whole market.\n\nThat is precisely the component TA tools are built to read. Same indicator, same math — dramatically better signal-to-noise.\n\nBroad ETFs also remove the single-name catastrophe: a diversified fund cannot go to zero on one fraud or one bankruptcy, so a trend rule on an ETF is never one headline away from a −60% gap. **This module is ETF-first for exactly these reasons** — every technique here works on stocks, but the honest odds are better on funds."
+      "id": "exponential-averages",
+      "title": "Exponential and weighted averages — choosing a memory",
+      "summary": "The exponential moving average (EMA) weights the newest prices most, decaying by a constant factor 2/(N+1). Same nominal length as an SMA, faster response — and faster response to noise too. The average family is a menu of memory shapes, not a ladder of quality.",
+      "anim": "ta_ema",
+      "cards": [
+        {
+          "h": "EMA: exponential memory",
+          "md": "The **exponential moving average (EMA)** blends each new price into a running value: `EMA_today = price × k + EMA_yesterday × (1−k)`, with smoothing constant **k = 2/(N+1)**. For N=40, k≈0.049 — each day the newest close gets ~4.9% of the weight and everything older decays by ×0.951.\n\nTwo consequences:\n- **Front-loaded memory** — the most recent days dominate, so the EMA responds to genuine changes noticeably faster than an SMA of the same N.\n- **No cliff** — an SMA *completely forgets* day N+1 in one step (which can jerk the line when a big old day drops out of the window). The EMA fades the past out smoothly; nothing ever falls off an edge."
+        },
+        {
+          "h": "The rest of the family",
+          "md": "- **Weighted moving average (WMA)** — linear weights (N, N−1, …, 1): front-loaded like the EMA, but with a hard cutoff like the SMA. A halfway house.\n- **Hull moving average (HMA)** — a WMA-of-WMAs construction that cuts lag dramatically; the cost is **overshoot** at turns (it swings past the price like an under-damped spring).\n- **Volume-weighted average price (VWAP)** — weights by traded volume; an execution benchmark for measuring fill quality far more than a signal line.\n\nThe honest summary: these are different **memory shapes** — flat with a cliff (SMA), fading (EMA), triangular (WMA). None dominates. Every reduction in lag is paid for in noise sensitivity or overshoot, always."
+        },
+        {
+          "h": "Fast is a choice, not an upgrade",
+          "md": "Because the EMA responds faster, it is tempting to call it 'better.' Resist that. The same responsiveness that catches a real turn 10 days earlier also chases a false wiggle 10 days earlier — and in a sideways market, false wiggles outnumber real turns badly. A faster average almost always means **more signals**, and in TA more signals means more costs, more taxes, more whipsaws.\n\nPractical guidance for an ETF investor:\n- Long-horizon regime reading → **SMA-200 or the 10-month SMA**; the lag is affordable, the reliability compounds.\n- If you genuinely operate at weeks-scale → EMA, accept the extra false positives knowingly.\n- Nobody needs the exotic averages to invest well. The **famous MACD indicator** (next lessons) is built from two EMAs — that is where exponential memory earns its keep."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "For an EMA of nominal length N, the weight on today's price is 2/(N+1). What does this construction imply?",
+          "options": [
+            "The EMA weights all N days equally, then discards older ones",
+            "Recent prices dominate and older prices decay geometrically — nothing ever falls off a cliff",
+            "The EMA is an average of the highest and lowest prices in the window",
+            "The EMA requires exactly N days of data before it is defined"
+          ],
+          "answer": 1,
+          "feedback": [
+            "That describes the SIMPLE moving average. The EMA's entire point is unequal weighting — newest counts most, with smooth geometric decay behind it.",
+            "Correct. Each day, old information fades by a constant factor rather than being dropped. That's why an EMA responds faster than an SMA of the same nominal length, and never jerks when an old day 'exits the window' — no window exists.",
+            "That's a midpoint/range calculation (related to Donchian channels), not an exponential average. The EMA uses closes, exponentially weighted.",
+            "An EMA can start from the first data point and simply becomes more meaningful as history accumulates — unlike the SMA, which is undefined until N closes exist."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Price steps up 18% and holds. A 40-day EMA and a 40-day SMA both track it. What happens?",
+          "options": [
+            "Both reach the new level after exactly 40 days, by definition of length",
+            "The SMA arrives first because simple averages are more direct",
+            "The EMA covers most of the gap much sooner; the SMA grinds up linearly over the full 40 days",
+            "Neither ever fully reaches the new level"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Only the SMA is bound to the 40-day arithmetic. The EMA's front-loaded weights let it absorb most of the step in roughly a third of the nominal window.",
+            "The SMA is the slow one here: each day only swaps one old price for one new one, so it climbs in equal daily steps for 40 days.",
+            "Right — front-loaded memory means fast absorption of new information. Remember the symmetric cost: it absorbs noise equally fast.",
+            "The EMA asymptotically closes the whole gap (each day covering ~4.9% of what remains), and the SMA closes it exactly at day 40. Both get there."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why is 'the EMA is better than the SMA because it reacts faster' a mistake?",
+          "options": [
+            "It is not a mistake — faster reaction is strictly better",
+            "EMAs are computationally too expensive for daily use",
+            "The EMA's math only works on stocks, not ETFs",
+            "Faster reaction to real turns is inseparable from faster reaction to noise — in choppy markets that means more false signals, trades, and costs"
+          ],
+          "answer": 3,
+          "feedback": [
+            "Strictly better would require reacting faster to signal WITHOUT reacting faster to noise. No average can distinguish the two in real time — that information does not exist yet.",
+            "An EMA is one multiply and one add per day — cheaper than an SMA if anything. The objection is statistical, not computational.",
+            "The arithmetic is identical on any price series. Vehicle choice changes signal-to-noise, not the formula.",
+            "Correct. Speed is a CHOICE about which error to prefer (lag vs false positives), not an upgrade. In sideways regimes false wiggles vastly outnumber real turns, so the fast average pays more in whipsaws than it earns at turns."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "StockCharts ChartSchool — Moving averages: SMA vs EMA weighting",
+          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages",
+          "type": "docs",
+          "note": "SMA vs EMA mechanics with worked examples — the arithmetic behind the smoothing-vs-lag dial."
+        },
+        {
+          "label": "Investopedia — Exponential moving average (EMA), formula and worked examples",
+          "url": "https://www.investopedia.com/terms/e/ema.asp",
+          "type": "article",
+          "note": "The EMA formula with the 2/(N+1) constant worked through — good for checking your own arithmetic."
+        }
+      ]
+    },
+    {
+      "id": "crossovers-and-regime",
+      "title": "Crossovers, the golden cross, and trend strength",
+      "summary": "Crossover rules turn averages into signals: price-vs-average or fast-average-vs-slow-average. The golden cross (SMA-50 above SMA-200) is the famous one. Crossovers define regimes well and time entries poorly — and the average directional index (ADX) tells you whether there is even a trend to follow.",
+      "cards": [
+        {
+          "h": "Two families of crossover",
+          "md": "- **Price vs average**: bullish while price holds above the line — e.g. price above SMA-200 as a regime test. One moving part, easy to reason about; our house studies use exactly this form (monthly close vs the 10-month average).\n- **Fast average vs slow average**: the **golden cross** (SMA-50 crosses above SMA-200) and its mirror the **death cross** (50 below 200). Two smoothed lines mean fewer, later, but cleaner signals than raw price crossings.\n\nEvery crossover inherits the lag of its slowest component. A golden cross confirms a bull regime that is typically already months old. As **confirmation**, that is fine. As a prediction of imminent gains, it is a misreading of what the tool measures — the cross says where you ARE, not where you are going."
+        },
+        {
+          "h": "Is there a trend at all? ADX",
+          "md": "Trend rules silently assume a trend exists. The **average directional index (ADX)** measures whether that assumption currently holds — it quantifies trend *strength*, direction-blind, on a 0–100 scale:\n- **Below ~20**: no meaningful trend. Crossover signals in this zone are mostly noise — this is whipsaw country.\n- **Above ~25–30**: a real trend is in force, in whichever direction.\n\nThis single filter kills a huge fraction of naive losses: the deadly move is taking every crossover in a flat market, paying full costs for signals with no informational content. Checking ADX (or any regime measure) before acting on a cross is the difference between using a tool and being used by it. The same 'condition + trigger' logic runs our own Stormwatch monitor: a macro condition must be armed AND the trend must break — either alone does nothing."
+        },
+        {
+          "h": "Support, resistance, and honest lines",
+          "md": "Classic TA draws **support** (a level where declines have stopped) and **resistance** (where rallies have stalled). The behavioral story is real enough — orders cluster at memorable prices, and round numbers anchor decisions — but these levels are drawn by eye, which makes them unfalsifiable: miss and the line was 'broken', hold and it 'worked'.\n\nMoving averages and ADX, whatever their limits, are **computable** — two people get the same line from the same data, so the rule can be backtested and the backtest can be audited.\n\nHouse rule for everything that follows: *if a signal cannot be computed identically by two people, it cannot be tested; if it cannot be tested, it is a story, not a strategy.*"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A golden cross (SMA-50 crossing above SMA-200) prints today. What has actually happened?",
+          "options": [
+            "A statistically reliable buy point for the next month has been identified",
+            "Two lagged summaries of past prices now agree the regime has been bullish for a while — a confirmation, not a forecast",
+            "Institutional buying is guaranteed to follow the signal",
+            "The market has bottomed"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Short-horizon returns after golden crosses are barely distinguishable from any other day. Its value is regime description, not entry timing.",
+            "Correct. Both averages are backward-looking; their agreement certifies an established uptrend. Useful as a regime gate — misread as a prediction.",
+            "Some funds do watch these levels, but nothing is guaranteed — and any mechanical front-running is itself arbitraged. The cross carries no enforcement mechanism.",
+            "The cross typically prints months AFTER a bottom — the 200-day component needs that long to turn. If anything it certifies the bottom is well behind you."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The average directional index (ADX) reads 14. A fast/slow crossover just fired. The disciplined read is:",
+          "options": [
+            "Take the trade — every signal must be taken to preserve the system's statistics",
+            "Take double size — low ADX means the move is early",
+            "ADX below ~20 says there is no trend in force: crossover signals here are mostly noise, and skipping them avoids classic whipsaw losses",
+            "Invert the signal and trade the other way"
+          ],
+          "answer": 2,
+          "feedback": [
+            "'Take every signal' applies within a REGIME the system was designed for. A trend signal in a certified no-trend regime is out of contract — filtering it IS the system.",
+            "Low ADX means no trend EXISTS, not that one is young. Sizing up on a noise signal compounds the error.",
+            "Right. Crossovers assume trend persistence; ADX under ~20 says persistence is currently absent. This one filter removes a large share of naive TA losses.",
+            "Chop punishes both directions equally — the whipsaw doesn't care which way you lean. The correct position in certified chop is usually no new position."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why does this course prefer computable signals (averages, ADX) over hand-drawn support and resistance?",
+          "options": [
+            "Hand-drawn levels have no behavioral basis whatsoever",
+            "Computable rules give identical output for identical input — so they can be backtested, audited, and falsified; drawn lines can always be redrawn",
+            "Computable indicators are always profitable",
+            "Support and resistance are illegal to use in managed accounts"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The behavioral basis (order clustering, round-number anchoring) is real. The problem is testability: an eyeballed line flexes to fit whatever happened.",
+            "Correct — this is the falsifiability standard the house applies to everything: a rule two people compute identically can be tested and can FAIL honestly. A story that bends cannot.",
+            "Plenty of computable rules lose money reliably — the whipsaw lesson is built on one. Computability buys testability, not profit.",
+            "Nothing illegal about drawn levels. The objection is epistemic (unfalsifiable), not regulatory."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "StockCharts ChartSchool — Average directional index (ADX)",
+          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:average_directional_index_adx",
+          "type": "docs",
+          "note": "How ADX quantifies trend strength — the filter that keeps crossover signals out of chop."
+        },
+        {
+          "label": "Investopedia — Golden cross: definition and the confirmation-vs-prediction caveat",
+          "url": "https://www.investopedia.com/terms/g/goldencross.asp",
+          "type": "article",
+          "note": "Defines the golden cross and, importantly, its confirmation-not-prediction caveat."
+        }
+      ]
+    },
+    {
+      "id": "oscillators",
+      "title": "Oscillators — RSI, MACD, and the overbought myth",
+      "summary": "Oscillators compress recent price action into a bounded gauge: the relative strength index (RSI) and the moving average convergence divergence (MACD) are the canon. Their readings mean opposite things in trending versus ranging regimes — the most common way retail traders misuse them.",
+      "cards": [
+        {
+          "h": "RSI — speed, not value",
+          "md": "The **relative strength index (RSI)**, standard period 14, compares average up-day gains to average down-day losses and maps the ratio to 0–100. Above 70 is conventionally 'overbought', below 30 'oversold'.\n\nThe trap is in those words: they imply *mispricing* — too expensive, must fall. RSI measures nothing of the sort. It measures **how fast price has been climbing recently** — recent one-directional speed, full stop.\n\nIn a **range**, speed does mean-revert, and fading RSI extremes works passably. In a **trend**, sustained speed is the trend's defining feature: RSI can pin above 70 for months in a strong bull market while prices double. Selling 'overbought' in a real uptrend is how disciplined-sounding traders systematically exit winners early — the same regime error as trading crossovers in chop, mirrored."
+        },
+        {
+          "h": "MACD — trend arithmetic made visible",
+          "md": "The **moving average convergence divergence (MACD)** is built from the exponential averages you already know: the **MACD line** = EMA-12 − EMA-26 (the gap between fast and slow memory), and the **signal line** = a 9-day EMA of that gap. The **histogram** plots their difference.\n\nRead it as trend calculus: MACD above zero ⇒ the fast average is above the slow (uptrend in force); the histogram shrinking ⇒ the trend is decelerating. A widely-watched subtlety is **divergence** — price makes a new high while the oscillator makes a lower high, suggesting the advance is thinning.\n\nBecause MACD is unbounded and built purely from EMAs, it is a *trend* tool wearing an oscillator's clothes — it inherits every property of the averages inside it, lag included. It is not new information; it is the same information, differenced and made legible."
+        },
+        {
+          "h": "The regime decides which oscillator logic applies",
+          "md": "The stochastic oscillator, rate-of-change, Williams %R — the extended oscillator family all remix one quantity: recent price change, normalized. So one rule governs them all:\n\n**In ranges, extremes mean reversal. In trends, extremes mean strength.** The oscillator cannot tell you which regime you are in — you must bring that answer TO the indicator, from the regime tools (the 200-day line, ADX).\n\nThis composes into the honest workflow: regime first (trend line + ADX), *then* the oscillator as a junior input — timing an add-on within an established trend, or spotting exhaustion in a certified range. An oscillator promoted to primary signal, with no regime check above it, is one of the most reliable money-losing machines in retail finance."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "RSI has read above 70 ('overbought') for six weeks while an ETF keeps climbing. What is the correct interpretation?",
+          "options": [
+            "The ETF is mispriced and a crash is imminent",
+            "The indicator is broken and should be recalculated",
+            "Persistent high RSI in an uptrend is the signature of trend strength — 'overbought' implies mispricing, which RSI does not measure",
+            "Someone is manipulating the ETF's price"
+          ],
+          "answer": 2,
+          "feedback": [
+            "RSI knows nothing about value — no earnings, no yields, no comparisons. It measures recent climb speed, and strong trends climb fast for months. The 1990s bull pinned RSI high for YEARS.",
+            "The indicator is doing exactly its job: reporting sustained one-directional speed. The error would be in the reader's regime assumption, not the arithmetic.",
+            "Correct. In ranges, speed extremes revert; in trends, speed extremes ARE the trend. Selling every 'overbought' reading in a bull market is systematic early exit from winners.",
+            "Sustained strength is what every genuine bull market looks like on this gauge. Reaching for manipulation to explain a normal reading is a category error."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The MACD line is EMA-12 minus EMA-26. What does MACD crossing above zero mean, mechanically?",
+          "options": [
+            "The fast EMA has moved above the slow EMA — the same event as a moving-average crossover, expressed as a difference",
+            "The asset's price has become positive",
+            "Volume has exceeded its monthly average",
+            "The RSI has confirmed the move"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Exactly. MACD > 0 ⇔ EMA-12 > EMA-26. The zero-cross IS an average crossover, just plotted as a difference — which is why MACD inherits crossover lag and crossover whipsaws.",
+            "MACD is a difference of two averages OF price; its sign says nothing about the price level itself, only which average is on top.",
+            "No volume enters the MACD's arithmetic anywhere — it is prices only, twice smoothed, once differenced.",
+            "RSI is a separate calculation entirely. MACD's components are the two EMAs and nothing else."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why should an oscillator never be the primary signal without a regime check above it?",
+          "options": [
+            "Oscillators are computed from unreliable data feeds",
+            "Oscillator extremes mean opposite things in trends (strength) versus ranges (reversal) — and the oscillator itself cannot tell you which regime you are in",
+            "Oscillators only work on daily charts",
+            "Regulators require moving averages to be checked first"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Same closes, same feed as every other indicator. The problem is interpretive, not data quality.",
+            "Correct — this is the central oscillator failure mode. The regime answer must come from OUTSIDE (the 200-day line, ADX); brought to the oscillator, its readings become useful; without it, they alternate between meanings invisibly.",
+            "The arithmetic is timeframe-agnostic; the regime-dependence problem follows it to every timeframe identically.",
+            "No such rule exists. The ordering is statistical hygiene, not regulation: context first, junior signal second."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "StockCharts ChartSchool — Relative strength index (RSI), including trend-range behavior",
+          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:relative_strength_index_rsi",
+          "type": "docs",
+          "note": "RSI construction plus the trend-vs-range behavior that the overbought myth ignores."
+        },
+        {
+          "label": "StockCharts ChartSchool — MACD, construction and divergence",
+          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_average_convergence_divergence_macd",
+          "type": "docs",
+          "note": "MACD assembled from its two EMAs — makes the 'trend tool in oscillator clothing' point visible."
+        }
+      ]
+    },
+    {
+      "id": "bands-volatility-volume",
+      "title": "Bands, volatility, and volume — the context layer",
+      "summary": "Bollinger Bands wrap a moving average in standard-deviation envelopes; the average true range (ATR) prices a day's normal motion; on-balance volume (OBV) and market breadth ask whether the crowd agrees with the price. None are entry signals — all are context that disciplines the signals you already have.",
+      "cards": [
+        {
+          "h": "Bollinger Bands — volatility made visible",
+          "md": "**Bollinger Bands** draw a 20-day SMA with envelopes ±2 standard deviations of recent price around it. Since the width is recomputed daily, the bands breathe with volatility: wide in storms, tight in calm.\n\nTwo honest uses:\n- **The squeeze** — unusually tight bands mark compressed volatility; volatility is strongly cyclical, so compression tends to precede expansion. Note carefully: the squeeze forecasts *bigger moves*, *unknown direction*.\n- **Band-touch context** — in a RANGE, tagging a band marks an extreme worth fading; in a TREND, price legitimately 'walks the band' for weeks. The same regime split as RSI, and the same trap: selling every upper-band touch in a bull market bleeds a portfolio dry one early exit at a time."
+        },
+        {
+          "h": "ATR — the unit of normal motion",
+          "md": "The **average true range (ATR)** averages the daily 'true range' (the day's high–low span, gap-adjusted) over ~14 days: one number that says what a NORMAL day's movement costs in dollars.\n\nIts best use is not signaling at all — it is **calibration**:\n- **Stops**: a stop 0.5×ATR away will be hit by ordinary noise (a coin-flip exit dressed up as discipline); ~2–3×ATR distinguishes 'thesis wrong' from 'Tuesday'.\n- **Position sizing**: dividing risk budget by ATR normalizes positions so a volatile ETF and a quiet one contribute comparable daily risk — the retail-accessible version of institutional vol-targeting.\n\nATR is where TA quietly converges with risk management — arguably the most valuable single page in the whole technical toolkit."
+        },
+        {
+          "h": "Volume and breadth — does the crowd agree?",
+          "md": "Price says what happened; volume says **how many participants it took**. A breakout on heavy volume reflects broad agreement; the same breakout on thin volume is a rumor that can be reversed by the first real seller. **On-balance volume (OBV)** runs the tally cumulatively — adding volume on up days, subtracting on down days — so its *divergence* from price (price rising, OBV flat) flags advances running on fumes.\n\nAt the market level the same question becomes **breadth**: how many STOCKS are participating? The **advance–decline line** and the McClellan family measure whether an index rally is an army or three generals — a handful of mega-caps dragging the capitalization-weighted index up while the median stock stalls. Breadth divergence preceded several major tops (2000, 2007). For an index-ETF investor, breadth is the volume-question at the only scale that matters: is the market's trend broad enough to trust?"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A Bollinger Band squeeze (unusually tight bands) tells you what?",
+          "options": [
+            "A breakout upward is coming",
+            "A breakdown downward is coming",
+            "Volatility is compressed and likely to expand — direction unknown",
+            "The moving average has stopped working"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Half right, dangerously. Squeezes precede expansions in EITHER direction — buying every squeeze longs a coin flip.",
+            "The mirror half of the same mistake — the squeeze is direction-blind by construction.",
+            "Correct. Volatility clusters and cycles: compression tends to resolve into expansion. The squeeze times WHEN movement is likely, and says nothing about WHICH WAY.",
+            "The bands ARE the average plus volatility envelopes, working as designed — tightness is a reading, not a malfunction."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why is a stop-loss placed 0.5×ATR from entry usually a design error?",
+          "options": [
+            "It risks too much capital on one position",
+            "Normal daily noise spans roughly one ATR, so a half-ATR stop gets hit by ordinary fluctuation — you exit on a coin flip, not on evidence the thesis failed",
+            "Stops should always be a fixed 10% regardless of the asset",
+            "ATR can only be computed on individual stocks, not ETFs"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Opposite — a tighter stop risks LESS per trade. Its failure is statistical: it converts ordinary noise into realized losses, over and over.",
+            "Correct. The stop's job is separating 'wrong thesis' from 'normal Tuesday'. Inside the noise band it cannot do that job; ~2–3×ATR gives the distinction room to operate.",
+            "A fixed percentage ignores that a quiet bond ETF and a volatile sector fund have utterly different normal days — that is precisely the miscalibration ATR exists to fix.",
+            "ATR computes identically on anything with highs, lows, and closes. ETFs qualify."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "An index ETF grinds to new highs while the advance–decline line flattens and OBV diverges. The reading is:",
+          "options": [
+            "Maximum bullishness — new highs are always confirmation",
+            "The advance is narrowing: fewer stocks and less committed volume are carrying the index — a caution flag on trend quality, worth tightening risk",
+            "An immediate crash signal requiring full liquidation",
+            "Breadth data is irrelevant to ETF holders"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The price high is real, but its QUALITY is the question. Highs carried by three mega-caps while the median stock stalls have historically been fragile highs.",
+            "Correct — and note the calibrated response: caution and risk-tightening, not prediction and liquidation. Narrow advances preceded 2000 and 2007, with long and variable leads.",
+            "Breadth divergences have led tops by months to a year-plus. As a timing trigger they are far too blunt; as a quality gauge they are genuinely informative.",
+            "A cap-weighted index ETF is exactly where breadth matters most — the index can be dragged up by its largest names while its median holding is already in a downtrend."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "StockCharts ChartSchool — Bollinger Bands and the squeeze",
+          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:bollinger_bands",
+          "type": "docs",
+          "note": "Band construction and the squeeze — with the direction-blindness caveat stated plainly."
+        },
+        {
+          "label": "StockCharts ChartSchool — Average true range (ATR) for stops and sizing",
+          "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:average_true_range_atr",
+          "type": "docs",
+          "note": "ATR as the unit of normal motion — the basis for stops and sizing that ignore noise."
+        }
+      ]
+    },
+    {
+      "id": "how-money-is-lost",
+      "title": "How money is lost — the whipsaw tax and its friends",
+      "summary": "The naive failure modes, quantified: whipsaw churn in sideways markets, cost and tax drag, overfit backtests, and indicator soup. In the animation, a standard crossover system turns a flat market into a −21% account — every trade executed exactly as designed.",
+      "anim": "ta_whipsaw",
+      "cards": [
+        {
+          "h": "The whipsaw machine",
+          "md": "Watch the animation closely, because nothing in it is rigged: a market that ends the year almost exactly flat, a textbook 10/30 crossover system, every signal taken with perfect discipline. Ten trades later the account is down over 20% — **while the market lost nothing**.\n\nThe mechanism is brutal and simple: in an oscillating market, a crossover system is a machine for **buying after rises and selling after dips** — precisely backwards, at every single turn, plus costs on top. No bad luck involved; the system did exactly what it was built to do, *in a regime it was never designed for*.\n\nOur own 99-year monthly study measured the real-world version: a fast trend rule bought its crash protection at the price of **69 defensive round-trips and ~50% annual turnover**. The protection was real. So was the bill."
+        },
+        {
+          "h": "Costs, taxes, and the arithmetic of churn",
+          "md": "Every trade pays the **bid–ask spread** (pennies on liquid ETFs, real money on thin ones), plus slippage. Small numbers — until multiplied by a signal-happy system: 25 basis points of round-trip friction × 20 trades ≈ **5% of the account per year**, paid before the strategy earns anything.\n\nTaxes are usually worse. Fast systems generate **short-term capital gains** (taxed as ordinary income — for high earners roughly *double* the long-term rate), and every profitable exit accelerates tax that buy-and-hold would have deferred for decades, surrendering the compounding on the deferred amount.\n\nA taxable trend-follower needs several points of annual outperformance just to tie the index fund it started from. This single paragraph, taken seriously, disqualifies most fast TA for most taxable investors — which is why our house runs its only timing rules in tax-sheltered accounts, slowly."
+        },
+        {
+          "h": "Overfitting: the backtest that lies politely",
+          "md": "Test 200 indicator/parameter combos on the same history and the best one looks brilliant — **guaranteed**, even on pure noise. You searched for the luckiest fit, and found it; out of sample, the mined edge evaporates while its costs stay.\n\nWarning signs you have met the beast: suspiciously specific parameters (why 13 days and not 10?), performance that dies when a parameter moves one notch, no *economic reason* the rule should work (trend rules have one: persistence; a 'Tuesday RSI-37' rule has none).\n\nThe cousin failure is **indicator soup** — six oscillators 'confirming' each other. All are cooked from the same closes; their agreement is one ingredient tasted six times, worth exactly one signal's evidence while feeling like six. The honest defenses are pre-registration (rules written and frozen BEFORE the test — house practice for every study), out-of-sample holdouts, and preferring rules boring enough to have survived a century of markets."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "In the whipsaw animation the market ends flat but the crossover account loses over 20%. What produced the loss?",
+          "options": [
+            "The trader deviated from the system's signals",
+            "In an oscillating market, crossovers systematically buy after rises and sell after dips — backwards at every turn — with costs stacked on top",
+            "One unlucky, oversized losing trade",
+            "The moving averages were computed incorrectly"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Every signal was taken perfectly — that is the uncomfortable point. Discipline in the wrong regime just executes the losses more reliably.",
+            "Correct. A crossover needs a rise to signal 'buy' and a dip to signal 'sell'; in chop, that timing is anti-optimal at every single oscillation. The regime, not the execution, was the error.",
+            "The bleed came in ten small, systematic cuts — which is worse than bad luck, because it repeats in every sideways market forever.",
+            "The math was flawless. A perfectly computed signal applied in the wrong regime loses money with precision."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why do taxes hit fast technical systems especially hard in taxable accounts?",
+          "options": [
+            "Trading systems are taxed at a special punitive rate",
+            "Fast systems produce short-term gains taxed as ordinary income (roughly double the long-term rate for high earners) AND accelerate taxes that holding would have deferred for decades",
+            "Taxes only matter for losing systems",
+            "ETFs are tax-disadvantaged relative to single stocks"
+          ],
+          "answer": 1,
+          "feedback": [
+            "No special rate exists — the ordinary short-term capital-gains treatment is punishment enough once churn multiplies it.",
+            "Correct, and the second half is the underrated half: every early realization surrenders decades of compounding on the deferred tax. A taxable fast-trader needs points of TRUE edge just to break even with an index fund.",
+            "Winning systems pay MORE tax — the drag scales with realized gains. A pre-tax win can be an after-tax tie or worse.",
+            "Backwards: ETFs' in-kind redemption mechanism makes them unusually tax-EFFICIENT — when held. Churning them away discards that advantage."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "You test 200 parameter combinations and the best backtest returns 31%/yr. The main reason for suspicion is:",
+          "options": [
+            "31% is impossible in any market",
+            "Selecting the best of 200 fits guarantees an impressive winner even on pure noise — the search mined luck, which will not repeat out of sample",
+            "The backtest window was too long",
+            "Only 200 combinations were tried — a serious search needs thousands"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Great years and lucky strategies do hit such numbers — plausibility is exactly what makes mined results dangerous.",
+            "Correct. This is selection bias: the maximum of 200 noisy outcomes is large BY CONSTRUCTION. The mined 'edge' evaporates out of sample; the trading costs it commands do not. Pre-registration and holdouts exist precisely for this.",
+            "Longer windows generally make overfitting HARDER, not easier. The sin is the width of the search, not the length of the data.",
+            "More combinations would deepen the sin. The direction of virtue is fewer, pre-specified, economically-motivated rules."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "Six different oscillators all flash 'buy' simultaneously. How much evidence is this?",
+          "options": [
+            "Six independent confirmations — a high-conviction signal",
+            "Roughly one signal's worth: all six are computed from the same closing prices, so their agreement is one ingredient tasted six times",
+            "None — indicator agreement is always meaningless",
+            "It depends only on which six were chosen"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Independence is the missing requirement. Six transforms of ONE price series cannot confirm each other any more than six thermometers in one room measure six climates.",
+            "Correct — 'indicator soup'. RSI, stochastics, MACD, rate-of-change all remix recent closes; correlated inputs add confidence, not information. Genuine confirmation must come from a different DATA SOURCE (volume, breadth, another asset class).",
+            "One signal's worth is not nothing — the reading itself may be valid. The error is only in counting it six times.",
+            "Any six close-derived oscillators share the flaw identically; the selection barely matters. Diversify the data, not the arithmetic."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "SEC Investor.gov — Day trading: the regulator's evidence on frequent-trading outcomes",
+          "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary/day-trading",
+          "type": "reading",
+          "note": "The regulator's evidence summary on frequent-trading outcomes — blunt and well-sourced."
+        },
+        {
+          "label": "Barber & Odean — Trading Is Hazardous to Your Wealth (the canonical churn study)",
+          "url": "https://faculty.haas.berkeley.edu/odean/papers/returns/Individual_Investor_Performance_Final.pdf",
+          "type": "paper",
+          "note": "Barber & Odean's canonical churn study: the households that traded most earned least, by a wide margin."
+        }
+      ]
+    },
+    {
+      "id": "trading-with-discipline",
+      "title": "How the same tools make money — cadence, bands, pre-commitment",
+      "summary": "The profitable version differs from the losing version by discipline, not indicators: slow cadence (monthly beats daily), confirmation bands against borderline churn, rules committed before the test arrives, and drawdown avoidance — not return chasing — as the honest objective.",
+      "anim": "ta_discipline",
+      "cards": [
+        {
+          "h": "One market, three temperaments",
+          "md": "The animation runs one market — a genuine uptrend with a real bear buried inside — through three investors:\n\n- **Buy & hold** rides everything: strong finish, −41% maximum drawdown, held all the way down.\n- **The naive daily crossover** trades 24 times. And here is the honest surprise: its protection is REAL — drawdown only −30%. But whipsaws and costs churn away every dollar the protection earned. It finishes *dead even with buy & hold*, having paid 24 trades and years of stress for nothing.\n- **The disciplined rule** — checked **monthly**, against the 200-day line, with a confirmation band — trades **4 times**, sidesteps the heart of the bear (−21%), and finishes on top.\n\nSame tools. The entire difference is *cadence and confirmation*: how often you look, and how sure you must be before acting."
+        },
+        {
+          "h": "The three disciplines",
+          "md": "**1. Slow cadence.** Checking monthly instead of daily filters out almost every intramonth head-fake before it can cost anything. Our 99-year study's rule — monthly close versus the 10-month average — traded roughly *once every year and a half* on average. Slowness is not laziness; it is the cheapest whipsaw filter that exists.\n\n**2. Confirmation bands.** Requiring price to break the line by a margin (1–3%) before acting means borderline wobbles — the single most common churn source — produce no trades at all. Cheap to implement, brutal to skip.\n\n**3. Pre-commitment.** The rule is written down — trigger, size, exit — BEFORE the situation arrives. Mid-crash improvisation has the worst decision-quality of any moment in investing; a pre-committed rule is a decision made while calm, executed while not. This is the same pre-registration discipline our research studies run: the spec freezes before the results exist, so the results cannot quietly rewrite the spec."
+        },
+        {
+          "h": "What the edge actually is",
+          "md": "Look again at what the disciplined rule won: not a higher peak — a **shallower valley** (−21% vs −41%). That is the honest prize of trend rules, confirmed across a century of studies: they are **drawdown-avoidance machines, not return machines**. Their pre-tax returns roughly match buy-and-hold; their crash behavior does not.\n\nWhy drawdown is the prize worth having: a −45% loss needs +82% to recover — losses compound against you asymmetrically. And the behavioral dividend is larger still: the investor who is down 21% *stays invested and follows the rule*; the one down 45% often capitulates at the bottom, converting a paper drawdown into a permanent one.\n\nSized honestly, this is decision support, not magic: the rule tells you *what the trend is doing*; position sizing and your written plan decide what, if anything, to do about it. That ordering — regime, then rule, then sizing — is this whole module in one sentence."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "In the discipline animation, the naive daily trader achieved real crash protection (−30% vs −41%) yet finished dead even with buy & hold. What does this teach?",
+          "options": [
+            "Trend protection is worthless",
+            "Protection can be real while its entire value is churned away by whipsaws and costs — HOW a rule trades matters as much as WHETHER it works",
+            "The naive trader was unlucky and would usually win",
+            "Buy & hold is always the best strategy"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The protection showed up plainly (−30% vs −41%). The lesson is about its PRICE, not its existence.",
+            "Correct — and this is the subtlest lesson in the module. Both timing rules cut the bear; only the one that traded 6× less kept the benefit. The signal was identical; the cadence decided who profited from it.",
+            "The whipsaw drag repeats in every sideways stretch, structurally — this is the expected outcome of daily cadence, not a bad draw.",
+            "Buy & hold ate a −41% drawdown here. Whether that is acceptable is a preference — but the disciplined rule beat it on BOTH end value and valley depth."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why does adding a 1–3% confirmation band around the trend line reduce losses so much relative to its cost?",
+          "options": [
+            "It guarantees trades only happen at better prices",
+            "It removes the single most common churn source — borderline wobbles across the line — while barely delaying response to genuine breaks",
+            "It doubles the number of profitable signals",
+            "It eliminates drawdowns entirely"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Entries after a band break are slightly WORSE prices — you give up a percent or two of each real move. The win is elsewhere: all the fake moves you never traded.",
+            "Correct. Price hovering at the line generates endless costless-looking crossings that each cost real money to obey. A genuine regime break blows through a 2% band in days; a wobble never does.",
+            "It REDUCES signal count — that is the mechanism. Fewer, better-confirmed signals.",
+            "Drawdowns within the trend remain untouched. The band only kills the churn tax at the boundary."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Trend-following's honest, century-backed edge is best described as:",
+          "options": [
+            "Substantially higher returns than buy & hold",
+            "Predicting market tops within weeks",
+            "Roughly market-like pre-tax returns with substantially shallower crash drawdowns — a drawdown-avoidance machine, not a return machine",
+            "Eliminating the need for diversification"
+          ],
+          "answer": 2,
+          "feedback": [
+            "The century-long studies show trend returns roughly MATCHING buy-and-hold pre-tax (often trailing after tax). Anyone selling trend as a return enhancer is selling the wrong property.",
+            "Trend rules confirm tops months late by construction — the lag lesson from the moving-average chapter. They avoid the MIDDLE of crashes, never the start.",
+            "Correct. The prize is the shallower valley — mathematically (a −45% loss needs +82% back) and behaviorally (investors follow rules from −21%; they capitulate from −45%).",
+            "A timing rule on one index is concentration WITH extra steps. Diversification across assets remains the first-order defense; trend can layer on top."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "Why must the rule be written down before the crash, rather than decided during it?",
+          "options": [
+            "Written rules are legally binding on brokers",
+            "Mid-crash decisions are made under the worst psychological conditions in investing; pre-commitment lets the calm version of you govern the panicked one",
+            "Because rules cannot be changed once written",
+            "It makes no practical difference"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Nothing legal about it — the binding is psychological, on yourself.",
+            "Correct. This is pre-registration applied to money: the spec is frozen before the test arrives, so fear cannot quietly rewrite it at the worst possible moment. Our research studies run the identical discipline for the identical reason.",
+            "Rules can be revised — calmly, between regimes, on schedule. What pre-commitment forbids is IMPROVISING the revision at the bottom, which is when every revision is a capitulation wearing a rationale.",
+            "The difference is measurable and large: panic selling at bottoms is the single most documented wealth-destroying behavior in retail investing."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "AQR — A Century of Evidence on Trend-Following Investing",
+          "url": "https://www.aqr.com/Insights/Research/White-Papers/A-Century-of-Evidence-on-Trend-Following-Investing",
+          "type": "paper",
+          "note": "AQR's century-scale evidence — the honest version of what trend rules do and don't deliver."
+        },
+        {
+          "label": "Meb Faber — A Quantitative Approach to Tactical Asset Allocation (the 10-month rule)",
+          "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461",
+          "type": "paper",
+          "note": "The 10-month SMA study this module's slow-cadence doctrine descends from; short, readable, replicated."
+        }
+      ]
+    },
+    {
+      "id": "etf-playbook",
+      "title": "The ETF playbook — putting it together",
+      "summary": "The full stack assembled for an ETF investor: regime first (200-day line + ADX), oscillators as junior context, ATR for sizing, slow cadence with bands, everything pre-written. Plus the relative-strength screen — TA's most defensible active use — and the checklist that decides when NOT to act.",
+      "cards": [
+        {
+          "h": "The stack, in order",
+          "md": "For a long-horizon ETF investor, the tools assemble in strict order — each layer only meaningful given the one above:\n\n1. **Policy** (not TA): your allocation, written down. TA never overrides policy; at most it times moves *within* policy bands.\n2. **Regime**: monthly close vs the 200-day/10-month line, with a 1–3% band. ADX if you want a second opinion on whether trend exists.\n3. **Relative strength (RS)**: WHICH funds — rank candidate ETFs by 3–12-month return versus a benchmark. Cross-sectional momentum is among the most replicated effects in finance, and between broad liquid funds, rotating is cheap and single-name risk is absent. This is TA's most defensible active use.\n4. **Oscillators/bands**: junior timing inside an established regime — an RSI dip in an uptrend to place an add-on. Never primary.\n5. **ATR**: sizes the position and sets stops wide enough to ignore noise.\n\nMost of the value is in layers 1–2. Each layer below adds less and churns more — stop descending when honest."
+        },
+        {
+          "h": "The pre-flight checklist",
+          "md": "Before any TA-motivated trade, six questions on paper:\n\n1. **Regime**: which side of the 200-day line, and did it break the band — or am I trading a wobble?\n2. **Trend strength**: ADX above 20, or am I taking a trend signal in certified chop?\n3. **Signal source**: computable and pre-committed — or drawn/improvised after looking?\n4. **Cost**: spread + slippage + expected tax. Does the expected edge clear the bill *after tax*?\n5. **Size**: from ATR and risk budget — or from conviction and adrenaline?\n6. **Exit**: written down NOW, both directions?\n\nAny 'no' is a stop. In practice the checklist's main output is **inaction** — it exists to block the trades that the whipsaw chapter showed are the default outcome of enthusiasm plus indicators. The best TA decision most months is the one you do not make."
+        },
+        {
+          "h": "What this module wants you to remember",
+          "md": "- TA is a **regime detector**, honest about the present, mute about the future.\n- Moving averages trade noise for lag; **the period IS the strategy**. Exponential just reshapes the memory.\n- Everything reads cleaner on **broad ETFs** — diversification deletes the news channel that charts cannot see.\n- Oscillator extremes mean **opposite things** in trends and ranges; bring the regime answer to the oscillator, never ask it.\n- Naive TA loses money **by design**: whipsaws, costs, taxes, overfits, soup.\n- Disciplined TA is slow, banded, pre-committed — and its real product is **shallower drawdowns**, which is precisely why this house treats it as decision support inside a written policy, never as the policy itself.\n\nIf one sentence survives: **the indicator was never the edge; the discipline around it was.**"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "In the playbook's stack, why does relative strength (RS) rotation among broad ETFs rank as TA's most defensible active use?",
+          "options": [
+            "RS predicts exact future returns of each fund",
+            "Cross-sectional momentum is among the most replicated effects in finance, and between diversified liquid funds it is cheap to harvest with no single-name risk",
+            "Broad ETFs never go down, so any rotation works",
+            "Regulators endorse RS strategies specifically"
+          ],
+          "answer": 1,
+          "feedback": [
+            "RS ranks RELATIVE recent performance; it predicts nothing exactly. Its edge is statistical persistence in the cross-section, not forecasts.",
+            "Correct. The momentum literature is a century deep and survives out-of-sample; ETFs remove the two classic implementation killers (illiquidity and single-name blowups). Persistent effect + cheap vehicle = the defensible corner of active TA.",
+            "Broad ETFs fall plenty — 2008 took the S&P down 55%. RS chooses among funds; the regime layer above it decides whether to be invested at all.",
+            "No regulator endorses strategies. The endorsement that matters is replication across decades, markets, and researchers."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why does the checklist treat 'the trade I don't make' as its main product?",
+          "options": [
+            "Because trading is always wrong",
+            "Because the loss chapters showed the default outcome of indicators-plus-enthusiasm is churn: most TA-motivated trade impulses fail at least one honest gate, and blocking them is where the money is saved",
+            "Because checklists are mainly for record-keeping",
+            "Because brokers reward low-activity accounts"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The disciplined animation's four trades were all worth making. The target is the OTHER twenty impulses.",
+            "Correct. The whipsaw math showed naive activity has negative expected value after costs; a gate that filters borderline signals converts that arithmetic from working against you to working for you.",
+            "The record matters (it is how you audit yourself honestly), but the live function is the veto.",
+            "No such reward exists from brokers — their incentive is the opposite, which is worth remembering when platforms gamify trading."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Your written policy says 60% equities. The 200-day regime line breaks decisively. What does disciplined TA permit?",
+          "options": [
+            "Selling all equities — the chart overrides the policy",
+            "Nothing — TA information may never influence anything",
+            "A pre-planned adjustment WITHIN the policy's bands (say 60%→50% if the plan says so); the policy is the constitution, TA at most times moves inside it",
+            "Doubling equities to buy the dip"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Policy-override is how a tool becomes a temptation — the moment charts outrank the constitution, every scary day renegotiates your allocation.",
+            "Too far the other way: a written plan may legitimately pre-authorize band moves keyed to regime signals. Discipline means the RESPONSE was decided in advance, not that no response exists.",
+            "Correct — this is the module's governing sentence: regime, then rule, then sizing, all inside policy. The signal informs a pre-authorized adjustment; it never invents one.",
+            "Some plans do pre-authorize contrarian adds — but 'double it' on impulse is improvisation, and mid-break improvisation is the exact failure mode pre-commitment exists to prevent."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "AQR — Value and Momentum Everywhere (the cross-sectional momentum evidence)",
+          "url": "https://www.aqr.com/Insights/Research/Journal-Article/Value-and-Momentum-Everywhere",
+          "type": "paper",
+          "note": "The cross-sectional momentum evidence behind relative-strength rotation — AQR's most-cited paper."
+        },
+        {
+          "label": "SEC Investor.gov — Exchange-traded funds: the vehicle-level basics",
+          "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-funds-etfs",
+          "type": "reading",
+          "note": "The vehicle-level ETF basics from the regulator — creation/redemption, costs, tax mechanics."
+        }
+      ]
     }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "What is the most defensible claim technical analysis can make?",
-     "options": [
-      "Chart patterns predict specific future prices with reliable accuracy",
-      "Prices trend more persistently than chance allows, and TA can characterize the current regime",
-      "Price history contains all future information, so charts anticipate news",
-      "TA identifies the intrinsic fair value of an asset"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That is the strong claim, and it fails testing — pattern-based price targets have no robust predictive record. The defensible version is weaker and regime-shaped.",
-      "Right. The momentum and trend literature supports persistence beyond chance, which makes TA a useful regime detector — while specific price prediction remains out of reach.",
-      "Backwards — news that has not happened cannot be in price history. Overnight gaps are the standing proof: information lands ON the chart, it does not pass through it first.",
-      "Intrinsic value is fundamental analysis's department (earnings, assets, discount rates). TA deliberately ignores the business and studies only price and volume behavior."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why does the same moving-average rule tend to work better on a broad ETF than on a single stock?",
-     "options": [
-      "ETFs are managed by professionals who keep prices trending",
-      "ETF prices update less frequently, giving the average time to catch up",
-      "Idiosyncratic company news largely cancels across holdings, leaving the shared trend the indicator is built to read",
-      "Regulators dampen ETF volatility by rule"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Most broad ETFs are passive index trackers — nobody is steering the price. The advantage is statistical (diversification), not managerial.",
-      "ETF prices tick all day exactly like stocks. Update frequency is not the difference; composition is.",
-      "Correct. One company's earnings shock is ~0.2% of a 500-stock fund, so the fund's chart is mostly the shared regime component — exactly what trend tools measure.",
-      "There is no such volatility rule. ETF prices are set by the same open market; their smoothness comes from averaging 500 stories, not from regulation."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "A stock gaps down 18% overnight on an earnings miss. What does this illustrate about stock-level TA?",
-     "options": [
-      "The trader should have used a faster moving average to catch it",
-      "A stop-loss order at −5% would have fully protected the position",
-      "The chart was wrong but the next pattern will compensate",
-      "A large share of single-stock risk arrives as news that price history cannot contain"
-     ],
-     "answer": 3,
-     "feedback": [
-      "No average of PAST prices — however fast — can react to information that arrives while markets are closed. The gap skips over every indicator level at once.",
-      "A stop-loss executes at the next available price. After an overnight gap, that is −18%, not −5% — stops do not protect through gaps, which is a nasty surprise the first time it happens.",
-      "Charts are not owed compensation. The gap is not an indicator error to be reversed; it is information arriving through a channel price history does not carry.",
-      "Exactly. Earnings, lawsuits, and announcements land ON the chart from outside. Diversified ETFs shrink this channel to near-irrelevance, which is why this module prefers them."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "Investor.gov — Technical analysis (the regulator's sober framing)",
-     "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary/technical-analysis",
-     "type": "reading",
-     "note": "The regulator's two-paragraph framing — usefully unexcited about what TA can claim."
-    },
-    {
-     "label": "StockCharts ChartSchool — Overview of technical analysis",
-     "url": "https://school.stockcharts.com/doku.php?id=overview:technical_analysis",
-     "type": "docs",
-     "note": "The standard free reference for every indicator in this module; start here when a term is fuzzy."
-    }
-   ]
-  },
-  {
-   "id": "moving-averages",
-   "title": "Moving averages — smoothing bought with lag",
-   "summary": "The simple moving average (SMA) replaces each day's price with the average of the last N closes. Longer windows mean smoother lines and later turns: every choice of N is a position on the noise-versus-lag dial, and choosing it IS the strategy decision.",
-   "anim": "ta_sma",
-   "cards": [
-    {
-     "h": "The mechanic",
-     "md": "A **simple moving average (SMA)** of length N is the arithmetic mean of the last N closing prices, recomputed each day as the window slides forward. SMA-10 averages two trading weeks; SMA-50 about a quarter; SMA-200 about a year.\n\nAveraging is a **low-pass filter**: day-to-day noise (which flips sign constantly) cancels against itself inside the window, while the trend (which points one way for months) survives. The longer the window, the more noise dies — and the more slowly the line responds when the trend genuinely changes.\n\nThat is the entire trade-off, and there is no third dial: **smoothness and responsiveness are the same budget spent two ways.**"
-    },
-    {
-     "h": "The canonical periods — and what each is for",
-     "md": "- **SMA-10/20** — tactical: hugs price, turns quickly, whipsaws constantly. Readable only in strong trends.\n- **SMA-50** — the intermediate trend line traders quote; a reasonable compromise for position management.\n- **SMA-200** — the **regime line**. Price above it = bull regime odds; below = bear regime odds. This is the average the long academic studies use, because at 200 days most of what remains is signal.\n\nNote what the period really encodes: **your holding horizon**. A 10-day average asks 'what happened these two weeks?' — a question only a short-term trader should care about. If your horizon is years, indicators built on days are answering someone else's question."
-    },
-    {
-     "h": "Lag is the price of truth",
-     "md": "At every genuine turn, a moving average is **late by design** — roughly half its window. SMA-200 confirms a top ~4–5 months after the top. This feels like a defect; it is actually the fee for filtering.\n\nThe useful reframe: a moving average never tells you what price *will* do. It tells you, with a chosen confidence, what price *has been* doing — and persistent trends make 'has been' informative about 'is'.\n\nOur own 99-year monthly study uses exactly one such line (a 10-**month** average, close cousin of SMA-200) as its trend gate. Slow, unfashionable — and it defended every major crash since 1929. The fashionably fast averages did not survive their own trading costs, as you will see in the whipsaw lesson."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "What is the fundamental trade-off in choosing a moving-average period?",
-     "options": [
-      "Longer averages are more accurate in every respect",
-      "Smoothness and responsiveness are one budget: less noise necessarily means more lag",
-      "Shorter averages are better for long-term investors because they update faster",
-      "The period only affects how the line looks, not any decision it drives"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Longer windows are smoother but LATER — a 200-day average confirms a turn months after it happens. 'Accurate' depends on which error you care about: noise or lag.",
-      "Correct. Averaging is a low-pass filter: each extra day of window cancels more noise and adds more delay. Every period choice is a position on that single dial.",
-      "Backwards pairing. A fast average asks a two-week question; a long-horizon investor needs the year-scale question. Matching the window to your holding horizon is the point.",
-      "The period changes WHEN the line crosses price — which is exactly the event trading rules key on. It is the single most consequential parameter in trend-following."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why does the SMA-200 earn the name 'regime line'?",
-     "options": [
-      "It reacts fastest to regime changes among common averages",
-      "Exchanges use it to classify bull and bear markets officially",
-      "It equals the market's average annual return",
-      "At ~200 days of smoothing, mostly trend survives — so which side price is on describes the prevailing regime"
-     ],
-     "answer": 3,
-     "feedback": [
-      "It is the SLOWEST of the common set — that is precisely why its verdict is trustworthy. Speed and trustworthiness point opposite ways here.",
-      "No official body classifies regimes by moving average. The name is earned statistically: above/below SMA-200 historically separates very different return and volatility environments.",
-      "The SMA-200 is an average of PRICES over ~a year, not a return figure. Its level means nothing alone; price's position relative to it is the signal.",
-      "Right. With a year of smoothing, daily and weekly noise is nearly gone. What remains — and which side of it price trades on — is a fair one-line summary of the regime."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "A 200-day SMA confirms a market top roughly how long after the actual top, and why?",
-     "options": [
-      "Months later — an average lags by about half its window; that delay is the cost of its noise filtering",
-      "The same day, if computed correctly",
-      "It anticipates tops slightly, because institutions front-run it",
-      "About two weeks later, regardless of window length"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Correct — call it 4–5 months. The window still contains months of pre-top prices, which hold the average up. That lag is not a bug; it is the fee for ignoring noise.",
-      "Impossible by construction: the day after a top, 199 of the 200 window days are still pre-top prices. The average CANNOT turn immediately.",
-      "An average of past prices anticipates nothing. Front-running behavior around popular levels exists but does not change the arithmetic of lag.",
-      "Lag scales with the window — that is the entire smoothing trade-off. A 10-day average lags days; a 200-day average lags months."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "StockCharts ChartSchool — Moving averages (SMA/EMA mechanics)",
-     "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages",
-     "type": "docs",
-     "note": "SMA vs EMA mechanics with worked examples — the arithmetic behind the smoothing-vs-lag dial."
-    },
-    {
-     "label": "Meb Faber — A Quantitative Approach to Tactical Asset Allocation (the 10-month SMA study)",
-     "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461",
-     "type": "paper",
-     "note": "The 10-month SMA study this module's slow-cadence doctrine descends from; short, readable, replicated."
-    }
-   ]
-  },
-  {
-   "id": "exponential-averages",
-   "title": "Exponential and weighted averages — choosing a memory",
-   "summary": "The exponential moving average (EMA) weights the newest prices most, decaying by a constant factor 2/(N+1). Same nominal length as an SMA, faster response — and faster response to noise too. The average family is a menu of memory shapes, not a ladder of quality.",
-   "anim": "ta_ema",
-   "cards": [
-    {
-     "h": "EMA: exponential memory",
-     "md": "The **exponential moving average (EMA)** blends each new price into a running value: `EMA_today = price × k + EMA_yesterday × (1−k)`, with smoothing constant **k = 2/(N+1)**. For N=40, k≈0.049 — each day the newest close gets ~4.9% of the weight and everything older decays by ×0.951.\n\nTwo consequences:\n- **Front-loaded memory** — the most recent days dominate, so the EMA responds to genuine changes noticeably faster than an SMA of the same N.\n- **No cliff** — an SMA *completely forgets* day N+1 in one step (which can jerk the line when a big old day drops out of the window). The EMA fades the past out smoothly; nothing ever falls off an edge."
-    },
-    {
-     "h": "The rest of the family",
-     "md": "- **Weighted moving average (WMA)** — linear weights (N, N−1, …, 1): front-loaded like the EMA, but with a hard cutoff like the SMA. A halfway house.\n- **Hull moving average (HMA)** — a WMA-of-WMAs construction that cuts lag dramatically; the cost is **overshoot** at turns (it swings past the price like an under-damped spring).\n- **Volume-weighted average price (VWAP)** — weights by traded volume; an execution benchmark for measuring fill quality far more than a signal line.\n\nThe honest summary: these are different **memory shapes** — flat with a cliff (SMA), fading (EMA), triangular (WMA). None dominates. Every reduction in lag is paid for in noise sensitivity or overshoot, always."
-    },
-    {
-     "h": "Fast is a choice, not an upgrade",
-     "md": "Because the EMA responds faster, it is tempting to call it 'better.' Resist that. The same responsiveness that catches a real turn 10 days earlier also chases a false wiggle 10 days earlier — and in a sideways market, false wiggles outnumber real turns badly. A faster average almost always means **more signals**, and in TA more signals means more costs, more taxes, more whipsaws.\n\nPractical guidance for an ETF investor:\n- Long-horizon regime reading → **SMA-200 or the 10-month SMA**; the lag is affordable, the reliability compounds.\n- If you genuinely operate at weeks-scale → EMA, accept the extra false positives knowingly.\n- Nobody needs the exotic averages to invest well. The **famous MACD indicator** (next lessons) is built from two EMAs — that is where exponential memory earns its keep."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "For an EMA of nominal length N, the weight on today's price is 2/(N+1). What does this construction imply?",
-     "options": [
-      "The EMA weights all N days equally, then discards older ones",
-      "Recent prices dominate and older prices decay geometrically — nothing ever falls off a cliff",
-      "The EMA is an average of the highest and lowest prices in the window",
-      "The EMA requires exactly N days of data before it is defined"
-     ],
-     "answer": 1,
-     "feedback": [
-      "That describes the SIMPLE moving average. The EMA's entire point is unequal weighting — newest counts most, with smooth geometric decay behind it.",
-      "Correct. Each day, old information fades by a constant factor rather than being dropped. That's why an EMA responds faster than an SMA of the same nominal length, and never jerks when an old day 'exits the window' — no window exists.",
-      "That's a midpoint/range calculation (related to Donchian channels), not an exponential average. The EMA uses closes, exponentially weighted.",
-      "An EMA can start from the first data point and simply becomes more meaningful as history accumulates — unlike the SMA, which is undefined until N closes exist."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Price steps up 18% and holds. A 40-day EMA and a 40-day SMA both track it. What happens?",
-     "options": [
-      "Both reach the new level after exactly 40 days, by definition of length",
-      "The SMA arrives first because simple averages are more direct",
-      "The EMA covers most of the gap much sooner; the SMA grinds up linearly over the full 40 days",
-      "Neither ever fully reaches the new level"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Only the SMA is bound to the 40-day arithmetic. The EMA's front-loaded weights let it absorb most of the step in roughly a third of the nominal window.",
-      "The SMA is the slow one here: each day only swaps one old price for one new one, so it climbs in equal daily steps for 40 days.",
-      "Right — front-loaded memory means fast absorption of new information. Remember the symmetric cost: it absorbs noise equally fast.",
-      "The EMA asymptotically closes the whole gap (each day covering ~4.9% of what remains), and the SMA closes it exactly at day 40. Both get there."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why is 'the EMA is better than the SMA because it reacts faster' a mistake?",
-     "options": [
-      "It is not a mistake — faster reaction is strictly better",
-      "EMAs are computationally too expensive for daily use",
-      "The EMA's math only works on stocks, not ETFs",
-      "Faster reaction to real turns is inseparable from faster reaction to noise — in choppy markets that means more false signals, trades, and costs"
-     ],
-     "answer": 3,
-     "feedback": [
-      "Strictly better would require reacting faster to signal WITHOUT reacting faster to noise. No average can distinguish the two in real time — that information does not exist yet.",
-      "An EMA is one multiply and one add per day — cheaper than an SMA if anything. The objection is statistical, not computational.",
-      "The arithmetic is identical on any price series. Vehicle choice changes signal-to-noise, not the formula.",
-      "Correct. Speed is a CHOICE about which error to prefer (lag vs false positives), not an upgrade. In sideways regimes false wiggles vastly outnumber real turns, so the fast average pays more in whipsaws than it earns at turns."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "StockCharts ChartSchool — Moving averages: SMA vs EMA weighting",
-     "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages",
-     "type": "docs",
-     "note": "SMA vs EMA mechanics with worked examples — the arithmetic behind the smoothing-vs-lag dial."
-    },
-    {
-     "label": "Investopedia — Exponential moving average (EMA), formula and worked examples",
-     "url": "https://www.investopedia.com/terms/e/ema.asp",
-     "type": "article",
-     "note": "The EMA formula with the 2/(N+1) constant worked through — good for checking your own arithmetic."
-    }
-   ]
-  },
-  {
-   "id": "crossovers-and-regime",
-   "title": "Crossovers, the golden cross, and trend strength",
-   "summary": "Crossover rules turn averages into signals: price-vs-average or fast-average-vs-slow-average. The golden cross (SMA-50 above SMA-200) is the famous one. Crossovers define regimes well and time entries poorly — and the average directional index (ADX) tells you whether there is even a trend to follow.",
-   "cards": [
-    {
-     "h": "Two families of crossover",
-     "md": "- **Price vs average**: bullish while price holds above the line — e.g. price above SMA-200 as a regime test. One moving part, easy to reason about; our house studies use exactly this form (monthly close vs the 10-month average).\n- **Fast average vs slow average**: the **golden cross** (SMA-50 crosses above SMA-200) and its mirror the **death cross** (50 below 200). Two smoothed lines mean fewer, later, but cleaner signals than raw price crossings.\n\nEvery crossover inherits the lag of its slowest component. A golden cross confirms a bull regime that is typically already months old. As **confirmation**, that is fine. As a prediction of imminent gains, it is a misreading of what the tool measures — the cross says where you ARE, not where you are going."
-    },
-    {
-     "h": "Is there a trend at all? ADX",
-     "md": "Trend rules silently assume a trend exists. The **average directional index (ADX)** measures whether that assumption currently holds — it quantifies trend *strength*, direction-blind, on a 0–100 scale:\n- **Below ~20**: no meaningful trend. Crossover signals in this zone are mostly noise — this is whipsaw country.\n- **Above ~25–30**: a real trend is in force, in whichever direction.\n\nThis single filter kills a huge fraction of naive losses: the deadly move is taking every crossover in a flat market, paying full costs for signals with no informational content. Checking ADX (or any regime measure) before acting on a cross is the difference between using a tool and being used by it. The same 'condition + trigger' logic runs our own Stormwatch monitor: a macro condition must be armed AND the trend must break — either alone does nothing."
-    },
-    {
-     "h": "Support, resistance, and honest lines",
-     "md": "Classic TA draws **support** (a level where declines have stopped) and **resistance** (where rallies have stalled). The behavioral story is real enough — orders cluster at memorable prices, and round numbers anchor decisions — but these levels are drawn by eye, which makes them unfalsifiable: miss and the line was 'broken', hold and it 'worked'.\n\nMoving averages and ADX, whatever their limits, are **computable** — two people get the same line from the same data, so the rule can be backtested and the backtest can be audited.\n\nHouse rule for everything that follows: *if a signal cannot be computed identically by two people, it cannot be tested; if it cannot be tested, it is a story, not a strategy.*"
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A golden cross (SMA-50 crossing above SMA-200) prints today. What has actually happened?",
-     "options": [
-      "A statistically reliable buy point for the next month has been identified",
-      "Two lagged summaries of past prices now agree the regime has been bullish for a while — a confirmation, not a forecast",
-      "Institutional buying is guaranteed to follow the signal",
-      "The market has bottomed"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Short-horizon returns after golden crosses are barely distinguishable from any other day. Its value is regime description, not entry timing.",
-      "Correct. Both averages are backward-looking; their agreement certifies an established uptrend. Useful as a regime gate — misread as a prediction.",
-      "Some funds do watch these levels, but nothing is guaranteed — and any mechanical front-running is itself arbitraged. The cross carries no enforcement mechanism.",
-      "The cross typically prints months AFTER a bottom — the 200-day component needs that long to turn. If anything it certifies the bottom is well behind you."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The average directional index (ADX) reads 14. A fast/slow crossover just fired. The disciplined read is:",
-     "options": [
-      "Take the trade — every signal must be taken to preserve the system's statistics",
-      "Take double size — low ADX means the move is early",
-      "ADX below ~20 says there is no trend in force: crossover signals here are mostly noise, and skipping them avoids classic whipsaw losses",
-      "Invert the signal and trade the other way"
-     ],
-     "answer": 2,
-     "feedback": [
-      "'Take every signal' applies within a REGIME the system was designed for. A trend signal in a certified no-trend regime is out of contract — filtering it IS the system.",
-      "Low ADX means no trend EXISTS, not that one is young. Sizing up on a noise signal compounds the error.",
-      "Right. Crossovers assume trend persistence; ADX under ~20 says persistence is currently absent. This one filter removes a large share of naive TA losses.",
-      "Chop punishes both directions equally — the whipsaw doesn't care which way you lean. The correct position in certified chop is usually no new position."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why does this course prefer computable signals (averages, ADX) over hand-drawn support and resistance?",
-     "options": [
-      "Hand-drawn levels have no behavioral basis whatsoever",
-      "Computable rules give identical output for identical input — so they can be backtested, audited, and falsified; drawn lines can always be redrawn",
-      "Computable indicators are always profitable",
-      "Support and resistance are illegal to use in managed accounts"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The behavioral basis (order clustering, round-number anchoring) is real. The problem is testability: an eyeballed line flexes to fit whatever happened.",
-      "Correct — this is the falsifiability standard the house applies to everything: a rule two people compute identically can be tested and can FAIL honestly. A story that bends cannot.",
-      "Plenty of computable rules lose money reliably — the whipsaw lesson is built on one. Computability buys testability, not profit.",
-      "Nothing illegal about drawn levels. The objection is epistemic (unfalsifiable), not regulatory."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "StockCharts ChartSchool — Average directional index (ADX)",
-     "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:average_directional_index_adx",
-     "type": "docs",
-     "note": "How ADX quantifies trend strength — the filter that keeps crossover signals out of chop."
-    },
-    {
-     "label": "Investopedia — Golden cross: definition and the confirmation-vs-prediction caveat",
-     "url": "https://www.investopedia.com/terms/g/goldencross.asp",
-     "type": "article",
-     "note": "Defines the golden cross and, importantly, its confirmation-not-prediction caveat."
-    }
-   ]
-  },
-  {
-   "id": "oscillators",
-   "title": "Oscillators — RSI, MACD, and the overbought myth",
-   "summary": "Oscillators compress recent price action into a bounded gauge: the relative strength index (RSI) and the moving average convergence divergence (MACD) are the canon. Their readings mean opposite things in trending versus ranging regimes — the most common way retail traders misuse them.",
-   "cards": [
-    {
-     "h": "RSI — speed, not value",
-     "md": "The **relative strength index (RSI)**, standard period 14, compares average up-day gains to average down-day losses and maps the ratio to 0–100. Above 70 is conventionally 'overbought', below 30 'oversold'.\n\nThe trap is in those words: they imply *mispricing* — too expensive, must fall. RSI measures nothing of the sort. It measures **how fast price has been climbing recently** — recent one-directional speed, full stop.\n\nIn a **range**, speed does mean-revert, and fading RSI extremes works passably. In a **trend**, sustained speed is the trend's defining feature: RSI can pin above 70 for months in a strong bull market while prices double. Selling 'overbought' in a real uptrend is how disciplined-sounding traders systematically exit winners early — the same regime error as trading crossovers in chop, mirrored."
-    },
-    {
-     "h": "MACD — trend arithmetic made visible",
-     "md": "The **moving average convergence divergence (MACD)** is built from the exponential averages you already know: the **MACD line** = EMA-12 − EMA-26 (the gap between fast and slow memory), and the **signal line** = a 9-day EMA of that gap. The **histogram** plots their difference.\n\nRead it as trend calculus: MACD above zero ⇒ the fast average is above the slow (uptrend in force); the histogram shrinking ⇒ the trend is decelerating. A widely-watched subtlety is **divergence** — price makes a new high while the oscillator makes a lower high, suggesting the advance is thinning.\n\nBecause MACD is unbounded and built purely from EMAs, it is a *trend* tool wearing an oscillator's clothes — it inherits every property of the averages inside it, lag included. It is not new information; it is the same information, differenced and made legible."
-    },
-    {
-     "h": "The regime decides which oscillator logic applies",
-     "md": "The stochastic oscillator, rate-of-change, Williams %R — the extended oscillator family all remix one quantity: recent price change, normalized. So one rule governs them all:\n\n**In ranges, extremes mean reversal. In trends, extremes mean strength.** The oscillator cannot tell you which regime you are in — you must bring that answer TO the indicator, from the regime tools (the 200-day line, ADX).\n\nThis composes into the honest workflow: regime first (trend line + ADX), *then* the oscillator as a junior input — timing an add-on within an established trend, or spotting exhaustion in a certified range. An oscillator promoted to primary signal, with no regime check above it, is one of the most reliable money-losing machines in retail finance."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "RSI has read above 70 ('overbought') for six weeks while an ETF keeps climbing. What is the correct interpretation?",
-     "options": [
-      "The ETF is mispriced and a crash is imminent",
-      "The indicator is broken and should be recalculated",
-      "Persistent high RSI in an uptrend is the signature of trend strength — 'overbought' implies mispricing, which RSI does not measure",
-      "Someone is manipulating the ETF's price"
-     ],
-     "answer": 2,
-     "feedback": [
-      "RSI knows nothing about value — no earnings, no yields, no comparisons. It measures recent climb speed, and strong trends climb fast for months. The 1990s bull pinned RSI high for YEARS.",
-      "The indicator is doing exactly its job: reporting sustained one-directional speed. The error would be in the reader's regime assumption, not the arithmetic.",
-      "Correct. In ranges, speed extremes revert; in trends, speed extremes ARE the trend. Selling every 'overbought' reading in a bull market is systematic early exit from winners.",
-      "Sustained strength is what every genuine bull market looks like on this gauge. Reaching for manipulation to explain a normal reading is a category error."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "The MACD line is EMA-12 minus EMA-26. What does MACD crossing above zero mean, mechanically?",
-     "options": [
-      "The fast EMA has moved above the slow EMA — the same event as a moving-average crossover, expressed as a difference",
-      "The asset's price has become positive",
-      "Volume has exceeded its monthly average",
-      "The RSI has confirmed the move"
-     ],
-     "answer": 0,
-     "feedback": [
-      "Exactly. MACD > 0 ⇔ EMA-12 > EMA-26. The zero-cross IS an average crossover, just plotted as a difference — which is why MACD inherits crossover lag and crossover whipsaws.",
-      "MACD is a difference of two averages OF price; its sign says nothing about the price level itself, only which average is on top.",
-      "No volume enters the MACD's arithmetic anywhere — it is prices only, twice smoothed, once differenced.",
-      "RSI is a separate calculation entirely. MACD's components are the two EMAs and nothing else."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Why should an oscillator never be the primary signal without a regime check above it?",
-     "options": [
-      "Oscillators are computed from unreliable data feeds",
-      "Oscillator extremes mean opposite things in trends (strength) versus ranges (reversal) — and the oscillator itself cannot tell you which regime you are in",
-      "Oscillators only work on daily charts",
-      "Regulators require moving averages to be checked first"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Same closes, same feed as every other indicator. The problem is interpretive, not data quality.",
-      "Correct — this is the central oscillator failure mode. The regime answer must come from OUTSIDE (the 200-day line, ADX); brought to the oscillator, its readings become useful; without it, they alternate between meanings invisibly.",
-      "The arithmetic is timeframe-agnostic; the regime-dependence problem follows it to every timeframe identically.",
-      "No such rule exists. The ordering is statistical hygiene, not regulation: context first, junior signal second."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "StockCharts ChartSchool — Relative strength index (RSI), including trend-range behavior",
-     "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:relative_strength_index_rsi",
-     "type": "docs",
-     "note": "RSI construction plus the trend-vs-range behavior that the overbought myth ignores."
-    },
-    {
-     "label": "StockCharts ChartSchool — MACD, construction and divergence",
-     "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_average_convergence_divergence_macd",
-     "type": "docs",
-     "note": "MACD assembled from its two EMAs — makes the 'trend tool in oscillator clothing' point visible."
-    }
-   ]
-  },
-  {
-   "id": "bands-volatility-volume",
-   "title": "Bands, volatility, and volume — the context layer",
-   "summary": "Bollinger Bands wrap a moving average in standard-deviation envelopes; the average true range (ATR) prices a day's normal motion; on-balance volume (OBV) and market breadth ask whether the crowd agrees with the price. None are entry signals — all are context that disciplines the signals you already have.",
-   "cards": [
-    {
-     "h": "Bollinger Bands — volatility made visible",
-     "md": "**Bollinger Bands** draw a 20-day SMA with envelopes ±2 standard deviations of recent price around it. Since the width is recomputed daily, the bands breathe with volatility: wide in storms, tight in calm.\n\nTwo honest uses:\n- **The squeeze** — unusually tight bands mark compressed volatility; volatility is strongly cyclical, so compression tends to precede expansion. Note carefully: the squeeze forecasts *bigger moves*, *unknown direction*.\n- **Band-touch context** — in a RANGE, tagging a band marks an extreme worth fading; in a TREND, price legitimately 'walks the band' for weeks. The same regime split as RSI, and the same trap: selling every upper-band touch in a bull market bleeds a portfolio dry one early exit at a time."
-    },
-    {
-     "h": "ATR — the unit of normal motion",
-     "md": "The **average true range (ATR)** averages the daily 'true range' (the day's high–low span, gap-adjusted) over ~14 days: one number that says what a NORMAL day's movement costs in dollars.\n\nIts best use is not signaling at all — it is **calibration**:\n- **Stops**: a stop 0.5×ATR away will be hit by ordinary noise (a coin-flip exit dressed up as discipline); ~2–3×ATR distinguishes 'thesis wrong' from 'Tuesday'.\n- **Position sizing**: dividing risk budget by ATR normalizes positions so a volatile ETF and a quiet one contribute comparable daily risk — the retail-accessible version of institutional vol-targeting.\n\nATR is where TA quietly converges with risk management — arguably the most valuable single page in the whole technical toolkit."
-    },
-    {
-     "h": "Volume and breadth — does the crowd agree?",
-     "md": "Price says what happened; volume says **how many participants it took**. A breakout on heavy volume reflects broad agreement; the same breakout on thin volume is a rumor that can be reversed by the first real seller. **On-balance volume (OBV)** runs the tally cumulatively — adding volume on up days, subtracting on down days — so its *divergence* from price (price rising, OBV flat) flags advances running on fumes.\n\nAt the market level the same question becomes **breadth**: how many STOCKS are participating? The **advance–decline line** and the McClellan family measure whether an index rally is an army or three generals — a handful of mega-caps dragging the capitalization-weighted index up while the median stock stalls. Breadth divergence preceded several major tops (2000, 2007). For an index-ETF investor, breadth is the volume-question at the only scale that matters: is the market's trend broad enough to trust?"
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "A Bollinger Band squeeze (unusually tight bands) tells you what?",
-     "options": [
-      "A breakout upward is coming",
-      "A breakdown downward is coming",
-      "Volatility is compressed and likely to expand — direction unknown",
-      "The moving average has stopped working"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Half right, dangerously. Squeezes precede expansions in EITHER direction — buying every squeeze longs a coin flip.",
-      "The mirror half of the same mistake — the squeeze is direction-blind by construction.",
-      "Correct. Volatility clusters and cycles: compression tends to resolve into expansion. The squeeze times WHEN movement is likely, and says nothing about WHICH WAY.",
-      "The bands ARE the average plus volatility envelopes, working as designed — tightness is a reading, not a malfunction."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why is a stop-loss placed 0.5×ATR from entry usually a design error?",
-     "options": [
-      "It risks too much capital on one position",
-      "Normal daily noise spans roughly one ATR, so a half-ATR stop gets hit by ordinary fluctuation — you exit on a coin flip, not on evidence the thesis failed",
-      "Stops should always be a fixed 10% regardless of the asset",
-      "ATR can only be computed on individual stocks, not ETFs"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Opposite — a tighter stop risks LESS per trade. Its failure is statistical: it converts ordinary noise into realized losses, over and over.",
-      "Correct. The stop's job is separating 'wrong thesis' from 'normal Tuesday'. Inside the noise band it cannot do that job; ~2–3×ATR gives the distinction room to operate.",
-      "A fixed percentage ignores that a quiet bond ETF and a volatile sector fund have utterly different normal days — that is precisely the miscalibration ATR exists to fix.",
-      "ATR computes identically on anything with highs, lows, and closes. ETFs qualify."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "An index ETF grinds to new highs while the advance–decline line flattens and OBV diverges. The reading is:",
-     "options": [
-      "Maximum bullishness — new highs are always confirmation",
-      "The advance is narrowing: fewer stocks and less committed volume are carrying the index — a caution flag on trend quality, worth tightening risk",
-      "An immediate crash signal requiring full liquidation",
-      "Breadth data is irrelevant to ETF holders"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The price high is real, but its QUALITY is the question. Highs carried by three mega-caps while the median stock stalls have historically been fragile highs.",
-      "Correct — and note the calibrated response: caution and risk-tightening, not prediction and liquidation. Narrow advances preceded 2000 and 2007, with long and variable leads.",
-      "Breadth divergences have led tops by months to a year-plus. As a timing trigger they are far too blunt; as a quality gauge they are genuinely informative.",
-      "A cap-weighted index ETF is exactly where breadth matters most — the index can be dragged up by its largest names while its median holding is already in a downtrend."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "StockCharts ChartSchool — Bollinger Bands and the squeeze",
-     "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:bollinger_bands",
-     "type": "docs",
-     "note": "Band construction and the squeeze — with the direction-blindness caveat stated plainly."
-    },
-    {
-     "label": "StockCharts ChartSchool — Average true range (ATR) for stops and sizing",
-     "url": "https://school.stockcharts.com/doku.php?id=technical_indicators:average_true_range_atr",
-     "type": "docs",
-     "note": "ATR as the unit of normal motion — the basis for stops and sizing that ignore noise."
-    }
-   ]
-  },
-  {
-   "id": "how-money-is-lost",
-   "title": "How money is lost — the whipsaw tax and its friends",
-   "summary": "The naive failure modes, quantified: whipsaw churn in sideways markets, cost and tax drag, overfit backtests, and indicator soup. In the animation, a standard crossover system turns a flat market into a −21% account — every trade executed exactly as designed.",
-   "anim": "ta_whipsaw",
-   "cards": [
-    {
-     "h": "The whipsaw machine",
-     "md": "Watch the animation closely, because nothing in it is rigged: a market that ends the year almost exactly flat, a textbook 10/30 crossover system, every signal taken with perfect discipline. Ten trades later the account is down over 20% — **while the market lost nothing**.\n\nThe mechanism is brutal and simple: in an oscillating market, a crossover system is a machine for **buying after rises and selling after dips** — precisely backwards, at every single turn, plus costs on top. No bad luck involved; the system did exactly what it was built to do, *in a regime it was never designed for*.\n\nOur own 99-year monthly study measured the real-world version: a fast trend rule bought its crash protection at the price of **69 defensive round-trips and ~50% annual turnover**. The protection was real. So was the bill."
-    },
-    {
-     "h": "Costs, taxes, and the arithmetic of churn",
-     "md": "Every trade pays the **bid–ask spread** (pennies on liquid ETFs, real money on thin ones), plus slippage. Small numbers — until multiplied by a signal-happy system: 25 basis points of round-trip friction × 20 trades ≈ **5% of the account per year**, paid before the strategy earns anything.\n\nTaxes are usually worse. Fast systems generate **short-term capital gains** (taxed as ordinary income — for high earners roughly *double* the long-term rate), and every profitable exit accelerates tax that buy-and-hold would have deferred for decades, surrendering the compounding on the deferred amount.\n\nA taxable trend-follower needs several points of annual outperformance just to tie the index fund it started from. This single paragraph, taken seriously, disqualifies most fast TA for most taxable investors — which is why our house runs its only timing rules in tax-sheltered accounts, slowly."
-    },
-    {
-     "h": "Overfitting: the backtest that lies politely",
-     "md": "Test 200 indicator/parameter combos on the same history and the best one looks brilliant — **guaranteed**, even on pure noise. You searched for the luckiest fit, and found it; out of sample, the mined edge evaporates while its costs stay.\n\nWarning signs you have met the beast: suspiciously specific parameters (why 13 days and not 10?), performance that dies when a parameter moves one notch, no *economic reason* the rule should work (trend rules have one: persistence; a 'Tuesday RSI-37' rule has none).\n\nThe cousin failure is **indicator soup** — six oscillators 'confirming' each other. All are cooked from the same closes; their agreement is one ingredient tasted six times, worth exactly one signal's evidence while feeling like six. The honest defenses are pre-registration (rules written and frozen BEFORE the test — house practice for every study), out-of-sample holdouts, and preferring rules boring enough to have survived a century of markets."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "In the whipsaw animation the market ends flat but the crossover account loses over 20%. What produced the loss?",
-     "options": [
-      "The trader deviated from the system's signals",
-      "In an oscillating market, crossovers systematically buy after rises and sell after dips — backwards at every turn — with costs stacked on top",
-      "One unlucky, oversized losing trade",
-      "The moving averages were computed incorrectly"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Every signal was taken perfectly — that is the uncomfortable point. Discipline in the wrong regime just executes the losses more reliably.",
-      "Correct. A crossover needs a rise to signal 'buy' and a dip to signal 'sell'; in chop, that timing is anti-optimal at every single oscillation. The regime, not the execution, was the error.",
-      "The bleed came in ten small, systematic cuts — which is worse than bad luck, because it repeats in every sideways market forever.",
-      "The math was flawless. A perfectly computed signal applied in the wrong regime loses money with precision."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why do taxes hit fast technical systems especially hard in taxable accounts?",
-     "options": [
-      "Trading systems are taxed at a special punitive rate",
-      "Fast systems produce short-term gains taxed as ordinary income (roughly double the long-term rate for high earners) AND accelerate taxes that holding would have deferred for decades",
-      "Taxes only matter for losing systems",
-      "ETFs are tax-disadvantaged relative to single stocks"
-     ],
-     "answer": 1,
-     "feedback": [
-      "No special rate exists — the ordinary short-term capital-gains treatment is punishment enough once churn multiplies it.",
-      "Correct, and the second half is the underrated half: every early realization surrenders decades of compounding on the deferred tax. A taxable fast-trader needs points of TRUE edge just to break even with an index fund.",
-      "Winning systems pay MORE tax — the drag scales with realized gains. A pre-tax win can be an after-tax tie or worse.",
-      "Backwards: ETFs' in-kind redemption mechanism makes them unusually tax-EFFICIENT — when held. Churning them away discards that advantage."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "You test 200 parameter combinations and the best backtest returns 31%/yr. The main reason for suspicion is:",
-     "options": [
-      "31% is impossible in any market",
-      "Selecting the best of 200 fits guarantees an impressive winner even on pure noise — the search mined luck, which will not repeat out of sample",
-      "The backtest window was too long",
-      "Only 200 combinations were tried — a serious search needs thousands"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Great years and lucky strategies do hit such numbers — plausibility is exactly what makes mined results dangerous.",
-      "Correct. This is selection bias: the maximum of 200 noisy outcomes is large BY CONSTRUCTION. The mined 'edge' evaporates out of sample; the trading costs it commands do not. Pre-registration and holdouts exist precisely for this.",
-      "Longer windows generally make overfitting HARDER, not easier. The sin is the width of the search, not the length of the data.",
-      "More combinations would deepen the sin. The direction of virtue is fewer, pre-specified, economically-motivated rules."
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "Six different oscillators all flash 'buy' simultaneously. How much evidence is this?",
-     "options": [
-      "Six independent confirmations — a high-conviction signal",
-      "Roughly one signal's worth: all six are computed from the same closing prices, so their agreement is one ingredient tasted six times",
-      "None — indicator agreement is always meaningless",
-      "It depends only on which six were chosen"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Independence is the missing requirement. Six transforms of ONE price series cannot confirm each other any more than six thermometers in one room measure six climates.",
-      "Correct — 'indicator soup'. RSI, stochastics, MACD, rate-of-change all remix recent closes; correlated inputs add confidence, not information. Genuine confirmation must come from a different DATA SOURCE (volume, breadth, another asset class).",
-      "One signal's worth is not nothing — the reading itself may be valid. The error is only in counting it six times.",
-      "Any six close-derived oscillators share the flaw identically; the selection barely matters. Diversify the data, not the arithmetic."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "SEC Investor.gov — Day trading: the regulator's evidence on frequent-trading outcomes",
-     "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary/day-trading",
-     "type": "reading",
-     "note": "The regulator's evidence summary on frequent-trading outcomes — blunt and well-sourced."
-    },
-    {
-     "label": "Barber & Odean — Trading Is Hazardous to Your Wealth (the canonical churn study)",
-     "url": "https://faculty.haas.berkeley.edu/odean/papers/returns/Individual_Investor_Performance_Final.pdf",
-     "type": "paper",
-     "note": "Barber & Odean's canonical churn study: the households that traded most earned least, by a wide margin."
-    }
-   ]
-  },
-  {
-   "id": "trading-with-discipline",
-   "title": "How the same tools make money — cadence, bands, pre-commitment",
-   "summary": "The profitable version differs from the losing version by discipline, not indicators: slow cadence (monthly beats daily), confirmation bands against borderline churn, rules committed before the test arrives, and drawdown avoidance — not return chasing — as the honest objective.",
-   "anim": "ta_discipline",
-   "cards": [
-    {
-     "h": "One market, three temperaments",
-     "md": "The animation runs one market — a genuine uptrend with a real bear buried inside — through three investors:\n\n- **Buy & hold** rides everything: strong finish, −41% maximum drawdown, held all the way down.\n- **The naive daily crossover** trades 24 times. And here is the honest surprise: its protection is REAL — drawdown only −30%. But whipsaws and costs churn away every dollar the protection earned. It finishes *dead even with buy & hold*, having paid 24 trades and years of stress for nothing.\n- **The disciplined rule** — checked **monthly**, against the 200-day line, with a confirmation band — trades **4 times**, sidesteps the heart of the bear (−21%), and finishes on top.\n\nSame tools. The entire difference is *cadence and confirmation*: how often you look, and how sure you must be before acting."
-    },
-    {
-     "h": "The three disciplines",
-     "md": "**1. Slow cadence.** Checking monthly instead of daily filters out almost every intramonth head-fake before it can cost anything. Our 99-year study's rule — monthly close versus the 10-month average — traded roughly *once every year and a half* on average. Slowness is not laziness; it is the cheapest whipsaw filter that exists.\n\n**2. Confirmation bands.** Requiring price to break the line by a margin (1–3%) before acting means borderline wobbles — the single most common churn source — produce no trades at all. Cheap to implement, brutal to skip.\n\n**3. Pre-commitment.** The rule is written down — trigger, size, exit — BEFORE the situation arrives. Mid-crash improvisation has the worst decision-quality of any moment in investing; a pre-committed rule is a decision made while calm, executed while not. This is the same pre-registration discipline our research studies run: the spec freezes before the results exist, so the results cannot quietly rewrite the spec."
-    },
-    {
-     "h": "What the edge actually is",
-     "md": "Look again at what the disciplined rule won: not a higher peak — a **shallower valley** (−21% vs −41%). That is the honest prize of trend rules, confirmed across a century of studies: they are **drawdown-avoidance machines, not return machines**. Their pre-tax returns roughly match buy-and-hold; their crash behavior does not.\n\nWhy drawdown is the prize worth having: a −45% loss needs +82% to recover — losses compound against you asymmetrically. And the behavioral dividend is larger still: the investor who is down 21% *stays invested and follows the rule*; the one down 45% often capitulates at the bottom, converting a paper drawdown into a permanent one.\n\nSized honestly, this is decision support, not magic: the rule tells you *what the trend is doing*; position sizing and your written plan decide what, if anything, to do about it. That ordering — regime, then rule, then sizing — is this whole module in one sentence."
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "In the discipline animation, the naive daily trader achieved real crash protection (−30% vs −41%) yet finished dead even with buy & hold. What does this teach?",
-     "options": [
-      "Trend protection is worthless",
-      "Protection can be real while its entire value is churned away by whipsaws and costs — HOW a rule trades matters as much as WHETHER it works",
-      "The naive trader was unlucky and would usually win",
-      "Buy & hold is always the best strategy"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The protection showed up plainly (−30% vs −41%). The lesson is about its PRICE, not its existence.",
-      "Correct — and this is the subtlest lesson in the module. Both timing rules cut the bear; only the one that traded 6× less kept the benefit. The signal was identical; the cadence decided who profited from it.",
-      "The whipsaw drag repeats in every sideways stretch, structurally — this is the expected outcome of daily cadence, not a bad draw.",
-      "Buy & hold ate a −41% drawdown here. Whether that is acceptable is a preference — but the disciplined rule beat it on BOTH end value and valley depth."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why does adding a 1–3% confirmation band around the trend line reduce losses so much relative to its cost?",
-     "options": [
-      "It guarantees trades only happen at better prices",
-      "It removes the single most common churn source — borderline wobbles across the line — while barely delaying response to genuine breaks",
-      "It doubles the number of profitable signals",
-      "It eliminates drawdowns entirely"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Entries after a band break are slightly WORSE prices — you give up a percent or two of each real move. The win is elsewhere: all the fake moves you never traded.",
-      "Correct. Price hovering at the line generates endless costless-looking crossings that each cost real money to obey. A genuine regime break blows through a 2% band in days; a wobble never does.",
-      "It REDUCES signal count — that is the mechanism. Fewer, better-confirmed signals.",
-      "Drawdowns within the trend remain untouched. The band only kills the churn tax at the boundary."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Trend-following's honest, century-backed edge is best described as:",
-     "options": [
-      "Substantially higher returns than buy & hold",
-      "Predicting market tops within weeks",
-      "Roughly market-like pre-tax returns with substantially shallower crash drawdowns — a drawdown-avoidance machine, not a return machine",
-      "Eliminating the need for diversification"
-     ],
-     "answer": 2,
-     "feedback": [
-      "The century-long studies show trend returns roughly MATCHING buy-and-hold pre-tax (often trailing after tax). Anyone selling trend as a return enhancer is selling the wrong property.",
-      "Trend rules confirm tops months late by construction — the lag lesson from the moving-average chapter. They avoid the MIDDLE of crashes, never the start.",
-      "Correct. The prize is the shallower valley — mathematically (a −45% loss needs +82% back) and behaviorally (investors follow rules from −21%; they capitulate from −45%).",
-      "A timing rule on one index is concentration WITH extra steps. Diversification across assets remains the first-order defense; trend can layer on top."
-     ]
-    },
-    {
-     "id": "q4",
-     "type": "mcq",
-     "prompt": "Why must the rule be written down before the crash, rather than decided during it?",
-     "options": [
-      "Written rules are legally binding on brokers",
-      "Mid-crash decisions are made under the worst psychological conditions in investing; pre-commitment lets the calm version of you govern the panicked one",
-      "Because rules cannot be changed once written",
-      "It makes no practical difference"
-     ],
-     "answer": 1,
-     "feedback": [
-      "Nothing legal about it — the binding is psychological, on yourself.",
-      "Correct. This is pre-registration applied to money: the spec is frozen before the test arrives, so fear cannot quietly rewrite it at the worst possible moment. Our research studies run the identical discipline for the identical reason.",
-      "Rules can be revised — calmly, between regimes, on schedule. What pre-commitment forbids is IMPROVISING the revision at the bottom, which is when every revision is a capitulation wearing a rationale.",
-      "The difference is measurable and large: panic selling at bottoms is the single most documented wealth-destroying behavior in retail investing."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "AQR — A Century of Evidence on Trend-Following Investing",
-     "url": "https://www.aqr.com/Insights/Research/White-Papers/A-Century-of-Evidence-on-Trend-Following-Investing",
-     "type": "paper",
-     "note": "AQR's century-scale evidence — the honest version of what trend rules do and don't deliver."
-    },
-    {
-     "label": "Meb Faber — A Quantitative Approach to Tactical Asset Allocation (the 10-month rule)",
-     "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461",
-     "type": "paper",
-     "note": "The 10-month SMA study this module's slow-cadence doctrine descends from; short, readable, replicated."
-    }
-   ]
-  },
-  {
-   "id": "etf-playbook",
-   "title": "The ETF playbook — putting it together",
-   "summary": "The full stack assembled for an ETF investor: regime first (200-day line + ADX), oscillators as junior context, ATR for sizing, slow cadence with bands, everything pre-written. Plus the relative-strength screen — TA's most defensible active use — and the checklist that decides when NOT to act.",
-   "cards": [
-    {
-     "h": "The stack, in order",
-     "md": "For a long-horizon ETF investor, the tools assemble in strict order — each layer only meaningful given the one above:\n\n1. **Policy** (not TA): your allocation, written down. TA never overrides policy; at most it times moves *within* policy bands.\n2. **Regime**: monthly close vs the 200-day/10-month line, with a 1–3% band. ADX if you want a second opinion on whether trend exists.\n3. **Relative strength (RS)**: WHICH funds — rank candidate ETFs by 3–12-month return versus a benchmark. Cross-sectional momentum is among the most replicated effects in finance, and between broad liquid funds, rotating is cheap and single-name risk is absent. This is TA's most defensible active use.\n4. **Oscillators/bands**: junior timing inside an established regime — an RSI dip in an uptrend to place an add-on. Never primary.\n5. **ATR**: sizes the position and sets stops wide enough to ignore noise.\n\nMost of the value is in layers 1–2. Each layer below adds less and churns more — stop descending when honest."
-    },
-    {
-     "h": "The pre-flight checklist",
-     "md": "Before any TA-motivated trade, six questions on paper:\n\n1. **Regime**: which side of the 200-day line, and did it break the band — or am I trading a wobble?\n2. **Trend strength**: ADX above 20, or am I taking a trend signal in certified chop?\n3. **Signal source**: computable and pre-committed — or drawn/improvised after looking?\n4. **Cost**: spread + slippage + expected tax. Does the expected edge clear the bill *after tax*?\n5. **Size**: from ATR and risk budget — or from conviction and adrenaline?\n6. **Exit**: written down NOW, both directions?\n\nAny 'no' is a stop. In practice the checklist's main output is **inaction** — it exists to block the trades that the whipsaw chapter showed are the default outcome of enthusiasm plus indicators. The best TA decision most months is the one you do not make."
-    },
-    {
-     "h": "What this module wants you to remember",
-     "md": "- TA is a **regime detector**, honest about the present, mute about the future.\n- Moving averages trade noise for lag; **the period IS the strategy**. Exponential just reshapes the memory.\n- Everything reads cleaner on **broad ETFs** — diversification deletes the news channel that charts cannot see.\n- Oscillator extremes mean **opposite things** in trends and ranges; bring the regime answer to the oscillator, never ask it.\n- Naive TA loses money **by design**: whipsaws, costs, taxes, overfits, soup.\n- Disciplined TA is slow, banded, pre-committed — and its real product is **shallower drawdowns**, which is precisely why this house treats it as decision support inside a written policy, never as the policy itself.\n\nIf one sentence survives: **the indicator was never the edge; the discipline around it was.**"
-    }
-   ],
-   "questions": [
-    {
-     "id": "q1",
-     "type": "mcq",
-     "prompt": "In the playbook's stack, why does relative strength (RS) rotation among broad ETFs rank as TA's most defensible active use?",
-     "options": [
-      "RS predicts exact future returns of each fund",
-      "Cross-sectional momentum is among the most replicated effects in finance, and between diversified liquid funds it is cheap to harvest with no single-name risk",
-      "Broad ETFs never go down, so any rotation works",
-      "Regulators endorse RS strategies specifically"
-     ],
-     "answer": 1,
-     "feedback": [
-      "RS ranks RELATIVE recent performance; it predicts nothing exactly. Its edge is statistical persistence in the cross-section, not forecasts.",
-      "Correct. The momentum literature is a century deep and survives out-of-sample; ETFs remove the two classic implementation killers (illiquidity and single-name blowups). Persistent effect + cheap vehicle = the defensible corner of active TA.",
-      "Broad ETFs fall plenty — 2008 took the S&P down 55%. RS chooses among funds; the regime layer above it decides whether to be invested at all.",
-      "No regulator endorses strategies. The endorsement that matters is replication across decades, markets, and researchers."
-     ]
-    },
-    {
-     "id": "q2",
-     "type": "mcq",
-     "prompt": "Why does the checklist treat 'the trade I don't make' as its main product?",
-     "options": [
-      "Because trading is always wrong",
-      "Because the loss chapters showed the default outcome of indicators-plus-enthusiasm is churn: most TA-motivated trade impulses fail at least one honest gate, and blocking them is where the money is saved",
-      "Because checklists are mainly for record-keeping",
-      "Because brokers reward low-activity accounts"
-     ],
-     "answer": 1,
-     "feedback": [
-      "The disciplined animation's four trades were all worth making. The target is the OTHER twenty impulses.",
-      "Correct. The whipsaw math showed naive activity has negative expected value after costs; a gate that filters borderline signals converts that arithmetic from working against you to working for you.",
-      "The record matters (it is how you audit yourself honestly), but the live function is the veto.",
-      "No such reward exists from brokers — their incentive is the opposite, which is worth remembering when platforms gamify trading."
-     ]
-    },
-    {
-     "id": "q3",
-     "type": "mcq",
-     "prompt": "Your written policy says 60% equities. The 200-day regime line breaks decisively. What does disciplined TA permit?",
-     "options": [
-      "Selling all equities — the chart overrides the policy",
-      "Nothing — TA information may never influence anything",
-      "A pre-planned adjustment WITHIN the policy's bands (say 60%→50% if the plan says so); the policy is the constitution, TA at most times moves inside it",
-      "Doubling equities to buy the dip"
-     ],
-     "answer": 2,
-     "feedback": [
-      "Policy-override is how a tool becomes a temptation — the moment charts outrank the constitution, every scary day renegotiates your allocation.",
-      "Too far the other way: a written plan may legitimately pre-authorize band moves keyed to regime signals. Discipline means the RESPONSE was decided in advance, not that no response exists.",
-      "Correct — this is the module's governing sentence: regime, then rule, then sizing, all inside policy. The signal informs a pre-authorized adjustment; it never invents one.",
-      "Some plans do pre-authorize contrarian adds — but 'double it' on impulse is improvisation, and mid-break improvisation is the exact failure mode pre-commitment exists to prevent."
-     ]
-    }
-   ],
-   "resources": [
-    {
-     "label": "AQR — Value and Momentum Everywhere (the cross-sectional momentum evidence)",
-     "url": "https://www.aqr.com/Insights/Research/Journal-Article/Value-and-Momentum-Everywhere",
-     "type": "paper",
-     "note": "The cross-sectional momentum evidence behind relative-strength rotation — AQR's most-cited paper."
-    },
-    {
-     "label": "SEC Investor.gov — Exchange-traded funds: the vehicle-level basics",
-     "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-funds-etfs",
-     "type": "reading",
-     "note": "The vehicle-level ETF basics from the regulator — creation/redemption, costs, tax mechanics."
-    }
-   ]
-  }
- ]
+  ]
 }

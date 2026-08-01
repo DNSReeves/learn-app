@@ -2,6 +2,7 @@
   "id": "bayesian-inference",
   "title": "Bayesian Inference",
   "tagline": "How to change your mind by exactly the right amount.",
+  "category": "AI & Machine Learning",
   "description": "From probability-as-belief to posterior distributions. Every concept is gated: you advance when the evidence says you know it.",
   "concepts": [
     {

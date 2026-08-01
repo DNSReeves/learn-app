@@ -2,6 +2,7 @@
   "id": "llms",
   "title": "Large Language Models",
   "tagline": "You run one every day. Here's what's actually happening inside.",
+  "category": "AI & Machine Learning",
   "prereqs": [
     "neural-networks"
   ],

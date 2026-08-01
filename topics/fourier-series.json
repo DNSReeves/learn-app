@@ -2,6 +2,7 @@
   "id": "fourier-series",
   "title": "Fourier Series",
   "tagline": "Every repeating signal is a chord — here's how to read the notes.",
+  "category": "Mathematics",
   "prereqs": [
     "calculus"
   ],
