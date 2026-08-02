@@ -25,8 +25,43 @@ import packver
 BASE = os.path.dirname(os.path.abspath(__file__))
 TOPIC_DIR = os.path.join(BASE, "topics")
 
-app = FastAPI(title="Learn")
+# SECURITY (2026-08-01): hide the interactive API docs / schema on a public install
+# (they hand an attacker a full endpoint+schema map). LAN/dev keeps them.
+_PUBLIC = os.environ.get("LEARN_PUBLIC") == "1"
+app = FastAPI(
+    title="Learn",
+    docs_url=None if _PUBLIC else "/docs",
+    redoc_url=None if _PUBLIC else "/redoc",
+    openapi_url=None if _PUBLIC else "/openapi.json",
+)
 db.init()
+
+
+# SECURITY (2026-08-01): defense-in-depth response headers. The SPA is same-origin
+# and self-contained except Google Fonts, so the CSP allows inline script/style
+# (one big inline SPA — no eval), the font CDN, and blob/data audio+images, while
+# blocking framing (clickjacking), external form posts, and base-uri hijacking.
+# HSTS is inert over plain HTTP and activates once a TLS front-end is added.
+_CSP = (
+    "default-src 'self'; "
+    "script-src 'self' 'unsafe-inline'; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "img-src 'self' data:; "
+    "media-src 'self' data: blob:; "
+    "connect-src 'self'; "
+    "frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+)
+
+@app.middleware("http")
+async def _security_headers(request: Request, call_next):
+    resp = await call_next(request)
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("X-Frame-Options", "DENY")
+    resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    resp.headers.setdefault("Content-Security-Policy", _CSP)
+    resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return resp
 
 # Operator visibility. uvicorn configures ONLY its own loggers and leaves root
 # bare, so everything this app logs under "learn" (the registration audit line,
