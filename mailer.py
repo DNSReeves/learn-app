@@ -2,14 +2,13 @@
 
 DELIBERATELY ISOLATED, and that isolation is the point.
 
-The sibling dnsr-agent runtime restricts its production Gmail identity to three
-recipient addresses behind an operator-confirmation gate (security/policies.py).
-Registration mail goes to arbitrary strangers, so routing it through that identity
-— or side-stepping the gate with the Gmail app password — would defeat an
-operator-set control. Therefore this module:
+Registration mail goes to arbitrary strangers, so it must NOT reuse any existing
+personal or production mail identity or its credentials — repurposing a mailbox
+that has its own recipient controls for a completely different trust domain would
+defeat those controls. Therefore this module:
 
-  * NEVER imports anything from the dnsr-agent repo,
-  * NEVER reads GMAIL_APP_PASSWORD or any agent credential,
+  * NEVER imports credentials or code from any sibling application,
+  * reads no ambient mail-account password from the environment,
   * is OFF by default and refuses to send until an operator has deliberately
     configured a DEDICATED sending identity of its own.
 

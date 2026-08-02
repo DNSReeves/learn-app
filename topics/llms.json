@@ -251,7 +251,7 @@
           "feedback": [
             "Backwards — 122B is what's stored; 10B is what any single token's forward pass touches.",
             "The router is the whole point: only a few experts fire per token, which is why per-token FLOPs resemble a ~10B dense model.",
-            "Correct. FLOPs like a 10B model, VRAM like a 122B model — precisely why it lives on your DGX Spark's large unified memory.",
+            "Correct. FLOPs like a 10B model, VRAM like a 122B model — precisely why it fits on a single large unified-memory device (e.g. an NVIDIA DGX Spark).",
             "Quantization shrinks bytes-per-parameter, not the parameter count — the two levers are independent (and you're using both)."
           ]
         },
