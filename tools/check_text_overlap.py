@@ -14,7 +14,7 @@ with two labels placed correctly. This wraps ctx.fillText during a static render
 measures every drawn box with the real font metrics, and reports intersecting
 pairs.
 """
-import sys, json
+import os, sys, json, tempfile
 from playwright.sync_api import sync_playwright
 sys.path.insert(0,'/Users/david/agentic_software_from_scratch/learn_app')
 import db; db.init()
@@ -122,7 +122,9 @@ for r in sorted(res, key=lambda r: -len(r.get("hits",[]))):
         print(f"                     vs  {h['b']!r}")
     for c in r.get("clipped", [])[:3]:
         print(f"      off-canvas by {c['over']}px:  {c['t']!r}")
-json.dump(res, open('/private/tmp/claude-501/-Users-david-agentic-software-from-scratch-dnsr-agent/76e4b1fc-6409-4cbe-adda-d4849f3dd11a/scratchpad/overlaps.json','w'), indent=1)
+_report = os.path.join(tempfile.gettempdir(), "learn_overlaps.json")
+json.dump(res, open(_report, "w"), indent=1)
+print(f"report: {_report}")
 with db.conn() as c:
     r=c.execute('SELECT id FROM users WHERE username=?',('overlap_tmp',)).fetchone()
     if r: c.execute('DELETE FROM sessions WHERE user_id=?',(r[0],)); c.execute('DELETE FROM users WHERE id=?',(r[0],))
