@@ -87,7 +87,8 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 .cats[data-mode="collapsed"] .cat:not([data-open="1"]) .cat-body{display:none}
 .cats[data-mode="collapsed"] .cat:not([data-open="1"]) .cat-chev{transform:rotate(-90deg)}
 .cats[data-mode="collapsed"] .cat-head{margin-top:14px}
-.catbar{display:flex;justify-content:flex-end;margin:2px 0 -8px}
+.catbar{display:flex;justify-content:flex-end;gap:8px;margin:2px 0 -8px}
+.catbar button[disabled]{opacity:.45;cursor:default;pointer-events:none}
 .catbar button{background:none;border:1px solid var(--line);color:var(--dim);font:inherit;font-size:12px;
   padding:4px 10px;border-radius:7px;cursor:pointer}
 .catbar button:hover{color:var(--fg);border-color:var(--lock)}
@@ -246,6 +247,9 @@ function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else sp
 function acceptSession(d){
   TOKEN=d.token; ROLE=d.role||"learner";
   sessionStorage.setItem("learn_token",TOKEN); sessionStorage.setItem("learn_role",ROLE);
+  /* Fresh LOGIN (not a mid-session reload): the dash starts in the collapsed
+     category view regardless of last session's toggle (operator, 2026-08-03). */
+  sessionStorage.setItem("learn_fresh_login","1");
   armIdleSignout(); route();
 }
 /* a***@example.com — mirrors the server's masking so the code screen can name
@@ -513,6 +517,12 @@ async function viewDash(){
   const d = await api("/topics");
   if(d.role){ ROLE=d.role; sessionStorage.setItem("learn_role",ROLE); }   // server-fresh author gate when provided
   $("#who").textContent=d.user; $("#signout").hidden=false;
+  /* Collapsed-on-login (operator, 2026-08-03): a fresh login always lands on the
+     compact category view; the toggle still works and persists WITHIN the session. */
+  if(sessionStorage.getItem("learn_fresh_login")){
+    sessionStorage.removeItem("learn_fresh_login");
+    saveCatPrefs(d.user, {mode:"collapsed", open:[]});
+  }
   const _mv=Object.entries(SESH.moves);
   const sessionCard = _mv.length ? `
     <div class="tcard" style="cursor:default;border-color:#8a6d2b">
@@ -547,7 +557,13 @@ async function viewDash(){
          USER (shared device — David and Kate keep their own view). Every card is always
          RENDERED and only CSS-hidden, so toggling is instant with no refetch and the
          existing .tcard click wiring below is untouched. */
-      const bar=`<div class="catbar"><button id="cat-toggle" type="button"></button></div>`;
+      /* RESUME (operator, 2026-08-03): jump back to the last concept the server saw
+         this user open — cross-device, validated server-side. DISABLED (with an
+         honest title) until the student has started something: d.resume is null. */
+      const bar=`<div class="catbar"><button id="cat-toggle" type="button"></button>
+        <button class="btn" id="resume-btn" type="button" ${d.resume?"":"disabled"}
+          title="${d.resume?`Continue ${esc(d.resume.topic_title)} — ${esc(d.resume.concept_title)}`:"Nothing started yet — pick a topic to begin"}"
+          style="margin-left:auto">▶ Resume${d.resume?` — ${esc(d.resume.concept_title)}`:""}</button></div>`;
       return bar + `<div class="cats" id="cats">` + cats.map(cat=>{
         const due=g[cat].reduce((n,t)=>n+(t.review_due||0),0);
         return `<section class="cat" data-cat="${esc(cat)}">
@@ -570,6 +586,7 @@ async function viewDash(){
   </div>`;
   wireCategoryView(d.user);
   main.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
+  { const rb=$("#resume-btn"); if(rb && d.resume) rb.onclick=()=>viewTopic(d.resume.tid, d.resume.cid); }
   { const ao=$("#author-open"); if(ao) ao.onclick=e=>{e.preventDefault(); viewAuthor();}; }
   /* P4.16: move progress between deployments. Export = download the JSON; import =
      server-side MERGE that never regresses local progress (stronger evidence wins). */

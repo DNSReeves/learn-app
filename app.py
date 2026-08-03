@@ -580,7 +580,17 @@ def topics(authorization: str | None = Header(default=None)):
                     "category": pack.get("category", "More Topics"),
                     "prereqs": [packs[p]["title"] for p in pack.get("prereqs", []) if p in packs],
                     "concepts": n, "mastered": mastered, "review_due": due})
-    return {"user": user["username"], "topics": out, "ai": ai.available()}
+    # Resume (2026-08-03): where this user last left off, validated against the
+    # LIVE packs (a removed/renamed topic or concept → null, never a dead link).
+    # null until the student has opened a first concept — the button renders disabled.
+    resume = None
+    loc = db.get_last_location(user["id"])
+    if loc and (rp := packs.get(loc["topic_id"])):
+        rc = next((c for c in rp["concepts"] if c["id"] == loc["concept_id"]), None)
+        if rc:
+            resume = {"tid": loc["topic_id"], "cid": loc["concept_id"],
+                      "topic_title": rp["title"], "concept_title": rc["title"]}
+    return {"user": user["username"], "topics": out, "ai": ai.available(), "resume": resume}
 
 
 @app.get("/api/topic/{tid}")
@@ -635,6 +645,9 @@ def concept(tid: str, cid: str, authorization: str | None = Header(default=None)
             raise HTTPException(403, "Master the previous concept to unlock this one.")
     c = pack["concepts"][idx]
     s = states.get(cid, {})
+    # Resume (2026-08-03): the student is HERE — record it. After the unlock gate,
+    # so a forbidden fetch can never become the resume target.
+    db.set_last_location(user["id"], tid, cid)
     # strip answers/feedback — grading happens server-side only
     qs = [{"id": q["id"], "type": q["type"], "prompt": q["prompt"], "options": q["options"]}
           for q in c["questions"]]

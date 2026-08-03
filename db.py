@@ -97,6 +97,15 @@ CREATE TABLE IF NOT EXISTS concept_state_archive (
 -- account does NOT exist until the emailed code is verified. Password is hashed
 -- HERE, at start — plaintext never lands in a row. The token is stored only as
 -- a PBKDF2 hash with its own salt (same scheme as passwords).
+-- Where the student left off (2026-08-03, operator ask): one row per user,
+-- overwritten on every concept open. Server-side (not localStorage) so Resume
+-- works across shared devices — the same reason concept_state lives here.
+CREATE TABLE IF NOT EXISTS last_location (
+    user_id     INTEGER PRIMARY KEY REFERENCES users(id),
+    topic_id    TEXT NOT NULL,
+    concept_id  TEXT NOT NULL,
+    at          REAL NOT NULL
+);
 CREATE TABLE IF NOT EXISTS pending_registrations (
     id          INTEGER PRIMARY KEY,
     username    TEXT NOT NULL,
@@ -433,6 +442,23 @@ def reg_count(kind: str, key: str, window_s: float) -> int:
         return c.execute(
             "SELECT COUNT(*) FROM reg_events WHERE kind=? AND key=? AND at > ?",
             (kind, key or "", time.time() - window_s)).fetchone()[0]
+
+
+# ---------- last location (Resume) ----------
+
+def set_last_location(user_id: int, topic_id: str, concept_id: str):
+    with conn() as c:
+        c.execute("INSERT INTO last_location (user_id, topic_id, concept_id, at) "
+                  "VALUES (?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET "
+                  "topic_id=excluded.topic_id, concept_id=excluded.concept_id, at=excluded.at",
+                  (user_id, topic_id, concept_id, time.time()))
+
+
+def get_last_location(user_id: int) -> dict | None:
+    with conn() as c:
+        r = c.execute("SELECT topic_id, concept_id, at FROM last_location "
+                      "WHERE user_id = ?", (user_id,)).fetchone()
+        return dict(r) if r else None
 
 
 # ---------- concept state ----------
