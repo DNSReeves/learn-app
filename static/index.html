@@ -207,7 +207,7 @@ const api = async (path, opts={}) => {
     body: opts.body ? JSON.stringify(opts.body) : undefined});
   if (r.status===401 && path!=="/login" && path!=="/register"){ signout(); throw new Error("signin"); }
   const data = await r.json().catch(()=>({}));
-  if (!r.ok) throw new Error(data.detail || "Request failed");
+  if (!r.ok){ const e=new Error(data.detail || "Request failed"); e.status=r.status; throw e; }
   return data;
 };
 const esc = s => (s==null?"":String(s)).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));   /* null-safe: a missing field (e.g. resource note) must never throw + abort a render */
@@ -284,8 +284,18 @@ async function viewAuth(mode="login"){
     btn.disabled=true;
     try{
       if(mode==="register"){
-        await api("/register/start",{method:"POST",body});
-        viewVerify(body);                       /* one neutral reply → always the code screen */
+        try{
+          await api("/register/start",{method:"POST",body});
+          viewVerify(body);                     /* one neutral reply → always the code screen */
+        }catch(err){
+          /* LOCAL-SETUP FALLBACK (2026-08-03): with the mail transport off the email
+             path honestly 503s — but a valid invite code doesn't need email at all.
+             Complete registration on the legacy invite path and sign straight in.
+             Without an invite code the 503 surfaces unchanged (operator's problem). */
+          if(err.status===503 && body.invite){
+            acceptSession(await api("/register",{method:"POST",body}));
+          } else { throw err; }
+        }
       } else {
         acceptSession(await api("/login",{method:"POST",body}));
       }

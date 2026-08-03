@@ -347,6 +347,23 @@ def test_transport_off_yields_the_operator_facing_503(reg, monkeypatch):
     assert _start(tc, email="other@example.com").content == r.content
 
 
+def test_transport_off_with_invite_code_registers_via_legacy_path(reg, monkeypatch):
+    """The LOCAL-SETUP flow (2026-08-03 live bug, Kate's registration): mail
+    transport off → /register/start 503s, but a valid invite code must still
+    complete registration on the legacy /api/register path — the frontend falls
+    back to it on exactly this 503. Pins the backend half of that contract:
+    the legacy path never consults the mail transport."""
+    tc, amod, dbmod, sent = reg
+    monkeypatch.setenv("LEARN_MAIL_TRANSPORT", "off")
+    monkeypatch.setenv("LEARN_INVITE_CODE", "family-code-1")
+    assert _start(tc, invite="family-code-1").status_code == 503   # email path: honestly down
+    r = tc.post("/api/register", json={"username": "kate2", "password": "pw-secret-1",
+                                       "invite": "family-code-1"})
+    assert r.status_code == 200 and r.json()["token"]              # invite path: works
+    assert "kate2" in dbmod.list_usernames()
+    assert sent == []                                              # and no mail was attempted
+
+
 def test_unknown_transport_is_treated_as_off(reg, monkeypatch):
     tc, amod, dbmod, sent = reg
     monkeypatch.setenv("LEARN_MAIL_TRANSPORT", "carrier-pigeon")
