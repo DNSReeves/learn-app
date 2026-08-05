@@ -44,9 +44,15 @@ a{color:var(--post-deep)}
 button{font:inherit;cursor:pointer;border:0;border-radius:8px}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--post-deep);outline-offset:2px}
 .btn{background:var(--ink);color:#fff;padding:10px 18px;font-weight:600}
-.btn:disabled{background:var(--lock);cursor:default}
 .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
 .btn.warm{background:var(--post);color:var(--ink)}
+/* AFTER the variants on purpose. `.btn:disabled` and `.btn.ghost` have EQUAL
+   specificity (0,2,0), so whichever is written last wins — with the disabled rule
+   first, a disabled ghost button kept its enabled appearance and the only cue left
+   was `cursor:default`, which does not exist on a touch device. Opacity + the lock
+   colour are stated on the variants too, so the cue survives regardless of class. */
+.btn:disabled,.btn.ghost:disabled,.btn.warm:disabled{
+  background:var(--lock);color:#fff;border-color:var(--lock);opacity:.55;cursor:default}
 input{font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;width:100%;background:#fff;color:var(--ink)}
 
 /* ---------- shell ---------- */
@@ -323,7 +329,111 @@ function armIdleSignout(){ clearTimeout(_idleTimer); if(!TOKEN) return; _idleTim
 $("#signout").onclick = async()=>{ try{await api("/logout",{method:"POST"});}catch(e){} signout(); };
 
 /* ================= views ================= */
-function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else speechSynthesis.cancel(); try{ if(typeof cancelVoice==="function") cancelVoice(); }catch(_){} if(TOKEN) armIdleSignout(); TOKEN ? viewDash() : viewAuth(); }
+function route(){ if(typeof stopCardAudio==="function") stopCardAudio(); else speechSynthesis.cancel(); try{ if(typeof cancelVoice==="function") cancelVoice(); }catch(_){} if(TOKEN) armIdleSignout();
+  if(!TOKEN){ viewAuth(); return; }
+  // Honour a deep link or a reload-in-place; fall back to the dashboard.
+  if(!renderFromHashSync()) viewDash(); }
+function renderFromHashSync(){ if(!parseHash()) return false; renderFromHash(); return true; }
+
+/* ================= history routing (2026-08-05) =================
+   THE BUG: this app had NO history management at all — no pushState, no
+   popstate, no hashchange, nothing. (The one `history.push(...)` in the
+   checkpoint is a local answer-log array, not the History API.) So the browser
+   / iPad Back button could only do one thing: leave the app. It then LOOKED
+   like Back worked in some modules and not others, because the server-side
+   RESUME would sometimes drop you back at your last concept on reload and
+   sometimes at the dashboard.
+
+   THE FIX, without rewriting 40 call sites: the view functions themselves
+   record where they are. Every existing caller — in-app Back buttons, ladder
+   rungs, "Continue", the resume path — keeps working untouched, and each one
+   now leaves a history entry behind it. Back then walks:
+
+       card N → card N-1 → concept → topic → all topics
+
+   Function declarations hoist, so these wrappers are installed before the
+   boot-time route() call below even runs.
+
+   Deep links and reloads land where you were, which is the same mechanism. */
+let _replaying = false;                 // true while re-rendering FROM history
+
+function _hashFor(view, a, b, c){
+  switch(view){
+    case "topics":  return "#/topics";
+    case "topic":   return `#/t/${a}`;
+    case "card":    return `#/t/${a}/c/${b}/${c}`;
+    case "check":   return `#/t/${a}/c/${b}/check`;
+    case "review":  return `#/t/${a}/review`;
+    case "cert":    return `#/t/${a}/cert`;
+    default:        return "#/topics";
+  }
+}
+function _mark(hash){
+  // Never write history while replaying it, and never stack a duplicate entry —
+  // a duplicate is what makes one Back press look like it did nothing.
+  if(_replaying || !TOKEN || location.hash === hash) return;
+  try{ history.pushState({h:hash}, "", location.pathname + location.search + hash); }
+  catch(_){ /* routing is a convenience; never let it break a lesson */ }
+}
+function parseHash(h){
+  const m = (h || location.hash || "").replace(/^#\/?/, "").split("/").filter(Boolean);
+  if(!m.length) return null;
+  if(m[0] === "topics") return {view:"topics"};
+  if(m[0] === "t" && m[1]){
+    const tid = decodeURIComponent(m[1]);
+    if(m[2] === "review") return {view:"review", tid};
+    if(m[2] === "cert")   return {view:"cert", tid};
+    if(m[2] === "c" && m[3]){
+      const cid = decodeURIComponent(m[3]);
+      if(m[4] === "check") return {view:"check", tid, cid};
+      return {view:"card", tid, cid, card: Math.max(0, parseInt(m[4] || "0", 10) || 0)};
+    }
+    return {view:"topic", tid};
+  }
+  return null;
+}
+async function renderFromHash(h){
+  const r = parseHash(h);
+  if(!r) return false;
+  _replaying = true;                    // suppress re-pushing what we are replaying
+  try{
+    if(r.view === "topics")      await viewDash();
+    else if(r.view === "topic")  await viewTopic(r.tid);
+    else if(r.view === "review") await viewReview(r.tid);
+    else if(r.view === "cert")   await viewCertificate(r.tid);
+    else if(r.view === "card" || r.view === "check"){
+      await viewTopic(r.tid, r.cid);    // rebuild the ladder around this concept
+      await viewConcept(r.tid, r.cid);
+      if(r.view === "check") startCheckpoint(r.tid);
+      else if(r.card > 0 && C && C.cards && r.card < C.cards.length){
+        cardIx = r.card; renderCard(r.tid);   // land on the exact card, not card 1
+      }
+    }
+  }catch(e){
+    _replaying = false;
+    try{ await viewDash(); }catch(_){}  // a stale/deleted deep link must not strand you
+    return true;
+  }finally{ _replaying = false; }
+  return true;
+}
+
+/* Wrap the renderers so every navigation records itself, whoever triggered it. */
+const _oViewDash = viewDash, _oViewTopic = viewTopic, _oRenderCard = renderCard,
+      _oStartCheckpoint = startCheckpoint, _oViewReview = viewReview,
+      _oViewCertificate = viewCertificate;
+viewDash = async function(){ _mark(_hashFor("topics")); return _oViewDash.apply(this, arguments); };
+viewTopic = async function(tid){ _mark(_hashFor("topic", tid)); return _oViewTopic.apply(this, arguments); };
+/* viewConcept deliberately does NOT mark: it calls renderCard immediately, and
+   two entries for one navigation is exactly the "Back did nothing" complaint.
+   renderCard owns the concept route, card index included. */
+renderCard = function(tid){ try{ if(C) _mark(_hashFor("card", tid, C.id, cardIx)); }catch(_){}
+                            return _oRenderCard.apply(this, arguments); };
+startCheckpoint = function(tid){ try{ if(C) _mark(_hashFor("check", tid, C.id)); }catch(_){}
+                                 return _oStartCheckpoint.apply(this, arguments); };
+viewReview = async function(tid){ _mark(_hashFor("review", tid)); return _oViewReview.apply(this, arguments); };
+viewCertificate = async function(tid){ _mark(_hashFor("cert", tid)); return _oViewCertificate.apply(this, arguments); };
+
+addEventListener("popstate", () => { if(TOKEN) renderFromHash(); else viewAuth(); });
 
 /* Sign the user in from a {token, role} payload — /login, /register and
    /register/verify all return the same shape, so they all land here. */
@@ -425,7 +535,7 @@ function viewVerify(ctx){
     <div class="sub" style="color:var(--dim);font-size:14px;margin-top:6px">
       No code? Check spam, then <button type="button" class="swap" id="resend" style="display:inline">resend it</button>.
     </div>
-    <button class="swap" id="back">← use a different address</button>
+    <button class="swap" id="auth-back">← use a different address</button>
   </div>`;
   const code=$("#code"), err=$("#err"), ttl=$("#ttl"), resend=$("#resend");
   code.focus();
@@ -440,7 +550,7 @@ function viewVerify(ctx){
     if(!left){ ttl.textContent="0:00"; err.textContent="That code has expired — resend to get a new one."; }
   },1000);
 
-  $("#back").onclick=()=>{ clearInterval(tick); viewAuth("register"); };
+  $("#auth-back").onclick=()=>{ clearInterval(tick); viewAuth("register"); };
 
   /* Resend honors the server throttle (3 starts/hour per address) — the reply
      is the same neutral body either way, so we can't report "sent" vs
@@ -1141,7 +1251,7 @@ function renderCard(tid){
     <div class="card-body">${md(card.md)}</div>
     ${last && C.anim ? animHTML() : ""}
     <div class="pager">
-      <button class="btn ghost" id="prev" ${cardIx===0?"disabled":""}>Back</button>
+      <button class="btn ghost" id="prev">${cardIx===0?"← All topics":"Back"}</button>
       <div class="crumbs">${C.cards.map((_,i)=>`<i class="${i<=cardIx?"on":""}"></i>`).join("")}</div>
       <span class="spacer"></span>
       <button class="btn ${last?"warm":""}" id="next">${last?"Start checkpoint":"Continue"}</button>
@@ -1150,7 +1260,18 @@ function renderCard(tid){
   </section>`;
   if (last && C.anim) mountAnim(C.anim);
   const cp=$("#cardplay"); if(cp) cp.onclick=()=>playCard(tid);
-  $("#prev").onclick=()=>{stopCardAudio(); cardIx--; renderCard(tid);};
+  /* BACK ON THE FIRST CARD (operator report, 2026-08-05: "the back button does not
+     work" on card 1 of "Sugar in, insulin out"). It was rendered `disabled`, which is
+     defensible — there IS no previous card — except that `.btn.ghost` overrides
+     `.btn:disabled` at equal specificity, so it kept the ENABLED look and the only
+     remaining cue was `cursor:default`, which an iPad does not have. A button that
+     looks live and does nothing reads as broken, and it is on the first card of every
+     concept — which is why it showed up "in some modules" and not others.
+     It now leaves the concept instead. Destination is the topic list rather than
+     viewTopic(tid), deliberately: viewTopic auto-opens the next unmastered concept,
+     which for a single-concept-in-progress topic is THIS one — so "back" would have
+     landed you exactly where you started. */
+  $("#prev").onclick=()=>{stopCardAudio(); if(cardIx===0){ viewDash(); return; } cardIx--; renderCard(tid);};
   $("#next").onclick=()=>{stopCardAudio(); last ? startCheckpoint(tid) : (cardIx++, renderCard(tid));};
 }
 /* --- P3.12 per-card audio: Remote's pre-rendered m4a → speechSynthesis fallback.
