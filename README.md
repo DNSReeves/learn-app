@@ -117,6 +117,38 @@ never credentials). Per-user isolation is enforced in every query.
 - Review scheduling is per-concept, not per-question; a due concept re-serves its
   full question set interleaved with other due concepts.
 
+## Completion certificates & spaced-review sessions (2026-08-04)
+
+**Certificate of completion.** When the answer that masters the *last* concept in a pack clears the
+gate, the checkpoint offers a certificate. It is issued **server-side** (`GET /api/topic/{tid}/certificate`)
+and **refuses unfinished work** with a 409 naming how many concepts are short — there is no path to a
+certificate for a course you did not finish. Every number on it is read from the answer log (concepts,
+questions answered, accuracy, elapsed days); the wall-worthiness is meant to come from stating the real
+standard — *95% posterior confidence with three consecutive correct answers at every gate*, which is
+stricter than most graded courses — not from imitating an accreditation.
+
+* **Verification code** is HMAC'd with a per-install key (`app_meta.cert_key`), so this server can
+  re-derive it and someone holding the recipe cannot. `GET /api/certificate/verify` is public on
+  purpose: a check that needs the holder's login proves nothing to anyone else.
+* **The name** on it is the student's to set (`POST /api/me/display_name` → `users.display_name`) —
+  a login handle is not the name you frame.
+* **Design**: A4 landscape, engraved double rule, drawn SVG seal, **no images and no external assets**,
+  so it prints identically offline. Print CSS hides all app chrome; enable "Background graphics".
+* **Issuer/signer are env-overridable**: `LEARN_CERT_ISSUER`, `LEARN_CERT_SIGNER`, `LEARN_CERT_SIGNER_TITLE`.
+* A 🎓 rung stays on the ladder afterwards — a certificate you can only see once is a screenshot, not a record.
+
+**Spaced-review sessions.** FSRS has scheduled reviews since P2.7, but nothing in the UI ever opened the
+queue, so "N reviews due" was a badge with no door. Now: `GET /api/review` (cross-topic) and
+`GET /api/topic/{tid}/review` serve **one retrieval per due concept** (not every question it owns — that
+is a re-test, not a review), **rotating by attempt count** so successive cycles ask something different,
+**most overdue first**. Answers post through the *normal* answer route, so FSRS rescheduling, relearn
+demotion and the ungraded-free-response rule behave exactly as they do in a checkpoint. Entry points:
+dashboard button (all topics), a 🔁 ladder rung, and the course-complete stage.
+
+**Performance.** `load_topics()` is cached behind a directory signature (name, mtime_ns, size): 7.44 ms
+→ 0.04 ms per call. The house *edit-file → refresh* convention is preserved — saving a pack moves its
+mtime and the next request reloads (and `packver.maybe_sync` re-runs).
+
 ## Pack versioning & migrations (P5.17, 2026-07-22)
 
 Every topic pack is content-hashed on load; versions live in `pack_versions`
