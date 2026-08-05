@@ -105,9 +105,9 @@ def test_display_name_is_settable_and_appears(client):
     assert tc.post("/api/me/display_name", json={"name": "   "}, headers=h).status_code == 400
 
 
-def test_topic_complete_flag_fires_only_on_the_last_gate(client):
-    """The trigger the celebration screen hangs on: `topic_complete` is true on
-    the answer that masters the FINAL concept, and false before that."""
+def test_completeness_requires_the_final_concept(client):
+    """The certificate's completeness rule: everything but the last concept is
+    still incomplete; mastering the last one is what opens it."""
     tc, amod, dbmod, h = client
     tid, pack = _first_topic(amod)
     with dbmod.conn() as c:
@@ -163,3 +163,40 @@ def test_certificate_uses_no_external_assets():
     seal = h.split("const CERT_SEAL")[1].split("`;")[0]
     for forbidden in ("http://", "https://", "<img", "url("):
         assert forbidden not in seal, f"certificate seal must not reference {forbidden}"
+
+
+# ---------- the "stuck in a loop" regression (operator, 2026-08-04 pm) ----------
+# "The ETF investing module gets stuck in a loop at Performance chasing and the
+# behavior gap." That card is the FIRST card of the LAST concept: a finished
+# course fell back to T.concepts[last], re-entered its cards, and the checkpoint's
+# "Next concept" button came right back — cards → checkpoint → cards, forever.
+
+def test_topic_complete_is_state_not_event(client):
+    """The backend half: topic_complete must stay true on a REVIEW answer of an
+    already-complete course. As a transition-only flag it went false, the UI fell
+    back to 'Next concept', and that button restarted the last concept."""
+    tc, amod, dbmod, h = client
+    tid, pack = _first_topic(amod)
+    with dbmod.conn() as c:
+        uid = c.execute("SELECT id FROM users WHERE username='u'").fetchone()["id"]
+    _master_all(dbmod, amod, uid, tid, pack, answers=0)
+    last = pack["concepts"][-1]
+    q = last["questions"][0]
+    r = tc.post(f"/api/topic/{tid}/concept/{last['id']}/answer",
+                json={"question_id": q["id"], "choice": q["answer"], "latency_ms": 800},
+                headers=h).json()
+    assert r["mastered"] is True
+    assert r["newly_mastered"] is False, "already mastered — this is a review"
+    assert r["topic_complete"] is True, "a finished course must stay finished"
+
+
+def test_finished_course_does_not_reopen_its_last_concept():
+    """The frontend half: viewTopic must route a fully-mastered course to the
+    completion stage instead of the last concept's first card."""
+    h = _index()
+    body = h.split("async function viewTopic(")[1].split("\n}")[0]
+    assert "allDone" in body and "viewTopicComplete(tid)" in body
+    assert "async function viewTopicComplete(" in h
+    # the loop was the checkpoint offering "Next concept" on a finished course
+    fin = h.split("const finish=(r,pickBtn)=>{")[1].split("\n  };")[0]
+    assert "r.topic_complete" in fin and 'id="go-cert"' in fin

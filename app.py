@@ -900,10 +900,14 @@ def answer(tid: str, cid: str, a: Answer,
                       interval_at=s.get("interval_d"), c=dbc)
 
     # CERTIFICATE TRIGGER (2026-08-04): the course is complete when EVERY concept
-    # in the pack is mastered. Computed only on a newly-mastered answer (the one
-    # moment it can change) so the hot path stays a single extra state read.
+    # in the pack is mastered. This is a STATE, not an event — it must stay true
+    # on every later answer too. (Bug 2026-08-04 pm, operator: "the ETF module
+    # gets stuck in a loop at Performance chasing and the behavior gap" — with a
+    # transition-only flag, a finished course fell back to the "Next concept"
+    # button, which re-entered the LAST concept's first card, forever.) Computed
+    # only when the concept ends mastered: one extra state read, off the hot path.
     topic_complete = False
-    if now_mastered and not was_mastered:
+    if now_mastered:
         st = db.get_states(user["id"], tid)
         topic_complete = all(st.get(c["id"], {}).get("mastered_at")
                              for c in pack["concepts"])

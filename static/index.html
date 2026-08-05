@@ -718,14 +718,45 @@ const SESH={moves:{},mastered:[]};   // P4.14: this visit's posterior moves
 async function viewTopic(tid, focus){
   T = await api("/topic/"+tid);
   if(!(T.concepts && T.concepts.length)){ main.innerHTML=`<div class="topic"><p class="sub">This topic has no concepts yet.</p></div>`; return; }   /* FE-7 */
-  const cur = focus || (T.concepts.find(c=>c.unlocked && !c.mastered) || T.concepts[T.concepts.length-1]).id;
+  /* LOOP FIX (2026-08-04, operator: "the ETF module gets stuck in a loop at
+     Performance chasing and the behavior gap"). The old fallback for "no
+     unmastered concept left" was T.concepts[last] — so a FINISHED course
+     re-opened its final concept at card 1 every time, and "Next concept" from
+     that concept's checkpoint came straight back here: cards → checkpoint →
+     Next concept → the same cards. A completed course now lands on its
+     completion stage; the ladder still opens any concept for review. */
+  const allDone = T.concepts.every(c=>c.mastered);
+  const nextOpen = T.concepts.find(c=>c.unlocked && !c.mastered);
+  const cur = focus || (nextOpen || T.concepts[T.concepts.length-1]).id;
   main.innerHTML = `<div class="topic">
     <nav class="ladder" id="ladder"></nav>
     <div id="stage"></div>
   </div>`;
-  renderLadder(cur);
+  renderLadder(focus || (allDone ? null : cur));
   if (T.needs_placement && !focus){ viewPlacement(tid); return; }
+  if (allDone && !focus){ viewTopicComplete(tid); return; }
   viewConcept(tid, cur);
+}
+
+/* The resting state of a finished course: what you earned, what's due, and the
+   way back to the certificate — never a re-entry into the last concept. */
+async function viewTopicComplete(tid){
+  const due = T.concepts.filter(c=>c.review_due).length;
+  $("#stage").innerHTML = `
+  <section class="stage celebrate">
+    <div class="laurel">🎓</div>
+    <h1>Course complete</h1>
+    <p class="sub">All <b>${T.concepts.length}</b> concepts in <b>${esc(T.title||"this course")}</b>
+      are mastered. ${due
+        ? `<b>${due}</b> ${due===1?"concept is":"concepts are"} due for spaced review — pick ${due===1?"it":"them"} from the ladder to keep the memory fresh.`
+        : `Nothing is due for review right now; open any concept from the ladder whenever you want a refresher.`}</p>
+    <div class="certactions">
+      <button class="btn ghost" id="tc-topics">All topics</button>
+      <button class="btn warm" id="tc-cert">🎓 View certificate</button>
+    </div>
+  </section>`;
+  $("#tc-topics").onclick=()=>{stopCardAudio(); viewDash();};
+  $("#tc-cert").onclick=()=>viewCertificate(tid);
 }
 function renderLadder(curId){
   $("#ladder").innerHTML =
@@ -1110,11 +1141,13 @@ function renderQuestion(tid){
     $("#after").innerHTML = `
       <div class="delta mono">posterior ${r.p_before.toFixed(3)} → <b>${r.p_after.toFixed(3)}</b> ${dir}</div>
       <div class="fb ${r.correct?"good":"bad"}">${esc(r.feedback)}</div>
-      ${r.topic_complete
+      ${r.topic_complete && r.newly_mastered
         ? `<div class="mastered-banner">🎓 <b>That was the last one — the course is complete.</b> Every concept in this topic has cleared the gate.</div>`
+        : (r.topic_complete
+        ? `<div class="mastered-banner">🎓 Course complete ✓ — this was a review; your certificate is one click away.</div>`
         : (r.newly_mastered
         ? `<div class="mastered-banner">Mastered — the gate is open. The next concept is unlocked, and this one enters spaced review tomorrow.</div>`
-        : (r.mastered ? `<div class="mastered-banner">Already mastered ✓ — keep reviewing, or move on.</div>` : ""))}
+        : (r.mastered ? `<div class="mastered-banner">Already mastered ✓ — keep reviewing, or move on.</div>` : "")))}
       <div class="pager">
         ${!r.correct?`<button class="btn ghost" id="reread">Re-read the cards</button>
                       <button class="btn ghost" id="helpme">Explain it differently</button>
