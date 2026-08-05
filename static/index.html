@@ -643,10 +643,16 @@ async function viewDash(){
       /* RESUME (operator, 2026-08-03): jump back to the last concept the server saw
          this user open — cross-device, validated server-side. DISABLED (with an
          honest title) until the student has started something: d.resume is null. */
+      /* REVIEW SESSION (2026-08-04): the FSRS queue finally has a door. Disabled
+         with an honest title when nothing is due — same contract as Resume. */
+      const dueAll=d.topics.reduce((n,t)=>n+(t.review_due||0),0);
       const bar=`<div class="catbar"><button id="cat-toggle" type="button"></button>
+        <button class="btn" id="review-btn" type="button" ${dueAll?"":"disabled"}
+          title="${dueAll?`Review ${dueAll} concept${dueAll>1?"s":""} due across all topics`:"Nothing is due for review yet"}"
+          style="margin-left:auto">🔁 Review${dueAll?` — ${dueAll} due`:""}</button>
         <button class="btn" id="resume-btn" type="button" ${d.resume?"":"disabled"}
           title="${d.resume?`Continue ${esc(d.resume.topic_title)} — ${esc(d.resume.concept_title)}`:"Nothing started yet — pick a topic to begin"}"
-          style="margin-left:auto">▶ Resume${d.resume?` — ${esc(d.resume.concept_title)}`:""}</button></div>`;
+          >▶ Resume${d.resume?` — ${esc(d.resume.concept_title)}`:""}</button></div>`;
       return bar + `<div class="cats" id="cats">` + cats.map(cat=>{
         const due=g[cat].reduce((n,t)=>n+(t.review_due||0),0);
         return `<section class="cat" data-cat="${esc(cat)}">
@@ -670,6 +676,7 @@ async function viewDash(){
   wireCategoryView(d.user);
   main.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
   { const rb=$("#resume-btn"); if(rb && d.resume) rb.onclick=()=>viewTopic(d.resume.tid, d.resume.cid); }
+  { const vb=$("#review-btn"); if(vb && !vb.disabled) vb.onclick=()=>viewReview(null); }
   { const ao=$("#author-open"); if(ao) ao.onclick=e=>{e.preventDefault(); viewAuthor();}; }
   /* P4.16: move progress between deployments. Export = download the JSON; import =
      server-side MERGE that never regresses local progress (stronger evidence wins). */
@@ -748,14 +755,16 @@ async function viewTopicComplete(tid){
     <h1>Course complete</h1>
     <p class="sub">All <b>${T.concepts.length}</b> concepts in <b>${esc(T.title||"this course")}</b>
       are mastered. ${due
-        ? `<b>${due}</b> ${due===1?"concept is":"concepts are"} due for spaced review — pick ${due===1?"it":"them"} from the ladder to keep the memory fresh.`
+        ? `<b>${due}</b> ${due===1?"concept is":"concepts are"} due for spaced review — that is where retention is actually won.`
         : `Nothing is due for review right now; open any concept from the ladder whenever you want a refresher.`}</p>
     <div class="certactions">
       <button class="btn ghost" id="tc-topics">All topics</button>
+      ${due?`<button class="btn" id="tc-review">🔁 Review ${due} due</button>`:""}
       <button class="btn warm" id="tc-cert">🎓 View certificate</button>
     </div>
   </section>`;
   $("#tc-topics").onclick=()=>{stopCardAudio(); viewDash();};
+  const tr=$("#tc-review"); if(tr) tr.onclick=()=>viewReview(tid);
   $("#tc-cert").onclick=()=>viewCertificate(tid);
 }
 function renderLadder(curId){
@@ -774,11 +783,20 @@ function renderLadder(curId){
     /* Certificate rung (2026-08-04): a certificate you can only see once is a
        screenshot, not a record — once the course is complete it stays one click
        away from the ladder, forever. */
+    /* Review rung (2026-08-04): the due queue is reachable from inside the
+       course too, not only the dashboard — that is where a student notices a
+       "review due" flag on a rung. */
+    ((T.concepts.filter(c=>c.review_due).length)
+      ? `<button class="rung" id="review-rung"><span class="dot">🔁</span>
+           <span><span class="rt">Review</span><br>
+           <span class="rp">${T.concepts.filter(c=>c.review_due).length} due now</span></span></button>`
+      : "") +
     (T.concepts.every(c=>c.mastered)
       ? `<button class="rung done" id="cert-rung"><span class="dot">🎓</span>
            <span><span class="rt">Certificate</span><br>
            <span class="rp">course complete</span></span></button>`
       : "");
+  const rr2=$("#review-rung"); if(rr2) rr2.onclick=()=>{stopCardAudio(); viewReview(T.id);};
   const cr=$("#cert-rung"); if(cr) cr.onclick=()=>{stopCardAudio(); viewCertificate(T.id);};
   $("#back").onclick=()=>{stopCardAudio(); viewDash();};
   $("#ladder").querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
@@ -902,6 +920,131 @@ async function viewCertificate(tid){
   </div>`;
   $("#cert-back").onclick=()=>viewTopic(tid);
   $("#cert-print").onclick=()=>window.print();
+}
+
+/* ---------- spaced review session (2026-08-04) ----------
+   The FSRS scheduler has always run; nothing in the UI ever opened its queue, so
+   "due for review" was a badge with no door behind it. A session serves ONE
+   retrieval per due concept (most overdue first), posts each answer through the
+   normal answer route — so the same FSRS reschedule and relearn-demotion logic
+   applies — and ends with an honest ledger of what held and what slipped. */
+let RV = null;   /* {queue, i, scope, tid, right, wrong, demoted[], moves[]} */
+
+async function viewReview(tid){
+  let d;
+  try{ d = await api(tid ? `/topic/${tid}/review` : "/review"); }
+  catch(e){ toast(e.message||"Couldn't load the review queue"); return viewDash(); }
+  RV = {queue:d.queue, i:0, scope:d.scope, tid, right:0, wrong:0, demoted:[], moves:[]};
+  if(!d.queue.length){
+    main.innerHTML = `<div class="dash"><h1>Nothing due</h1>
+      <p class="sub">No concepts in <b>${esc(d.scope)}</b> have come due for review yet.
+        Spacing is the point — they'll surface here as their intervals expire.</p>
+      <div class="certactions" style="justify-content:flex-start">
+        <button class="btn" id="rv-back">Back to topics</button></div></div>`;
+    $("#rv-back").onclick=()=>viewDash();
+    return;
+  }
+  main.innerHTML = `<div class="dash" style="max-width:760px">
+    <div id="rv-head"></div><div id="rv-stage"></div></div>`;
+  renderReviewQ();
+}
+
+function renderReviewQ(){
+  const it = RV.queue[RV.i];
+  if(!it) return renderReviewDone();
+  const q = it.question, isFree = q.type === "free";
+  const t0 = Date.now();
+  $("#rv-head").innerHTML = `
+    <div class="kicker">Spaced review · ${esc(RV.scope)} — ${RV.i+1} of ${RV.queue.length}</div>
+    <div class="meterline" style="margin:6px 0 14px">
+      <div class="bar"><i style="width:${100*(RV.i)/RV.queue.length}%"></i></div>
+      <span class="num">${RV.right}✓ ${RV.wrong}✗</span>
+    </div>`;
+  $("#rv-stage").innerHTML = `
+  <section class="stage">
+    <div class="kicker">${esc(it.topic_title)} · ${esc(it.concept_title)}
+      ${it.overdue_days>=1?`<span class="flag">${Math.round(it.overdue_days)}d overdue</span>`:""}</div>
+    <p class="qprompt">${esc(q.prompt)}</p>
+    ${isFree
+      ? `<div><textarea id="rv-free" rows="3" style="width:100%;max-width:640px" placeholder="your answer…"></textarea>
+         <div style="margin-top:8px"><button class="btn" id="rv-go">Submit</button></div></div>`
+      : `<div id="rv-opts">${q.options.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`}
+    <div id="rv-after"></div>
+  </section>`;
+
+  const send = async (payload, pickBtn) => {
+    let r;
+    try{
+      r = await api(`/topic/${it.topic_id}/concept/${it.concept_id}/answer`,
+                    {method:"POST", body:{...payload, latency_ms:Date.now()-t0}});
+    }catch(e){ toast(e.message||"Couldn't record that answer"); return; }
+    if(r.ungraded){
+      $("#rv-after").innerHTML = `<div class="fb">${esc(r.feedback)}</div>
+        <div class="fb good"><b>Model answer:</b> ${esc(r.model_answer||"")}</div>
+        <div class="pager"><span class="spacer"></span>
+          <button class="btn" id="rv-next">Next</button></div>`;
+      $("#rv-next").onclick=()=>{RV.i++; renderReviewQ();};
+      return;   /* ungraded never counts either way — mastery is untouched */
+    }
+    r.correct ? RV.right++ : RV.wrong++;
+    RV.moves.push({concept:it.concept_title, from:r.p_before, to:r.p_after});
+    if(r.demoted) RV.demoted.push(it.concept_title);
+    if(pickBtn) pickBtn.classList.add(r.correct?"right":"wrongpick");
+    $("#rv-opts")&&$("#rv-opts").querySelectorAll(".opt").forEach(b=>b.disabled=true);
+    const dir = r.p_after>=r.p_before ? "↑" : "↓";
+    $("#rv-after").innerHTML = `
+      <div class="delta mono">posterior ${r.p_before.toFixed(3)} → <b>${r.p_after.toFixed(3)}</b> ${dir}</div>
+      <div class="fb ${r.correct?"good":"bad"}">${esc(r.feedback)}</div>
+      ${r.demoted?`<div class="mastered-banner">This one slipped below the retention floor — it goes back into the ladder for relearning, and its cards are served again.</div>`:""}
+      <div class="pager">
+        <button class="btn ghost" id="rv-open">Open the concept</button>
+        <span class="spacer"></span>
+        <button class="btn ${RV.i+1<RV.queue.length?"":"warm"}" id="rv-next">
+          ${RV.i+1<RV.queue.length?"Next":"Finish review"}</button>
+      </div>`;
+    $("#rv-next").onclick=()=>{RV.i++; renderReviewQ();};
+    $("#rv-open").onclick=()=>viewTopic(it.topic_id, it.concept_id);
+  };
+
+  if(isFree){
+    $("#rv-go").onclick=()=>{
+      const txt=($("#rv-free").value||"").trim(); if(!txt) return;
+      $("#rv-go").disabled=true; $("#rv-go").textContent="Grading…";
+      send({question_id:q.id, text:txt});
+    };
+  }else{
+    $("#rv-opts").querySelectorAll(".opt").forEach(b=>{
+      b.onclick=()=>send({question_id:q.id, choice:+b.dataset.i}, b);
+    });
+  }
+}
+
+function renderReviewDone(){
+  const n = RV.queue.length, kept = n - RV.demoted.length;
+  $("#rv-head").innerHTML = "";
+  $("#rv-stage").innerHTML = `
+  <section class="stage celebrate">
+    <div class="laurel">${RV.wrong===0?"🎯":"📘"}</div>
+    <h1>Review complete</h1>
+    <p class="sub">${RV.right} of ${n} recalled correctly.
+      ${RV.demoted.length
+        ? `<b>${RV.demoted.length}</b> slipped back for relearning: ${RV.demoted.map(esc).join(", ")}.`
+        : `Every concept held its mastery — each one's next review is now scheduled further out.`}</p>
+    <div class="cstats">
+      <div class="cstat"><b>${n}</b><span>reviewed</span></div>
+      <div class="cstat"><b>${RV.right}</b><span>correct</span></div>
+      <div class="cstat"><b>${kept}</b><span>held mastery</span></div>
+    </div>
+    ${RV.moves.length?`<div class="mono" style="font-size:12.5px;max-width:420px;margin:0 auto 20px;text-align:left">
+      ${RV.moves.map(m=>`${esc(m.concept)}: ${m.from.toFixed(2)} → <b>${m.to.toFixed(2)}</b> ${m.to>=m.from?"↑":"↓"}`).join("<br>")}
+    </div>`:""}
+    <div class="certactions">
+      <button class="btn ghost" id="rv-dash">Back to topics</button>
+      <button class="btn warm" id="rv-more">Check for more due</button>
+    </div>
+  </section>`;
+  $("#rv-dash").onclick=()=>viewDash();
+  $("#rv-more").onclick=()=>viewReview(RV.tid);
 }
 
 /* ---------- placement (adaptive prior-setting) ---------- */

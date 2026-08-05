@@ -998,24 +998,60 @@ def set_display_name(body: DisplayName, authorization: str | None = Header(defau
 
 # ---------- review queue (interleaved, spaced) ----------
 
+def _due_items(user_id: int, packs: dict) -> list[dict]:
+    """Every concept whose spaced-review date has arrived, most overdue first.
+
+    ONE retrieval per concept, not every question it owns (2026-08-04 rewrite —
+    the old queue emitted all 3-5 questions of every due concept, which is a
+    re-test, not a review; retrieval practice wants one recall per item and the
+    FSRS reschedule happens on the first answer anyway). The question ROTATES by
+    attempt count, so successive review cycles ask a different question instead
+    of training recall of one item.
+    """
+    now = time.time()
+    out = []
+    for tid, pack in packs.items():
+        states = db.get_states(user_id, tid)
+        for c in pack["concepts"]:
+            s = states.get(c["id"])
+            if not (s and s.get("mastered_at") and s.get("due_at") and s["due_at"] < now):
+                continue
+            qs = c.get("questions") or []
+            if not qs:
+                continue
+            q = qs[(s.get("attempts") or 0) % len(qs)]
+            out.append({
+                "topic_id": tid, "topic_title": pack["title"],
+                "concept_id": c["id"], "concept_title": c["title"],
+                "p_mastery": round(mastery.decay_for_review(
+                    s.get("p_mastery", mastery.P_INIT), s.get("due_at")), 4),
+                "overdue_days": round(max(0.0, (now - s["due_at"]) / 86400), 2),
+                # the answer is NEVER sent — grading stays server-side
+                "question": {"id": q["id"], "type": q.get("type", "mcq"),
+                             "prompt": q["prompt"], "options": q.get("options") or []},
+            })
+    out.sort(key=lambda r: -r["overdue_days"])
+    return out
+
+
 @app.get("/api/topic/{tid}/review")
 def review(tid: str, authorization: str | None = Header(default=None)):
     user = require_user(authorization)
     pack = load_topics().get(tid)
     if not pack:
         raise HTTPException(404, "No such topic.")
-    states = db.get_states(user["id"], tid)
-    queue = []
-    for c in pack["concepts"]:
-        s = states.get(c["id"])
-        if s and s.get("mastered_at") and s.get("due_at") and s["due_at"] < time.time():
-            for q in c["questions"]:
-                queue.append({"concept_id": c["id"], "concept_title": c["title"],
-                              "id": q["id"], "type": q["type"],
-                              "prompt": q["prompt"], "options": q["options"]})
-    # interleave across concepts: round-robin by original order
-    queue.sort(key=lambda q: q["id"])
-    return {"queue": queue}
+    queue = _due_items(user["id"], {tid: pack})
+    return {"queue": queue, "due": len(queue), "scope": pack["title"]}
+
+
+@app.get("/api/review")
+def review_all(authorization: str | None = Header(default=None)):
+    """Cross-topic review session (2026-08-04). Spaced repetition only pays if
+    the due queue is somewhere the student actually looks — per-topic queues make
+    reviewing a chore you have to remember to go find, topic by topic."""
+    user = require_user(authorization)
+    queue = _due_items(user["id"], load_topics())
+    return {"queue": queue, "due": len(queue), "scope": "All topics"}
 
 
 # ---------- AI remediation (hybrid layer) ----------
