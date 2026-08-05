@@ -78,7 +78,36 @@ if not _applog.handlers:
 
 # ---------- topic packs (the extensible part: drop a JSON in topics/) ----------
 
+# PACK CACHE (2026-08-04): load_topics() ran on EVERY request — listdir plus a
+# full json.load of all 22 packs (~2 MB of parsing) to answer "what is the title
+# of one topic", and again on every review answer. The cache is keyed on a
+# directory signature (name, mtime_ns, size per file), so the house
+# "edit-file → refresh" convention survives untouched: save a pack and the
+# signature changes, the next request reloads and packver.maybe_sync re-runs.
+# Held by reference — nothing in the app mutates a loaded pack (verified), and
+# the author-upload path writes a FILE, which moves the signature.
+_packs_cache: dict | None = None
+_packs_sig: tuple | None = None
+
+
+def _topics_signature() -> tuple:
+    """Cheap fingerprint of topics/: one stat() per file, no parsing."""
+    sig = []
+    for fn in sorted(os.listdir(TOPIC_DIR)):
+        if fn.endswith(".json") and not fn.startswith("_"):
+            try:
+                st = os.stat(os.path.join(TOPIC_DIR, fn))
+                sig.append((fn, st.st_mtime_ns, st.st_size))
+            except OSError:
+                sig.append((fn, 0, 0))     # vanished mid-scan → force a reload
+    return tuple(sig)
+
+
 def load_topics() -> dict:
+    global _packs_cache, _packs_sig
+    sig = _topics_signature()
+    if _packs_cache is not None and sig == _packs_sig:
+        return _packs_cache
     packs = {}
     for fn in sorted(os.listdir(TOPIC_DIR)):
         if fn.endswith(".json") and not fn.startswith("_"):
@@ -101,6 +130,7 @@ def load_topics() -> dict:
         packver.maybe_sync(packs)
     except Exception:
         logging.getLogger("learn").exception("pack version sync failed (serving anyway)")
+    _packs_cache, _packs_sig = packs, sig
     return packs
 
 

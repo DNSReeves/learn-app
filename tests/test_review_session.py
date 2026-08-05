@@ -174,3 +174,33 @@ def test_review_posts_through_the_normal_answer_route():
     assert "/concept/${it.concept_id}/answer" in body
     assert "r.demoted" in body, "a demotion must be shown, not silently swallowed"
     assert "r.ungraded" in body, "an ungraded free response must not count either way"
+
+
+# ---------- topic-pack cache (operator, 2026-08-04: "cache the topic packs") ----------
+
+def test_pack_cache_serves_the_same_object_until_a_file_changes(tmp_path, monkeypatch):
+    """Repeat calls must not re-parse; a pack EDIT must still be picked up on the
+    next request (the house edit-file -> refresh convention)."""
+    import importlib, json as _json, os, time as _t
+    monkeypatch.setenv("LEARN_DB", str(tmp_path / "learn.db"))
+    topics = tmp_path / "topics"; topics.mkdir()
+    pack = {"id": "t1", "title": "One", "concepts": [
+        {"id": "c1", "title": "C1", "summary": "s", "cards": [],
+         "questions": [{"id": "q1", "type": "mcq", "prompt": "p",
+                        "options": ["a", "b"], "answer": 0, "feedback": ["x", "y"]}]}]}
+    (topics / "t1.json").write_text(_json.dumps(pack))
+    import db as dbmod; importlib.reload(dbmod); dbmod.init()
+    import app as amod; importlib.reload(amod)
+    monkeypatch.setattr(amod, "TOPIC_DIR", str(topics))
+    monkeypatch.setattr(amod, "_packs_cache", None)
+    monkeypatch.setattr(amod, "_packs_sig", None)
+    first = amod.load_topics()
+    assert amod.load_topics() is first, "second call must hit the cache"
+    assert first["t1"]["title"] == "One"
+    _t.sleep(0.01)
+    pack["title"] = "Two"
+    (topics / "t1.json").write_text(_json.dumps(pack))
+    os.utime(topics / "t1.json", None)
+    reloaded = amod.load_topics()
+    assert reloaded is not first, "an edited pack must invalidate the cache"
+    assert reloaded["t1"]["title"] == "Two"
