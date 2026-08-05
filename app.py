@@ -2,6 +2,7 @@
 
 Run:  uvicorn app:app --host 0.0.0.0 --port 8090
 """
+import hashlib
 import json
 import logging
 import os
@@ -898,12 +899,97 @@ def answer(tid: str, cid: str, a: Answer,
                       correct, a.latency_ms,
                       interval_at=s.get("interval_d"), c=dbc)
 
+    # CERTIFICATE TRIGGER (2026-08-04): the course is complete when EVERY concept
+    # in the pack is mastered. Computed only on a newly-mastered answer (the one
+    # moment it can change) so the hot path stays a single extra state read.
+    topic_complete = False
+    if now_mastered and not was_mastered:
+        st = db.get_states(user["id"], tid)
+        topic_complete = all(st.get(c["id"], {}).get("mastered_at")
+                             for c in pack["concepts"])
+
     return {"correct": correct,
             "feedback": fr_feedback if q.get("type") == "free" else q["feedback"][a.choice],
             "p_before": round(p_before, 4), "p_after": round(p_after, 4),
             "streak": streak, "mastered": now_mastered,
             "newly_mastered": now_mastered and not was_mastered,
+            "topic_complete": topic_complete,
             "demoted": demoted}
+
+
+# ---------- certificates of completion (2026-08-04) ----------
+# A certificate is issued ONLY when every concept in the pack is mastered under
+# the live gate (P(known) >= 0.95 with a 3-answer streak). Everything printed on
+# it is read from the answer log — no rounded-up "achievement" copy, no claim the
+# student didn't earn. The prestige comes from stating the real standard, which
+# is stricter than most graded courses.
+
+CERT_ISSUER = os.getenv("LEARN_CERT_ISSUER", "DNSR Learning")
+CERT_SIGNER = os.getenv("LEARN_CERT_SIGNER", "David Reeves, PhD")
+CERT_SIGNER_TITLE = os.getenv("LEARN_CERT_SIGNER_TITLE", "Program Director")
+
+
+def _cert_code(username: str, tid: str, completed_at: float) -> str:
+    """HMAC-signed verification code — re-derivable by THIS server only."""
+    msg = f"{username}|{tid}|{int(completed_at or 0)}".encode()
+    dig = hmac.new(db.install_key(), msg, hashlib.sha256).hexdigest().upper()
+    return f"{dig[0:4]}-{dig[4:8]}-{dig[8:12]}"
+
+
+@app.get("/api/topic/{tid}/certificate")
+def certificate(tid: str, authorization: str | None = Header(default=None)):
+    user = require_user(authorization)
+    pack = load_topics().get(tid)
+    if not pack:
+        raise HTTPException(404, "No such topic.")
+    states = db.get_states(user["id"], tid)
+    missing = [c["title"] for c in pack["concepts"]
+               if not states.get(c["id"], {}).get("mastered_at")]
+    if missing:
+        # Honest refusal — never issue a certificate for unfinished work.
+        raise HTTPException(409, f"{len(missing)} concept(s) not yet mastered.")
+    st = db.topic_stats(user["id"], tid)
+    completed_at = st["completed_at"] or time.time()
+    acc = (st["correct"] / st["answers"]) if st["answers"] else 0.0
+    days = None
+    if st["first_at"] and st["last_at"]:
+        days = max(1, round((st["last_at"] - st["first_at"]) / 86400))
+    return {
+        "student": db.get_display_name(user["id"]) or user["username"],
+        "username": user["username"],
+        "course": pack["title"],
+        "tagline": pack.get("tagline", ""),
+        "concepts": len(pack["concepts"]),
+        "concept_titles": [c["title"] for c in pack["concepts"]],
+        "completed_at": completed_at,
+        "questions_answered": st["answers"],
+        "accuracy": round(acc, 4),
+        "days_elapsed": days,
+        "standard": {"mastery_p": mastery.MASTERY_P, "streak": mastery.STREAK_GATE},
+        "issuer": CERT_ISSUER, "signer": CERT_SIGNER, "signer_title": CERT_SIGNER_TITLE,
+        "code": _cert_code(user["username"], tid, completed_at),
+    }
+
+
+@app.get("/api/certificate/verify")
+def certificate_verify(u: str, t: str, at: float, c: str):
+    """Re-derive a certificate code. Public by design: a verification that needs
+    the holder's login proves nothing to anyone else."""
+    ok = hmac.compare_digest(_cert_code(u, t, at), (c or "").strip().upper())
+    return {"valid": ok, "student": u if ok else None, "topic": t if ok else None}
+
+
+class DisplayName(BaseModel):
+    name: str
+
+
+@app.post("/api/me/display_name")
+def set_display_name(body: DisplayName, authorization: str | None = Header(default=None)):
+    user = require_user(authorization)
+    clean = db.set_display_name(user["id"], body.name)
+    if not clean:
+        raise HTTPException(400, "A name is required.")
+    return {"display_name": clean}
 
 
 # ---------- review queue (interleaved, spaced) ----------

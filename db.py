@@ -194,6 +194,20 @@ def init():
             pass
         c.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email "
                   "ON users(email) WHERE email IS NOT NULL")
+    # Certificates (2026-08-04): the name that appears on a completion
+    # certificate. Separate from `username` on purpose — a login handle
+    # ("kate") is not the name you frame ("Kate Reeves"). NULL until the
+    # student sets it; the certificate falls back to the username.
+    # `app_meta` holds the per-install HMAC key that signs verification
+    # codes: without a secret the code would be a public recipe anyone
+    # could re-derive, which is decoration, not verification.
+    with conn() as c:
+        try:
+            c.execute("ALTER TABLE users ADD COLUMN display_name TEXT")
+        except sqlite3.OperationalError:
+            pass
+        c.execute("CREATE TABLE IF NOT EXISTS app_meta ("
+                  "key TEXT PRIMARY KEY, value TEXT NOT NULL)")
 
 
 def _hash(pw: str, salt: bytes) -> bytes:
@@ -558,6 +572,54 @@ def has_answers(user_id: int, topic_id: str) -> bool:
             "SELECT 1 FROM answers WHERE user_id=? AND topic_id=? LIMIT 1",
             (user_id, topic_id),
         ).fetchone() is not None
+
+
+# ---------- certificates (2026-08-04) ----------
+
+def install_key() -> bytes:
+    """Per-install secret that signs certificate verification codes. Generated
+    once on first use and stored in app_meta — so a code can be RE-DERIVED by
+    this server (real verification) and not by whoever holds the recipe."""
+    with conn() as c:
+        row = c.execute("SELECT value FROM app_meta WHERE key='cert_key'").fetchone()
+        if row:
+            return bytes.fromhex(row["value"])
+        key = secrets.token_bytes(32)
+        c.execute("INSERT OR REPLACE INTO app_meta (key, value) VALUES ('cert_key', ?)",
+                  (key.hex(),))
+        return key
+
+
+def get_display_name(user_id: int) -> str | None:
+    with conn() as c:
+        row = c.execute("SELECT display_name FROM users WHERE id=?", (user_id,)).fetchone()
+        return (row["display_name"] or None) if row else None
+
+
+def set_display_name(user_id: int, name: str) -> str:
+    """Set the name that appears on certificates. Trimmed and length-capped;
+    stored verbatim otherwise (people's names are not ours to normalize)."""
+    clean = " ".join((name or "").split())[:60]
+    with conn() as c:
+        c.execute("UPDATE users SET display_name=? WHERE id=?", (clean or None, user_id))
+    return clean
+
+
+def topic_stats(user_id: int, topic_id: str) -> dict:
+    """Honest completion statistics for a certificate: what the student
+    actually did, straight from the answer log — never estimated."""
+    with conn() as c:
+        row = c.execute(
+            "SELECT COUNT(*) n, COALESCE(SUM(is_correct),0) ok, MIN(at) first_at, MAX(at) last_at "
+            "FROM answers WHERE user_id=? AND topic_id=?", (user_id, topic_id)).fetchone()
+        mrow = c.execute(
+            "SELECT COUNT(*) n, MAX(mastered_at) last_mastered FROM concept_state "
+            "WHERE user_id=? AND topic_id=? AND mastered_at IS NOT NULL",
+            (user_id, topic_id)).fetchone()
+    return {"answers": row["n"] or 0, "correct": row["ok"] or 0,
+            "first_at": row["first_at"], "last_at": row["last_at"],
+            "mastered_concepts": mrow["n"] or 0,
+            "completed_at": mrow["last_mastered"]}
 
 
 if __name__ == "__main__":

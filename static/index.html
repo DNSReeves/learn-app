@@ -185,6 +185,77 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 @media (prefers-reduced-motion:reduce){
   .strip .fill{transition:none}
 }
+
+/* ---------- completion + certificate (2026-08-04) ---------- */
+.celebrate{text-align:center;padding:44px 24px}
+.celebrate h1{font-size:34px;margin-bottom:6px}
+.celebrate .sub{color:var(--dim);max-width:52ch;margin:0 auto 22px}
+.celebrate .laurel{font-size:52px;line-height:1;margin-bottom:14px}
+.cstats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 auto 26px;max-width:640px}
+.cstat{background:var(--panel);border:1.5px solid var(--line);border-radius:var(--r);padding:12px 18px;min-width:120px}
+.cstat b{display:block;font-family:"IBM Plex Mono",monospace;font-size:22px;color:var(--post-deep)}
+.cstat span{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.namebox{max-width:420px;margin:0 auto 22px;text-align:left}
+.namebox label{display:block;font-size:13px;color:var(--dim);margin-bottom:6px}
+
+/* The certificate. Landscape, engraved double rule, drawn seal — no images, so
+   it prints identically offline and survives any asset host going away. */
+.certwrap{padding:24px 16px 60px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.cert{
+  width:min(100%,1000px);aspect-ratio:1.4142/1;   /* A4 landscape */
+  background:
+    radial-gradient(circle at 12% 14%, rgba(232,161,60,.07), transparent 42%),
+    radial-gradient(circle at 88% 86%, rgba(232,161,60,.07), transparent 42%),
+    #FCFBF7;
+  color:#16243A;position:relative;padding:5.2% 6.4%;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  box-shadow:0 2px 6px rgba(22,36,58,.10),0 22px 60px rgba(22,36,58,.14);
+  border:1px solid #D9C79A;
+}
+.cert::before,.cert::after{content:"";position:absolute;pointer-events:none}
+.cert::before{inset:14px;border:2.5px solid #C9A227}          /* outer engraved rule */
+.cert::after{inset:22px;border:1px solid #D9C79A}             /* inner hairline */
+.cert .corner{position:absolute;width:34px;height:34px;border:0 solid #C9A227;opacity:.9}
+.cert .corner.tl{top:24px;left:24px;border-top-width:3px;border-left-width:3px}
+.cert .corner.tr{top:24px;right:24px;border-top-width:3px;border-right-width:3px}
+.cert .corner.bl{bottom:24px;left:24px;border-bottom-width:3px;border-left-width:3px}
+.cert .corner.br{bottom:24px;right:24px;border-bottom-width:3px;border-right-width:3px}
+.cert .issuer{font-family:"IBM Plex Serif",serif;font-size:clamp(13px,1.5vw,17px);
+  letter-spacing:.34em;text-transform:uppercase;color:#8A6D1F;margin-bottom:2px}
+.cert .rule{width:56px;height:2px;background:#C9A227;margin:10px auto 14px}
+.cert .kicker{font-family:"IBM Plex Serif",serif;font-style:italic;
+  font-size:clamp(13px,1.6vw,18px);color:#5B6B80}
+.cert .who{font-family:"IBM Plex Serif",serif;font-weight:600;
+  font-size:clamp(26px,4.6vw,52px);line-height:1.12;margin:6px 0 4px;
+  border-bottom:1.5px solid #D9C79A;padding:0 .4em .12em}
+.cert .what{font-family:"IBM Plex Serif",serif;font-size:clamp(16px,2.3vw,27px);
+  font-weight:600;margin:14px 0 2px;max-width:22ch}
+.cert .tag{color:#5B6B80;font-size:clamp(11px,1.35vw,15px);max-width:46ch}
+.cert .standard{margin-top:auto;font-size:clamp(10px,1.15vw,13px);color:#5B6B80;
+  max-width:60ch;line-height:1.5}
+.cert .standard b{color:#16243A}
+.cert .feet{width:100%;display:flex;align-items:flex-end;justify-content:space-between;
+  gap:16px;margin-top:14px}
+.cert .sig{flex:1;text-align:center}
+.cert .sigline{border-top:1.2px solid #16243A;margin:0 auto 5px;width:min(100%,230px)}
+.cert .signame{font-family:"IBM Plex Serif",serif;font-size:clamp(11px,1.3vw,15px);font-weight:600}
+.cert .sigrole{font-size:clamp(9px,1.05vw,11px);color:#5B6B80;text-transform:uppercase;letter-spacing:.08em}
+.cert .seal{flex:0 0 auto;width:clamp(74px,10vw,116px);opacity:.95}
+.cert .vcode{position:absolute;bottom:30px;left:0;right:0;font-family:"IBM Plex Mono",monospace;
+  font-size:clamp(8px,.95vw,10px);color:#8A6D1F;letter-spacing:.1em}
+.certactions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.certnote{color:var(--dim);font-size:13px;max-width:56ch;text-align:center}
+
+/* Print: the certificate alone, edge to edge, colors intact. */
+@media print{
+  @page{size:A4 landscape;margin:8mm}
+  #top,#ladder,.certactions,.certnote,#toast{display:none !important}
+  body{background:#fff}
+  .certwrap{padding:0;display:block}
+  .cert{width:100%;max-width:none;aspect-ratio:auto;height:calc(100vh - 16mm);
+    box-shadow:none;border:1px solid #C9A227;break-inside:avoid;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -212,6 +283,18 @@ const api = async (path, opts={}) => {
   return data;
 };
 const esc = s => (s==null?"":String(s)).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));   /* null-safe: a missing field (e.g. resource note) must never throw + abort a render */
+/* Transient status line (2026-08-04, added with certificates): a failure the
+   learner should see but that must not replace the screen they are on. */
+let _toastT=null;
+function toast(msg, ms=3600){
+  let el=$("#toast");
+  if(!el){ el=document.createElement("div"); el.id="toast"; document.body.appendChild(el);
+           el.style.cssText="position:fixed;left:50%;bottom:22px;transform:translateX(-50%);"+
+             "background:#16243A;color:#fff;padding:10px 16px;border-radius:8px;z-index:60;"+
+             "box-shadow:0 8px 24px rgba(22,36,58,.28);max-width:min(90vw,460px);font-size:14px"; }
+  el.textContent=msg; el.style.display="block";
+  clearTimeout(_toastT); _toastT=setTimeout(()=>{ el.style.display="none"; }, ms);
+}
 /* minimal markdown: ## big line, ### h3, **bold**, - lists, blank-line paragraphs */
 function md(src){
   const blocks = src.split(/\n\n+/).map(b=>{
@@ -656,12 +739,138 @@ function renderLadder(curId){
         ${c.review_due?'<br><span class="flag">review due</span>':""}
         ${!c.unlocked?'<br><span class="rp">locked</span>':""}
       </span>
-    </button>`).join("");
+    </button>`).join("") +
+    /* Certificate rung (2026-08-04): a certificate you can only see once is a
+       screenshot, not a record — once the course is complete it stays one click
+       away from the ladder, forever. */
+    (T.concepts.every(c=>c.mastered)
+      ? `<button class="rung done" id="cert-rung"><span class="dot">🎓</span>
+           <span><span class="rt">Certificate</span><br>
+           <span class="rp">course complete</span></span></button>`
+      : "");
+  const cr=$("#cert-rung"); if(cr) cr.onclick=()=>{stopCardAudio(); viewCertificate(T.id);};
   $("#back").onclick=()=>{stopCardAudio(); viewDash();};
   $("#ladder").querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
     stopCardAudio();
     renderLadder(b.dataset.c); viewConcept(T.id,b.dataset.c);
   });
+}
+
+/* ---------- completion + certificate (2026-08-04) ----------
+   Fires when the LAST concept in a pack clears the 0.95 + streak-3 gate. The
+   certificate is issued by the server (which re-checks every concept and
+   refuses on unfinished work) and every number on it comes from the answer
+   log — the wall-worthiness is supposed to come from the standard being real. */
+const CERT_SEAL = `
+<svg class="seal" viewBox="0 0 120 120" role="img" aria-label="Seal">
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#C9A227" stroke-width="2.5"/>
+  <circle cx="60" cy="60" r="47" fill="none" stroke="#C9A227" stroke-width="1"/>
+  <circle cx="60" cy="60" r="38" fill="#FBF3DC" stroke="#D9C79A" stroke-width="1"/>
+  <g stroke="#C9A227" stroke-width="2" stroke-linecap="round">
+    ${Array.from({length:36},(_,i)=>{
+      const a=i*10*Math.PI/180, r1=47, r2=52;
+      return `<line x1="${(60+r1*Math.cos(a)).toFixed(1)}" y1="${(60+r1*Math.sin(a)).toFixed(1)}"
+                    x2="${(60+r2*Math.cos(a)).toFixed(1)}" y2="${(60+r2*Math.sin(a)).toFixed(1)}"/>`;
+    }).join("")}
+  </g>
+  <path d="M60 40 l5.3 10.9 12 1.7 -8.7 8.5 2.1 12 -10.7-5.7 -10.7 5.7 2.1-12 -8.7-8.5 12-1.7z"
+        fill="#C9A227"/>
+  <text x="60" y="82" text-anchor="middle" font-family="IBM Plex Serif,serif"
+        font-size="9" letter-spacing="1.4" fill="#8A6D1F">MASTERY</text>
+</svg>`;
+
+async function viewCelebration(tid, topicTitle){
+  let cert=null, err=null;
+  try{ cert = await api(`/topic/${tid}/certificate`); }
+  catch(e){ err = e.message || "could not issue the certificate"; }
+  const acc = cert ? Math.round(cert.accuracy*100) : 0;
+  $("#stage").innerHTML = `
+  <section class="stage celebrate">
+    <div class="laurel">🎓</div>
+    <h1>Course complete</h1>
+    <p class="sub">Every concept in <b>${esc(topicTitle||"this course")}</b> cleared the mastery gate —
+      95% posterior confidence with three correct in a row, each one. That is a stricter bar than most
+      graded courses set.</p>
+    ${cert?`
+    <div class="cstats">
+      <div class="cstat"><b>${cert.concepts}</b><span>concepts mastered</span></div>
+      <div class="cstat"><b>${cert.questions_answered}</b><span>questions answered</span></div>
+      <div class="cstat"><b>${acc}%</b><span>accuracy</span></div>
+      ${cert.days_elapsed?`<div class="cstat"><b>${cert.days_elapsed}</b><span>day${cert.days_elapsed===1?"":"s"}</span></div>`:""}
+    </div>
+    <div class="namebox">
+      <label for="certname">Name as it should appear on the certificate</label>
+      <input id="certname" value="${esc(cert.student)}" maxlength="60" autocomplete="name">
+    </div>
+    <div class="certactions">
+      <button class="btn ghost" id="cel-back">Back to the ladder</button>
+      <button class="btn warm" id="cel-go">See my certificate</button>
+    </div>`
+    :`<div class="fb bad">Certificate unavailable — ${esc(err)}</div>
+      <div class="certactions"><button class="btn ghost" id="cel-back">Back to the ladder</button></div>`}
+  </section>`;
+  const b=$("#cel-back"); if(b) b.onclick=()=>viewTopic(tid);
+  const g=$("#cel-go"); if(g) g.onclick=async()=>{
+    const nm=($("#certname").value||"").trim();
+    g.disabled=true;
+    try{
+      if(nm && nm!==cert.student) await api("/me/display_name",{method:"POST",body:{name:nm}});
+      await viewCertificate(tid);
+    }catch(e){ g.disabled=false; toast("Couldn't save that name — "+(e.message||"try again")); }
+  };
+}
+
+async function viewCertificate(tid){
+  let c;
+  try{ c = await api(`/topic/${tid}/certificate`); }
+  catch(e){ toast(e.message||"Certificate not available yet"); return viewTopic(tid); }
+  const d = new Date((c.completed_at||Date.now()/1000)*1000);
+  const when = d.toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+  const acc = Math.round(c.accuracy*100);
+  main.innerHTML = `
+  <div class="certwrap">
+    <div class="cert" id="cert">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <div class="issuer">${esc(c.issuer)}</div>
+      <div class="rule"></div>
+      <div class="kicker">This certifies that</div>
+      <div class="who">${esc(c.student)}</div>
+      <div class="kicker">has completed the course of study in</div>
+      <div class="what">${esc(c.course)}</div>
+      ${c.tagline?`<div class="tag">${esc(c.tagline)}</div>`:""}
+      <div class="standard">
+        mastering all <b>${c.concepts}</b> concepts to a posterior confidence of
+        <b>${(c.standard.mastery_p*100).toFixed(0)}%</b> with <b>${c.standard.streak}</b> consecutive
+        correct answers at each gate — <b>${c.questions_answered}</b> questions answered at
+        <b>${acc}%</b> accuracy${c.days_elapsed?` over ${c.days_elapsed} day${c.days_elapsed===1?"":"s"}`:""}.
+      </div>
+      <div class="feet">
+        <div class="sig">
+          <div class="sigline"></div>
+          <div class="signame">${esc(c.signer)}</div>
+          <div class="sigrole">${esc(c.signer_title)}</div>
+        </div>
+        ${CERT_SEAL}
+        <div class="sig">
+          <div class="sigline"></div>
+          <div class="signame">${esc(when)}</div>
+          <div class="sigrole">Date of completion</div>
+        </div>
+      </div>
+      <div class="vcode">VERIFICATION ${esc(c.code)} · ${esc(c.issuer).toUpperCase()}</div>
+    </div>
+    <div class="certactions">
+      <button class="btn ghost" id="cert-back">← Back to the course</button>
+      <button class="btn warm" id="cert-print">🖨 Print / Save as PDF</button>
+    </div>
+    <p class="certnote">Printing gives you an A4 landscape sheet — in the print dialog, enable
+      “Background graphics” so the gold rules and seal come through. The verification code is
+      signed by this installation and can be re-derived here; it is not an accredited credential,
+      and it does not pretend to be.</p>
+  </div>`;
+  $("#cert-back").onclick=()=>viewTopic(tid);
+  $("#cert-print").onclick=()=>window.print();
 }
 
 /* ---------- placement (adaptive prior-setting) ---------- */
@@ -901,20 +1110,26 @@ function renderQuestion(tid){
     $("#after").innerHTML = `
       <div class="delta mono">posterior ${r.p_before.toFixed(3)} → <b>${r.p_after.toFixed(3)}</b> ${dir}</div>
       <div class="fb ${r.correct?"good":"bad"}">${esc(r.feedback)}</div>
-      ${r.newly_mastered
+      ${r.topic_complete
+        ? `<div class="mastered-banner">🎓 <b>That was the last one — the course is complete.</b> Every concept in this topic has cleared the gate.</div>`
+        : (r.newly_mastered
         ? `<div class="mastered-banner">Mastered — the gate is open. The next concept is unlocked, and this one enters spaced review tomorrow.</div>`
-        : (r.mastered ? `<div class="mastered-banner">Already mastered ✓ — keep reviewing, or move on.</div>` : "")}
+        : (r.mastered ? `<div class="mastered-banner">Already mastered ✓ — keep reviewing, or move on.</div>` : ""))}
       <div class="pager">
         ${!r.correct?`<button class="btn ghost" id="reread">Re-read the cards</button>
                       <button class="btn ghost" id="helpme">Explain it differently</button>
                       <button class="btn ghost" id="xpractice" title="AI-generated extra reps — doesn't count toward mastery">🔄 Extra practice</button>`:""}
         <span class="spacer"></span>
-        ${r.mastered
+        ${r.topic_complete
+          ? `<button class="btn ghost" id="go-on">Keep practicing</button>
+             <button class="btn warm" id="go-cert">🎓 Claim your certificate</button>`
+          : (r.mastered
           ? `<button class="btn ghost" id="go-on">Next question</button>
              <button class="btn warm" id="go-next">Next concept</button>`
-          : `<button class="btn" id="go-on">${r.correct?"Next question":"Try another"}</button>`}
+          : `<button class="btn" id="go-on">${r.correct?"Next question":"Try another"}</button>`)}
       </div>
       <div id="aihelp"></div>`;
+    const gc=$("#go-cert"); if(gc) gc.onclick=()=>viewCelebration(tid, T && T.title);
     const on=$("#go-on"); if(on) on.onclick=()=>{qIx++; renderQuestion(tid);};
     const gn=$("#go-next"); if(gn) gn.onclick=()=>viewTopic(tid);
     const rr=$("#reread"); if(rr) rr.onclick=()=>{cardIx=0; renderCard(tid);};
