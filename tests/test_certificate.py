@@ -200,3 +200,49 @@ def test_finished_course_does_not_reopen_its_last_concept():
     # the loop was the checkpoint offering "Next concept" on a finished course
     fin = h.split("const finish=(r,pickBtn)=>{")[1].split("\n  };")[0]
     assert "r.topic_complete" in fin and 'id="go-cert"' in fin
+
+
+# ── the face of the certificate (operator, 2026-08-05) ───────────────────────
+# "remove my name from the certificate. Sign it Anthropic Fable."
+
+def _page():
+    from pathlib import Path
+    return (Path(__file__).resolve().parent.parent / "static" / "index.html").read_text()
+
+
+def test_recipient_name_is_not_printed_on_the_certificate():
+    import re
+    src = _page()
+    cert = src[src.index('<div class="cert" id="cert">'):src.index('class="certactions"')]
+    assert "c.student" not in cert, (
+        "the holder's name is back on the certificate face; it was removed on purpose")
+    assert re.search(r'class="who"', cert) is None
+
+
+def test_certificate_is_signed_by_the_course_author_not_a_person():
+    import app
+    assert app.CERT_SIGNER == "Anthropic Fable"
+    assert "David" not in app.CERT_SIGNER and "Reeves" not in app.CERT_SIGNER
+    assert app.CERT_SIGNER_TITLE == "Course author"
+
+
+def test_signature_is_still_env_overridable():
+    """The operator must be able to change the signature without a code edit."""
+    import inspect, app
+    src = inspect.getsource(app)
+    assert 'os.getenv("LEARN_CERT_SIGNER"' in src
+    assert 'os.getenv("LEARN_CERT_SIGNER_TITLE"' in src
+
+
+def test_removing_the_name_did_not_weaken_verification():
+    """The code is derived from the USERNAME, not the printed display name — so
+    dropping the name from the face changes nothing about what can be verified."""
+    import inspect, app
+    assert "username" in inspect.signature(app._cert_code).parameters
+
+
+def test_the_certificate_still_refuses_to_imitate_accreditation():
+    """The honesty property this whole feature was built around must survive a
+    cosmetic change to the signature line."""
+    src = _page()
+    assert "not an accredited credential" in src

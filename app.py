@@ -959,8 +959,12 @@ def answer(tid: str, cid: str, a: Answer,
 # is stricter than most graded courses.
 
 CERT_ISSUER = os.getenv("LEARN_CERT_ISSUER", "DNSR Learning")
-CERT_SIGNER = os.getenv("LEARN_CERT_SIGNER", "David Reeves, PhD")
-CERT_SIGNER_TITLE = os.getenv("LEARN_CERT_SIGNER_TITLE", "Program Director")
+# Signed by the model that authored the packs and set the gate, not by a person
+# (operator, 2026-08-05). Kept honest on purpose: the signature names the AUTHOR of
+# the course, the issuer stays this installation, and the certificate goes on saying
+# in plain text that it is not an accredited credential. Both remain env-overridable.
+CERT_SIGNER = os.getenv("LEARN_CERT_SIGNER", "Anthropic Fable")
+CERT_SIGNER_TITLE = os.getenv("LEARN_CERT_SIGNER_TITLE", "Course author")
 
 
 def _cert_code(username: str, tid: str, completed_at: float) -> str:

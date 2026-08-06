@@ -993,9 +993,12 @@ async function viewCertificate(tid){
       <span class="corner bl"></span><span class="corner br"></span>
       <div class="issuer">${esc(c.issuer)}</div>
       <div class="rule"></div>
-      <div class="kicker">This certifies that</div>
-      <div class="who">${esc(c.student)}</div>
-      <div class="kicker">has completed the course of study in</div>
+      <!-- The recipient's name is deliberately NOT printed (operator, 2026-08-05).
+           The certificate records that the standard below was met, which is the part
+           that carries any weight; the holder knows who they are. The API still
+           returns the student field for the authenticated holder, and the verification code
+           is derived from the username, so nothing about verification changes. -->
+      <div class="kicker">This certifies the completion of the course of study in</div>
       <div class="what">${esc(c.course)}</div>
       ${c.tagline?`<div class="tag">${esc(c.tagline)}</div>`:""}
       <div class="standard">
