@@ -316,7 +316,24 @@ function md(src){
     return `<p>${inline(b).replace(/\n/g,"<br>")}</p>`;
   });
   return blocks.join("");
-  function inline(t){return esc(t).replace(/`([^`]+)`/g,'<code class="mono" style="background:var(--line);padding:1px 5px;border-radius:4px;font-size:.9em">$1</code>').replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>");}   /* FE-9: inline `code` */
+  /* Backslash escapes (2026-08-05, operator: "some cards in the investment area show
+     a slash before the $"). This renderer never handled them, so an authored \\$50.10
+     printed its backslash, and genetics' star alleles printed CYP2C9\\*2 instead of
+     CYP2C9*2. Escapes are lifted out BEFORE emphasis and put back after, because the
+     packs legitimately wrap an escaped star in italics — *CYP2C9\\*2* must come out as
+     an italic CYP2C9*2, which a naive strip-the-backslash pass would turn into a
+     mangled emphasis run.
+
+     The escapable set deliberately excludes & < > " : esc() has already turned those
+     into entities, so a restored literal could otherwise re-introduce raw HTML. */
+  function inline(t){
+    const lit=[];
+    let s=esc(t).replace(/\\([\\`*_{}\[\]()#+\-.!$~|])/g,(_,c)=>`\u0000${lit.push(c)-1}\u0000`);
+    s=s.replace(/`([^`]+)`/g,'<code class="mono" style="background:var(--line);padding:1px 5px;border-radius:4px;font-size:.9em">$1</code>')
+       .replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")
+       .replace(/\*(.+?)\*/g,"<em>$1</em>");
+    return s.replace(/\u0000(\d+)\u0000/g,(_,i)=>lit[+i]);
+  }   /* FE-9: inline `code` */
 }
 function signout(){ TOKEN=""; ROLE="learner"; sessionStorage.removeItem("learn_token"); sessionStorage.removeItem("learn_role");
   clearTimeout(_idleTimer); if(typeof SESH==="object"){ SESH.moves={}; SESH.mastered=[]; }   // Phase A: clear per-user session state on switch/sign-out

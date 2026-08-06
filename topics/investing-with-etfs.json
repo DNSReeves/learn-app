@@ -127,22 +127,22 @@
       "cards": [
         {
           "h": "Two ways to package a fund (open-end: mutual fund vs ETF)",
-          "md": "Same portfolio, two very different price experiences. The variable that matters isn't the assets inside — it's whether the **share count can change**.\n\n**Open-end** means the fund can mint and retire shares on demand. New money in → new shares created at NAV. Money out → shares redeemed at NAV. The float breathes, so **price stays tethered to net asset value**. Both classic mutual funds AND ETFs are open-end.\n\n- **Mutual fund:** you transact **once a day**, at the NAV struck *after* the close (**forward pricing**). Put in an order at 11am, you still get the 4pm NAV. No intraday quote, no premium, no discount — you always trade at asset value, full stop.\n- **ETF:** exchange-listed, trades **intraday** like a stock. Its market price *can* drift from NAV tick to tick — but **Authorized Participants** (APs) arbitrage it back. If the ETF trades rich, APs create new baskets in-kind and sell; if cheap, they buy and redeem. That valve keeps liquid-ETF premiums/discounts to **basis points**.\n\nWorked example: an ETF quotes \\$50.10 against a \\$50.00 NAV — a +0.2% premium. An AP delivers the underlying basket, gets shares worth \\$50.10, pockets \\$0.10, and the selling pressure drags price back to \\$50.00. The profit motive *is* the tether.\n\n**Rule:** In any open-end wrapper you're transacting at (mutual fund) or near (ETF) NAV by construction. The create/redeem valve is the whole reason — remember it, because the next wrapper rips it out."
+          "md": "Same portfolio, two very different price experiences. The variable that matters isn't the assets inside — it's whether the **share count can change**.\n\n**Open-end** means the fund can mint and retire shares on demand. New money in → new shares created at NAV. Money out → shares redeemed at NAV. The float breathes, so **price stays tethered to net asset value**. Both classic mutual funds AND ETFs are open-end.\n\n- **Mutual fund:** you transact **once a day**, at the NAV struck *after* the close (**forward pricing**). Put in an order at 11am, you still get the 4pm NAV. No intraday quote, no premium, no discount — you always trade at asset value, full stop.\n- **ETF:** exchange-listed, trades **intraday** like a stock. Its market price *can* drift from NAV tick to tick — but **Authorized Participants** (APs) arbitrage it back. If the ETF trades rich, APs create new baskets in-kind and sell; if cheap, they buy and redeem. That valve keeps liquid-ETF premiums/discounts to **basis points**.\n\nWorked example: an ETF quotes $50.10 against a $50.00 NAV — a +0.2% premium. An AP delivers the underlying basket, gets shares worth $50.10, pockets $0.10, and the selling pressure drags price back to $50.00. The profit motive *is* the tether.\n\n**Rule:** In any open-end wrapper you're transacting at (mutual fund) or near (ETF) NAV by construction. The create/redeem valve is the whole reason — remember it, because the next wrapper rips it out."
         },
         {
           "h": "The closed-end twist: fixed shares, floating price",
-          "md": "A **closed-end fund (CEF)** raises capital **once**, at an IPO (Initial Public Offering). After that the door is welded shut: **no ongoing creation, no ongoing redemption**. The share count is **fixed**.\n\nPull that valve out and everything changes. There's no AP standing by to arbitrage price to NAV, and you can't redeem your shares back to the fund for asset value. To get out, you **sell to another buyer** on the exchange — full stop. Price is now set by pure **secondary-market supply and demand**, not by the assets.\n\nSo two numbers diverge and *stay* diverged:\n\n- **NAV** — what a share of the portfolio is actually worth.\n- **Market price** — what someone will pay you today.\n\nNothing mechanical forces them together. A CEF can trade at a **premium** (price > NAV) or, far more often, a **discount** (price < NAV) — and it can sit there for **years**.\n\n## Discount % = (Market Price − NAV) / NAV\n\nWorked: NAV \\$20.00, the fund trades at \\$18.00 → (18 − 20)/20 = **−10%**. You're buying \\$1.00 of assets for **\\$0.90**.\n\nThat sounds like free money — and sometimes it's a real edge. But there's no catalyst that *makes* the gap close. Unlike an ETF, where a premium is an arbitrage opportunity someone will act on within minutes, a CEF discount is just… the price. It can persist, or widen.\n\n**Rule:** In a CEF you're buying two things — a portfolio *and* a sentiment-driven discount. The wrapper gives you no mechanism to collect that discount; only a buyer at a narrower discount can."
+          "md": "A **closed-end fund (CEF)** raises capital **once**, at an IPO (Initial Public Offering). After that the door is welded shut: **no ongoing creation, no ongoing redemption**. The share count is **fixed**.\n\nPull that valve out and everything changes. There's no AP standing by to arbitrage price to NAV, and you can't redeem your shares back to the fund for asset value. To get out, you **sell to another buyer** on the exchange — full stop. Price is now set by pure **secondary-market supply and demand**, not by the assets.\n\nSo two numbers diverge and *stay* diverged:\n\n- **NAV** — what a share of the portfolio is actually worth.\n- **Market price** — what someone will pay you today.\n\nNothing mechanical forces them together. A CEF can trade at a **premium** (price > NAV) or, far more often, a **discount** (price < NAV) — and it can sit there for **years**.\n\n## Discount % = (Market Price − NAV) / NAV\n\nWorked: NAV $20.00, the fund trades at $18.00 → (18 − 20)/20 = **−10%**. You're buying $1.00 of assets for **$0.90**.\n\nThat sounds like free money — and sometimes it's a real edge. But there's no catalyst that *makes* the gap close. Unlike an ETF, where a premium is an arbitrage opportunity someone will act on within minutes, a CEF discount is just… the price. It can persist, or widen.\n\n**Rule:** In a CEF you're buying two things — a portfolio *and* a sentiment-driven discount. The wrapper gives you no mechanism to collect that discount; only a buyer at a narrower discount can."
         },
         {
           "h": "The discount that persists — and the return-of-capital trap",
-          "md": "Why don't discounts just close? Because **nothing forces them to**. A −10% CEF discount can stay −10%, drift to −5%, or gap to −15% — driven by sentiment, not arithmetic. Buying the discount is a *bet on mean-reversion with no referee*. Persistent −5% to −15% discounts are normal and can last for years.\n\nTwo CEF features make the trap deeper:\n\n- **Leverage.** CEFs commonly **borrow to buy more assets**. A fund 30% levered turns a −10% portfolio year into roughly **−13%** on NAV (and amplifies the upside the same way). Leverage magnifies NAV swings *both* directions — great in a rally, brutal in a drawdown, and it's why CEF NAVs are more volatile than the assets suggest.\n- **Headline distribution rates.** A CEF advertising a **9% distribution** looks like rich income. But part of that payout can be **return of capital (ROC)** — the fund handing you back **your own principal**, not earnings.\n\nWhy ROC matters: it isn't income, and it **erodes NAV**. If a fund earns 5% but pays out 9%, the extra ~4% comes out of assets. Worked: NAV \\$20, pays \\$1.80/yr (9%) but earns only \\$1.00 → NAV bleeds ~\\$0.80/yr before markets even move. You're being paid with your own money and calling it yield.\n\n**Trap to avoid:** never buy a CEF on distribution rate alone. Check the **NAV total return** and the **ROC line** in the fund's Section 19 notice — a fat yield funded by destructive ROC is a wealth transfer *from* you, dressed up as income. The discount can be an edge; the yield can be a lie."
+          "md": "Why don't discounts just close? Because **nothing forces them to**. A −10% CEF discount can stay −10%, drift to −5%, or gap to −15% — driven by sentiment, not arithmetic. Buying the discount is a *bet on mean-reversion with no referee*. Persistent −5% to −15% discounts are normal and can last for years.\n\nTwo CEF features make the trap deeper:\n\n- **Leverage.** CEFs commonly **borrow to buy more assets**. A fund 30% levered turns a −10% portfolio year into roughly **−13%** on NAV (and amplifies the upside the same way). Leverage magnifies NAV swings *both* directions — great in a rally, brutal in a drawdown, and it's why CEF NAVs are more volatile than the assets suggest.\n- **Headline distribution rates.** A CEF advertising a **9% distribution** looks like rich income. But part of that payout can be **return of capital (ROC)** — the fund handing you back **your own principal**, not earnings.\n\nWhy ROC matters: it isn't income, and it **erodes NAV**. If a fund earns 5% but pays out 9%, the extra ~4% comes out of assets. Worked: NAV $20, pays $1.80/yr (9%) but earns only $1.00 → NAV bleeds ~$0.80/yr before markets even move. You're being paid with your own money and calling it yield.\n\n**Trap to avoid:** never buy a CEF on distribution rate alone. Check the **NAV total return** and the **ROC line** in the fund's Section 19 notice — a fat yield funded by destructive ROC is a wealth transfer *from* you, dressed up as income. The discount can be an edge; the yield can be a lie."
         }
       ],
       "questions": [
         {
           "id": "q1",
           "type": "mcq",
-          "prompt": "An ETF is quoting \\$40.20 while its underlying basket (NAV) is worth \\$40.00. What mechanism, unique to the open-end ETF wrapper, most directly pushes the price back toward \\$40.00?",
+          "prompt": "An ETF is quoting $40.20 while its underlying basket (NAV) is worth $40.00. What mechanism, unique to the open-end ETF wrapper, most directly pushes the price back toward $40.00?",
           "options": [
             "Authorized Participants create new shares in-kind and sell them, arbitraging the premium away",
             "The fund manager issues a press release correcting the price",
@@ -151,7 +151,7 @@
           ],
           "answer": 0,
           "feedback": [
-            "Right — APs exploit the \\$0.20 gap by delivering the basket for shares worth more, and their selling drags price to NAV. The profit motive is the valve.",
+            "Right — APs exploit the $0.20 gap by delivering the basket for shares worth more, and their selling drags price to NAV. The profit motive is the valve.",
             "No mechanism here — managers don't move secondary-market price with statements. The tether is the AP create/redeem arbitrage, which acts in minutes, not via PR.",
             "Forward pricing is the mutual-fund once-a-day-at-NAV rule; ETFs trade intraday. It's the AP arbitrage, not forward pricing, that keeps an ETF near NAV.",
             "Retail sentiment is too slow and unreliable to hold a tight tether. What actually keeps ETF premiums to basis points is APs acting on the arbitrage profit."
@@ -160,7 +160,7 @@
         {
           "id": "q2",
           "type": "mcq",
-          "prompt": "A closed-end fund holds a portfolio worth \\$25.00/share (NAV) but trades at \\$21.25. You buy, reasoning you're getting assets at a discount. What is the honest characterization of this trade?",
+          "prompt": "A closed-end fund holds a portfolio worth $25.00/share (NAV) but trades at $21.25. You buy, reasoning you're getting assets at a discount. What is the honest characterization of this trade?",
           "options": [
             "A guaranteed 15% gain, since price must eventually converge to NAV",
             "A −15% discount you can arbitrage yourself by redeeming shares at NAV",
@@ -171,24 +171,24 @@
           "feedback": [
             "Nothing is guaranteed — (21.25−25)/25 = −15%, but no catalyst forces convergence. CEF discounts routinely persist for years or deepen; this is the core trap.",
             "You can't redeem a CEF share back to the fund for NAV — that valve only exists in open-end funds. Your only exit is selling to another buyer on the exchange.",
-            "Right — (21.25−25)/25 = −15%, you're paying \\$0.85 for \\$1.00 of assets, but the fixed-share wrapper has no create/redeem arbitrage to close the gap. It's a mean-reversion bet with no referee.",
+            "Right — (21.25−25)/25 = −15%, you're paying $0.85 for $1.00 of assets, but the fixed-share wrapper has no create/redeem arbitrage to close the gap. It's a mean-reversion bet with no referee.",
             "It's not an error — with fixed shares and no redemption, secondary supply/demand legitimately sets price below NAV, sometimes indefinitely."
           ]
         },
         {
           "id": "q3",
           "type": "mcq",
-          "prompt": "A CEF advertises a 9% distribution rate. Its NAV is \\$20, it pays \\$1.80/share annually, but the portfolio only earns about \\$1.00/share. What's actually happening?",
+          "prompt": "A CEF advertises a 9% distribution rate. Its NAV is $20, it pays $1.80/share annually, but the portfolio only earns about $1.00/share. What's actually happening?",
           "options": [
             "The fund is a high-yield bargain — 9% income beats almost any ETF",
-            "Roughly \\$0.80/share is return of capital, eroding NAV — you're being paid with your own principal",
+            "Roughly $0.80/share is return of capital, eroding NAV — you're being paid with your own principal",
             "The 9% is fully covered because distribution rate always equals earnings yield",
             "Leverage guarantees the 9% payout is safe regardless of what the portfolio earns"
           ],
           "answer": 1,
           "feedback": [
-            "A high headline rate isn't income if it isn't earned. Paying \\$1.80 on \\$1.00 of earnings means ~\\$0.80 is destructive return of capital, not yield.",
-            "Right — earns \\$1.00 but pays \\$1.80, so ~\\$0.80 is ROC that bleeds NAV ~4%/yr before markets move. Check the Section 19 notice and NAV total return, never the distribution rate alone.",
+            "A high headline rate isn't income if it isn't earned. Paying $1.80 on $1.00 of earnings means ~$0.80 is destructive return of capital, not yield.",
+            "Right — earns $1.00 but pays $1.80, so ~$0.80 is ROC that bleeds NAV ~4%/yr before markets move. Check the Section 19 notice and NAV total return, never the distribution rate alone.",
             "Distribution rate and earnings yield are not the same thing — the gap here is exactly the ROC that erodes NAV. That's the whole trap.",
             "Leverage amplifies NAV moves both ways and adds borrowing cost; it doesn't create earnings. Overpaying relative to earnings still returns your own capital."
           ]
