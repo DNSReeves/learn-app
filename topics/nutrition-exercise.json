@@ -3,6 +3,30 @@
   "title": "Nutrition & Exercise",
   "tagline": "How food and movement build the body — the honest, evidence-based version.",
   "description": "What calories, protein, carbs and fat actually do; how muscle grows and shrinks; why the scale lies; cardio versus weights; exercise as metabolic medicine; protein and muscle as you age; and a clear-eyed pass through the myths. Plain language, current evidence, for everyone. Educational only — not medical advice.",
+  "intro": {
+    "hook": "The field looks like chaos from outside. Underneath, a small number of things are actually well established.",
+    "body": [
+      "Nutrition science has a deserved reputation for reversing itself, and the reporting is worse than the science. Eggs alternate between poison and health food on a roughly five-year cycle. It is reasonable to conclude that nobody knows anything.",
+      "That conclusion is wrong, and this course is largely about separating the genuinely settled from the genuinely contested. Energy balance, protein requirements, the adaptations that follow resistance and endurance training, and the dose-response of activity to mortality are not seriously in dispute.",
+      "You will also learn why the field keeps flip-flopping — the specific study designs that produce unreliable headlines — which is a skill you can apply to any health claim you meet afterwards."
+    ],
+    "why": [
+      {
+        "title": "Signal from noise",
+        "text": "Knowing which findings are robust and which are one observational study is the whole practical skill here."
+      },
+      {
+        "title": "Adaptation is specific",
+        "text": "Muscle, mitochondria, bone and the nervous system each respond to particular stimuli. Training is applied physiology."
+      },
+      {
+        "title": "The effect sizes are large",
+        "text": "Few interventions in medicine move all-cause mortality as much as moving from sedentary to modestly active."
+      }
+    ],
+    "anim": "nut_energy",
+    "closer": "The most reliable finding in the entire field is also the least marketable: the first hour of activity a week buys the most."
+  },
   "category": "Health & Medicine",
   "prereqs": [],
   "concepts": [

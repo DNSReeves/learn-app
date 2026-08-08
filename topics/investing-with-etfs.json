@@ -4,6 +4,30 @@
   "tagline": "Own the whole market for the price of a sandwich.",
   "category": "Investing & Finance",
   "description": "What an ETF actually is, how to read one like a label, how to assemble a portfolio that's diversified in fact and not just in fund count, and the handful of well-mapped mistakes that cost real investors more than any fee ever will. No finance background assumed.",
+  "intro": {
+    "hook": "A structure invented in 1993 quietly became the default way the world owns everything.",
+    "body": [
+      "An exchange-traded fund is a strange hybrid: it trades all day like a share, but its price is tethered to the value of the assets inside it by a mechanism most owners have never heard of. When the price drifts from the contents, professionals are paid to push it back — that arbitrage is why the thing works at all.",
+      "Understanding the plumbing is not academic. It explains why some ETFs track beautifully and others do not, why the ones holding illiquid bonds behave oddly in a crisis, what you actually own in a synthetic product, and where the costs hide when the headline fee is 0.03%.",
+      "This course is about the vehicle, not stock tips: how it is built, how it fails, and how to tell a well-constructed fund from a badly constructed one."
+    ],
+    "why": [
+      {
+        "title": "The default vehicle",
+        "text": "Most new money entering markets arrives through these. Knowing how they work is basic financial literacy now."
+      },
+      {
+        "title": "The arbitrage is the product",
+        "text": "Creation and redemption is what keeps price near value. When it breaks, the ETF stops behaving as advertised."
+      },
+      {
+        "title": "Costs hide below the headline",
+        "text": "Spread, tracking difference, securities lending and tax treatment often dominate the quoted expense ratio."
+      }
+    ],
+    "anim": "etf_arb",
+    "closer": "The first one launched to yawns and was nearly cancelled. It now trades more than most countries' entire stock markets."
+  },
   "prereqs": [],
   "concepts": [
     {

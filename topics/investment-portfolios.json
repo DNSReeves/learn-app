@@ -4,6 +4,30 @@
   "tagline": "Allocation and discipline decide almost everything; products decide almost nothing",
   "category": "Investing & Finance",
   "description": "How portfolios actually work: the diversification free lunch and where it runs out, why asset allocation dominates stock picking (and what the famous 90% really means), the construction workflow, a taxonomy of the risks that matter — drawdown, sequence, inflation, liquidity, behavior — the growth/duration/convexity three-jobs model, bond duration and convexity mechanics, managed futures and trend following, commodities, and the honest case for and against liquid and private alternatives.",
+  "intro": {
+    "hook": "Combining two risky assets can produce something less risky than either. It is the closest thing to a free lunch in finance.",
+    "body": [
+      "The result is genuinely counterintuitive. Take two volatile investments that do not move in lockstep, hold both, and the combination can swing less than either one alone — without giving up the average return. Nothing was hedged and nothing was paid for. The gain came from imperfect correlation.",
+      "That observation, formalised in 1952 by a graduate student, restructured the entire profession. It moved the question from \"is this a good investment?\" to \"what does this do to my portfolio?\", which is a different and better question.",
+      "This course also covers where the theory breaks — correlations that rise exactly when you need them low, inputs estimated with enormous error, and why the elegant optimiser often loses to a naive equal split."
+    ],
+    "why": [
+      {
+        "title": "Diversification is real and free",
+        "text": "The one benefit in finance that does not require paying a premium or taking a view."
+      },
+      {
+        "title": "Position, not selection",
+        "text": "What an asset does to the whole portfolio matters more than whether it is good on its own."
+      },
+      {
+        "title": "And where it fails",
+        "text": "Correlations converge in crises, estimates are noisy, and the optimiser is notoriously fragile. Knowing this is the practical part."
+      }
+    ],
+    "anim": "pf_free_lunch",
+    "closer": "Markowitz's committee reportedly doubted it was economics at all. It won the Nobel Prize thirty-eight years later."
+  },
   "concepts": [
     {
       "id": "why-a-portfolio",

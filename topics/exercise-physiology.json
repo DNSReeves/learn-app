@@ -1,0 +1,920 @@
+{
+  "id": "exercise-physiology",
+  "title": "Exercise Physiology — The Body Under Load",
+  "tagline": "What actually changes when you train: the pump, the plumbing, the fuel, the muscle, and the years.",
+  "category": "Physiology",
+  "description": "The mechanisms behind training adaptation: cardiac output and its determinants (preload, afterload, contractility), autonomic control of heart rate including vagal withdrawal and heart-rate variability, VO2max and the Fick equation, what lactate actually does, motor-unit recruitment, hypertrophy versus strength, the evidence-based drivers of muscle growth, sleep and recovery, testosterone and TRT stated honestly, and sarcopenia with the countermeasures that work. Educational only — not medical advice.",
+  "prereqs": [
+    "physiology-biophysics"
+  ],
+  "intro": {
+    "hook": "A trained heart and an untrained heart beat the same blood. The difference is how much moves per beat — and that single number reshapes a life.",
+    "body": [
+      "At rest your heart moves about five litres a minute, and it does that whether you are an Olympian or have not stood up in a week. Ask for more and the two bodies diverge completely: an untrained adult can reach perhaps twenty litres a minute, an elite endurance athlete close to forty. Almost none of that gap is heart rate — maximum heart rate is stubbornly fixed and falls with age no matter what you do. The gap is stroke volume, and stroke volume is trainable.",
+      "That is the shape of this whole subject. Exercise physiology is not a list of workouts; it is the study of which parts of you respond to load and which do not, on what timescale, and by how much. Some things change in weeks and some in years. Some things you can train and some you can only defend.",
+      "It is also a field with unusually persistent folklore. Lactic acid does not cause your soreness and is not what you produce. Strength and size are not the same adaptation and do not follow the same rules. And the intervention with the largest effect on how the last twenty years of your life go is not a supplement — it is a barbell, or something that behaves like one."
+    ],
+    "why": [
+      {
+        "title": "Fitness predicts survival",
+        "text": "Cardiorespiratory fitness is among the strongest predictors of all-cause mortality yet measured — larger than smoking, diabetes or hypertension in the same cohorts. Knowing what sets it tells you what is worth training."
+      },
+      {
+        "title": "The mechanisms overturn the folklore",
+        "text": "Lactate is a fuel, not a poison. Early strength gains are mostly nervous system. Once you know the mechanism, most training advice sorts itself into evidence and marketing."
+      },
+      {
+        "title": "Ageing is partly negotiable",
+        "text": "Muscle and power decline on a schedule — but resistance training works in the tenth decade of life. Sarcopenia is a trajectory, not a verdict."
+      }
+    ],
+    "anim": "med_starling",
+    "closer": "The heart is the only muscle you cannot choose to exercise directly. Everything you do to it, you do by asking the rest of the body for more."
+  },
+  "concepts": [
+    {
+      "id": "cardiac-output",
+      "title": "Cardiac Output — preload, afterload, and the pump under load",
+      "summary": "Output is heart rate times stroke volume; exercise raises both, but the interesting one is stroke volume, governed by filling, contractility and the load it ejects against.",
+      "anim": "med_starling",
+      "cards": [
+        {
+          "h": "One equation, two knobs",
+          "md": "**Cardiac output (Q) = heart rate × stroke volume.** At rest that is roughly 70 beats/min × 70 mL ≈ **5 L/min**. In hard exercise an untrained adult reaches ~20–22 L/min; a highly trained endurance athlete can exceed **35–40 L/min**.\n\nHeart rate does most of the early work and can rise nearly threefold. But maximum heart rate is **not trainable** — it is set largely by age (the old `220 − age` is a poor estimator; `208 − 0.7 × age` fits populations better, with wide individual scatter). So the athlete's advantage is almost entirely **stroke volume**: a bigger, more compliant left ventricle that fills more and empties more completely.\n\nThat is why endurance training changes what you can do without changing how fast your heart can beat."
+        },
+        {
+          "h": "Preload — filling is not passive",
+          "md": "**Preload** is the degree to which the ventricle is stretched at the end of filling (end-diastolic volume). By the **Frank–Starling** relationship, more stretch means more forceful ejection — the length–tension property of cardiac sarcomeres, plus stretch-induced changes in calcium sensitivity.\n\nExercise raises preload actively. The **skeletal muscle pump** squeezes veins between contracting muscles, and one-way valves make the flow unidirectional. The **respiratory pump** adds a thoracic pressure swing with every breath. Venoconstriction shifts blood out of the splanchnic reservoir. Together these return blood to the heart far faster than at rest — and the heart, obeying Starling, ejects it.\n\nStand still after hard exercise and you remove the muscle pump while the arterioles are still dilated: preload collapses, and so can you. That is why cool-downs exist."
+        },
+        {
+          "h": "Afterload — and why lifting is not running",
+          "md": "**Afterload** is the load the ventricle must overcome to eject — closely related to wall stress, which by **Laplace's law** rises with pressure and chamber radius and falls with wall thickness (σ ≈ P·r / 2h).\n\nIn **dynamic** exercise (running, cycling), mean arterial pressure rises only modestly because the working muscles' arterioles dilate and total peripheral resistance *falls*. The ventricle handles a large **volume** load at near-normal pressure.\n\nIn heavy **resistance** exercise, especially with a Valsalva manoeuvre, arterial pressure can spike enormously for a few seconds — a **pressure** load.\n\nThe heart remodels to match: endurance training tends toward **eccentric hypertrophy** (a larger chamber), strength training toward **concentric hypertrophy** (a thicker wall). Same organ, two different loads, two different adaptations — the physiological \"athlete's heart\", distinct from the pathological hypertrophy of untreated hypertension."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "An elite endurance athlete's much higher maximal cardiac output comes mainly from:",
+          "options": [
+            "A much higher stroke volume",
+            "A much higher maximum heart rate",
+            "Thicker ventricular walls raising afterload",
+            "A faster resting heart rate"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — maximum heart rate is essentially untrainable, so the athlete's advantage is stroke volume.",
+            "No — maximum heart rate is set largely by age and barely responds to training.",
+            "No — that describes a pressure-loaded adaptation, and afterload is a load, not an output.",
+            "No — trained athletes have LOWER resting heart rates, a consequence of high stroke volume and vagal tone."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The skeletal muscle pump increases cardiac output primarily by raising:",
+          "options": [
+            "Preload, via increased venous return",
+            "Afterload, via increased arterial pressure",
+            "Maximum heart rate",
+            "Haemoglobin concentration"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — it speeds venous return, which stretches the ventricle and, by Frank–Starling, increases ejection.",
+            "No — it acts on the venous side; afterload is the arterial load opposing ejection.",
+            "No — maximum heart rate is not altered by venous return.",
+            "No — that is a slower haematological adaptation, not a beat-to-beat mechanism."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why does mean arterial pressure rise only modestly during hard cycling, despite cardiac output quadrupling?",
+          "options": [
+            "Total peripheral resistance falls as muscle arterioles dilate",
+            "Stroke volume falls to compensate",
+            "The Valsalva manoeuvre lowers pressure",
+            "Venous return decreases during exercise"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — pressure is flow × resistance; resistance falls sharply, so a large flow rise produces only a modest pressure rise.",
+            "No — stroke volume rises during dynamic exercise.",
+            "No — a Valsalva transiently RAISES arterial pressure, which is why it features in resistance exercise, not cycling.",
+            "No — venous return increases, driven by the muscle and respiratory pumps."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "free",
+          "prompt": "A runner has a heart rate of 180 beats/min and a stroke volume of 130 mL. What is the cardiac output in litres per minute?",
+          "grading": {
+            "kind": "numeric",
+            "answer": 23.4,
+            "tolerance": 0.6,
+            "unit": "L/min"
+          },
+          "feedback_correct": "Right: Q = HR × SV = 180 × 130 mL = 23,400 mL/min = 23.4 L/min. Note how far above the resting ~5 L/min that is — and that most of the rise came from stroke volume nearly doubling, not from the heart rate alone.",
+          "feedback_incorrect": "Multiply the two: 180 beats/min × 130 mL/beat = 23,400 mL/min, which is 23.4 L/min. The usual slip is forgetting to convert millilitres to litres and answering 23,400."
+        }
+      ],
+      "resources": [
+        {
+          "label": "StatPearls — Physiology, Cardiac Output",
+          "type": "reading",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK470455/"
+        },
+        {
+          "label": "StatPearls — Physiology, Preload",
+          "type": "reading",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK541109/"
+        }
+      ]
+    },
+    {
+      "id": "autonomic-control",
+      "title": "The Vagus, Adrenaline and Heart-Rate Variability",
+      "summary": "The first half of your heart-rate rise is a brake being released, not an accelerator being pressed — and the beat-to-beat wobble that remains is a readable signal.",
+      "anim": "med_homeostasis",
+      "cards": [
+        {
+          "h": "Release the brake, then press the accelerator",
+          "md": "The sinoatrial node, left alone, would fire at about **100 beats/min**. Your resting rate is lower than that because the **vagus nerve** (parasympathetic, via acetylcholine on muscarinic receptors) holds it down continuously. Resting bradycardia in athletes is largely this brake applied harder.\n\nAt the start of exercise the rise happens in two stages:\n\n- **Up to roughly 100 bpm: vagal withdrawal.** The brake is released. This is fast — effectively beat-to-beat, because acetylcholine is cleared in milliseconds.\n- **Above that: sympathetic drive.** Noradrenaline released from cardiac sympathetic nerves, plus circulating adrenaline from the adrenal medulla, acting on **β₁-adrenergic** receptors. This is slower to arrive and slower to clear — seconds to minutes.\n\nThe asymmetry explains something you have felt: heart rate leaps almost instantly when you start, and drifts down slowly when you stop."
+        },
+        {
+          "h": "What the catecholamines actually do",
+          "md": "**Noradrenaline** (norepinephrine) is the neurotransmitter of sympathetic nerve endings; **adrenaline** (epinephrine) is the hormone dumped into the blood by the adrenal medulla. Both act on β-adrenergic receptors, with distinct emphases.\n\nOn the heart they produce four classical effects: **chronotropic** (rate up), **inotropic** (contractility up — more force at any given filling, shifting the whole Frank–Starling curve upward), **dromotropic** (conduction speed up) and **lusitropic** (faster *relaxation*, which matters more than it sounds — at 180 bpm there is very little time to refill, and a heart that cannot relax quickly cannot fill).\n\nElsewhere adrenaline mobilises fuel: glycogenolysis in liver and muscle, lipolysis in fat. It is the same molecule doing the systemic bookkeeping for the effort your heart is now supporting."
+        },
+        {
+          "h": "Heart-rate variability — signal and hype",
+          "md": "A healthy heart is not metronomic. The interval between beats varies, largely with breathing (**respiratory sinus arrhythmia**), and that variation is mostly vagal. **HRV** quantifies it — commonly as **RMSSD**, the root mean square of successive interval differences.\n\nWhat it genuinely reflects: parasympathetic activity. Higher resting HRV generally accompanies better fitness and lower resting heart rate; a sustained drop can accompany illness, sleep loss, alcohol or accumulated training stress. **Heart-rate recovery** — how many beats your rate falls in the first minute after stopping — is the same vagal reactivation, and a slow recovery is an established mortality marker.\n\nThe honest caveats matter. HRV is **highly individual** (absolute numbers between people mean little), noisy day to day, and sensitive to measurement conditions — posture, breathing rate, time since waking, alcohol. A single low morning reading tells you very little; a trend over weeks, measured the same way each time, tells you something. Treat it as one noisy input, not a verdict on your readiness."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The very rapid heart-rate rise in the first seconds of exercise is mainly due to:",
+          "options": [
+            "Withdrawal of vagal (parasympathetic) tone",
+            "Adrenaline released from the adrenal medulla",
+            "Increased preload stretching the SA node",
+            "A rise in core temperature"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — acetylcholine clears in milliseconds, so releasing the vagal brake acts almost beat-to-beat.",
+            "No — circulating adrenaline is slower to rise and dominates later, at higher intensities.",
+            "No — preload affects stroke volume via Frank–Starling, not the initial rate jump.",
+            "No — temperature rises over minutes and contributes to cardiac drift, not the initial jump."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A 'lusitropic' effect of adrenaline on the heart means:",
+          "options": [
+            "Faster relaxation, which allows filling at high rates",
+            "Faster conduction through the AV node",
+            "Greater force of contraction",
+            "A higher intrinsic SA node rate"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — and it matters: at 180 bpm diastole is very short, so a heart that relaxes slowly cannot fill.",
+            "No — that is dromotropic.",
+            "No — that is inotropic.",
+            "No — that is chronotropic."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Which use of HRV is best supported?",
+          "options": [
+            "Tracking your own trend over weeks with a consistent measurement protocol",
+            "Comparing your absolute RMSSD against a friend's to see who is fitter",
+            "Cancelling training whenever a single morning reading is below average",
+            "Using it to diagnose overtraining on its own"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — HRV is highly individual and noisy, so within-person trends under fixed conditions are what carry information.",
+            "No — absolute values differ enormously between individuals and say little on their own.",
+            "No — day-to-day noise is large; a single reading is weak evidence.",
+            "No — it is one noisy input among several, not a diagnostic test."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "StatPearls — Physiology, Autonomic Nervous System",
+          "type": "reading",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK539845/"
+        },
+        {
+          "label": "Shaffer & Ginsberg — An Overview of Heart Rate Variability Metrics and Norms",
+          "type": "reading",
+          "url": "https://www.frontiersin.org/articles/10.3389/fpubh.2017.00258/full"
+        }
+      ]
+    },
+    {
+      "id": "vo2max",
+      "title": "VO₂max — the ceiling on sustained work",
+      "summary": "Maximum oxygen uptake is cardiac output multiplied by how much oxygen the tissues strip out of the blood — and it predicts mortality better than most things in medicine.",
+      "anim": "med_o2curve",
+      "cards": [
+        {
+          "h": "The Fick equation is the whole story",
+          "md": "**VO₂ = Q × (a−v)O₂ difference.**\n\nOxygen consumption equals cardiac output times the arteriovenous oxygen difference — how much oxygen the tissues extract from each litre of blood passing through. Everything that sets your VO₂max sits in one of those two terms.\n\nAt rest: ~5 L/min × ~50 mL O₂/L ≈ 250 mL/min. At maximum in a trained athlete: ~35 L/min × ~160 mL O₂/L ≈ **5.6 L/min** — a twentyfold increase, from a fourfold rise in flow and a threefold rise in extraction.\n\nReported per kilogram, untrained adults land around 30–45 mL/kg/min; elite endurance athletes reach 70–85, with the highest credible values in cross-country skiers around 90."
+        },
+        {
+          "h": "Central or peripheral — which is the limit?",
+          "md": "In healthy people exercising with a large muscle mass, the dominant limit is **central**: the heart's maximal output, and specifically stroke volume. The classic evidence is that breathing a hyperoxic mixture or infusing red cells raises VO₂max, while training a single small muscle group extensively does not raise whole-body VO₂max much.\n\n**Peripheral** factors — capillary density, mitochondrial volume, oxidative enzymes — matter enormously for *endurance performance* at submaximal intensity, and they adapt faster and further than the heart does. Two athletes with identical VO₂max can differ hugely in what fraction of it they can hold for an hour.\n\nSo VO₂max is a ceiling. It is not the same as performance, and beyond a point, training mostly raises the fraction of the ceiling you can use."
+        },
+        {
+          "h": "Trainability, decline, and why it matters medically",
+          "md": "Typical improvement with structured training is **15–20%**, but the individual range is wide — the HERITAGE Family Study found responses from essentially zero to more than 40%, with a substantial genetic component. Your starting point and your response are both partly inherited.\n\nVO₂max declines roughly **8–10% per decade** after about age 30, and the decline steepens with inactivity; a large part of the fall is stroke volume and maximum heart rate.\n\nThe medical significance is hard to overstate. In large cohorts, cardiorespiratory fitness is among the strongest predictors of all-cause mortality — in one 122,000-patient analysis, the adjusted risk difference between the lowest and highest fitness groups exceeded that associated with smoking, diabetes or coronary artery disease. Association is not causation, and fitness is partly a marker of everything else going right. But few modifiable variables track survival this closely."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "According to the Fick equation, VO₂ equals:",
+          "options": [
+            "Cardiac output × arteriovenous oxygen difference",
+            "Heart rate × stroke volume",
+            "Tidal volume × respiratory rate",
+            "Cardiac output ÷ body mass"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — flow multiplied by how much oxygen is extracted per unit of blood.",
+            "No — that is cardiac output itself, only one of the two terms.",
+            "No — that is minute ventilation.",
+            "No — dividing by mass is just a way of reporting VO₂, not the equation."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In a healthy person doing whole-body exercise, VO₂max is limited mainly by:",
+          "options": [
+            "Maximal cardiac output — chiefly stroke volume",
+            "Mitochondrial density in the working muscle",
+            "The lungs' ability to oxygenate arterial blood",
+            "Maximum heart rate, which training raises"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the limit is central, which is why raising oxygen delivery raises VO₂max.",
+            "No — peripheral factors strongly affect sustainable intensity but are not the ceiling on VO₂max.",
+            "No — in most healthy people arterial saturation is well maintained; some elite athletes are an exception.",
+            "No — maximum heart rate is essentially untrainable."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Two runners have the same VO₂max but one races much faster over an hour. The most likely explanation is:",
+          "options": [
+            "A higher fraction of VO₂max sustainable, from peripheral and metabolic adaptations",
+            "A higher maximum heart rate",
+            "A larger arteriovenous oxygen difference at rest",
+            "A lower body mass alone"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the usable fraction of the ceiling, along with efficiency, separates athletes with equal VO₂max.",
+            "No — a higher maximum heart rate does not imply better endurance performance.",
+            "No — resting extraction is not what limits racing.",
+            "No — VO₂max is already expressed per kilogram in this comparison."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Bassett & Howley — Limiting factors for maximum oxygen uptake",
+          "type": "reading",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/10647532/"
+        },
+        {
+          "label": "Mandsager et al. — Cardiorespiratory Fitness and Long-Term Mortality (JAMA Netw Open, 2018)",
+          "type": "reading",
+          "url": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2707428"
+        }
+      ]
+    },
+    {
+      "id": "lactate",
+      "title": "Lactate — the fuel that got blamed",
+      "summary": "It is not lactic acid, it does not cause the burn or the soreness, and far from being waste it is one of your most important circulating fuels.",
+      "cards": [
+        {
+          "h": "Three claims you have heard, all wrong",
+          "md": "**\"You produce lactic acid.\"** At body pH (~7.4) and with a pKa of about 3.9, essentially all of it exists as **lactate**, the dissociated anion. Lactic acid as such is not what accumulates.\n\n**\"Lactate causes the acidosis.\"** The protons come overwhelmingly from **ATP hydrolysis** during rapid glycolytic flux, not from lactate production. Converting pyruvate to lactate actually **consumes** a proton — it buffers, slightly. Lactate is produced alongside the acidosis, which is exactly why it correlates with it and got the blame.\n\n**\"Lactate causes next-day soreness.\"** Blood lactate returns to baseline within roughly an hour of stopping. Delayed-onset muscle soreness peaks at 24–72 hours and is associated with mechanical damage and inflammation from eccentric contractions. The timelines do not even overlap."
+        },
+        {
+          "h": "What it actually is: a fuel and a signal",
+          "md": "Lactate is produced continuously, even at rest, and is constantly consumed. The **lactate shuttle** (Brooks) describes the traffic: fast glycolytic fibres export it, and slow oxidative fibres, the **heart**, liver and brain take it up and oxidise it or convert it back.\n\nThe heart in particular is a lactate consumer, and prefers it during hard exercise. The liver runs the **Cori cycle**, remaking glucose from lactate.\n\nIt is also a signalling molecule — implicated in adaptation, angiogenesis and mitochondrial biogenesis, and acting on a specific receptor (HCAR1). Blood lactate rises during exercise not because disposal failed but because production outran disposal at that intensity."
+        },
+        {
+          "h": "Thresholds — a real and useful concept",
+          "md": "Although the mechanism was mythologised, the measurement is genuinely useful. As intensity rises, blood lactate stays near baseline, then rises gently, then climbs steeply.\n\nThe intensity above which production exceeds clearance and lactate accumulates progressively is described by several related constructs: **lactate threshold**, **maximal lactate steady state (MLSS)**, and **critical power**. They are defined differently and do not coincide exactly — a common source of confusion in training literature.\n\nWhat makes them valuable is that this threshold, expressed as a fraction of VO₂max, is far more trainable than VO₂max itself and correlates better with endurance performance. An athlete may hold 60% of VO₂max untrained and 85% after years of training — with the ceiling barely moved."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The acidosis during intense exercise comes chiefly from:",
+          "options": [
+            "Proton release during ATP hydrolysis at high glycolytic flux",
+            "Lactate production, which releases protons",
+            "Carbon dioxide dissolving in muscle",
+            "Lactic acid dissociating in the mitochondria"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — and converting pyruvate to lactate actually consumes a proton, so lactate production is mildly buffering.",
+            "No — this is the classic misattribution; lactate correlates with acidosis without causing it.",
+            "No — CO₂ contributes but is not the chief source in intense exercise.",
+            "No — at body pH the species present is lactate, and this is not the mechanism."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The strongest evidence that lactate does not cause delayed-onset muscle soreness is:",
+          "options": [
+            "Blood lactate normalises within about an hour, while soreness peaks at 24–72 hours",
+            "Lactate is not produced during eccentric exercise",
+            "Soreness occurs only in untrained people",
+            "Lactate cannot cross the muscle membrane"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the timelines do not overlap, and DOMS follows mechanical damage from eccentric work.",
+            "No — lactate is produced in eccentric exercise too, though less than in maximal glycolytic work.",
+            "No — trained people get DOMS from unaccustomed eccentric work.",
+            "No — lactate is transported across membranes by MCT carriers; that is how the shuttle works."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why is lactate threshold often a better predictor of endurance performance than VO₂max?",
+          "options": [
+            "It reflects the fraction of the ceiling that can be sustained, and is more trainable",
+            "It measures maximum heart rate more accurately",
+            "VO₂max cannot be measured reliably",
+            "It is unaffected by training, so it is a stable trait"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the usable fraction of VO₂max improves substantially with training even when the ceiling does not.",
+            "No — it is unrelated to maximum heart rate measurement.",
+            "No — VO₂max is measurable and reliable; it is simply a ceiling, not a sustainable intensity.",
+            "No — the threshold is highly trainable, which is precisely the point."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Brooks — The Science and Translation of Lactate Shuttle Theory",
+          "type": "reading",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29617642/"
+        },
+        {
+          "label": "Robergs et al. — Biochemistry of exercise-induced metabolic acidosis",
+          "type": "reading",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15308499/"
+        }
+      ]
+    },
+    {
+      "id": "fiber-types",
+      "title": "Motor Units and the Size Principle",
+      "summary": "Your nervous system recruits muscle in a fixed order, smallest first — which is why 'lifting light with intent' and 'lifting heavy' are not equivalent unless you go near failure.",
+      "anim": "med_sarcomere",
+      "cards": [
+        {
+          "h": "The motor unit, and the order of recruitment",
+          "md": "A **motor unit** is one motor neuron plus every fibre it innervates — the smallest independently controllable piece of muscle. Fine-control muscles have units of a few fibres; large muscles have units of a thousand or more.\n\n**Henneman's size principle**: motor units are recruited in order of size, smallest first. Low force recruits small, fatigue-resistant **type I** units. As demand rises you add progressively larger **type IIa**, then **type IIx** units. The order is fixed — you cannot choose to recruit the big ones first by concentrating.\n\nForce is then graded two ways: recruiting more units, and firing the recruited ones faster (**rate coding**)."
+        },
+        {
+          "h": "What this means for training",
+          "md": "The practical consequence is important and widely misunderstood. High-threshold motor units are recruited either by **high force** or by **fatigue** — as low-threshold units tire during a set, larger ones are progressively brought in to maintain force.\n\nThat is why a light set taken close to failure and a heavy set can produce similar hypertrophy: both end with the largest units recruited and under tension. It is also why a light set stopped far from failure does not — the big units were never called upon.\n\n**Fibre types** are not fixed labels either. Training reliably shifts **IIx → IIa** (both are fast, IIa more oxidative); conversion between type I and type II is limited in humans. Detraining shifts it back, and endurance athletes' muscle is not mostly converted so much as mostly selected and adapted."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The size principle states that motor units are recruited:",
+          "options": [
+            "Smallest first, with larger units added as force demand rises",
+            "Largest first, to produce force quickly",
+            "Randomly, depending on the movement",
+            "In an order the lifter can consciously choose"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — an orderly recruitment from small, fatigue-resistant units upward.",
+            "No — that is the reverse of Henneman's observation.",
+            "No — the order is highly stereotyped, not random.",
+            "No — intent does not override the recruitment order."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why can a set with a light load produce hypertrophy similar to a heavy set?",
+          "options": [
+            "If taken close to failure, fatigue recruits the high-threshold units too",
+            "Light loads preferentially recruit type IIx fibres",
+            "Light loads cause more muscle damage",
+            "Because load is irrelevant to hypertrophy"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — accumulating fatigue brings in the larger units to maintain force, so the set ends with them loaded.",
+            "No — light loads start with the smallest units; the large ones arrive only with fatigue or high force.",
+            "No — damage is not the main driver of hypertrophy, and heavy eccentrics typically cause more.",
+            "No — load matters; what the evidence shows is that a wide range works IF proximity to failure is sufficient."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Which fibre-type change does training reliably produce in humans?",
+          "options": [
+            "A shift from type IIx toward type IIa",
+            "Wholesale conversion of type I into type II",
+            "Wholesale conversion of type II into type I",
+            "No change of any kind"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the IIx → IIa shift is well documented, and reverses with detraining.",
+            "No — conversion between the major type I and type II classes is limited in humans.",
+            "No — same reason; the reliable shift is within the fast subtypes.",
+            "No — subtype shifts and large changes in the oxidative machinery certainly occur."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "StatPearls — Physiology, Muscle Fiber Types",
+          "type": "reading",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK537254/"
+        }
+      ]
+    },
+    {
+      "id": "hypertrophy-vs-strength",
+      "title": "Hypertrophy vs Strength — two different adaptations",
+      "summary": "Getting bigger and getting stronger overlap but are not the same thing; the first weeks of any strength gain are mostly your nervous system, not new muscle.",
+      "cards": [
+        {
+          "h": "Strength is not just cross-sectional area",
+          "md": "Muscle size is one input to strength, but only one. Strength also depends on:\n\n- **Neural drive** — how many motor units you can recruit, and how fast you can fire them (rate coding).\n- **Coordination and skill** — a squat is a motor pattern, and it is practised.\n- **Reduced antagonist co-contraction** — you stop braking yourself.\n- **Tendon stiffness** — force transmitted rather than absorbed in slack.\n- **Moment arms and limb proportions** — leverage, which you do not get to change.\n\nThis is why beginners often add substantial weight to the bar in the first six to eight weeks with little measurable change in muscle size. Those gains are real, and they are largely **neural**."
+        },
+        {
+          "h": "The bodybuilder and the powerlifter",
+          "md": "The two adaptations dissociate visibly. A powerlifter may be markedly stronger than a bodybuilder with more muscle, because they have trained the skill, the neural drive and the specific positions of the competition lifts. The bodybuilder has more contractile tissue but less specialised expression of it.\n\nThe training that emphasises each differs accordingly:\n\n- **Strength-biased**: heavier loads (roughly ≥85% of 1RM), lower repetitions, longer rests, more practice of the specific lift, well short of failure on most sets so quality stays high.\n- **Hypertrophy-biased**: a wider effective load range (about 30–85% of 1RM), more total hard sets, proximity to failure as the key variable, exercise variety to cover a muscle's regions.\n\nThey are not opposites — size supports strength over the long run, and heavy work contributes to size. But adaptation is **specific**, and what you practise is what improves."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A beginner adds 20 kg to their squat in six weeks with no measurable change in muscle size. The best explanation is:",
+          "options": [
+            "Neural adaptations — recruitment, rate coding and skill",
+            "The measurement of muscle size must be wrong",
+            "Tendons lengthened substantially",
+            "Hypertrophy always precedes strength"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — early strength gains are predominantly neural, and they are genuine.",
+            "No — this dissociation is a robust and repeatedly observed finding.",
+            "No — tendons become stiffer, not longer, and this is not the main early mechanism.",
+            "No — the usual order is the reverse: neural gains come first."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Which best describes the relationship between muscle size and strength?",
+          "options": [
+            "Size is one determinant among several, including neural drive, skill and leverage",
+            "Strength is determined entirely by cross-sectional area",
+            "They are unrelated",
+            "Bigger muscle always means proportionally more strength"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — which is why two people with identical muscle mass can differ substantially in strength.",
+            "No — that ignores neural and mechanical factors that clearly matter.",
+            "No — they are related, just not identical.",
+            "No — the relationship is real but not proportional across individuals."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "For maximising hypertrophy specifically, the evidence points to which variable mattering most?",
+          "options": [
+            "Total hard sets performed close to failure",
+            "Using loads above 85% of 1RM exclusively",
+            "Training each muscle once per week",
+            "Maximising time under tension regardless of effort"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — a wide load range works provided sets are taken near failure; volume of such sets is the main dose variable.",
+            "No — heavy loads build strength well but are not required for hypertrophy.",
+            "No — frequency has a modest effect at most; total weekly volume matters more.",
+            "No — slow reps far from failure do not substitute for effort."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Folland & Williams — The Adaptations to Strength Training",
+          "type": "reading",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17595154/"
+        }
+      ]
+    },
+    {
+      "id": "how-to-grow-muscle",
+      "title": "How to Actually Grow Muscle",
+      "summary": "Mechanical tension is the signal, hard sets are the dose, protein is the substrate, and progression over months is the mechanism — everything else is a rounding error.",
+      "cards": [
+        {
+          "h": "The signal: mechanical tension",
+          "md": "The primary driver of hypertrophy is **mechanical tension** on the fibre, sensed by mechanotransduction and converted into elevated **muscle protein synthesis** over the following ~24–48 hours. Muscle grows when synthesis exceeds breakdown, repeatedly, for months.\n\nTwo mechanisms once given headline status are now considered secondary at best: **muscle damage** (soreness is not the goal, and excessive damage impairs the next session) and **metabolic stress** (\"the pump\") — which accompanies effective training rather than driving it.\n\nThis reframes the practical question. You are not trying to feel destroyed. You are trying to place a meaningful mechanical load on a muscle, often enough, and slightly more over time."
+        },
+        {
+          "h": "The dose: hard sets, proximity to failure, progression",
+          "md": "- **Volume**: roughly **10–20 hard sets per muscle per week** covers most of the response for most trainees, with diminishing and eventually negative returns beyond.\n- **Proximity to failure**: sets should end within about **0–3 repetitions in reserve**. This is the variable most often got wrong — self-selected effort is systematically too easy.\n- **Load**: anywhere from about **30% to 85% of 1RM** produces similar hypertrophy *if* sets are near failure. Very light loads simply require uncomfortably many reps.\n- **Frequency**: 2 sessions per muscle per week is marginally better than 1 at matched volume; beyond that, frequency mainly helps you fit the volume in.\n- **Progressive overload**: over months, load or reps must trend upward. Without progression, the stimulus becomes the new normal.\n\n**Timescale**: measurable hypertrophy takes roughly **8–12 weeks**; meaningful change takes years. Anything promising more is selling something."
+        },
+        {
+          "h": "The substrate and the conditions",
+          "md": "- **Protein**: about **1.6 g per kg body weight per day** captures nearly all the benefit; meta-analysis finds little added benefit beyond ~2.2 g/kg. Distribution across 3–4 meals of 0.3–0.4 g/kg is sensible, largely for the leucine trigger.\n- **Energy**: growth is easiest in a small surplus. It is possible in a deficit — most reliably in beginners, those returning after a layoff, and those with more fat to lose — but it is slower.\n- **Sleep**: covered in its own concept, and not optional.\n- **Alcohol**: acutely blunts the protein-synthesis response to training in a dose-dependent way.\n\nThe uncomfortable summary: the controllable variables are few, well characterised, and boring. Nearly all of the supplement industry addresses the rounding errors, and the two supplements with genuinely good evidence for this purpose are **creatine monohydrate** and **protein powder** — the latter simply being food.\n\n*Educational information, not medical or dietary advice.*"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The primary stimulus for hypertrophy is best described as:",
+          "options": [
+            "Mechanical tension applied to the fibre",
+            "Muscle damage, indicated by soreness",
+            "Metabolic stress, indicated by the pump",
+            "Total calories consumed"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — tension is the signal; damage and metabolic stress accompany effective training rather than driving it.",
+            "No — soreness is a poor guide, and excessive damage impairs subsequent sessions.",
+            "No — the pump accompanies hard work but is not the driver.",
+            "No — energy availability is a permissive condition, not the stimulus."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Which is the most common error in self-directed hypertrophy training?",
+          "options": [
+            "Ending sets too far from failure",
+            "Using loads that are too heavy",
+            "Training each muscle too often",
+            "Eating too much protein"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — self-selected effort is systematically too conservative; sets should finish within roughly 0–3 reps in reserve.",
+            "No — heavy loads work well for hypertrophy when taken near failure.",
+            "No — frequency has a modest effect; it is rarely the limiting error.",
+            "No — excess protein is wasteful but not the reason people fail to grow."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Daily protein intake that captures nearly all of the hypertrophy benefit is about:",
+          "options": [
+            "1.6 g per kg body weight",
+            "0.4 g per kg body weight",
+            "4.0 g per kg body weight",
+            "As much as possible; there is no ceiling"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — meta-analysis places the plateau near 1.6 g/kg/day, with little added benefit beyond about 2.2.",
+            "No — that is closer to a single-meal dose than a daily target.",
+            "No — far beyond the point of any measured benefit.",
+            "No — the dose–response plateaus."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "free",
+          "prompt": "An 80 kg lifter wants the evidence-based daily protein target of 1.6 g/kg. How many grams per day is that?",
+          "grading": {
+            "kind": "numeric",
+            "answer": 128,
+            "tolerance": 2,
+            "unit": "g/day"
+          },
+          "feedback_correct": "Right: 80 kg × 1.6 g/kg = 128 g per day. Spread across 3–4 meals that is roughly 32–43 g each, which is close to the 0.3–0.4 g/kg per meal that maximises the response.",
+          "feedback_incorrect": "Multiply body mass by the target: 80 × 1.6 = 128 g per day. A common error is using the 0.8 g/kg RDA (64 g), which was set to prevent deficiency, not to support hypertrophy."
+        }
+      ],
+      "resources": [
+        {
+          "label": "Morton et al. — Protein supplementation and resistance training (meta-analysis)",
+          "type": "reading",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28698222/"
+        },
+        {
+          "label": "Schoenfeld et al. — Dose-response relationship between weekly set volume and hypertrophy",
+          "type": "reading",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27433992/"
+        }
+      ]
+    },
+    {
+      "id": "sleep-recovery",
+      "title": "Sleep, Recovery and Adaptation",
+      "summary": "Training is the stimulus; adaptation happens while you are asleep, and sleep restriction measurably lowers testosterone, blunts protein synthesis and raises injury risk.",
+      "cards": [
+        {
+          "h": "Adaptation is not the workout",
+          "md": "Training is a **stimulus**; the adaptation happens afterwards. The classical description is **supercompensation** — performance dips after a hard session, then recovers to slightly above baseline if the next stimulus is well timed. Chronically too soon and you accumulate fatigue; chronically too late and you drift back to where you started.\n\n**Functional overreaching** — a planned block of high load with a temporary performance dip, followed by a deliberate taper — is a real and useful tool. **Non-functional overreaching** and **overtraining syndrome** sit further along the same continuum, take weeks to months to resolve, and are diagnosed largely by exclusion.\n\nThe distinguishing feature is not how hard the training was. It is whether recovery was allowed to happen."
+        },
+        {
+          "h": "What sleep loss measurably does",
+          "md": "The effects are not vague:\n\n- **Testosterone**: one week of five hours' sleep per night lowered daytime testosterone by roughly **10–15%** in healthy young men (Leproult & Van Cauter, JAMA 2011) — an effect comparable to a decade or more of ageing.\n- **Growth hormone**: the largest GH pulse of the day accompanies **slow-wave sleep**. Fragmenting deep sleep truncates it.\n- **Muscle protein synthesis** is blunted and catabolic signalling raised under sleep restriction; in energy deficit, sleep loss shifts weight loss toward lean tissue rather than fat.\n- **Injury**: in adolescent athletes, sleeping under eight hours has been associated with substantially higher injury rates.\n- **Performance**: sleep *extension* has improved sprint times, accuracy and reaction time in athletes given several weeks at extended duration.\n\nAppetite regulation moves too — sleep restriction raises ghrelin and lowers leptin, which is the physiological version of \"tired and hungry\"."
+        },
+        {
+          "h": "What to actually do, and what to ignore",
+          "md": "The high-value items are unglamorous: a **consistent schedule** (the same wake time matters more than the same bedtime), sufficient **duration** (7–9 hours for most adults), a **dark, cool room**, and limiting **alcohol** — which fragments the second half of the night and specifically suppresses REM, even when it shortens sleep onset.\n\nCaffeine has a half-life of roughly **5–6 hours**, so an afternoon coffee is still measurably present at bedtime.\n\nOn tracking: consumer sleep-stage estimates are **weakly accurate** against polysomnography, particularly for distinguishing light from deep sleep. Total duration and timing are estimated reasonably; stage breakdown is not. Combined with HRV's individual variability, this is a domain where the metric is easily taken more seriously than it deserves — and where anxiety about the score can cost more sleep than the insight gains.\n\n*Educational information, not medical advice.*"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "One week of five hours' sleep per night in healthy young men lowered daytime testosterone by roughly:",
+          "options": [
+            "10–15%",
+            "1–2%",
+            "50%",
+            "It raised testosterone"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — an effect of similar magnitude to a decade or more of normal ageing.",
+            "No — the measured effect was substantially larger than this.",
+            "No — the effect is meaningful but not of that magnitude.",
+            "No — sleep restriction lowered it."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Functional overreaching is best described as:",
+          "options": [
+            "A planned high-load block with a temporary performance dip, followed by a taper",
+            "Training so hard that recovery takes months",
+            "Any training that produces soreness",
+            "A synonym for overtraining syndrome"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — deliberate, time-limited, and followed by planned recovery.",
+            "No — that is further along the continuum, toward overtraining syndrome.",
+            "No — soreness is not the defining feature.",
+            "No — they sit at different points on the same continuum."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Regarding consumer sleep trackers, the accurate statement is:",
+          "options": [
+            "Duration and timing are estimated reasonably; sleep-stage breakdown is weakly accurate",
+            "They match polysomnography closely for all stages",
+            "They cannot estimate sleep duration at all",
+            "Deep-sleep percentage is their most reliable output"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — treat stage percentages with considerable caution and watch duration and consistency instead.",
+            "No — stage classification in particular diverges substantially from polysomnography.",
+            "No — duration and timing are among the things they do reasonably well.",
+            "No — deep-sleep estimates are among the least reliable outputs."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Leproult & Van Cauter — Effect of 1 Week of Sleep Restriction on Testosterone (JAMA, 2011)",
+          "type": "reading",
+          "url": "https://jamanetwork.com/journals/jama/fullarticle/900091"
+        },
+        {
+          "label": "Walsh et al. — Sleep and the athlete (Br J Sports Med, 2021)",
+          "type": "reading",
+          "url": "https://bjsm.bmj.com/content/55/7/356"
+        }
+      ]
+    },
+    {
+      "id": "hormones-trt",
+      "title": "Testosterone and TRT — stated honestly",
+      "summary": "Testosterone builds muscle with or without exercise and the dose–response is steep; that is exactly why the gap between treating deficiency and selling enhancement matters so much.",
+      "cards": [
+        {
+          "h": "What testosterone does, and how much",
+          "md": "Testosterone increases muscle protein synthesis, satellite-cell activity and motor-neuron output. The landmark demonstration is **Bhasin et al. (NEJM, 1996)**: over ten weeks, men given supraphysiologic testosterone **without exercising** gained more lean mass and strength than men who exercised on placebo. The combination was greater still.\n\nThe dose–response is steep across and beyond the physiological range, which is the uncomfortable core of the subject: this is a genuinely powerful anabolic agent, and that is exactly why the distinction between **restoring** a deficient level and **exceeding** a normal one is not a technicality.\n\nNormal ranges are wide (roughly 300–1000 ng/dL in most laboratories) and levels fall about **1% per year** after around age 30 — a slower decline than the menopausal transition it is often compared to."
+        },
+        {
+          "h": "Treating deficiency vs enhancing normality",
+          "md": "**Clinical hypogonadism** requires both consistently low morning testosterone on repeated measurement *and* symptoms, with secondary causes excluded — sleep apnoea, obesity, opioids, and pituitary pathology among them. Several of those are reversible, which is why the workup matters.\n\nIn genuinely hypogonadal men, replacement reliably improves sexual function, bone density, lean mass and often mood.\n\nIn men with **normal** levels, effects on strength and body composition are modest relative to what training alone achieves — and this is precisely the population that direct-to-consumer clinics market to, frequently using symptom checklists so non-specific (fatigue, low mood, reduced motivation) that almost anyone screens positive.\n\nKnown effects of exogenous testosterone include **suppression of the HPG axis** — the testes stop producing, and **spermatogenesis is suppressed**, often profoundly. Fertility may recover slowly after stopping, or incompletely. For a man who may want children, this is the consequence most often glossed over."
+        },
+        {
+          "h": "Risks, and what the recent evidence says",
+          "md": "- **Erythrocytosis** — a rise in haematocrit is the most common dose-limiting effect and requires monitoring.\n- **Fertility suppression** — as above; co-treatment protocols exist but are not guaranteed.\n- **Acne, sleep apnoea worsening, gynaecomastia** via aromatisation to oestradiol.\n- **Cardiovascular**: long contested. The **TRAVERSE** trial (NEJM, 2023), randomising ~5,200 middle-aged and older men with hypogonadism and cardiovascular risk, found testosterone **non-inferior** to placebo for major adverse cardiac events — while noting higher rates of atrial fibrillation, acute kidney injury and pulmonary embolism.\n- **Prostate**: current evidence does not support the older claim that replacement causes prostate cancer, though monitoring remains standard.\n- **Dependence**: once the axis is suppressed, stopping means a period of genuinely low levels.\n\nThe honest summary is that this is legitimate medicine for a real diagnosis and a heavily marketed product outside it. *Educational information only — not medical advice; these are decisions for a physician who has examined you and your bloodwork.*"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "The Bhasin 1996 NEJM trial is important because it showed that:",
+          "options": [
+            "Supraphysiologic testosterone increased lean mass and strength even without exercise",
+            "Testosterone works only when combined with training",
+            "Testosterone had no measurable effect on muscle",
+            "Exercise raises testosterone permanently"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — and the combination of testosterone plus training was greater still.",
+            "No — the no-exercise testosterone group still out-gained the exercising placebo group.",
+            "No — the effect was large and dose-dependent.",
+            "No — that was not the finding; acute post-exercise rises are transient."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A consequence of exogenous testosterone that is often under-disclosed is:",
+          "options": [
+            "Suppression of the HPG axis and of spermatogenesis, with uncertain recovery",
+            "Permanent elevation of natural production after stopping",
+            "A guaranteed reduction in haematocrit",
+            "Improved fertility"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — fertility suppression is common and recovery after stopping can be slow or incomplete.",
+            "No — the axis is suppressed, and stopping is followed by a period of low levels.",
+            "No — erythrocytosis, a RISE in haematocrit, is the common dose-limiting effect.",
+            "No — the effect on fertility is the opposite."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The TRAVERSE trial (2023) found that in hypogonadal men with cardiovascular risk, testosterone therapy was:",
+          "options": [
+            "Non-inferior to placebo for major adverse cardiac events, with some higher secondary event rates",
+            "Clearly protective against heart attacks",
+            "Clearly harmful, with more heart attacks",
+            "Impossible to assess because the trial was stopped early"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — non-inferior for MACE, but with higher rates of atrial fibrillation, acute kidney injury and pulmonary embolism.",
+            "No — non-inferiority is not protection.",
+            "No — the primary cardiac endpoint did not show harm.",
+            "No — the trial completed and reported."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Bhasin et al. — The Effects of Supraphysiologic Doses of Testosterone (NEJM, 1996)",
+          "type": "reading",
+          "url": "https://www.nejm.org/doi/full/10.1056/NEJM199607043350101"
+        },
+        {
+          "label": "Lincoff et al. — Cardiovascular Safety of Testosterone-Replacement Therapy, TRAVERSE (NEJM, 2023)",
+          "type": "reading",
+          "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa2215025"
+        }
+      ]
+    },
+    {
+      "id": "sarcopenia",
+      "title": "Sarcopenia — defending muscle across the decades",
+      "summary": "Muscle mass falls slowly with age and power falls faster; both respond to resistance training well into the tenth decade, which makes this the most negotiable part of ageing.",
+      "anim": "med_bodycomp_recomp",
+      "cards": [
+        {
+          "h": "What is lost, and how fast",
+          "md": "**Sarcopenia** is the age-related loss of muscle mass and function. Mass declines roughly **3–8% per decade** after about 30, accelerating after 60.\n\nTwo details matter more than the headline:\n\n- **Power declines faster than strength**, and strength faster than mass. Power — force × velocity — is what catches you when you trip and gets you out of a chair. It depends heavily on **type II** fibres, which atrophy preferentially with age, and on motor units that are progressively lost and partially reinnervated by slower neurons.\n- **Function is the endpoint.** Modern definitions (EWGSOP2) lead with low **strength**, using mass as confirmatory — because the functional consequence, not the tissue, is what determines independence.\n\nThe clinical stakes are falls, fractures, loss of independence, and reduced physiological reserve for surviving illness and surgery."
+        },
+        {
+          "h": "Anabolic resistance — why the old rules stop working",
+          "md": "Older muscle responds less to the same stimulus. A protein dose that maximally stimulates protein synthesis in a young adult produces a blunted response in an older one — **anabolic resistance**. The same is true for a given training load.\n\nThe practical corrections follow directly:\n\n- **More protein per meal**, not just per day: roughly **0.4 g/kg per meal** and a daily total around **1.2–1.6 g/kg**, above the RDA of 0.8 which was never designed to optimise muscle.\n- **Distribute it** across meals; older adults frequently eat almost no protein at breakfast.\n- **Resistance training is non-negotiable** — nutrition alone does not fix it, and inactivity accelerates everything above.\n\nBed rest and immobilisation are especially costly in older adults: a week of bed rest can cost more leg muscle than a year of ordinary ageing, and it is not automatically regained."
+        },
+        {
+          "h": "What works — and it works late",
+          "md": "The evidence here is unusually encouraging. In the landmark **Fiatarone (1990/1994)** studies, frail nursing-home residents with a mean age around 87 — some over 95 — performed progressive resistance training and produced large gains in strength, muscle area, gait speed and stair-climbing power.\n\nThe practical programme is not exotic:\n\n- **Progressive resistance training**, 2–3 sessions weekly, working the large muscles through a full range, with load that genuinely increases over time.\n- **Include power work** — moving a moderate load with intent — since power is what declines fastest and matters for falls.\n- **Protein as above**, distributed.\n- **Keep walking**, but understand that walking alone does not defend muscle mass or power.\n- **Vitamin D** where deficient; correction improves outcomes, supplementation in the already-replete does not.\n\nThe overall message is that this trajectory is modifiable at essentially any age, and that the intervention with the best evidence is resistance training. *Educational information, not medical advice.*"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "With ageing, which declines fastest?",
+          "options": [
+            "Muscle power",
+            "Muscle mass",
+            "Muscle strength",
+            "All three decline at identical rates"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — power falls faster than strength, and strength faster than mass, largely reflecting type II fibre loss.",
+            "No — mass declines most slowly of the three.",
+            "No — strength declines faster than mass but more slowly than power.",
+            "No — the rates differ substantially, which is why function is the endpoint that matters."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "'Anabolic resistance' in older adults means:",
+          "options": [
+            "A blunted muscle protein synthesis response to a given dose of protein or training",
+            "An inability to absorb protein from the gut",
+            "Resistance training becomes unsafe with age",
+            "Muscle can no longer grow at all"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — hence higher per-meal protein doses and a genuinely progressive training stimulus.",
+            "No — absorption is largely preserved; the blunting is in the anabolic response.",
+            "No — resistance training is the best-evidenced intervention, including in frail elderly people.",
+            "No — muscle can and does grow; it simply requires a larger stimulus."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The Fiatarone nursing-home studies are important because they demonstrated that:",
+          "options": [
+            "Progressive resistance training produced large functional gains in very frail people aged around 87",
+            "Only younger people can gain muscle",
+            "Protein supplementation alone reversed frailty",
+            "Walking programmes were sufficient to restore strength"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — gains in strength, muscle area, gait speed and stair-climbing power, some in participants over 95.",
+            "No — that is precisely the belief these studies overturned.",
+            "No — nutritional supplementation alone did not produce the gains; the training did.",
+            "No — walking is valuable but does not defend strength and power on its own."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Cruz-Jentoft et al. — EWGSOP2 revised European consensus on sarcopenia",
+          "type": "reading",
+          "url": "https://academic.oup.com/ageing/article/48/1/16/5126243"
+        },
+        {
+          "label": "Fiatarone et al. — Exercise Training and Nutritional Supplementation for Physical Frailty (NEJM, 1994)",
+          "type": "reading",
+          "url": "https://www.nejm.org/doi/full/10.1056/NEJM199406233302501"
+        }
+      ]
+    }
+  ],
+  "order": 2
+}

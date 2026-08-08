@@ -3,6 +3,30 @@
   "title": "Diabetes — How Blood Sugar Works, and How It Breaks",
   "tagline": "The insulin system from the inside: how the β-cell fires, what insulin does, why type 1 and type 2 differ, why it looks different across the world, and how every drug plugs in.",
   "description": "A plain-language, in-depth tour of diabetes: glucose control, the β-cell's stimulus–secretion relay, insulin action and resistance, type 1 vs type 2, the often-missed variants (LADA, MODY), why type 2 appears at much lower weights in East and South Asian populations, and a receptor map of how every drug works — cross-linked to the GLP-1 module. Educational only — not medical advice.",
+  "intro": {
+    "hook": "Blood sugar has to stay inside a band about as wide as a teaspoon of sugar dissolved in your whole bloodstream.",
+    "body": [
+      "The total glucose circulating in an adult at any moment is roughly four grams — about a teaspoon. You eat far more than that in a single meal, and yet the concentration barely moves. The machinery that achieves this is fast, layered, and mostly invisible until it fails.",
+      "Diabetes is what failure looks like, and the two main kinds fail for opposite reasons: one because the factory that makes insulin is destroyed, the other because the tissues stop listening to it. Conflating them causes real harm, including in how the disease is talked about.",
+      "This course builds the control system first, then shows exactly where each type breaks, why the complications are what they are, and what each treatment is actually doing."
+    ],
+    "why": [
+      {
+        "title": "One in ten adults",
+        "text": "You almost certainly know several people managing this daily. Understanding it changes how you can help."
+      },
+      {
+        "title": "Two diseases, one name",
+        "text": "Type 1 and type 2 differ in cause, course and treatment. The shared label causes ongoing confusion and blame."
+      },
+      {
+        "title": "A model case of regulation",
+        "text": "It is the clearest worked example of a feedback loop in the human body — and of what happens when it breaks."
+      }
+    ],
+    "anim": "dia_tightrope",
+    "closer": "Before insulin was isolated in 1921, a type 1 diagnosis in a child meant months. The first patient treated lived another thirteen years."
+  },
   "category": "Health & Medicine",
   "prereqs": [],
   "concepts": [

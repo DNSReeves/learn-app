@@ -4,6 +4,30 @@
   "tagline": "How to build for two thousand years.",
   "category": "Physics & Engineering",
   "description": "Concrete, arches, aqueducts, roads, and the systems thinking that held an empire together — and why some of it still stands.",
+  "intro": {
+    "hook": "A concrete dome built in the year 126 has no steel in it, has never been repaired, and is still the largest of its kind on Earth.",
+    "body": [
+      "The Pantheon's dome has stood unreinforced for nineteen centuries. Roman harbour concrete has sat in seawater since Augustus and is measurably stronger now than when it was poured — modern marine concrete degrades in decades. Aqueducts crossed sixty kilometres on gradients averaging a fraction of a percent, surveyed with water, sticks and string.",
+      "This is not a story about mysterious lost genius. Every one of these achievements has an explanation in materials science, hydraulics and structural mechanics, and the explanations are genuinely interesting — the self-healing chemistry of their concrete was only properly characterised in the last decade.",
+      "It is also a study in constraints: what you build when you have no steel, no pumps, no power tools, and an empire's worth of time and labour."
+    ],
+    "why": [
+      {
+        "title": "The material outperforms ours",
+        "text": "Roman marine concrete gains strength in seawater. Understanding why is active modern research, not antiquarianism."
+      },
+      {
+        "title": "Engineering under hard constraints",
+        "text": "No steel, no pumps, no electricity — and aqueducts holding a gradient of centimetres per kilometre."
+      },
+      {
+        "title": "Infrastructure as strategy",
+        "text": "Roads, water and ports were not conveniences. They were how the empire held together, and where it spent its money."
+      }
+    ],
+    "anim": "roman_concrete_heal",
+    "closer": "Their concrete heals its own cracks. We are now trying to copy it."
+  },
   "prereqs": [],
   "concepts": [
     {

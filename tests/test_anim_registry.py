@@ -94,6 +94,15 @@ def test_no_duplicate_anim_wiring():
         "med_insulin_action",   # diabetes/insulin-action + nutrition/intermittent-fasting
         "med_actrii",           # glp1/muscle-saving + nutrition/protein-ageing-sarcopenia
         "med_sarcomere",        # nutrition/muscle-growth-loss + physiology/muscle-contraction
+        # exercise-physiology (2026-08-08). Cross-pack reuse only, and only where the MECHANISM
+        # is the same one — that pack lists physiology-biophysics as a prerequisite, so a
+        # returning visual is a callback rather than a gap. Within-pack duplicates were removed
+        # instead of declared: meeting the same animation twice in one course is a weakness the
+        # allowlist should not launder.
+        "med_starling",         # physiology/frank-starling + exercise-phys/cardiac-output
+        "med_homeostasis",      # physiology/homeostasis + exercise-phys/autonomic-control
+        "med_o2curve",          # physiology/oxygen-transport + exercise-phys/vo2max
+        "med_bodycomp_recomp",  # nutrition/body-composition + exercise-phys/sarcopenia
     }
     unexpected = {a: w for a, w in dupes.items() if a not in INTENTIONAL}
     assert not unexpected, (

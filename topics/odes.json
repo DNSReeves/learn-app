@@ -4,6 +4,30 @@
   "tagline": "Laws of change, and the functions that obey them.",
   "category": "Mathematics",
   "description": "A refresher ladder for someone who once knew this cold. The mechanics you'll re-recognize are compressed to worked reminders; the depth goes where the half-memories are — where the integrating factor comes from, what the discriminant says physically, why the Wronskian matters, how to read a phase portrait, and why Euler drifts while RK4 doesn't.",
+  "intro": {
+    "hook": "Write down how something changes, and the equation tells you its entire future.",
+    "body": [
+      "A differential equation is a strange kind of sentence. It never tells you where anything is. It tells you only how things change — and that turns out to be enough to recover where they will be for all time.",
+      "This is how nearly every physical law is actually written. Newton did not give a formula for the position of a planet; he gave a rule relating acceleration to force, and the orbit falls out. The same move describes cooling coffee, spreading rumours, drug concentrations, predator and prey, and the charge on a capacitor.",
+      "The skill you are building is reading such a sentence and seeing the behaviour it implies — growth, decay, oscillation, runaway, equilibrium — often before solving anything at all."
+    ],
+    "why": [
+      {
+        "title": "Laws are written as rates",
+        "text": "Almost no law of nature states a value. They state how values change, which means they are differential equations."
+      },
+      {
+        "title": "Qualitative before quantitative",
+        "text": "A direction field shows you the family of all solutions at a glance. Reading behaviour without solving is the practitioner's real skill."
+      },
+      {
+        "title": "Same equation, many worlds",
+        "text": "Exponential decay is radioactivity, cooling, drug clearance and forgetting. Learn the form once and recognise it everywhere."
+      }
+    ],
+    "anim": "ode_field",
+    "closer": "The surprise is not that these equations are hard. It is how much of the world runs on a handful of them."
+  },
   "prereqs": [
     "calculus"
   ],

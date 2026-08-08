@@ -33,7 +33,9 @@ def test_collapse_is_css_only_so_cards_stay_wired():
     (and any future per-card feature) must not depend on the view mode."""
     assert '.cats[data-mode="collapsed"] .cat:not([data-open="1"]) .cat-body{display:none}' in SRC
     i = SRC.index("wireCategoryView(d.user);")
-    j = SRC.index('main.querySelectorAll(".tcard")')
+    # `[data-t]` added 2026-08-08: work-in-progress cards reuse .tcard for layout but carry no
+    # topic id, so the wiring must skip them or it calls viewTopic(undefined).
+    j = SRC.index('main.querySelectorAll(".tcard[data-t]")')
     assert j > i, "card wiring must run after the view is painted"
 
 

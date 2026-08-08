@@ -7,6 +7,30 @@
     "calculus"
   ],
   "description": "From periodic functions to the frequency domain. The one move that matters — extracting a coefficient by integrating against a basis function — gets the depth; the rest is calibrated refresher for an engineer who has seen this before.",
+  "intro": {
+    "hook": "Any repeating signal — a violin note, a heartbeat, a year of temperatures — is a sum of simple waves.",
+    "body": [
+      "The claim sounds too strong the first time you hear it. Take any periodic signal, however jagged: a square wave with vertical cliffs, the sawtooth buzz of a synthesiser, the trace of a beating heart. Fourier's assertion is that each one is nothing but pure sine waves added together, and that you can find exactly how much of each.",
+      "It was controversial precisely because it seemed impossible — Lagrange objected that smooth curves could never build a corner. He was almost right; the way the sum behaves at a jump is subtle enough to have its own name and its own century of argument.",
+      "Once you accept it, you gain a second way of seeing everything. Every signal has a shape in time and a shape in frequency, and problems that are hopeless in one are often trivial in the other."
+    ],
+    "why": [
+      {
+        "title": "It runs the modern world",
+        "text": "MP3, JPEG, MRI, Wi-Fi, noise cancellation and spectrum analysis are all this one idea, industrialised."
+      },
+      {
+        "title": "A second pair of eyes",
+        "text": "Switching between time and frequency turns hard problems into easy ones — differentiation becomes multiplication."
+      },
+      {
+        "title": "Where filtering comes from",
+        "text": "Bass, treble, smoothing and denoising all mean the same thing: keep some frequencies, discard others."
+      }
+    ],
+    "anim": "fourier_superpose",
+    "closer": "Fourier was trying to understand heat. He ended up handing us the format of nearly every sound and picture you will see today."
+  },
   "concepts": [
     {
       "id": "c01-periodic",

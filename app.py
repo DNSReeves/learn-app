@@ -103,6 +103,43 @@ def _topics_signature() -> tuple:
     return tuple(sig)
 
 
+_PLANNED_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             "topics", "_planned.json")
+
+
+def load_planned() -> list:
+    """The visible roadmap: departments and the courses intended for them.
+
+    NOT packs. Nothing here can be opened, mastered or counted — the loader skips files starting
+    with '_', and these entries never enter `load_topics()`. A department can therefore exist
+    before its first course does, which is the point: the school's shape should be legible while
+    it is still being built.
+
+    Entries whose title already matches a LIVE pack are filtered out here rather than trusted to
+    be removed by hand. That is exactly how the previous roadmap rotted — `_roadmap.json` still
+    listed every topic in it long after all of them shipped. A roadmap that advertises finished
+    work is worse than none, so the filter is mechanical.
+
+    Any failure returns an empty list: a broken roadmap must never take down the dashboard.
+    """
+    try:
+        with open(_PLANNED_PATH) as f:
+            raw = json.load(f)
+    except Exception:
+        logging.getLogger("learn").exception(
+            "planned-topics registry unreadable — serving none")
+        return []
+    live = {p["title"].strip().lower() for p in load_topics().values()}
+    out = []
+    for dept in raw.get("departments", []):
+        planned = [p for p in dept.get("planned", [])
+                   if p.get("title", "").strip().lower() not in live]
+        out.append({"category": dept.get("category", "More Topics"),
+                    "blurb": dept.get("blurb", ""),
+                    "planned": planned})
+    return out
+
+
 def load_topics() -> dict:
     global _packs_cache, _packs_sig
     sig = _topics_signature()
@@ -609,6 +646,12 @@ def topics(authorization: str | None = Header(default=None)):
         out.append({"id": tid, "title": pack["title"], "tagline": pack.get("tagline", ""),
                     "description": pack.get("description", ""),
                     "category": pack.get("category", "More Topics"),
+                    # WITHIN-CATEGORY ORDER (2026-08-08). Packs previously rendered in filename
+                    # order, which put a survey pack LAST among its own depth modules
+                    # (cardiac-, exercise-, neuro-, then physiology-biophysics). `order` is an
+                    # optional integer; unset sorts after ordered packs, then alphabetically by
+                    # title, so every existing pack keeps its current position.
+                    "order": pack.get("order"),
                     "prereqs": [packs[p]["title"] for p in pack.get("prereqs", []) if p in packs],
                     "concepts": n, "mastered": mastered, "review_due": due})
     # Resume (2026-08-03): where this user last left off, validated against the
@@ -621,7 +664,8 @@ def topics(authorization: str | None = Header(default=None)):
         if rc:
             resume = {"tid": loc["topic_id"], "cid": loc["concept_id"],
                       "topic_title": rp["title"], "concept_title": rc["title"]}
-    return {"user": user["username"], "topics": out, "ai": ai.available(), "resume": resume}
+    return {"user": user["username"], "topics": out, "ai": ai.available(), "resume": resume,
+            "departments": load_planned()}
 
 
 @app.get("/api/topic/{tid}")
@@ -654,6 +698,14 @@ def topic(tid: str, authorization: str | None = Header(default=None)):
         prev_mastered = mastered or relearn
     return {"id": tid, "title": pack["title"], "tagline": pack.get("tagline", ""),
             "concepts": concepts, "needs_placement": needs_placement,
+            # INTRODUCTION (2026-08-08, operator ask): a broad, motivating opening shown before
+            # the first concept. `fresh` is derived from the answer log and state table rather
+            # than a "seen" flag, so it costs no new column and cannot drift out of sync with
+            # actual progress: you get the intro automatically until you have actually started.
+            # It stays reachable from the ladder forever after — a returning student should be
+            # able to re-read why the subject matters without being forced to.
+            "intro": pack.get("intro"),
+            "fresh": (not db.has_answers(user["id"], tid)) and not states,
             "mastery_p": mastery.MASTERY_P, "streak_gate": mastery.STREAK_GATE}
 
 
@@ -992,8 +1044,11 @@ def certificate(tid: str, authorization: str | None = Header(default=None)):
     days = None
     if st["first_at"] and st["last_at"]:
         days = max(1, round((st["last_at"] - st["first_at"]) / 86400))
+    name = db.get_name(user["id"])
     return {
-        "student": db.get_display_name(user["id"]) or user["username"],
+        "student": name["full_name"] or user["username"],
+        "first_name": name["first_name"],
+        "last_name": name["last_name"],
         "username": user["username"],
         "course": pack["title"],
         "tagline": pack.get("tagline", ""),
@@ -1023,11 +1078,33 @@ class DisplayName(BaseModel):
 
 @app.post("/api/me/display_name")
 def set_display_name(body: DisplayName, authorization: str | None = Header(default=None)):
+    """LEGACY single-field name. Kept working for anything still calling it (2026-08-08);
+    the UI now posts /api/me/name with first and last."""
     user = require_user(authorization)
     clean = db.set_display_name(user["id"], body.name)
     if not clean:
         raise HTTPException(400, "A name is required.")
     return {"display_name": clean}
+
+
+class StudentName(BaseModel):
+    first_name: str = ""
+    last_name: str = ""
+
+
+@app.post("/api/me/name")
+def set_student_name(body: StudentName, authorization: str | None = Header(default=None)):
+    """Set the certificate name as first + last.
+
+    BOTH are required. A diploma reading "Kate" is not a diploma, and accepting a half-filled
+    name here would put it on the printed face — the one place the omission is permanent.
+    """
+    user = require_user(authorization)
+    first = " ".join((body.first_name or "").split())
+    last = " ".join((body.last_name or "").split())
+    if not first or not last:
+        raise HTTPException(400, "A first and last name are both required.")
+    return db.set_name(user["id"], first, last)
 
 
 # ---------- review queue (interleaved, spaced) ----------

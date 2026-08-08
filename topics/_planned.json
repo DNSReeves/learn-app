@@ -1,0 +1,119 @@
+{
+  "_comment": [
+    "PLANNED TOPICS — the visible roadmap (operator, 2026-08-08: 'create all departments and fill",
+    "out taxonomies now, and if there is no material add some kind of visual work in progress').",
+    "",
+    "This file is NOT a pack. The loader skips anything beginning with '_', so nothing here can be",
+    "opened, mastered, or counted toward a certificate. It exists so a department can exist before",
+    "its courses do, and so a student can see where the school is going.",
+    "",
+    "HONESTY RULE: an entry here is a stated intention, not a promise with a date. The UI labels",
+    "these 'In development' and they are not clickable. When a pack ships, DELETE its entry — a",
+    "roadmap that still advertises what already exists is how the old _roadmap.json became stale",
+    "(every topic it listed had since been built).",
+    "",
+    "Order within a category follows the order of this list."
+  ],
+  "departments": [
+    {
+      "category": "Health & Medicine",
+      "blurb": "Clinical and consumer health, for people making decisions about their own care.",
+      "planned": [
+        { "title": "Cardiovascular Disease", "hint": "risk factors, lipids and what the trials actually showed; blood pressure; statins and their critics" },
+        { "title": "Immunology & Vaccines", "hint": "innate vs adaptive immunity; how a vaccine trains it; herd immunity; reading a safety signal" },
+        { "title": "Sleep Medicine", "hint": "sleep architecture; apnoea; insomnia and CBT-I; what sleep trackers can and cannot see" },
+        { "title": "Pharmacology Basics", "hint": "dose-response, half-life, first-pass metabolism; why drug interactions happen" }
+      ]
+    },
+    {
+      "category": "Physiology",
+      "blurb": "How the living body works, system by system. Start with Foundations, then go deep.",
+      "planned": [
+        { "title": "Neurophysiology", "hint": "synaptic transmission; sensory coding; motor control; plasticity and learning" },
+        { "title": "Cardiac Physiology", "hint": "conduction and the ECG; the pressure-volume loop; coronary flow; valve mechanics; HFrEF vs HFpEF" },
+        { "title": "Respiratory Physiology", "hint": "mechanics of breathing; ventilation-perfusion matching; gas exchange; control of ventilation" },
+        { "title": "Renal Physiology & Fluid Balance", "hint": "filtration and reabsorption; the counter-current multiplier; acid-base; diuretics" },
+        { "title": "Endocrinology", "hint": "hormone classes and receptors; the hypothalamic-pituitary axes; feedback and its failures" },
+        { "title": "The Science of Ageing", "hint": "hallmarks of ageing; senescence and telomeres; nutrient sensing; healthspan vs lifespan; what the evidence supports" }
+      ]
+    },
+    {
+      "category": "Molecular Biology",
+      "blurb": "The molecules that carry, copy and express biological information.",
+      "planned": [
+        { "title": "Gene Expression & Regulation", "hint": "transcription factors; promoters and enhancers; RNA processing; how one genome makes many cell types" },
+        { "title": "Cell Biology", "hint": "organelles as compartments; the cytoskeleton; trafficking; the cell cycle and its checkpoints" },
+        { "title": "Epigenetics", "hint": "methylation and chromatin; imprinting; what is and is not heritable; the overclaiming problem" }
+      ]
+    },
+    {
+      "category": "Biochemistry",
+      "blurb": "The chemistry of life: energy, catalysis, and the molecules that do the work.",
+      "planned": [
+        { "title": "Metabolism & Bioenergetics", "hint": "glycolysis, the TCA cycle, oxidative phosphorylation; ATP as currency; fed and fasted states" },
+        { "title": "Enzymes & Kinetics", "hint": "catalysis; Michaelis-Menten; inhibition; allosteric regulation as biological control" },
+        { "title": "Proteins & Folding", "hint": "structure from sequence; folding and misfolding; why AlphaFold mattered" }
+      ]
+    },
+    {
+      "category": "Statistics",
+      "blurb": "Reasoning from data under uncertainty — the substrate under science, medicine and finance.",
+      "planned": [
+        { "title": "Statistical Inference", "hint": "sampling; confidence intervals; what a p-value is and is not; power; the replication crisis" },
+        { "title": "Regression & Modelling", "hint": "least squares; assumptions and diagnostics; multiple regression; overfitting" },
+        { "title": "Causal Inference", "hint": "confounding; randomisation; DAGs; instrumental variables; when observational data can and cannot answer a question" },
+        { "title": "Experimental Design", "hint": "randomisation and blinding; multiple comparisons; pre-registration; designing a study you can believe" }
+      ]
+    },
+    {
+      "category": "Mathematics",
+      "blurb": "The language the sciences are written in.",
+      "planned": [
+        { "title": "Linear Algebra", "hint": "vectors and matrices as transformations; eigenvalues; decompositions; why it underpins machine learning" },
+        { "title": "Probability", "hint": "random variables; distributions; expectation and variance; limit theorems" },
+        { "title": "Optimization", "hint": "convexity; gradient methods; constraints and Lagrange multipliers; what solvers actually do" }
+      ]
+    },
+    {
+      "category": "Computer Science",
+      "blurb": "Computation itself — the discipline AI sits inside.",
+      "planned": [
+        { "title": "Algorithms & Complexity", "hint": "asymptotic analysis; sorting and searching; graphs; dynamic programming; P vs NP" },
+        { "title": "Data Structures", "hint": "arrays, lists, trees, hash tables, heaps; choosing the structure that makes the problem easy" },
+        { "title": "Databases & SQL", "hint": "the relational model; joins; indexes and query plans; transactions and ACID" },
+        { "title": "Operating Systems & Concurrency", "hint": "processes and threads; scheduling; memory; locks, races and deadlock" },
+        { "title": "Computer Networks", "hint": "the layered model; TCP/IP; DNS; TLS and what it actually guarantees" }
+      ]
+    },
+    {
+      "category": "AI & Machine Learning",
+      "blurb": "From the perceptron to the systems now writing code.",
+      "planned": [
+        { "title": "Classical Machine Learning", "hint": "linear and tree models; the bias-variance trade-off; cross-validation; when not to use a neural network" },
+        { "title": "Reinforcement Learning", "hint": "agents, rewards and value; exploration vs exploitation; policy gradients; reward hacking" },
+        { "title": "Computer Vision", "hint": "convolution; feature hierarchies; detection and segmentation; adversarial examples" },
+        { "title": "AI Safety & Alignment", "hint": "specification gaming; interpretability; evaluations; the arguments taken seriously by researchers" }
+      ]
+    },
+    {
+      "category": "Investing & Finance",
+      "blurb": "Markets, instruments and the arithmetic of long-horizon decisions.",
+      "planned": [
+        { "title": "Fixed Income & Interest Rates", "hint": "yield, duration and convexity; the curve; credit risk; why bonds behave as they do" },
+        { "title": "Macroeconomics for Investors", "hint": "growth, inflation and policy; what the data series mean; why forecasts fail" },
+        { "title": "Behavioural Finance", "hint": "the documented biases; where they move prices; and the replication caveats" },
+        { "title": "Risk Management", "hint": "drawdown and tail risk; position sizing; correlation under stress; what hedges actually cost" }
+      ]
+    },
+    {
+      "category": "Physics & Engineering",
+      "blurb": "The physical world and what we have built in it.",
+      "planned": [
+        { "title": "Thermodynamics", "hint": "the laws; entropy; heat engines and their limits; free energy" },
+        { "title": "Electromagnetism", "hint": "fields; Maxwell's equations assembled one piece at a time; light as a consequence" },
+        { "title": "Special Relativity", "hint": "the two postulates; time dilation and length contraction; E=mc²; what 'relative' does and does not mean" },
+        { "title": "Quantum Mechanics", "hint": "quantisation; superposition and measurement; the uncertainty principle; interpretations, labelled as such" }
+      ]
+    }
+  ]
+}

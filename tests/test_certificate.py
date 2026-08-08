@@ -48,6 +48,20 @@ def _master_all(dbmod, amod, uid, tid, pack, *, answers=10, correct=10):
                          1 if i < correct else 0, 900)
 
 
+def _cert_face() -> str:
+    """The certificate's rendered markup — from the cert div to the buttons AFTER it.
+
+    THE SLICE MATTERS. The previous version searched for 'class="certactions"' from position
+    zero, which finds the CSS RULE `.certactions{...}` several hundred lines EARLIER than the
+    cert div. start > end yields an empty string, and the old assertions ("the name is NOT
+    here") passed on that emptiness rather than on the markup — a guard that could not fail.
+    Searching from the cert div forward is what makes this test able to be wrong.
+    """
+    src = _index()
+    start = src.index('<div class="cert" id="cert">')
+    return src[start:src.index('class="certactions"', start)]
+
+
 def test_unfinished_course_is_refused(client):
     tc, amod, dbmod, h = client
     tid, _ = _first_topic(amod)
@@ -210,13 +224,23 @@ def _page():
     return (Path(__file__).resolve().parent.parent / "static" / "index.html").read_text()
 
 
-def test_recipient_name_is_not_printed_on_the_certificate():
-    import re
-    src = _page()
-    cert = src[src.index('<div class="cert" id="cert">'):src.index('class="certactions"')]
-    assert "c.student" not in cert, (
-        "the holder's name is back on the certificate face; it was removed on purpose")
-    assert re.search(r'class="who"', cert) is None
+def test_recipient_name_IS_printed_on_the_certificate():
+    """REVERSED 2026-08-08 on operator request. This pinned the opposite until today.
+
+    The 2026-08-05 reasoning — the standard carries the weight, the holder knows who they
+    are — holds for the standard. What it missed is that a certificate is also a document you
+    hand to someone else, and an unnamed one cannot be.
+    """
+    cert = _cert_face()
+    assert 'class="who"' in cert, "the recipient's name is missing from the certificate face"
+    assert "c.student" in cert, "the name element is present but nothing is rendered into it"
+
+
+def test_the_printed_name_is_escaped():
+    """A name is user-supplied text on a page built by string interpolation."""
+    cert = _cert_face()
+    who = cert[cert.index('class="who"'):]
+    assert who[:80].count("esc(") == 1, "the recipient's name is interpolated unescaped"
 
 
 def test_certificate_is_signed_by_the_course_author_not_a_person():
@@ -234,15 +258,83 @@ def test_signature_is_still_env_overridable():
     assert 'os.getenv("LEARN_CERT_SIGNER_TITLE"' in src
 
 
-def test_removing_the_name_did_not_weaken_verification():
-    """The code is derived from the USERNAME, not the printed display name — so
-    dropping the name from the face changes nothing about what can be verified."""
+def test_the_printed_name_does_not_affect_verification():
+    """The code is derived from the USERNAME, never the printed name — which is why the name
+    could be removed in August and put back today without either change touching what can be
+    verified. It also means a student who corrects their name does not invalidate a
+    certificate already issued."""
     import inspect, app
     assert "username" in inspect.signature(app._cert_code).parameters
+
+
+def test_first_and_last_name_round_trip_onto_the_certificate(client):
+    tc, amod, dbmod, h = client
+    tid, pack = _first_topic(amod)
+    with dbmod.conn() as c:
+        uid = c.execute("SELECT id FROM users WHERE username='u'").fetchone()["id"]
+    _master_all(dbmod, amod, uid, tid, pack)
+
+    r = tc.post("/api/me/name", json={"first_name": " Kate ", "last_name": "  Reeves "},
+                headers=h)
+    assert r.status_code == 200 and r.json() == {
+        "first_name": "Kate", "last_name": "Reeves", "full_name": "Kate Reeves"}
+
+    cert = tc.get(f"/api/topic/{tid}/certificate", headers=h).json()
+    assert cert["student"] == "Kate Reeves"
+    assert cert["first_name"] == "Kate" and cert["last_name"] == "Reeves"
+
+
+def test_a_half_filled_name_is_refused(client):
+    """A diploma reading "Kate" is not a diploma, and the omission is permanent once printed."""
+    tc, amod, dbmod, h = client
+    for body in ({"first_name": "Kate", "last_name": " "},
+                 {"first_name": "", "last_name": "Reeves"},
+                 {"first_name": " ", "last_name": " "}):
+        assert tc.post("/api/me/name", json=body, headers=h).status_code == 400
+
+
+def test_names_with_particles_and_apostrophes_survive_verbatim(client):
+    """No title-casing, no folding. "van der Berg" and "O'Neill" are correct as typed and
+    wrong after normalisation."""
+    tc, amod, dbmod, h = client
+    r = tc.post("/api/me/name", json={"first_name": "Seán", "last_name": "van der O'Neill"},
+                headers=h).json()
+    assert r["first_name"] == "Seán" and r["last_name"] == "van der O'Neill"
+
+
+def test_legacy_display_name_still_works_and_still_prints(client):
+    """Students who set a single-field name before 2026-08-08 must not lose it."""
+    tc, amod, dbmod, h = client
+    tid, pack = _first_topic(amod)
+    with dbmod.conn() as c:
+        uid = c.execute("SELECT id FROM users WHERE username='u'").fetchone()["id"]
+        c.execute("UPDATE users SET first_name=NULL, last_name=NULL, display_name='Kate Reeves' "
+                  "WHERE id=?", (uid,))
+    _master_all(dbmod, amod, uid, tid, pack)
+    cert = tc.get(f"/api/topic/{tid}/certificate", headers=h).json()
+    assert cert["student"] == "Kate Reeves"
+
+
+def test_certificate_falls_back_to_the_username_when_no_name_is_set(client):
+    tc, amod, dbmod, h = client
+    tid, pack = _first_topic(amod)
+    with dbmod.conn() as c:
+        uid = c.execute("SELECT id FROM users WHERE username='u'").fetchone()["id"]
+        c.execute("UPDATE users SET first_name=NULL, last_name=NULL, display_name=NULL "
+                  "WHERE id=?", (uid,))
+    _master_all(dbmod, amod, uid, tid, pack)
+    assert tc.get(f"/api/topic/{tid}/certificate", headers=h).json()["student"] == "u"
+
+
+def test_the_ui_collects_two_name_fields():
+    src = _index()
+    assert 'id="certfirst"' in src and 'id="certlast"' in src
+    assert 'autocomplete="given-name"' in src and 'autocomplete="family-name"' in src
+    assert '"/me/name"' in src, "the celebration screen still posts the legacy single-name route"
 
 
 def test_the_certificate_still_refuses_to_imitate_accreditation():
     """The honesty property this whole feature was built around must survive a
     cosmetic change to the signature line."""
-    src = _page()
+    src = _index()
     assert "not an accredited credential" in src

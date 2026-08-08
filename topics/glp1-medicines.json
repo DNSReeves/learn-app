@@ -3,6 +3,30 @@
   "title": "GLP-1 Medicines — How Ozempic, Wegovy & Mounjaro Work",
   "tagline": "The gut hormone behind the biggest shift in medicine in a generation — how it works, the newest drugs, the muscle question, and the honest risks.",
   "description": "A plain-language, up-to-date (2026) tour of the GLP-1 revolution: the incretin biology, how the drugs were engineered, the newest dual/triple agonists and the first oral pill, what the trials really showed, a special section on muscle loss and how the newest drugs preserve it, and an honest account of the serious side effects. Educational only — not medical advice.",
+  "intro": {
+    "hook": "A hormone from your gut, first noticed in a lizard's venom, turned out to be a weight and diabetes drug.",
+    "body": [
+      "For decades there was an unexplained observation: glucose taken by mouth triggers far more insulin than the same glucose injected into a vein. The body clearly knew the difference between eating and being dosed. Something in the gut was signalling ahead.",
+      "That something was GLP-1, and it does several things at once — amplifies insulin only when glucose is high, slows stomach emptying, and reduces appetite through the brain. The natural hormone is destroyed within minutes, which is why the drugs are chemically modified to survive for a week.",
+      "This course explains the mechanism honestly: what these medicines do, what they cost physiologically, why the weight returns when they stop, and which claims about them are ahead of the evidence."
+    ],
+    "why": [
+      {
+        "title": "The glucose gate matters",
+        "text": "GLP-1 amplifies insulin only when blood sugar is already high — which is why it rarely causes hypoglycaemia alone."
+      },
+      {
+        "title": "Appetite is physiological",
+        "text": "These drugs work on the signalling that governs hunger, which reframes a condition long treated as a failure of character."
+      },
+      {
+        "title": "Honest limitations",
+        "text": "Muscle loss, gastrointestinal effects, cost, and regain after stopping are part of the real picture."
+      }
+    ],
+    "anim": "med_incretin",
+    "closer": "The stabilising trick came from exendin-4, in the saliva of the Gila monster. It lasts hours where the human hormone lasts minutes."
+  },
   "category": "Health & Medicine",
   "prereqs": [],
   "concepts": [

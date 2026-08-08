@@ -7,6 +7,30 @@
     "neural-networks"
   ],
   "description": "From tokens to evaluation: the mechanics under the systems you already operate. Every concept is gated — you advance when the evidence says you know it.",
+  "intro": {
+    "hook": "It was trained to guess the next word. Nobody expected that to produce something you could argue with.",
+    "body": [
+      "The training objective of a large language model is almost insultingly simple: given some text, predict what comes next. That is the whole task. It was chosen because it needs no labels — every sentence ever written is already a training example.",
+      "What nobody predicted is what falls out of doing that well enough, at enough scale. To predict the next word in a proof you must track the argument. To finish a translation you must represent the meaning. Capabilities appeared that were never targeted, and the honest position is that we still cannot fully explain why.",
+      "This course goes under the hood — tokens, embeddings, attention, and why the thing confidently invents citations. You will end up both more impressed and considerably harder to fool."
+    ],
+    "why": [
+      {
+        "title": "You are already using them",
+        "text": "Understanding the mechanism is the difference between good judgement about these tools and superstition."
+      },
+      {
+        "title": "Attention is the key idea",
+        "text": "One mechanism — letting every word consult every other — unlocked the whole generation of models."
+      },
+      {
+        "title": "It explains the failures too",
+        "text": "Hallucination, context limits and prompt sensitivity stop being mysterious once you see how the thing actually works."
+      }
+    ],
+    "anim": "llm_embed",
+    "closer": "The paper that started it is eight pages long and titled \"Attention Is All You Need\". It was about translation."
+  },
   "concepts": [
     {
       "id": "c01-tokens",
@@ -806,5 +830,6 @@
       ],
       "anim": "llm_goodhart"
     }
-  ]
+  ],
+  "order": 2
 }

@@ -4,6 +4,30 @@
   "tagline": "The heat equation went to Wall Street — payoffs diffuse, uncertainty gets a quoted price, and theta pays for gamma.",
   "category": "Investing & Finance",
   "description": "From the kinked payoff to the volatility surface. The centerpiece: Black–Scholes IS the heat equation under a change of variables — log-price as space, time-to-expiry as time, σ² as the diffusion coefficient, the payoff as the initial condition. Then the Greeks as the PDE's own identity, implied volatility as the market's quoted diffusion coefficient, the smile/skew as the model's error ledger, and the structures and failure modes of actually trading it.",
+  "intro": {
+    "hook": "Two identical options on the same stock, expiring the same day, can trade at very different prices. The difference is a forecast.",
+    "body": [
+      "An option is a right without an obligation, and that asymmetry makes its value depend on something no other instrument cares about so directly: how much the underlying is expected to move. Not which direction — how much.",
+      "Because the pricing model links price and expected movement, you can run it backwards. Take the price the market is paying and solve for the volatility that would justify it. That number, implied volatility, is the market's own forecast of turbulence, readable in real time.",
+      "It is also systematically wrong in an interesting direction, and that persistent bias is one of the most studied phenomena in finance. This course builds up to why."
+    ],
+    "why": [
+      {
+        "title": "A forecast you can read off a screen",
+        "text": "Implied volatility is the market stating what it expects. Few other numbers in finance are that direct."
+      },
+      {
+        "title": "Asymmetry is the point",
+        "text": "Rights without obligations create payoff shapes that stocks and bonds simply cannot produce."
+      },
+      {
+        "title": "Insurance, priced",
+        "text": "Options are how risk is transferred. Understanding the price is understanding what protection costs."
+      }
+    ],
+    "anim": "opt_payoff",
+    "closer": "Implied volatility usually exceeds what follows. Whoever sells that gap is being paid to take the tail."
+  },
   "prereqs": [
     "calculus",
     "quant-finance"

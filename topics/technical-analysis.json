@@ -4,6 +4,30 @@
   "tagline": "Reading price — and knowing when the chart is lying to you",
   "category": "Investing & Finance",
   "description": "What technical analysis (TA) can and cannot tell you, built moving-average-first: simple and exponential averages, crossovers, momentum oscillators, bands and volume. Why the same tools read cleaner on exchange-traded funds (ETFs) than on single stocks, exactly how naive TA loses money (whipsaws, costs, overfitting), and what disciplined use looks like — slow rules, pre-committed, on diversified vehicles.",
+  "intro": {
+    "hook": "Most of what you see in a price chart is noise that looks exactly like signal. Learning the difference is the actual subject.",
+    "body": [
+      "Human beings are superb pattern detectors, including in data that contains no pattern. Show anyone a random walk and they will find head-and-shoulders, support levels and trends. This is not stupidity — it is the same faculty that makes us good at almost everything else, misfiring on noise.",
+      "This course takes technical analysis seriously enough to test it. Some effects survive careful examination: trend and momentum have been documented across centuries and asset classes, and there are structural reasons why. A great deal of the rest does not survive, and the honest thing is to say which is which.",
+      "You will finish able to evaluate a claimed pattern rather than believe it — including the ones you generate yourself, which are the hardest to doubt."
+    ],
+    "why": [
+      {
+        "title": "Your eyes overfit",
+        "text": "Randomness is full of convincing shapes. Knowing this about yourself is the prerequisite for everything else here."
+      },
+      {
+        "title": "Some of it is real",
+        "text": "Momentum and trend persistence hold up across markets and eras, with explanations rooted in behaviour and flows."
+      },
+      {
+        "title": "Testing beats believing",
+        "text": "Out-of-sample evidence, transaction costs and multiple-comparison discipline are what separate a method from a story."
+      }
+    ],
+    "anim": "ta_noise_vs_trend",
+    "closer": "The oldest documented trend-following rule is from a rice merchant in 18th-century Japan. Versions of it still work, which is its own puzzle."
+  },
   "concepts": [
     {
       "id": "price-as-information",

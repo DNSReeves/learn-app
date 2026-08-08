@@ -4,6 +4,30 @@
   "tagline": "Local laws, global behavior — the equations the physical world is written in.",
   "category": "Mathematics",
   "description": "The summit of the refresher ladder. The full heat-on-a-rod story end to end — how boundary conditions select the eigenfunctions, how Fourier coefficients carry the initial condition — plus why classification predicts whether a solution smooths, propagates, or settles.",
+  "intro": {
+    "hook": "Heat spreading, waves travelling, prices diffusing — three phenomena, three equations, one toolkit.",
+    "body": [
+      "Ordinary differential equations follow something changing in time. Partial differential equations follow something changing in time AND spread across space — a temperature across a metal bar, a wave down a string, a contaminant through groundwater.",
+      "What makes them beautiful rather than merely difficult is that a small number of equations cover an enormous amount of reality, and each has a distinct personality. The heat equation smooths and forgets. The wave equation transports and remembers. The transport equation just carries. Recognising which personality you are dealing with tells you what the answer must look like before you compute it.",
+      "Black-Scholes, incidentally, is the heat equation in disguise. That is not a coincidence and by the end of this course it will not be a surprise."
+    ],
+    "why": [
+      {
+        "title": "Space and time together",
+        "text": "Most real systems vary in both. PDEs are the language for anything that has an extent, not just a state."
+      },
+      {
+        "title": "Three archetypes cover most of it",
+        "text": "Parabolic smooths, hyperbolic propagates, elliptic equilibrates. Classify first and half the analysis is already done."
+      },
+      {
+        "title": "The bridge to finance and engineering",
+        "text": "Diffusion, option pricing, structural stress and image processing are the same mathematics wearing different clothes."
+      }
+    ],
+    "anim": "pde_transport",
+    "closer": "Fourier invented his series to solve one of these. The method outlived the problem by two centuries."
+  },
   "prereqs": [
     "odes",
     "fourier-series"

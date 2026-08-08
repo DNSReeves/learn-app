@@ -4,6 +4,30 @@
   "tagline": "The mathematics of change and accumulation.",
   "category": "Mathematics",
   "description": "Limits to derivatives to integrals to the theorem that ties them together. Root of the mathematics chain: ODEs, Fourier, and PDEs all build on this.",
+  "intro": {
+    "hook": "Everything that moves, grows, cools, or spreads obeys the same two ideas.",
+    "body": [
+      "For two thousand years mathematics could describe things that sat still. A triangle, a circle, a number. What it could not describe was the moment — how fast something is changing right now, at an instant with no duration to average over. That question looks like nonsense: speed is distance over time, and at an instant there is no time.",
+      "Calculus is the resolution of that paradox, and the resolution turned out to be one of the most productive ideas humans have ever had. Two operations, inverse to each other: the derivative, which reads the instantaneous rate of change, and the integral, which accumulates a rate back into a total. Between them they describe orbits, epidemics, interest, heat, populations, and the shape of a hanging chain.",
+      "You will not be memorising rules here. You will be building the two ideas until they feel obvious, because almost everything technical you might learn afterwards is written in this language."
+    ],
+    "why": [
+      {
+        "title": "It is the grammar of science",
+        "text": "Physics, chemistry, biology, economics and machine learning all state their laws as relationships between rates. Without calculus those laws are unreadable."
+      },
+      {
+        "title": "Two ideas, not two hundred",
+        "text": "Derivative and integral, and the theorem that says they undo each other. Everything else in a first course is technique for applying those two."
+      },
+      {
+        "title": "It changes what you can ask",
+        "text": "\"How fast?\" and \"how much in total?\" become answerable about anything you can model — which is most things."
+      }
+    ],
+    "anim": "calc_limit",
+    "closer": "Newton and Leibniz each found this independently, within a decade of each other. Ideas this natural tend to be found more than once."
+  },
   "prereqs": [],
   "concepts": [
     {

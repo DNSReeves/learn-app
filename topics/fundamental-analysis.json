@@ -4,6 +4,30 @@
   "tagline": "Price is what you pay; value is what you get — read the business, not the chart.",
   "category": "Investing & Finance",
   "description": "What a share is really worth. Read a business from its financials, value it with multiples and discounted cash flow, and apply the two great lenses — value and growth — to single stocks and to ETFs.",
+  "intro": {
+    "hook": "A share price is what someone will pay today. What the business is worth is a different number, and the gap is the whole opportunity.",
+    "body": [
+      "Every business has an economic value: the cash it will generate for its owners, discounted for time and risk. Nobody can observe that number directly. The market posts a price instead, and the price is a vote — informed, emotional, sometimes both.",
+      "Fundamental analysis is the discipline of estimating value independently of price, from the financial statements and the economics of the business, so that you have something to compare the price against. Without it, \"cheap\" and \"expensive\" have no meaning.",
+      "You will read the three statements properly, learn what accounting can and cannot hide, and see why a company can be profitable on paper and still run out of money — the most common way businesses actually die."
+    ],
+    "why": [
+      {
+        "title": "Price and value are different things",
+        "text": "Confusing them is the single most expensive error in investing, and the most common."
+      },
+      {
+        "title": "Cash is harder to fake",
+        "text": "Earnings involve judgement. Cash flow constrains it. That is why practitioners read the cash flow statement first."
+      },
+      {
+        "title": "It transfers everywhere",
+        "text": "The same analysis applies to a private business, a job offer, or any decision with a stream of future money attached."
+      }
+    ],
+    "anim": "fa_price_vs_value",
+    "closer": "Profitable companies go bankrupt regularly. The statement that would have warned you is not the one most people read."
+  },
   "prereqs": [
     "investing-with-etfs"
   ],

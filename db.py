@@ -208,6 +208,21 @@ def init():
             pass
         c.execute("CREATE TABLE IF NOT EXISTS app_meta ("
                   "key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+    # FIRST + LAST NAME (2026-08-08, operator request): the certificate now prints the
+    # recipient's name, so the name is captured as two fields rather than one free-text
+    # line. Separate columns because "the name on the diploma" has parts a single string
+    # cannot address — sorting, "Last, First", and a middle name typed into a one-line box
+    # all become guesswork the moment you need them.
+    #
+    # `display_name` is KEPT, not dropped: existing students already set one, and silently
+    # discarding a name someone chose for their own certificate would be a data loss with a
+    # face on it. It is the fallback when first/last are empty.
+    with conn() as c:
+        for col in ("first_name", "last_name"):
+            try:
+                c.execute(f"ALTER TABLE users ADD COLUMN {col} TEXT")
+            except sqlite3.OperationalError:
+                pass
 
 
 def _hash(pw: str, salt: bytes) -> bytes:
@@ -603,6 +618,43 @@ def set_display_name(user_id: int, name: str) -> str:
     with conn() as c:
         c.execute("UPDATE users SET display_name=? WHERE id=?", (clean or None, user_id))
     return clean
+
+
+def get_name(user_id: int) -> dict:
+    """The certificate name, as parts and as the line to print.
+
+    Resolution order: first/last if either is set → the legacy `display_name` → None.
+    Returning the parts AND the composed line keeps the caller from re-deriving the
+    fallback rule in three places and getting it slightly different in one of them.
+    """
+    with conn() as c:
+        row = c.execute("SELECT first_name, last_name, display_name FROM users WHERE id=?",
+                        (user_id,)).fetchone()
+    if not row:
+        return {"first_name": None, "last_name": None, "full_name": None}
+    first = (row["first_name"] or "").strip() or None
+    last = (row["last_name"] or "").strip() or None
+    full = " ".join(p for p in (first, last) if p) or (row["display_name"] or None)
+    return {"first_name": first, "last_name": last, "full_name": full}
+
+
+def set_name(user_id: int, first: str, last: str) -> dict:
+    """Set the certificate name as two fields.
+
+    Names are trimmed and length-capped and otherwise stored VERBATIM — no title-casing,
+    no ASCII folding, no splitting on spaces. "van der Berg", "O'Neill", "de la Cruz" and
+    every name with a particle or an apostrophe are correct as typed and wrong after
+    normalisation, and a certificate is the last place to be clever about someone's name.
+
+    `display_name` is kept in sync so anything still reading it sees the current name.
+    """
+    f = " ".join((first or "").split())[:40]
+    l = " ".join((last or "").split())[:40]
+    full = " ".join(p for p in (f, l) if p)
+    with conn() as c:
+        c.execute("UPDATE users SET first_name=?, last_name=?, display_name=? WHERE id=?",
+                  (f or None, l or None, full or None, user_id))
+    return {"first_name": f or None, "last_name": l or None, "full_name": full or None}
 
 
 def topic_stats(user_id: int, topic_id: str) -> dict:

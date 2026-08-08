@@ -4,6 +4,30 @@
   "tagline": "The most consequential argument nobody has settled.",
   "category": "AI & Machine Learning",
   "description": "Definitions, scaling debates, alignment, forecasting, and economic transformation — taught as live disagreements, not settled facts. You pass a checkpoint here by understanding the argument's structure, not by picking the 'right' side.",
+  "intro": {
+    "hook": "The most consequential question in the field has no agreed definition, and that is exactly the problem.",
+    "body": [
+      "\"Artificial general intelligence\" is used to mean at least five different things: human-level performance across tasks, autonomous goal-pursuit, economic substitution for most labour, self-improvement, or consciousness. Arguments about whether it is near are usually arguments about which definition is in play, conducted by people who have not said which one they mean.",
+      "This course is not advocacy in either direction. It is an attempt to make you a competent reader of the debate: what the actual claims are, what evidence would distinguish them, where the strongest version of each argument sits, and which questions are empirical rather than rhetorical.",
+      "You will finish able to tell a serious argument from a confident one — a distinction this subject badly needs."
+    ],
+    "why": [
+      {
+        "title": "Definitions do the arguing",
+        "text": "Most disagreement here is definitional and unacknowledged. Separating the senses dissolves a surprising amount of it."
+      },
+      {
+        "title": "Claims you can test",
+        "text": "Scaling laws, benchmark saturation and capability forecasts are empirical. Treat them that way."
+      },
+      {
+        "title": "It is becoming a policy question",
+        "text": "Decisions with real consequences are being made now, by people using these words loosely."
+      }
+    ],
+    "anim": "agi_define",
+    "closer": "Turing sidestepped the definition entirely and proposed a test instead. Seventy-five years on, we are still arguing about the words."
+  },
   "concepts": [
     {
       "id": "defining-agi",
@@ -713,5 +737,6 @@
       ],
       "anim": "agi_decision"
     }
-  ]
+  ],
+  "order": 4
 }

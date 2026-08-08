@@ -192,6 +192,75 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
   .strip .fill{transition:none}
 }
 
+/* ---------- planned courses / empty departments (2026-08-08) ----------
+   A work-in-progress card must read as clearly unavailable at a glance and must not invite a
+   click. Dashed border, reduced contrast on the title only, and no progress meter — the pill
+   carries the state, and the tagline still does real work by saying what the course will cover.
+   Contrast is kept above the AA floor deliberately: "not yet available" is not a reason to make
+   text unreadable, and this surface will eventually be public. */
+.tcard.wip{cursor:default;border-style:dashed;background:transparent;box-shadow:none}
+.tcard.wip:hover{border-color:var(--line)}
+.tcard.wip h2{color:#3A4A61}                    /* 9.01:1 on --panel, 7.81:1 on --paper */
+.wip-pill{margin-left:8px;font-size:11px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:#8A550C;background:rgba(232,161,60,.14);
+  border:1px solid rgba(199,127,20,.35);border-radius:999px;padding:2px 8px;vertical-align:middle}
+.cat-blurb{margin:0 0 10px;color:#3A4A61;font-size:14px;line-height:1.5;max-width:70ch}
+
+/* ---------- course introduction (2026-08-08) ----------
+   The doorway screen. Typographically louder than a card on purpose: this is the one
+   screen whose whole job is to make someone want the next one. Uses the same tokens as
+   the rest of the app — no new palette, no imported fonts. */
+.intro{max-width:820px;margin:0 auto}
+.introhead{text-align:center;margin-bottom:6px}
+.introkicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.introhook{font-family:"IBM Plex Serif",serif;font-weight:600;line-height:1.18;
+  font-size:clamp(24px,3.9vw,40px);margin:8px 0 4px;text-wrap:balance}
+/* The intro reuses animHTML() — the SAME .player markup the concept cards use — rather than
+   a hand-rolled canvas. The first version duplicated it and dropped one line, `.player canvas
+   {background:#0F1A2C}`; since clear() is a clearRect the canvas is TRANSPARENT, so every
+   animation drew into a see-through box and looked broken. Duplicated markup is how you lose a
+   line like that, so it is no longer duplicated. */
+.introanim{margin:18px 0 10px}
+
+/* ZOOM ON PLAY (2026-08-08, operator ask). The animations are drawn for a 900x380 field with
+   real detail in them; inline at column width that detail is unreadable. Pressing play lifts
+   the player to full viewport, and it returns when the run ends or on Esc / backdrop click. */
+.player.zoomed{position:fixed;inset:0;z-index:70;margin:0;padding:max(2vh,12px) max(2vw,12px);
+  background:rgba(8,13,22,.96);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px}
+.player.zoomed canvas{width:min(1500px,96vw);max-width:96vw;height:auto;max-height:82vh;
+  object-fit:contain;border-radius:10px}
+.player.zoomed .bar2{width:min(1500px,96vw);max-width:96vw}
+.zoomhint{display:none}
+/* --dim is tuned for the LIGHT paper; on the zoom backdrop it measured 3.58:1. */
+.player.zoomed .zoomhint{display:block;color:#9FB0C4;font-size:12px;letter-spacing:.04em}
+@media (prefers-reduced-motion: no-preference){
+  .player.zoomed canvas{transition:width .18s ease}
+}
+.introbody p{font-size:clamp(15px,1.7vw,18px);line-height:1.62;margin:14px 0}
+.introbody p:first-child::first-letter{font-family:"IBM Plex Serif",serif;float:left;
+  font-size:3.1em;line-height:.82;padding:.06em .09em 0 0;color:#965D0D}   /* 4.71:1 on --paper;
+     `var(--warm,…)` was a token this app does not define, and its amber fallback measured
+     1.90:1 — below even the 3:1 large-text floor, on the first letter of the body copy. */
+.whygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:14px;margin:22px 0 6px}
+/* CONTRAST FIX (2026-08-08, operator). The first version wrote
+   `background:var(--card,#141B26)` — but this app has NO `--card` token, so every why-card
+   fell back to that hardcoded DARK navy while the theme is light (--paper #ECEFF3). Measured
+   on what actually rendered: the title was #16243A on #141B26 = 1.11:1, effectively invisible,
+   and the body #5B6B80 on #141B26 = 3.18:1, below the 4.5:1 AA floor. Inventing a token and
+   supplying a fallback from a different palette is how you ship an unreadable card that still
+   "looks intentional" in the source.
+   Now: white panel on the grey paper (that contrast IS the highlight), ink title 15.58:1,
+   body #3A4A61 at 9.01:1 — both AAA. */
+.whycard{background:var(--panel);border:1px solid var(--line);
+  border-left:3px solid var(--post-deep);
+  border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.whycard h3{margin:0 0 6px;font-size:15px;letter-spacing:.01em;color:var(--ink)}
+.whycard p{margin:0;font-size:14px;line-height:1.55;color:#3A4A61}
+.introcloser{font-family:"IBM Plex Serif",serif;font-style:italic;text-align:center;
+  font-size:clamp(15px,1.8vw,19px);line-height:1.5;margin:22px auto 6px;max-width:60ch}
+
 /* ---------- completion + certificate (2026-08-04) ---------- */
 .celebrate{text-align:center;padding:44px 24px}
 .celebrate h1{font-size:34px;margin-bottom:6px}
@@ -203,6 +272,10 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 .cstat span{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
 .namebox{max-width:420px;margin:0 auto 22px;text-align:left}
 .namebox label{display:block;font-size:13px;color:var(--dim);margin-bottom:6px}
+/* Two fields, side by side on anything wider than a phone; stacked below 420px so neither
+   name is squeezed to a few characters on a narrow screen. */
+.namerow{display:flex;gap:10px;flex-wrap:wrap}
+.namerow input{flex:1 1 150px;min-width:0}
 
 /* The certificate. Landscape, engraved double rule, drawn seal — no images, so
    it prints identically offline and survives any asset host going away. */
@@ -255,7 +328,7 @@ main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
 /* Print: the certificate alone, edge to edge, colors intact. */
 @media print{
   @page{size:A4 landscape;margin:8mm}
-  #top,#ladder,.certactions,.certnote,#toast{display:none !important}
+  #top,#ladder,.certactions,.certnote,#toast,.intro{display:none !important}
   body{background:#fff}
   .certwrap{padding:0;display:block}
   .cert{width:100%;max-width:none;aspect-ratio:auto;height:calc(100vh - 16mm);
@@ -747,8 +820,24 @@ async function viewDash(){
     ${(()=>{
       /* CATEGORY GROUPING (2026-08-01): group topics by pack.category, ordered. Cards are
          unchanged (same data-t click target, meter, review pill) — only sectioned. */
-      const ORDER=["Health & Medicine","Investing & Finance","AI & Machine Learning","Mathematics","Physics & Engineering","More Topics"];
+      const ORDER=["Health & Medicine","Physiology","Molecular Biology","Biochemistry",
+                   "Statistics","Mathematics","Computer Science","AI & Machine Learning",
+                   "Investing & Finance","Physics & Engineering","More Topics"];
       const g={}; d.topics.forEach(t=>{const c=t.category||"More Topics";(g[c]=g[c]||[]).push(t);});
+      /* DEPARTMENTS BEFORE COURSES (operator, 2026-08-08). A department appears as soon as it is
+         planned, even with nothing built in it — Biochemistry and Computer Science are empty
+         today. Seeding the group here is what lets an empty category render at all, since the
+         grouping above only sees packs that exist. */
+      const DEPT={}; (d.departments||[]).forEach(x=>{ DEPT[x.category]=x; g[x.category]=g[x.category]||[]; });
+      /* WITHIN-CATEGORY ORDER (2026-08-08). Packs arrive in filename order, which put the
+         Physiology SURVEY last among its own depth modules (cardiac-, exercise-, neuro-, then
+         physiology-biophysics) — the one that should be read first, shown last. An optional
+         pack-level `order` integer fixes it. Packs WITHOUT one keep their arrival order — the
+         comparator returns 0 for them and Array.sort is stable — so every existing category
+         renders byte-identically. An earlier version broke that tie alphabetically by TITLE,
+         which silently moved "Trading Options" from 4th to 6th in Investing & Finance: a
+         cosmetic regression in a category nobody asked me to touch. */
+      Object.values(g).forEach(list=>list.sort((a,b)=>(a.order??Infinity)-(b.order??Infinity)));
       const cats=Object.keys(g).sort((a,b)=>{const ia=ORDER.indexOf(a),ib=ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
       const tcard=t=>`
       <button class="tcard" data-t="${t.id}">
@@ -759,6 +848,16 @@ async function viewDash(){
           <span class="num">${t.mastered}/${t.concepts} mastered</span>
         </div>
       </button>`;
+      /* WORK-IN-PROGRESS CARD (2026-08-08). Deliberately NOT a .tcard and NOT clickable: it has
+         no pack behind it, so a click could only lead somewhere that does not exist. It carries
+         no progress meter for the same reason — a 0/0 bar would render as either NaN or a
+         misleading full bar. The label says "In development", not "coming soon": this is a
+         stated intention with no date attached, and the site will eventually be public. */
+      const pcard=p=>`
+      <div class="tcard wip" aria-disabled="true">
+        <h2>${esc(p.title)}<span class="wip-pill">In development</span></h2>
+        ${p.hint?`<div class="tag">${esc(p.hint)}</div>`:""}
+      </div>`;
       /* CATEGORY COLLAPSE (operator, 2026-08-01): "as more and more topics are added
          students will find it easier to navigate with less scrolling". A global toggle
          switches between EXPANDED (every card visible — how it has always looked) and
@@ -785,10 +884,14 @@ async function viewDash(){
         return `<section class="cat" data-cat="${esc(cat)}">
           <button class="cat-head" type="button" aria-expanded="true">
             <span class="cat-chev" aria-hidden="true">▾</span>${esc(cat)}
-            <span class="cat-count">${g[cat].length}</span>
+            <span class="cat-count">${g[cat].length ? g[cat].length : "planned"}</span>
             ${due?`<span class="cat-due">${due} review${due>1?"s":""} due</span>`:""}
           </button>
-          <div class="cat-body">${g[cat].map(tcard).join("")}</div>
+          <div class="cat-body">
+            ${DEPT[cat] && DEPT[cat].blurb ? `<p class="cat-blurb">${esc(DEPT[cat].blurb)}</p>` : ""}
+            ${g[cat].map(tcard).join("")}
+            ${((DEPT[cat]||{}).planned||[]).map(pcard).join("")}
+          </div>
         </section>`;
       }).join("") + `</div>`;
     })()}
@@ -801,7 +904,10 @@ async function viewDash(){
       <span id="prog-msg" class="mono" style="margin-left:8px"></span></p>
   </div>`;
   wireCategoryView(d.user);
-  main.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
+  /* `[data-t]` is load-bearing, not decorative. Work-in-progress cards reuse `.tcard` for its
+     layout but carry no topic id, so a bare `.tcard` selector wires a click that calls
+     viewTopic(undefined) and lands the student on a 404 for a course that does not exist. */
+  main.querySelectorAll(".tcard[data-t]").forEach(b=>b.onclick=()=>viewTopic(b.dataset.t));
   { const rb=$("#resume-btn"); if(rb && d.resume) rb.onclick=()=>viewTopic(d.resume.tid, d.resume.cid); }
   { const vb=$("#review-btn"); if(vb && !vb.disabled) vb.onclick=()=>viewReview(null); }
   { const ao=$("#author-open"); if(ao) ao.onclick=e=>{e.preventDefault(); viewAuthor();}; }
@@ -848,6 +954,10 @@ async function viewDash(){
 }
 
 let T=null; // current topic payload
+/* Topics whose intro has been dismissed THIS SESSION. Keyed by topic id so reading one
+   course's intro does not suppress another's. Not persisted: the intro is cheap to re-show
+   and a student returning days later has usually forgotten why they started. */
+const INTRO_SEEN = new Set();
 const SESH={moves:{},mastered:[]};   // P4.14: this visit's posterior moves
 async function viewTopic(tid, focus){
   T = await api("/topic/"+tid);
@@ -866,10 +976,78 @@ async function viewTopic(tid, focus){
     <nav class="ladder" id="ladder"></nav>
     <div id="stage"></div>
   </div>`;
+  /* INTRODUCTION FIRST (2026-08-08). Order matters: the intro comes BEFORE placement.
+     Placement asks "what do you already know?", which is a reasonable question only once
+     someone has decided they care about the subject. Asking it first meets a new student with
+     a test; the intro meets them with a reason. */
+  /* INTRO_SEEN, not just `fresh`. `fresh` stays true until the FIRST ANSWER is logged, so a
+     student who reads the intro and clicks through to placement would be sent straight back to
+     the intro — cards → intro → cards. That is the same shape as the 2026-08-04 "stuck at
+     Performance chasing" loop, and the fix is the same: dismissal is a state, not a re-derived
+     condition. Session-scoped on purpose — a new visit tomorrow with still no answers logged
+     SHOULD open with the intro again. */
+  /* NOT gated on `fresh` (fixed 2026-08-08, same day, operator: "i don't see an intro for
+     Physiology and Biophysics"). Gating on first-visit-ever meant the modules a student has
+     actually studied were precisely the ones that never showed the introduction — backwards
+     for a screen whose job is to make the subject compelling. Now it opens once per session
+     per topic for everyone; the button reads "Back to the course" for anyone with progress,
+     so it costs a returning student one click and nothing else. */
+  if (T.intro && !focus && !INTRO_SEEN.has(tid)){
+    renderLadder("__intro__"); viewIntro(tid); return;
+  }
   renderLadder(focus || (allDone ? null : cur));
   if (T.needs_placement && !focus){ viewPlacement(tid); return; }
   if (allDone && !focus){ viewTopicComplete(tid); return; }
   viewConcept(tid, cur);
+}
+
+/* The doorway into a subject: why it is worth knowing, before any test of what you know.
+   Content is pack-authored (`intro` in the topic JSON) and validated by validate_pack.py;
+   the visual reuses the existing animation registry, so an intro adds no new asset path. */
+function viewIntro(tid){
+  const I = T.intro; if(!I){ return viewTopic(tid); }
+  renderLadder("__intro__");
+  $("#stage").innerHTML = `
+  <section class="stage intro">
+    <div class="introhead">
+      <div class="introkicker">${esc(T.title||"")}</div>
+      <h1 class="introhook">${esc(I.hook)}</h1>
+      <button class="btn ghost" id="introplay" title="Listen to this introduction">🔊 Listen</button>
+    </div>
+    ${I.anim ? `<div class="introanim">${animHTML()}</div>` : ""}
+    <div class="introbody">${I.body.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+    <div class="whygrid">
+      ${I.why.map(w=>`<div class="whycard"><h3>${esc(w.title)}</h3><p>${esc(w.text)}</p></div>`).join("")}
+    </div>
+    ${I.closer?`<p class="introcloser">${esc(I.closer)}</p>`:""}
+    <div class="certactions">
+      <button class="btn ghost" id="intro-topics">All topics</button>
+      <button class="btn warm" id="intro-go">${T.fresh?"Begin the course →":"Back to the course →"}</button>
+    </div>
+  </section>`;
+  if (I.anim) mountAnim(I.anim, {zoom:true});
+
+  /* LISTEN (2026-08-08 operator ask). Same path as the card Listen button: browser
+     speechSynthesis via speakPaced, called synchronously inside the gesture — Safari blocks
+     both audio and speech if an `await` intervenes, silently. Reuses stopCardAudio/voiceBusy so
+     the intro, a card, and an animation narration can never talk over one another. */
+  const ip=$("#introplay");
+  if(ip) ip.onclick=()=>{
+    if(_introStop){ _introStop(); ip.textContent="🔊 Listen"; return; }      // toggle off
+    stopCardAudio(); cancelVoice();
+    unlockAnimAudio();          // MUST be synchronous, in-gesture — Safari blocks a later play()
+    ip.textContent="⏸ Stop";
+    speakIntro(I, ip);
+  };
+
+  $("#intro-topics").onclick=()=>{_introStop&&_introStop(); stopCardAudio(); cancelVoice(); viewDash();};
+  /* `focus` is passed so re-entry from the rung does not bounce straight back into the
+     intro — viewTopic only auto-shows it when nothing is focused. */
+  $("#intro-go").onclick=()=>{
+    _introStop&&_introStop(); stopCardAudio(); cancelVoice(); INTRO_SEEN.add(tid);
+    const nextOpen = T.concepts.find(c=>c.unlocked && !c.mastered);
+    viewTopic(tid, T.needs_placement ? undefined : (nextOpen||T.concepts[0]).id);
+  };
 }
 
 /* The resting state of a finished course: what you earned, what's due, and the
@@ -897,6 +1075,14 @@ async function viewTopicComplete(tid){
 function renderLadder(curId){
   $("#ladder").innerHTML =
     `<button class="rung" id="back"><span class="dot">←</span><span><span class="rt">All topics</span></span></button>` +
+    /* Intro rung (2026-08-08): the opening is shown automatically on a first visit, but a
+       student who wants to re-read why the subject matters should not have to reset progress
+       to get it back. Same reasoning as the certificate rung. */
+    (T.intro
+      ? `<button class="rung ${curId==="__intro__"?"active":""}" id="intro-rung"><span class="dot">✦</span>
+           <span><span class="rt">Why this matters</span><br>
+           <span class="rp">the big picture</span></span></button>`
+      : "") +
     T.concepts.map((c,i)=>`
     <button class="rung ${c.mastered?"done":""} ${c.relearn?"relearn":""} ${c.id===curId?"active":""}" data-c="${c.id}" ${c.unlocked?"":"disabled"}>
       <span class="dot">${c.mastered?"✓":(c.relearn?"↻":i+1)}</span>
@@ -925,6 +1111,7 @@ function renderLadder(curId){
       : "");
   const rr2=$("#review-rung"); if(rr2) rr2.onclick=()=>{stopCardAudio(); viewReview(T.id);};
   const cr=$("#cert-rung"); if(cr) cr.onclick=()=>{stopCardAudio(); viewCertificate(T.id);};
+  const ir=$("#intro-rung"); if(ir) ir.onclick=()=>{stopCardAudio(); viewIntro(T.id);};
   $("#back").onclick=()=>{stopCardAudio(); viewDash();};
   $("#ladder").querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
     stopCardAudio();
@@ -975,8 +1162,13 @@ async function viewCelebration(tid, topicTitle){
       ${cert.days_elapsed?`<div class="cstat"><b>${cert.days_elapsed}</b><span>day${cert.days_elapsed===1?"":"s"}</span></div>`:""}
     </div>
     <div class="namebox">
-      <label for="certname">Name as it should appear on the certificate</label>
-      <input id="certname" value="${esc(cert.student)}" maxlength="60" autocomplete="name">
+      <label for="certfirst">Name as it should appear on the certificate</label>
+      <div class="namerow">
+        <input id="certfirst" value="${esc(cert.first_name||"")}" maxlength="40"
+               autocomplete="given-name" placeholder="First name" aria-label="First name">
+        <input id="certlast" value="${esc(cert.last_name||"")}" maxlength="40"
+               autocomplete="family-name" placeholder="Last name" aria-label="Last name">
+      </div>
     </div>
     <div class="certactions">
       <button class="btn ghost" id="cel-back">Back to the ladder</button>
@@ -987,10 +1179,18 @@ async function viewCelebration(tid, topicTitle){
   </section>`;
   const b=$("#cel-back"); if(b) b.onclick=()=>viewTopic(tid);
   const g=$("#cel-go"); if(g) g.onclick=async()=>{
-    const nm=($("#certname").value||"").trim();
+    const first=($("#certfirst").value||"").trim(), last=($("#certlast").value||"").trim();
+    // Checked here as well as server-side: the name goes on the printed face, so catching a
+    // half-filled one before issuing beats explaining it afterwards.
+    if(!first || !last){
+      toast("Please enter both a first and a last name for the certificate.");
+      ($("#certfirst").value.trim()?$("#certlast"):$("#certfirst")).focus();
+      return;
+    }
     g.disabled=true;
     try{
-      if(nm && nm!==cert.student) await api("/me/display_name",{method:"POST",body:{name:nm}});
+      if(first!==(cert.first_name||"") || last!==(cert.last_name||""))
+        await api("/me/name",{method:"POST",body:{first_name:first,last_name:last}});
       await viewCertificate(tid);
     }catch(e){ g.disabled=false; toast("Couldn't save that name — "+(e.message||"try again")); }
   };
@@ -1010,12 +1210,16 @@ async function viewCertificate(tid){
       <span class="corner bl"></span><span class="corner br"></span>
       <div class="issuer">${esc(c.issuer)}</div>
       <div class="rule"></div>
-      <!-- The recipient's name is deliberately NOT printed (operator, 2026-08-05).
-           The certificate records that the standard below was met, which is the part
-           that carries any weight; the holder knows who they are. The API still
-           returns the student field for the authenticated holder, and the verification code
-           is derived from the username, so nothing about verification changes. -->
-      <div class="kicker">This certifies the completion of the course of study in</div>
+      <!-- REVERSED 2026-08-08 on operator request: the recipient's name IS printed again.
+           It was removed 2026-08-05 on the reasoning that the standard carries the weight and
+           the holder knows who they are. That reasoning holds for the standard; what it missed
+           is that a certificate is also a document you hand to someone else, and an unnamed one
+           cannot be. Verification is unaffected either way — the code is derived from the
+           USERNAME, never from the printed name, so a student who changes their name later
+           does not invalidate a certificate already issued. -->
+      <div class="kicker">This certifies that</div>
+      <div class="who">${esc(c.student)}</div>
+      <div class="kicker">has completed the course of study in</div>
       <div class="what">${esc(c.course)}</div>
       ${c.tagline?`<div class="tag">${esc(c.tagline)}</div>`:""}
       <div class="standard">
@@ -1641,17 +1845,84 @@ async function narrate(text){
   if("speechSynthesis" in window){ await speakPaced(text, {rate:1.0}); return; }
   await new Promise(r=>setTimeout(r, Math.max(2200, text.length*55)));
 }
-function mountAnim(kind){
+/* INTRO NARRATION — the house voice, not the browser's (2026-08-08, operator: "the listen
+   button sounds robotic. it should the same voice system used in the other components").
+
+   The first version called speakPaced, i.e. the browser's speechSynthesis. That is the
+   FALLBACK path in this app, not the voice: cards are pre-rendered Kokoro and animation lines
+   go live through /api/anim_tts in the active house voice. The intro now uses the same engine.
+
+   CHUNKED, because /api/anim_tts caps a request at 800 characters (anim lines are 1-3
+   sentences; an intro is 1500-2500) and a silent truncation would cut a student off
+   mid-sentence. Paragraph-sized pieces are also what makes the cache useful — each one is
+   content-addressed, so a replay is instant — and they give pause/cancel a natural boundary.
+
+   Safari: unlockAnimAudio() must run synchronously inside the click, before any await. */
+let _introStop=null;
+function _introChunks(I, limit=760){
+  const raw=[I.hook, ...(I.body||[]),
+             ...((I.why||[]).map(w=>`${w.title}. ${w.text}`)), I.closer].filter(Boolean);
+  const out=[];
+  for(const p of raw){
+    if(p.length<=limit){ out.push(p); continue; }
+    let buf="";                                   // over-long paragraph → split on sentences
+    for(const s of p.split(/(?<=[.!?])\s+/)){
+      if((buf+" "+s).trim().length>limit){ if(buf) out.push(buf.trim()); buf=s; }
+      else buf=(buf+" "+s).trim();
+    }
+    if(buf) out.push(buf.trim());
+  }
+  return out;
+}
+async function speakIntro(I, btn){
+  const chunks=_introChunks(I);
+  let cancelled=false;
+  _introStop=()=>{ cancelled=true; try{_animCancel&&_animCancel();}catch(_){} cancelVoice(); };
+  try{
+    for(const t of chunks){
+      if(cancelled) break;
+      const url=await _animTTSFetch(t);           // Kokoro, content-addressed cache
+      if(cancelled) break;
+      if(url && await _animPlay(url)) continue;   // the house voice spoke
+      if(cancelled) break;
+      if("speechSynthesis" in window) await speakPaced(t,{rate:1.0});   // engine down → fallback
+    }
+  } finally {
+    _introStop=null;
+    if(btn) btn.textContent="🔊 Listen";
+  }
+}
+
+function mountAnim(kind, opts){
   const cv=$("#cv"), ctx=cv.getContext("2d");
   const playBtn=$("#a-play"), muteBtn=$("#a-mute");
   muteBtn.onclick=()=>{AUDIO_ON=!AUDIO_ON; cancelVoice();
     muteBtn.setAttribute("aria-pressed",AUDIO_ON); muteBtn.textContent=AUDIO_ON?"🔊 Voice on":"🔇 Voice off";};
+
+  /* ZOOM (2026-08-08). Opt-in via {zoom:true} so the concept-card player behaves exactly as it
+     did — this was asked for on the introduction, and silently changing every existing
+     animation's behaviour is a bigger change than the one requested. */
+  const wrap = opts && opts.zoom ? cv.closest(".player") : null;
+  const unzoom=()=>{ if(wrap) wrap.classList.remove("zoomed"); };
+  if(wrap){
+    // Esc and a click on the backdrop (not the canvas or the buttons) both exit.
+    const onKey=e=>{ if(e.key==="Escape") unzoom(); };
+    addEventListener("keydown", onKey);
+    wrap.addEventListener("click", e=>{ if(e.target===wrap) unzoom(); });
+    // Leaving the screen must not leave a fixed overlay behind or the listener attached.
+    const obs=new MutationObserver(()=>{ if(!document.body.contains(cv)){
+      unzoom(); removeEventListener("keydown", onKey); obs.disconnect(); } });
+    obs.observe(document.body,{childList:true,subtree:true});
+  }
+
   let running=false;
   playBtn.onclick=async()=>{
     if(running) return; running=true; playBtn.textContent="Playing…";
+    if(wrap) wrap.classList.add("zoomed");
     unlockAnimAudio();                       // in-gesture: Safari lets the SAME element replay programmatically later
     cancelVoice();
-    try{ await ANIMS[kind](cv,ctx); }finally{ running=false; playBtn.textContent="↻ Replay"; }
+    try{ await ANIMS[kind](cv,ctx); }
+    finally{ running=false; playBtn.textContent="↻ Replay"; unzoom(); }
   };
   ANIMS[kind+"_static"]?.(cv,ctx); // draw first frame
 }
@@ -3857,6 +4128,147 @@ ANIMS.nn_neuron=async(cv,ctx)=>{
   await tween(800,k=>nnN_draw(ctx,cv,{charge:1,acc:-2.0}));
   await narrate("ReLU squashes it — max(0, −2.0) = 0, so the neuron stays silent. The weights hold the knowledge; the nonlinear squash is what makes stacking layers worthwhile.");
   await tween(1000,k=>nnN_draw(ctx,cv,{charge:1,acc:-2.0,relu:k,out:0}));
+};
+})();
+/* neural-networks / nn_bio_vs_unit — the biological neuron beside the artificial one.
+   OPERATOR ASK (2026-08-08): "start with the analogue of a biologic action potential …
+   but the analogy is mostly mathematic and not at all the same as the biological …
+   show a sketch of a real nerve and a perceptron next to each other."
+   The drawing deliberately puts them side by side so the CORRESPONDENCES are visible —
+   and so the caption can then say which ones are false. */
+(function(){
+const C={soma:"#C85A52", den:"#9FB2C6", axon:"#E8A13C", exc:"#5FBF95", inh:"#D46A62",
+         box:"#7C8DA5", txt:MED.txt, dim:MED.dim};
+function bioNeuron(ctx,x,y,s){
+  // dendrites
+  ctx.strokeStyle=C.den; ctx.lineWidth=2;
+  const dends=[[-1,-1.15],[-1.25,-0.5],[-1.2,0.35],[-0.9,1.05]];
+  dends.forEach(([dx,dy],i)=>{
+    ctx.beginPath(); ctx.moveTo(x,y); 
+    ctx.quadraticCurveTo(x+dx*38, y+dy*30, x+dx*64, y+dy*46); ctx.stroke();
+    // little branchlets
+    ctx.beginPath(); ctx.moveTo(x+dx*64,y+dy*46);
+    ctx.lineTo(x+dx*80, y+dy*46-9); ctx.moveTo(x+dx*64,y+dy*46);
+    ctx.lineTo(x+dx*80, y+dy*46+9); ctx.stroke();
+  });
+  // soma
+  ctx.beginPath(); ctx.ellipse(x,y,26,22,0,0,7); ctx.fillStyle=C.soma; ctx.fill();
+  ctx.beginPath(); ctx.arc(x+4,y-2,7,0,7); ctx.fillStyle="#7E3B36"; ctx.fill();   // nucleus
+  // axon hillock + axon + myelin
+  ctx.strokeStyle=C.axon; ctx.lineWidth=3.5;
+  ctx.beginPath(); ctx.moveTo(x+26,y); ctx.lineTo(x+150,y); ctx.stroke();
+  ctx.fillStyle="rgba(232,161,60,.22)";
+  for(let i=0;i<3;i++){ ctx.fillRect(x+40+i*36, y-7, 26, 14); }
+  // terminals
+  ctx.strokeStyle=C.axon; ctx.lineWidth=2;
+  [-14,0,14].forEach(dy=>{ ctx.beginPath(); ctx.moveTo(x+150,y);
+    ctx.lineTo(x+172,y+dy); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x+175,y+dy,3.5,0,7); ctx.fillStyle=C.axon; ctx.fill(); });
+  _t(ctx,x-96,y-74,"dendrites",{size:11,col:C.dim});
+  _t(ctx,x-6,y+40,"soma",{size:11,col:C.dim,align:"center"});
+  _t(ctx,x+34,y-16,"axon hillock",{size:10,col:C.dim});
+  _t(ctx,x+96,y+24,"axon (myelinated)",{size:10,col:C.dim,align:"center"});
+}
+function unit(ctx,x,y,s){
+  const inY=[y-46,y,y+46];
+  inY.forEach((iy,i)=>{
+    ctx.beginPath(); ctx.arc(x-118,iy,13,0,7);
+    ctx.fillStyle="#22304A"; ctx.fill(); ctx.strokeStyle=C.box; ctx.lineWidth=1.5; ctx.stroke();
+    _t(ctx,x-118,iy+4,"x"+(i+1),{size:12,align:"center",col:C.txt});
+    ctx.beginPath(); ctx.moveTo(x-105,iy); ctx.lineTo(x-34,y);
+    ctx.strokeStyle=(s.hi===i?C.exc:C.box); ctx.lineWidth=(s.hi===i?2.6:1.4); ctx.stroke();
+    _t(ctx,(x-105+x-34)/2, iy+(i===0?-8:i===2?16:-8), ["w₁=+3","w₂=−4","w₃=+1"][i],
+       {size:11,col:i===1?C.inh:C.exc,align:"center"});
+  });
+  ctx.beginPath(); ctx.arc(x,y,30,0,7); ctx.fillStyle="#22304A"; ctx.fill();
+  ctx.strokeStyle=C.box; ctx.lineWidth=2; ctx.stroke();
+  _t(ctx,x,y-2,"Σ",{size:20,align:"center",col:C.txt,bold:true});
+  _t(ctx,x,y+16,"+b",{size:11,align:"center",col:C.dim});
+  ctx.beginPath(); ctx.moveTo(x+30,y); ctx.lineTo(x+72,y); ctx.strokeStyle=C.box; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.strokeRect(x+72,y-26,54,52); 
+  // relu glyph
+  ctx.beginPath(); ctx.moveTo(x+82,y+16); ctx.lineTo(x+99,y+16); ctx.lineTo(x+118,y-16);
+  ctx.strokeStyle=C.axon; ctx.lineWidth=2.2; ctx.stroke();
+  _t(ctx,x+99,y+34,"activation",{size:10,col:C.dim,align:"center"});
+  ctx.beginPath(); ctx.moveTo(x+126,y); ctx.lineTo(x+168,y); ctx.strokeStyle=C.box; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.beginPath(); ctx.arc(x+178,y,10,0,7); ctx.fillStyle=C.axon; ctx.fill();
+  _t(ctx,x+178,y+30,"output",{size:10,col:C.dim,align:"center"});
+}
+function bvu_draw(ctx,cv,s){
+  clear(ctx,cv);
+  _t(ctx,cv.width/2,26,"A real neuron and an artificial 'neuron'",{size:17,bold:true,align:"center"});
+  _t(ctx,225,52,"BIOLOGICAL",{size:11,align:"center",col:C.dim});
+  _t(ctx,675,52,"ARTIFICIAL (one unit)",{size:11,align:"center",col:C.dim});
+  ctx.strokeStyle="rgba(124,141,165,.35)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(450,44); ctx.lineTo(450,330); ctx.stroke();
+  bioNeuron(ctx,205,165,s); unit(ctx,640,165,s);
+  if(s.note) _t(ctx,cv.width/2,356,s.note,{size:13,align:"center",col:s.warn?C.inh:C.txt});
+}
+ANIMS.nn_bio_vs_unit_static=(cv,ctx)=>bvu_draw(ctx,cv,{note:"Same picture, different machine."});
+ANIMS.nn_bio_vs_unit=async(cv,ctx)=>{
+  bvu_draw(ctx,cv,{});
+  await narrate("On the left, a real neuron. Dendrites collect signals from thousands of other cells, the soma sums them, and if the membrane at the axon hillock crosses threshold, an action potential fires down the axon.");
+  bvu_draw(ctx,cv,{hi:0,note:"Excitatory input pushes the sum up."});
+  await narrate("Some of those inputs are excitatory and push the membrane toward threshold. Others are inhibitory and push it away. That is the piece the artificial version genuinely borrows: a positive weight excites, a negative weight opposes.");
+  bvu_draw(ctx,cv,{hi:1,note:"Negative weight = the inhibitory analogue."});
+  await narrate("On the right, the artificial unit. Multiply each input by a weight, add them all up, add a bias, and pass the total through a nonlinearity. Weighted summation, then a threshold-like squash.");
+  bvu_draw(ctx,cv,{note:"Now the differences — and they are not small.",warn:true});
+  await narrate("Now the honest part. The action potential is ALL OR NOTHING and its size carries no information — biological neurons encode strength in firing RATE and timing. The artificial unit emits a graded number, once, with no time axis at all.");
+  await narrate("A real neuron has thousands of inputs, dendrites that compute locally before the soma ever sums, neurotransmitters, receptor subtypes, a refractory period, and it learns by mechanisms nothing like backpropagation. The artificial unit has none of that.");
+  bvu_draw(ctx,cv,{note:"An analogy for the arithmetic — not a model of the cell."});
+  await narrate("So treat the resemblance as what it is. The metaphor is mathematical: weighted summation and a threshold. Beyond that the two machines have almost nothing in common, and the name 'neural network' has misled more people than it has helped.");
+};
+})();
+
+/* neural-networks / nn_perceptron_xor — what ONE unit can and cannot do, and what a second
+   layer fixes. The geometric picture is the whole argument: one unit draws ONE straight line. */
+(function(){
+const P={ax:"#7C8DA5", on:"#5FBF95", off:"#D46A62", line:"#E8A13C", txt:MED.txt, dim:MED.dim};
+function panel(ctx,ox,oy,w,title,pts,lines,ok){
+  const S=w, px=v=>ox+18+v*(S-36), py=v=>oy+S-18-v*(S-36);
+  ctx.strokeStyle="rgba(124,141,165,.45)"; ctx.lineWidth=1; ctx.strokeRect(ox,oy,S,S);
+  _t(ctx,ox+S/2,oy-10,title,{size:13,align:"center",col:P.txt,bold:true});
+  (lines||[]).forEach(L=>{                       // L: [x0,y0,x1,y1]
+    ctx.beginPath(); ctx.moveTo(px(L[0]),py(L[1])); ctx.lineTo(px(L[2]),py(L[3]));
+    ctx.strokeStyle=P.line; ctx.lineWidth=2.4; ctx.stroke();
+  });
+  pts.forEach(([x,y,v])=>{
+    ctx.beginPath(); ctx.arc(px(x),py(y),8,0,7);
+    ctx.fillStyle=v?P.on:P.off; ctx.fill();
+    ctx.strokeStyle="#0F1A2C"; ctx.lineWidth=1.5; ctx.stroke();
+  });
+  _t(ctx,ox+4,oy+S+16,"x₁ →",{size:10,col:P.dim});
+  if(ok!==undefined) _t(ctx,ox+S-4,oy+S+16, ok?"separable ✓":"impossible ✗",
+                        {size:11,align:"right",col:ok?P.on:P.off,bold:true});
+}
+const AND=[[0,0,0],[0,1,0],[1,0,0],[1,1,1]];
+const OR =[[0,0,0],[0,1,1],[1,0,1],[1,1,1]];
+const XOR=[[0,0,0],[0,1,1],[1,0,1],[1,1,0]];
+function xor_draw(ctx,cv,s){
+  clear(ctx,cv);
+  _t(ctx,cv.width/2,24,"One unit draws one straight line",{size:17,bold:true,align:"center"});
+  const W=190, Y=58;
+  panel(ctx,60,Y,W,"AND",AND, s.stage>=1?[[ -0.05,1.25, 1.25,-0.05 ]]:[], s.stage>=1?true:undefined);
+  panel(ctx,330,Y,W,"OR", OR,  s.stage>=1?[[ -0.05,0.55, 0.55,-0.05 ]]:[], s.stage>=1?true:undefined);
+  panel(ctx,600,Y,W,"XOR",XOR, s.stage>=3?[[-0.05,0.55,0.55,-0.05],[-0.05,1.45,1.45,-0.05]]:[],
+        s.stage>=2?(s.stage>=3?true:false):undefined);
+  if(s.note) _t(ctx,cv.width/2,332,s.note,{size:13,align:"center",
+                col:s.stage===2?P.off:(s.stage>=3?P.on:P.txt)});
+  if(s.stage>=3) _t(ctx,cv.width/2,356,"two units in a hidden layer → two lines → a region",
+                    {size:11,align:"center",col:P.dim});
+}
+ANIMS.nn_perceptron_xor_static=(cv,ctx)=>xor_draw(ctx,cv,{stage:0,
+  note:"Green fires, red stays silent. Can one straight line split them?"});
+ANIMS.nn_perceptron_xor=async(cv,ctx)=>{
+  xor_draw(ctx,cv,{stage:0,note:"Green fires, red stays silent."});
+  await narrate("Here are the four possible inputs to a two-input unit. Green means the answer should be one, red means zero. The question for each panel is simple: can a single straight line put all the greens on one side and all the reds on the other?");
+  xor_draw(ctx,cv,{stage:1,note:"AND and OR: yes. One line each."});
+  await narrate("For AND, yes — one line, tucked into the far corner. For OR, yes again, a line near the origin. A single unit computes exactly this: the weighted sum equals zero along a line, and the unit fires on one side of it. That is all a perceptron is, geometrically.");
+  xor_draw(ctx,cv,{stage:2,note:"XOR: no line exists. Not a harder problem — an impossible one."});
+  await narrate("Now XOR — fire when the inputs differ. The greens sit on one diagonal and the reds on the other. There is no straight line that separates them, and no amount of training will find one, because none exists. Minsky and Papert proved this in 1969, and interest in these models collapsed for years.");
+  xor_draw(ctx,cv,{stage:3,note:"Add another perceptron. Two lines carve out the middle."});
+  await narrate("The fix is the whole idea of deep learning. Add a second unit. Now you have two lines, and a layer above can combine them — fire when you are above the first line AND below the second. That strip of space is exactly the XOR answer.");
+  await narrate("Notice what actually did the work. Not a cleverer neuron, and not more training. A LAYER — one unit feeding another, with a nonlinearity in between so the two lines cannot collapse back into one. Everything after this is that same move, repeated.");
 };
 })();
 /* neural-networks / nn_loss_xent */

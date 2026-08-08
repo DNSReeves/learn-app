@@ -4,6 +4,30 @@
   "tagline": "Edges, error bars, and the discipline that keeps you from fooling yourself.",
   "category": "Investing & Finance",
   "description": "From return arithmetic to the honest-research loop. The through-line: every number you compute is a noisy estimate, most published edges are selection artifacts, and the machinery that survives is the machinery built to catch its own errors — pre-registered gates, trial accounting, and drawdown-first verdicts.",
+  "intro": {
+    "hook": "A portfolio that gains 50% then loses 50% is not flat. It is down 25%, and that arithmetic drives more of investing than any forecast.",
+    "body": [
+      "Returns compound, which means they multiply rather than add, which means volatility itself costs you money — even with no fees, no mistakes and a perfectly fair bet. Two strategies with identical average returns can end decades apart purely because one was smoother.",
+      "Quantitative finance is what happens when this kind of arithmetic is taken seriously and applied systematically: measuring risk properly, understanding what drives returns, and testing ideas against data in a way that survives contact with reality.",
+      "A large part of the discipline is defensive — knowing how backtests lie, how survivorship and look-ahead bias creep in, and why most impressive historical results are artefacts. That scepticism is the most valuable thing you will take from it."
+    ],
+    "why": [
+      {
+        "title": "Compounding is not intuitive",
+        "text": "Volatility drag, path dependence and the gap between average and median outcomes catch out experienced investors."
+      },
+      {
+        "title": "Risk measured, not sensed",
+        "text": "Drawdown, tail behaviour and correlation under stress are quantities. They can be computed rather than felt."
+      },
+      {
+        "title": "Backtests mostly lie",
+        "text": "Look-ahead, survivorship and overfitting produce beautiful histories and poor futures. Detecting them is a core skill."
+      }
+    ],
+    "anim": "qf_voldrag",
+    "closer": "Recovering from a 50% loss requires a 100% gain. That single asymmetry explains most of what careful investors actually do."
+  },
   "prereqs": [
     "calculus",
     "bayesian-inference"

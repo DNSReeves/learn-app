@@ -4,6 +4,30 @@
   "tagline": "What happens when a language model gets hands.",
   "category": "AI & Machine Learning",
   "description": "From a model that can only talk to a system that acts: tools, loops, plans, memory, coordination — and the guardrails that keep an acting system honest. The running case study is a real production agent.",
+  "intro": {
+    "hook": "A model that only answers is a tool. A model that can act, observe and try again is something else.",
+    "body": [
+      "Ask a language model a question and you get text. Give that same model the ability to run a search, call an API, read the result and decide what to do next, and the character of the thing changes: it can now pursue a goal across many steps, recover from its own mistakes, and do work rather than describe it.",
+      "That loop — think, act, observe, repeat — is the entire idea. Everything else is engineering: how to give it tools safely, how to keep it on task, how to stop it confidently doing the wrong thing at scale.",
+      "The failure modes are as instructive as the successes, and considerably less discussed."
+    ],
+    "why": [
+      {
+        "title": "From answering to doing",
+        "text": "Multi-step work with real tools is the difference between a chatbot and something that finishes tasks."
+      },
+      {
+        "title": "The loop is the architecture",
+        "text": "Think, act, observe. Almost every agent framework is a variation on those three steps."
+      },
+      {
+        "title": "Safety is a design problem",
+        "text": "Permissions, verification and blast radius are not add-ons. They are what makes an agent usable at all."
+      }
+    ],
+    "anim": "agent_loop",
+    "closer": "The hard part was never getting an agent to act. It was getting it to stop when it should."
+  },
   "concepts": [
     {
       "id": "what-is-an-agent",
@@ -897,5 +921,9 @@
       ],
       "anim": "agent_heartbeat"
     }
+  ],
+  "order": 3,
+  "prereqs": [
+    "llms"
   ]
 }

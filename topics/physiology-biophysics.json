@@ -1,9 +1,33 @@
 {
   "id": "physiology-biophysics",
-  "title": "Physiology & Biophysics — How the Living Body Works",
-  "tagline": "From the charged membrane to the self-tuning heart: the machinery of life, and the physics that shapes it.",
-  "description": "A plain-language tour of physiology and its underlying biophysics: homeostasis, the membrane battery and the action potential, muscle contraction, the heart and the Frank–Starling law, membrane transport, oxygen carriage, and how simple physics (surface-to-volume, Laplace's law) sets the rules of living design. Educational; reuses the shared sarcomere visual.",
-  "category": "Health & Medicine",
+  "title": "Physiology & Biophysics — Foundations",
+  "tagline": "The survey course: from the charged membrane to the self-tuning heart. Start here, then go deep in a specialist module.",
+  "description": "The FOUNDATION course for the Physiology track — a plain-language survey of the machinery of life and the physics that shapes it: homeostasis, the membrane battery and the action potential, muscle contraction, the heart and the Frank-Starling law, membrane transport, oxygen carriage, and how simple physics (surface-to-volume, Laplace's law) sets the rules of living design. Specialist modules — Exercise Physiology and others — build on this one.",
+  "intro": {
+    "hook": "Your body holds a hundred variables nearly constant while everything around it changes. That is not a metaphor for engineering — it is engineering.",
+    "body": [
+      "Blood pH stays within about 0.05 of a set point, or you die. Core temperature holds to a fraction of a degree through a Houston summer and a winter night. Blood glucose, oxygen, calcium, sodium, pressure — all defended continuously against a world that is not trying to help.",
+      "Physiology is the study of how that control is achieved, and biophysics is the insistence that the answers obey physics: pressure, flow, diffusion, electrical gradients, mechanics. A capillary bed is a plumbing problem. A nerve impulse is a travelling electrical event you can write down.",
+      "Understanding the control loops is also the shortest route to understanding what disease actually is — nearly always a loop that has failed, saturated, or been corrected in the wrong direction."
+    ],
+    "why": [
+      {
+        "title": "Feedback control, in wetware",
+        "text": "Sensors, set points, error signals and effectors. The same mathematics as any regulated system, running in tissue."
+      },
+      {
+        "title": "Physics, not vitalism",
+        "text": "Ohm's law, Fick's law and Starling forces do real explanatory work at the bedside."
+      },
+      {
+        "title": "Disease becomes legible",
+        "text": "Most pathology is a control loop breaking in an identifiable way. Knowing the loop tells you what to expect."
+      }
+    ],
+    "anim": "med_homeostasis",
+    "closer": "Claude Bernard called it the constancy of the internal environment, in 1865, before anyone knew how a single one of these loops worked. This course is the survey; each specialist module that follows takes one of these systems and pushes it much further."
+  },
+  "category": "Physiology",
   "prereqs": [],
   "concepts": [
     {
@@ -596,5 +620,6 @@
       "resources": [],
       "anim": "bio_scaling"
     }
-  ]
+  ],
+  "order": 1
 }

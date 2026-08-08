@@ -4,6 +4,30 @@
   "tagline": "The machine you learned in 1972 still runs. Time to blow the dust off.",
   "category": "Physics & Engineering",
   "description": "A refresher ladder for an engineer who once owned this material: definitions compressed to reminders, depth spent on the classic half-remembered confusions — weight vs normal force, why centripetal isn't a force, momentum vs energy, the small-angle lie, and where the whole edifice finally breaks.",
+  "intro": {
+    "hook": "Three sentences, written in 1687, still predict where a spacecraft will be in ten years.",
+    "body": [
+      "Before Newton, the heavens and the earth were understood to obey different rules — celestial motion was perfect and circular, earthly motion was messy and finite. His claim was that the apple and the Moon are doing exactly the same thing, and that one law covers both.",
+      "What makes this course worth your time is not the formulas. It is the habit of mind: identify the system, name every force acting on it, and let the mathematics tell you the consequence. That procedure is unreasonably powerful and transfers to problems Newton never imagined.",
+      "It is also worth knowing precisely where it stops — very fast, very small, very massive — because knowing the boundary of a theory is what separates using it from believing it."
+    ],
+    "why": [
+      {
+        "title": "The first real unification",
+        "text": "One law for falling apples and orbiting moons. Every later unification in physics follows this template."
+      },
+      {
+        "title": "A transferable procedure",
+        "text": "System, forces, consequence. The same discipline works on engineering, biomechanics and anything with interacting parts."
+      },
+      {
+        "title": "Right where it matters to you",
+        "text": "For everything at human scale and speed, Newton is not an approximation you tolerate — it is the correct answer."
+      }
+    ],
+    "anim": "phys_frames",
+    "closer": "Two hundred years of experiment failed to dent it. It took light itself, and the orbit of Mercury, to find the edge."
+  },
   "prereqs": [
     "calculus"
   ],

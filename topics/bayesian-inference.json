@@ -2,8 +2,32 @@
   "id": "bayesian-inference",
   "title": "Bayesian Inference",
   "tagline": "How to change your mind by exactly the right amount.",
-  "category": "AI & Machine Learning",
+  "category": "Statistics",
   "description": "From probability-as-belief to posterior distributions. Every concept is gated: you advance when the evidence says you know it.",
+  "intro": {
+    "hook": "A rule for changing your mind by exactly the right amount, no more and no less.",
+    "body": [
+      "You already reason this way, badly. You hold a belief, evidence arrives, you update. The trouble is that human updating is systematically wrong in known directions: we ignore how rare things are to begin with, and we treat weak evidence as strong.",
+      "Bayes' theorem is the arithmetic of doing it correctly. It says precisely how much a piece of evidence should move you, given how likely that evidence was under each explanation — and given what you believed before it arrived.",
+      "The famous consequence is that a 99%-accurate test for a rare disease can still leave you far more likely healthy than sick. That is not a trick or a paradox. It is what happens when you finally account for the base rate, and it is the moment most people realise their intuition needs an upgrade."
+    ],
+    "why": [
+      {
+        "title": "Uncertainty is the normal case",
+        "text": "Diagnosis, forecasting, search, spam filtering and scientific inference are all decisions under incomplete information."
+      },
+      {
+        "title": "It names your assumptions",
+        "text": "The prior forces you to state what you believed beforehand. That is the feature — hidden assumptions are the dangerous ones."
+      },
+      {
+        "title": "It fixes a real bug in your head",
+        "text": "Base-rate neglect is measurable, widespread, and expensive. This is the correction."
+      }
+    ],
+    "anim": "bayes_belief",
+    "closer": "Bayes never published it. A friend found the essay among his papers after he died."
+  },
   "concepts": [
     {
       "id": "c01-belief",
@@ -875,5 +899,6 @@
       ],
       "anim": "bayes_decision"
     }
-  ]
+  ],
+  "order": 1
 }

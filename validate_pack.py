@@ -72,6 +72,56 @@ def _regex_issue(pat) -> str | None:
     return None
 
 
+def _check_intro(pack):
+    """The optional `intro` block — a motivating opening shown before concept 1.
+
+    OPTIONAL, but strict once present. A half-built intro is worse than none: it is the first
+    thing a student sees, so a missing hook or an unregistered animation is a broken first
+    impression rather than a degraded later screen.
+
+    `anim` must name an animation ALREADY registered in index.html. The intro reuses the
+    existing animation registry deliberately — no new asset pipeline, no external files, same
+    edit-file-then-refresh property the rest of the app has.
+    """
+    intro = pack.get("intro")
+    if intro is None:
+        return
+    if not isinstance(intro, dict):
+        err("intro must be an object")
+        return
+    hook = intro.get("hook")
+    if not isinstance(hook, str) or not hook.strip():
+        err("intro: missing 'hook' (the opening line that has to earn the next 30 seconds)")
+    elif len(hook) > 240:
+        err(f"intro: hook is {len(hook)} chars — keep it under 240, it is a hook not a paragraph")
+
+    body = intro.get("body")
+    if not isinstance(body, list) or not body or not all(
+            isinstance(p, str) and p.strip() for p in body):
+        err("intro: 'body' must be a non-empty list of non-empty paragraphs")
+    elif len(body) > 4:
+        err(f"intro: {len(body)} body paragraphs — 4 is the ceiling; this is a doorway, not a lecture")
+
+    why = intro.get("why")
+    if not isinstance(why, list) or not (2 <= len(why) <= 4):
+        err("intro: 'why' must be a list of 2-4 {title, text} cards")
+    else:
+        for i, w in enumerate(why):
+            if not isinstance(w, dict) or not str(w.get("title", "")).strip() \
+                    or not str(w.get("text", "")).strip():
+                err(f"intro: why[{i}] needs a non-empty 'title' and 'text'")
+
+    anim = intro.get("anim")
+    if anim is not None:
+        if not isinstance(anim, str) or anim not in _ANIMS:
+            err(f"intro: anim '{anim}' is not registered in static/index.html "
+                f"(a visual that does not exist is a blank box on the first screen)")
+
+    closer = intro.get("closer")
+    if closer is not None and (not isinstance(closer, str) or not closer.strip()):
+        err("intro: 'closer' must be a non-empty string when present")
+
+
 def check(pack):
     _tl.errs = []
     for k in ("id", "title", "concepts"):
@@ -79,6 +129,7 @@ def check(pack):
             err(f"pack missing '{k}'")
     if not re.fullmatch(r"[a-z0-9-]+", pack.get("id", "")):
         err("pack id must be a lowercase slug")
+    _check_intro(pack)
     ids = set()
     for i, c in enumerate(pack.get("concepts", [])):
         tag = f"concept[{i}] ({c.get('id','?')})"

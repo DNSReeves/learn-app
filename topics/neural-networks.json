@@ -4,10 +4,123 @@
   "tagline": "Functions that learn from being wrong.",
   "category": "AI & Machine Learning",
   "description": "From a single neuron to backpropagation to why deep learning works. Root of the AI chain: LLMs, AI agents, and AGI build on this.",
+  "intro": {
+    "hook": "Nobody programmed the network to recognise a face. It was shown examples, and it worked out the rest — an idea that took eighty years and two collapses to arrive.",
+    "body": [
+      "Conventional software is a list of instructions written by someone who already knows the procedure. That approach fails completely for tasks nobody can write down — you cannot enumerate the rules distinguishing a cat from a dog, and neither can anyone else, yet you do it instantly.",
+      "The alternative is old. In 1943 McCulloch and Pitts wrote down a neuron as a piece of mathematics; in 1949 Hebb proposed that cells firing together strengthen their connection. By 1958 Rosenblatt had built the Perceptron in hardware, and the New York Times reported that the Navy expected a machine that would walk, talk, see and reproduce itself. In 1969 Minsky and Papert published a short proof that a single one of these units could not compute even XOR — and funding, along with most of the field, evaporated.",
+      "It came back twice. Backpropagation made multi-layer networks trainable and was popularised in 1986; LeCun had convolutional networks reading handwritten digits by 1989. Then a second winter, in which support vector machines were the respectable choice. What ended it in 2012 was not a new insight but AlexNet — the same ideas, run on gaming GPUs against a large enough dataset. In 2024 Hopfield and Hinton were given the Nobel Prize in Physics for the work nobody wanted to fund in 1970.",
+      "So this course spends its first concepts on the thing that caused both collapses and the recovery: what a single unit can compute, what it provably cannot, and why stacking them changes the answer. Nothing in it is intelligent. Everything in it is arithmetic and a blind downhill walk on a landscape of mistakes."
+    ],
+    "why": [
+      {
+        "title": "Learned, not written",
+        "text": "A change of method as fundamental as the shift from hand computation to programming — the rules come from data."
+      },
+      {
+        "title": "Surprisingly few ideas",
+        "text": "A weighted sum, a nonlinearity, a loss and the chain rule. The scale is enormous; the vocabulary is small."
+      },
+      {
+        "title": "It demystifies the rest",
+        "text": "Language models, image generation and recommendation engines are all this machinery, arranged differently."
+      }
+    ],
+    "anim": "nn_neuron",
+    "closer": "The core algorithm was worked out decades before it worked. What changed was data and silicon — which is worth remembering when the next idea looks like a dead end."
+  },
   "prereqs": [
     "calculus"
   ],
   "concepts": [
+    {
+      "id": "c00-biological-neuron",
+      "title": "The neuron and the unit — an analogy with limits",
+      "summary": "Where the artificial 'neuron' genuinely borrows from the biological one, and the much longer list of places it does not.",
+      "anim": "nn_bio_vs_unit",
+      "cards": [
+        {
+          "h": "What a real neuron does",
+          "md": "A neuron collects input on its **dendrites** from — typically — thousands of other cells. Each arriving signal produces a small local voltage change: **excitatory** ones (EPSPs) push the membrane toward threshold, **inhibitory** ones (IPSPs) push it away.\n\nThose changes spread to the **soma** and sum, in space and in time. At the **axon hillock**, where voltage-gated sodium channels are densest, one thing is being asked continuously: *is the membrane above threshold right now?*\n\nIf it is, an **action potential** fires — and here is the property that matters most for what follows. It is **all-or-none**. A stimulus twice as strong does not produce a bigger spike; it produces spikes more often. Strength is encoded in **rate** and **timing**, not amplitude."
+        },
+        {
+          "h": "What the artificial unit borrows",
+          "md": "The artificial unit keeps exactly two things:\n\n- **Weighted summation.** Each input is multiplied by a weight and added up. A **positive** weight is the excitatory analogue; a **negative** weight is the inhibitory one. This much is a fair borrowing.\n- **A threshold-like nonlinearity.** The sum passes through a function that behaves differently above and below a point — a rough echo of \"fire or don't\".\n\nThat is the whole of the resemblance:\n\n```\noutput = activation(w₁x₁ + w₂x₂ + … + b)\n```\n\nRosenblatt's 1958 Perceptron was precisely this, built in hardware, with the weights set by motorised potentiometers."
+        },
+        {
+          "h": "Where the analogy breaks — and it breaks badly",
+          "md": "| Real neuron | Artificial unit |\n|---|---|\n| All-or-none spike; information in **rate and timing** | A single **graded number**, no time axis |\n| Thousands of inputs; **dendrites compute locally** before the soma sums | Inputs sum in one flat step |\n| Chemical synapses, dozens of neurotransmitters and receptor subtypes | One scalar per connection |\n| **Refractory period**, adaptation, fatigue | None |\n| Learns by Hebbian and neuromodulatory mechanisms | Learns by **backpropagation** — biologically implausible |\n| ~86 billion cells, richly recurrent, embodied | A directed graph of arithmetic |\n\n**The honest summary: the analogy is mathematical, not biological.** It captures weighted summation and a threshold and essentially nothing else. The name \"neural network\" has misled more people than it has helped — including researchers, who spent years arguing about brains when the interesting questions were about function approximation.\n\nKeep the intuition; discard the biology. Nothing in the rest of this course depends on the brain being anything like this."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Which feature does the artificial unit genuinely borrow from biology?",
+          "options": [
+            "Weighted summation of inputs, with negative weights acting as inhibition",
+            "The all-or-none action potential",
+            "Rate coding of signal strength",
+            "The refractory period"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — summation plus a threshold-like nonlinearity is the whole of the fair resemblance.",
+            "No — the artificial unit emits a graded value, not an all-or-none spike.",
+            "No — there is no time axis in a single unit, so no rate to code with.",
+            "No — the artificial unit has no refractory period or any other temporal dynamics."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A real neuron signals a STRONGER stimulus mainly by:",
+          "options": [
+            "Firing more frequently",
+            "Producing a larger action potential",
+            "Lowering its threshold permanently",
+            "Releasing fewer neurotransmitters"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the spike is all-or-none, so strength lives in rate and timing.",
+            "No — this is the key property people forget: spike amplitude carries no information.",
+            "No — threshold modulation occurs but is not the primary encoding of intensity.",
+            "No — stronger signalling generally involves more transmitter release, not less."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "The best description of the biological analogy in 'neural networks' is:",
+          "options": [
+            "A mathematical metaphor — weighted summation and a threshold — not a model of the cell",
+            "An accurate simulation of cortical neurons",
+            "Irrelevant, since the maths was derived without any reference to biology",
+            "Exact for single neurons but wrong for networks"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — keep the intuition, discard the biology; nothing later in the course depends on it.",
+            "No — dendritic computation, timing, neuromodulation and much else are simply absent.",
+            "No — McCulloch and Pitts and Rosenblatt were explicitly inspired by neurons.",
+            "No — the mismatch is at the level of the single unit, which is where it matters most."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "McCulloch & Pitts (1943) — A Logical Calculus of the Ideas Immanent in Nervous Activity",
+          "type": "reading",
+          "url": "https://link.springer.com/article/10.1007/BF02478259"
+        },
+        {
+          "label": "StatPearls — Physiology, Action Potential",
+          "type": "reading",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK538143/"
+        }
+      ]
+    },
     {
       "id": "c01-neuron",
       "title": "The neuron: weighted sum plus squash",
@@ -93,6 +206,112 @@
         }
       ],
       "anim": "nn_neuron"
+    },
+    {
+      "id": "c01b-perceptron-limits",
+      "title": "What one unit can do — and what it provably cannot",
+      "summary": "A single unit draws exactly one straight line, which is enough for AND and OR, impossible for XOR, and the reason layers exist at all.",
+      "anim": "nn_perceptron_xor",
+      "cards": [
+        {
+          "h": "One unit = one straight line",
+          "md": "Take a unit with two inputs. It fires when\n\n```\nw₁x₁ + w₂x₂ + b > 0\n```\n\nSet that expression **equal** to zero and you have the equation of a straight line. So geometrically a single unit does one thing: it draws a line through the input space and fires on one side of it.\n\nThe weights set the line's **slope**; the bias sets its **position**. Training a single unit means sliding and rotating one line until it separates the examples.\n\nProblems a single line can solve are called **linearly separable**. **AND** is — the line tucks into one corner. **OR** is — the line sits near the origin. Both are learnable, and Rosenblatt's convergence proof guarantees training will find the line if one exists."
+        },
+        {
+          "h": "XOR — not hard, impossible",
+          "md": "Now ask the unit to fire when the two inputs **differ** — exclusive OR.\n\n| x₁ | x₂ | XOR |\n|---|---|---|\n| 0 | 0 | 0 |\n| 0 | 1 | **1** |\n| 1 | 0 | **1** |\n| 1 | 1 | 0 |\n\nPlot those four points. The two ones sit on one diagonal, the two zeros on the other. **No straight line separates them.**\n\nThis is not a training problem, a tuning problem, or a data problem. No weights exist, so no procedure can find them. Minsky and Papert set this out in *Perceptrons* (1969), and the field's funding and confidence collapsed with it — the first AI winter.\n\nThe lesson generalises past XOR: a single unit cannot represent any relationship where the right answer depends on a **combination** of inputs rather than on each independently."
+        },
+        {
+          "h": "Add another perceptron",
+          "md": "The fix is the entire idea of deep learning, and it is almost disappointing in its simplicity: **use more than one unit.**\n\nGive a hidden layer two units. Each draws its own line — say, one for \"at least one input is on\" (OR) and one for \"both are on\" (AND). Now a unit in the next layer reads *those two answers* instead of the raw inputs, and computes `OR AND NOT AND` — which is exactly XOR.\n\nTwo lines carve the plane into a **strip**, and the answer lives inside it. With enough units you can carve arbitrarily complicated regions, which is the informal content of the **universal approximation theorem**.\n\n**One caveat is load-bearing.** This only works because of the nonlinearity between the layers. Stack *linear* units and a weighted sum of weighted sums is still just a weighted sum — two lines collapse back into one, and you are exactly where you started. That is why the squash in the previous concept was described as non-negotiable.\n\nThe representational problem was solved in principle by 1969. **Training** such a network was the unsolved part, and that took backpropagation and another seventeen years."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Geometrically, what does a single two-input unit compute?",
+          "options": [
+            "It draws one straight line and fires on one side of it",
+            "It draws a circle around the positive examples",
+            "It memorises each training point",
+            "It draws any curve the data requires"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — w₁x₁ + w₂x₂ + b = 0 is a line; the weights set its slope, the bias its position.",
+            "No — a closed region needs more than one unit.",
+            "No — a single unit has only as many parameters as inputs, plus a bias.",
+            "No — curvature requires composing units through a nonlinearity."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Why can a single unit not learn XOR?",
+          "options": [
+            "The four points are not linearly separable, so no weights exist",
+            "The learning rate is too high",
+            "There is not enough training data",
+            "XOR needs a bias and a single unit has none"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — this is a representational impossibility, not a training difficulty.",
+            "No — no schedule helps when the solution does not exist.",
+            "No — all four possible inputs are already present.",
+            "No — a single unit does have a bias; it still cannot help here."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Adding a hidden layer solves XOR only if:",
+          "options": [
+            "A nonlinearity sits between the layers",
+            "The hidden layer has at least ten units",
+            "The bias is removed",
+            "The inputs are scaled to zero mean"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — stacked linear layers collapse into a single linear layer, and you gain nothing.",
+            "No — two hidden units suffice for XOR.",
+            "No — biases are needed to position each line.",
+            "No — scaling helps optimisation but does not change what is representable."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "Minsky and Papert's 1969 result mattered historically because it:",
+          "options": [
+            "Showed a fundamental limit of single-layer models, and funding collapsed",
+            "Proved neural networks can never work at all",
+            "Introduced backpropagation",
+            "Demonstrated that XOR is unsolvable by any network"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct — the limit was real and narrow, but the field read it as fatal and the first AI winter followed.",
+            "No — they addressed single-layer perceptrons, not multi-layer networks.",
+            "No — backpropagation was popularised in 1986, seventeen years later.",
+            "No — a two-unit hidden layer solves XOR; the limit applies to a single unit."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Minsky & Papert — Perceptrons (1969), overview",
+          "type": "reading",
+          "url": "https://en.wikipedia.org/wiki/Perceptrons_(book)"
+        },
+        {
+          "label": "Rosenblatt (1958) — The Perceptron: A Probabilistic Model",
+          "type": "reading",
+          "url": "https://psycnet.apa.org/record/1959-09865-001"
+        }
+      ]
     },
     {
       "id": "c02-layers",
@@ -666,5 +885,6 @@
       ],
       "anim": "nn_training"
     }
-  ]
+  ],
+  "order": 1
 }
