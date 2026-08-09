@@ -350,14 +350,16 @@ def test_phase_a_sessions_are_12h_sliding(tmp_path, monkeypatch):
     dbmod.create_user("u", "pw-secret-1")
     tok = dbmod.authenticate("u", "pw-secret-1")
     with dbmod.conn() as c:
-        exp0 = c.execute("SELECT expires_at FROM sessions WHERE token=?", (tok,)).fetchone()[0]
+        exp0 = c.execute("SELECT expires_at FROM sessions WHERE token=?", (dbmod._tok_hash(tok),)).fetchone()[0]
     assert exp0 - time.time() < 12.5 * 3600            # 12h, not 30d
     with dbmod.conn() as c:                            # simulate an old session
+        # Sessions are stored as sha256(token) since 2026-08-08; a test reaching into
+        # the table must address the STORED key, not the one the client holds.
         c.execute("UPDATE sessions SET expires_at=? WHERE token=?",
-                  (time.time() + 60, tok))
+                  (time.time() + 60, dbmod._tok_hash(tok)))
     assert dbmod.user_for_token(tok)                   # still valid → renews
     with dbmod.conn() as c:
-        exp1 = c.execute("SELECT expires_at FROM sessions WHERE token=?", (tok,)).fetchone()[0]
+        exp1 = c.execute("SELECT expires_at FROM sessions WHERE token=?", (dbmod._tok_hash(tok),)).fetchone()[0]
     assert exp1 - time.time() > 11 * 3600              # slid forward
 
 

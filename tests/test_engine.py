@@ -158,7 +158,10 @@ def test_expired_session_rejected(dbmod):
     dbmod.create_user("t", "longenough")
     tok = dbmod.authenticate("t", "longenough")
     with dbmod.conn() as c:
-        c.execute("UPDATE sessions SET expires_at = ? WHERE token = ?", (time.time() - 1, tok))
+        # Sessions are stored as sha256(token) since 2026-08-08; a test reaching into
+        # the table must address the STORED key, not the one the client holds.
+        c.execute("UPDATE sessions SET expires_at = ? WHERE token = ?",
+                  (time.time() - 1, dbmod._tok_hash(tok)))
     assert dbmod.user_for_token(tok) is None
 
 

@@ -151,6 +151,17 @@ def conn():
 def init():
     with conn() as c:
         c.executescript(SCHEMA)
+    # SESSION TOKENS AT REST (2026-08-08): convert any raw token to sha256(token). Runs on
+    # every init, costs one scan, and is a no-op once converted. Live sessions survive because
+    # the client's raw token hashes to the stored value on its next request.
+    with conn() as c:
+        n = _migrate_session_tokens(c)
+    if n:
+        try:
+            import logging
+            logging.getLogger("learn").info("hashed %d session token(s) at rest", n)
+        except Exception:
+            pass
     # P2.6 additive migration (existing DBs predate the relearn column)
     with conn() as c:
         try:
@@ -290,7 +301,7 @@ def authenticate(username: str, password: str) -> str | None:
         now = time.time()
         c.execute(
             "INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?,?,?,?)",
-            (token, row["id"], now, now + SESSION_TTL_S),
+            (_tok_hash(token), row["id"], now, now + SESSION_TTL_S),
         )
         return token
 
@@ -311,11 +322,11 @@ def user_for_token(token: str):
         row = c.execute(
             """SELECT u.id, u.username, u.role FROM sessions s JOIN users u ON u.id = s.user_id
                WHERE s.token = ? AND s.expires_at > ?""",
-            (token, now),
+            (_tok_hash(token), now),
         ).fetchone()
         if row:
             c.execute("UPDATE sessions SET expires_at = ? WHERE token = ?",
-                      (now + SESSION_TTL_S, token))          # sliding renewal
+                      (now + SESSION_TTL_S, _tok_hash(token)))   # sliding renewal
         return dict(row) if row else None
 
 
@@ -338,6 +349,41 @@ def user_count() -> int:
         return c.execute("SELECT COUNT(*) FROM users").fetchone()[0]
 
 
+# ---------- session tokens at rest (2026-08-08) ----------
+# Sessions stored the RAW token as the primary key, so anything that could read the database
+# file held 50 working credentials — no password needed. That is not only a hosting concern:
+# learn.db is picked up by Time Machine and the nightly off-site backup, so raw tokens were
+# already leaving the machine on removable media every night.
+#
+# The fix is the standard one: store sha256(token) and look up by hash. The token itself is
+# high-entropy (secrets.token_urlsafe(32)), so a plain SHA-256 is correct here — there is
+# nothing to brute-force and no salt/stretching needed, unlike a password.
+#
+# MIGRATION IS IN-PLACE AND NON-DISRUPTIVE: existing rows are rewritten as sha256(stored
+# value), so a client presenting its raw token still matches on the next request and nobody
+# is logged out. It runs once; a second pass would hash the hashes, so it is guarded by a
+# marker column check.
+def _tok_hash(token: str) -> str:
+    return hashlib.sha256((token or "").encode()).hexdigest()
+
+
+def _migrate_session_tokens(c) -> int:
+    """Rewrite raw tokens as their hashes. Idempotent: a 64-char lowercase hex value is
+    already hashed and is left alone. Returns how many rows were converted."""
+    rows = c.execute("SELECT token FROM sessions").fetchall()
+    n = 0
+    for r in rows:
+        t = r["token"]
+        if isinstance(t, str) and len(t) == 64 and all(ch in "0123456789abcdef" for ch in t):
+            continue                       # already a hash
+        try:
+            c.execute("UPDATE sessions SET token = ? WHERE token = ?", (_tok_hash(t), t))
+            n += 1
+        except Exception:
+            c.execute("DELETE FROM sessions WHERE token = ?", (t,))   # collision → drop it
+    return n
+
+
 def set_role(username: str, role: str) -> bool:
     """P5.20: grant/revoke authoring. Roles: 'learner' (default) | 'author'."""
     if role not in ("learner", "author"):
@@ -350,7 +396,7 @@ def set_role(username: str, role: str) -> bool:
 
 def logout(token: str):
     with conn() as c:
-        c.execute("DELETE FROM sessions WHERE token = ?", (token,))
+        c.execute("DELETE FROM sessions WHERE token = ?", (_tok_hash(token),))
 
 
 def issue_session(username: str) -> str | None:
@@ -366,7 +412,7 @@ def issue_session(username: str) -> str | None:
         now = time.time()
         c.execute(
             "INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?,?,?,?)",
-            (token, row["id"], now, now + SESSION_TTL_S),
+            (_tok_hash(token), row["id"], now, now + SESSION_TTL_S),
         )
         return token
 
