@@ -1328,7 +1328,7 @@
     "body": [
       "Buying shares in one company means your money rides on that company. If it does well you do well. If it burns down, so does your money. Picking the right one is hard — professionals who do it full time mostly do not beat simply owning everything.",
       "So instead, imagine a big shared pot. Thousands of people put money in, and the pot buys a small piece of every large company in the country. You buy a share of the pot. Now you own a sliver of all of them.",
-      "That is an ETF. One company going bust barely dents it, because it was only ever a fraction of a percent of what you hold. You have swapped the chance of a spectacular win for a far smaller chance of a disaster.",
+      "That is an index fund. An ETF is one you can buy and sell on the stock market like a single share, at any moment the market is open, rather than posting an order that settles once at the end of the day. It also tends to hand you smaller tax bills along the way, for reasons buried in how new shares of the pot get created. One company going bust barely dents it either way, because it was only ever a fraction of a percent of what you hold.",
       "The other half of the story is cost. Someone picking shares for you charges real money every year — often one or two percent. A pot that simply holds everything needs almost no decisions, so it can charge a tiny fraction of that.",
       "That difference sounds trivial and is not. Over decades, fees compound exactly like returns do, just against you. The unglamorous move — own everything, pay almost nothing, wait a long time — beats most clever ones."
     ],
@@ -1339,7 +1339,7 @@
       },
       {
         "title": "Small fees are not small",
-        "text": "One percent a year sounds like a rounding error. Over forty years it can quietly consume a quarter of what you would have had. It is charged whether the year was good or bad."
+        "text": "One percent a year sounds like a rounding error. Over forty years it quietly takes about a THIRD of what you would otherwise have had — and that figure barely changes whether markets do well or badly. It is charged either way."
       },
       {
         "title": "Spreading out is not free of risk",
