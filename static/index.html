@@ -3832,45 +3832,65 @@ Object.assign(window,{pkFrame,pkBar,pkPath,pkDots,pkArrow,pkPanel,pkPair,pkLerp}
 /* preface animations — batch 1: calculus, neural-networks, genetics, newtonian, bayes, fourier */
 (function(){
 
-/* ── CALCULUS: zoom in until the curve is straight ────────────────────────────────────────── */
+/* ── CALCULUS: a tangent sliding along the curve, then rectangles under it ────────────────
+   Rebuilt 2026-08-13 on the operator's design. The first version zoomed until a curve looked
+   straight and drew rectangles beside it — rendering showed the "curve" ending as a flat sliver
+   with no memory of being curved, its label 450px away, and the rectangles with NO CURVE over
+   them, so "area under the curve" was never actually shown. A moving tangent teaches steepness
+   directly, and rectangles under the same curve tie the two halves together. */
+const CAL_X0=140, CAL_X1=800, CAL_BASE=300, CAL_TOP=110;
+function calY(u){                       // one hump, gentle then steep then over the top
+  return CAL_BASE-(CAL_TOP===0?0:1)*(CAL_BASE-CAL_TOP)*(0.18+0.82*Math.sin(Math.PI*u)*Math.sin(Math.PI*u*0.9+0.25));
+}
+function calPt(u){ return [CAL_X0+(CAL_X1-CAL_X0)*u, calY(u)]; }
+function calSlope(u){ const h=0.004, [x1,y1]=calPt(Math.max(0,u-h)), [x2,y2]=calPt(Math.min(1,u+h));
+  return (y2-y1)/(x2-x1); }
 function pref_calcScene(ctx,cv,st){
-  const {zoom=0, slices=0}=st;
-  pkFrame(ctx,cv,"Zoom in far enough and the curve goes straight",
-    slices>0 ? "Fill it with rectangles. Thinner ones fit better."
-             : "The bend never disappears. It just stops mattering.");
-  const cx=300, cy=210, R=140;
-  const span=pkLerp(Math.PI*0.9, 0.09, zoom);        // arc shown, shrinking as we zoom
-  const scale=pkLerp(1, 12, zoom);
-  const pts=[];
-  for(let i=0;i<=60;i++){
-    const a=-Math.PI/2 - span/2 + span*(i/60);
-    pts.push([cx + R*scale*Math.cos(a), cy + R*scale*Math.sin(a) + R*(scale-1)]);
-  }
-  pkPath(ctx,pts,PK.a,3);
-  if(zoom>0.75){
-    pkPath(ctx,[[pts[0][0],pts[0][1]],[pts[60][0],pts[60][1]]],PK.good,2);
-    _t(ctx,cx,300,"a straight line, near enough",{align:"center",col:PK.good,size:14,bold:true});
-  }
+  const {tan=-1, slices=0}=st;
+  pkFrame(ctx,cv, slices>0 ? "Now add up thin slices to get the area"
+                           : "How steep is it right here?",
+    slices>0 ? "Thinner rectangles fit better. Keep going and you close in on the true area."
+             : "Slide along and the little straight line tilts with the hill.");
+  // the curve
+  const pts=[]; for(let i=0;i<=140;i++) pts.push(calPt(i/140));
+  // rectangles first, so the curve draws on top of them
   if(slices>0){
-    const n=Math.round(pkLerp(4,26,slices)), x0=560, x1=830, base=300;
+    const n=Math.round(pkLerp(5,34,slices));
     for(let i=0;i<n;i++){
-      const w=(x1-x0)/n, x=x0+i*w;
-      const h=90*Math.sin(Math.PI*(i+0.5)/n)+40;
-      ctx.fillStyle="rgba(232,161,60,0.35)"; ctx.fillRect(x,base-h,w-1,h);
-      ctx.strokeStyle=PK.b; ctx.lineWidth=1; ctx.strokeRect(x,base-h,w-1,h);
+      const u=(i+0.5)/n, [ ,yy]=calPt(u);
+      const w=(CAL_X1-CAL_X0)/n, x=CAL_X0+i*w;
+      ctx.fillStyle="rgba(232,161,60,0.30)"; ctx.fillRect(x,yy,w-1,CAL_BASE-yy);
+      ctx.strokeStyle=PK.b; ctx.lineWidth=1; ctx.strokeRect(x,yy,w-1,CAL_BASE-yy);
     }
-    _t(ctx,695,325,n+" rectangles",{align:"center",col:PK.b,size:14,bold:true});
+    _t(ctx,cv.width/2,CAL_BASE+30,n+" rectangles under the curve",
+       {align:"center",col:PK.b,size:14,bold:true});
+  }
+  ctx.strokeStyle=PK.line; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(CAL_X0,CAL_BASE); ctx.lineTo(CAL_X1,CAL_BASE); ctx.stroke();
+  pkPath(ctx,pts,PK.a,3);
+  // the tangent: a SHORT straight line touching the curve, tilting as it slides
+  if(tan>=0){
+    const u=Math.max(0.04,Math.min(0.96,tan));
+    const [px,py]=calPt(u), m=calSlope(u), L=78;
+    const dx=L/Math.sqrt(1+m*m), dy=m*dx;
+    ctx.strokeStyle=PK.good; ctx.lineWidth=3.5;
+    ctx.beginPath(); ctx.moveTo(px-dx,py-dy); ctx.lineTo(px+dx,py+dy); ctx.stroke();
+    ctx.fillStyle=PK.good; ctx.beginPath(); ctx.arc(px,py,6,0,Math.PI*2); ctx.fill();
+    const steep = m<-0.55 ? "steep uphill" : m<-0.12 ? "gentle uphill"
+                : m<0.12 ? "flat — the very top" : m<0.55 ? "gentle downhill" : "steep downhill";
+    _t(ctx,px + (m<0 ? -66 : 66), py - 34, steep,
+       {align:"center",col:PK.good,size:14,bold:true});   // offset away from the tangent it names
   }
 }
-ANIMS.pref_calculus_static=(cv,ctx)=>pref_calcScene(ctx,cv,{zoom:1,slices:1});
+ANIMS.pref_calculus_static=(cv,ctx)=>pref_calcScene(ctx,cv,{tan:0.30,slices:1});
 ANIMS.pref_calculus=async(cv,ctx)=>{
-  pref_calcScene(ctx,cv,{});
-  await narrate("Here is a curve. Nothing about it is straight.");
-  await tween(1600,k=>pref_calcScene(ctx,cv,{zoom:k}));
-  await narrate("Now zoom in on one tiny piece of it. And again. The bend gets gentler and gentler until, on your screen, it is simply a straight line. It was never actually straight — but the closer you look, the less that matters, and straight lines are easy.");
-  await tween(1400,k=>pref_calcScene(ctx,cv,{zoom:1,slices:k}));
-  await narrate("The same trick backwards. To find the area under a wobbly shape, fill it with rectangles, which you already know how to measure. Thin ones fit better than fat ones. Make them thinner and thinner and add them all up, and you close in on the true answer. Chop the hard thing small enough that it becomes an easy thing.");
-  pref_calcScene(ctx,cv,{zoom:1,slices:1});
+  pref_calcScene(ctx,cv,{tan:0.05});
+  await narrate("Here is a hill. Its steepness is different at every point along it.");
+  await tween(3200,k=>pref_calcScene(ctx,cv,{tan:k}));
+  await narrate("Watch the little straight line. It touches the curve at one place and tilts to match it exactly there. Climbing steeply, then more gently, then flat at the very top, then tipping downhill. That tilt — the steepness right here — is the first half of calculus, and you can read it off the picture without any arithmetic at all.");
+  await tween(2000,k=>pref_calcScene(ctx,cv,{tan:0.30,slices:k}));
+  await narrate("The second half is the area underneath. You do not know how to measure a wobbly shape, but you do know rectangles. So fill it with them. Thin ones fit better than fat ones. Make them thinner and thinner, add them all up, and you close in on the true area. Chop the hard thing small enough and it becomes an easy thing.");
+  pref_calcScene(ctx,cv,{tan:0.30,slices:1});
 };
 
 /* ── NEURAL NETWORKS: dials tuned by being wrong ──────────────────────────────────────────── */
@@ -3986,37 +4006,47 @@ ANIMS.pref_newtonian_physics=async(cv,ctx)=>{
   pref_newtonScene(ctx,cv,{roll:1,orbit:0.75});
 };
 
-/* ── BAYES: 100 ill, 10,000 false alarms ──────────────────────────────────────────────────── */
+/* ── BAYES: everyone who tested positive, at an honest scale ─────────────────────────────
+   Rebuilt 2026-08-13 after rendering it. The first version drew 400 dots at 2,500 people each and
+   then labelled ONE red dot "about 100 ill" (off by 25x) and ~250 amber dots "about 10,000" (off
+   by 60x) — so the picture showed false positives as most of the population when they are 1%. An
+   animation whose only job is to convey a proportion cannot get the proportion wrong. The grid is
+   now the POSITIVE RESULTS: 101 dots at 100 people each, 1 red and 100 amber, which is the ratio
+   the whole argument turns on. */
 function pref_bayesScene(ctx,cv,st){
-  const {sick=0, fp=0, zoom=0}=st;
-  pkFrame(ctx,cv,"A million people, and a very good test",
-    zoom>0 ? "Among the positives: about 100 ill, about 10,000 not."
-           : "One in ten thousand is ill. The test is right 99 times in 100.");
-  const cols=40, rows=10, gap=17, x0=140, y0=80;
-  pkDots(ctx,x0,y0,cols,rows,gap,5,(i)=>{
-    const total=cols*rows;
-    const nSick=Math.round(total*0.0025*sick);          // scaled for visibility
-    const nFp=Math.round(total*0.25*fp);
-    if(i<nSick) return PK.bad;
-    if(i>=total-nFp) return PK.b;
-    return "rgba(132,150,171,0.3)";
-  });
-  _t(ctx,x0,y0-18,"each dot = 2,500 people",{col:PK.dim,size:12});
-  if(sick>0) _t(ctx,x0,300,"● about 100 genuinely ill",{col:PK.bad,size:13.5});
-  if(fp>0)   _t(ctx,x0,322,"● about 10,000 healthy, told they are ill",{col:PK.b,size:13.5});
-  if(zoom>0) pkPanel(ctx,560,286,300,50,"positive → still ~1 in 100 ill",PK.good);
+  const {pop=0, positives=0}=st;
+  pkFrame(ctx,cv, positives>0 ? "Everyone who tested positive"
+                              : "A million people, and a very good test",
+    positives>0 ? "One in a hundred of them is actually ill."
+                : "One in ten thousand is ill. The test is right 99 times in 100.");
+  if(positives<=0){
+    const cols=40, rows=10, gap=17, x0=140, y0=96;
+    pkDots(ctx,x0,y0,cols,rows,gap,5,()=> "rgba(132,150,171,0.32)");
+    _t(ctx,x0,y0-18,"each dot = 2,500 people",{col:PK.dim,size:12});
+    if(pop>0){
+      // the ill are far too rare to see — which is the point
+      ctx.fillStyle=PK.bad; ctx.beginPath(); ctx.arc(x0,y0,3,0,Math.PI*2); ctx.fill();
+      _t(ctx,x0,300,"about 100 are ill — too few to even show up here",{col:PK.bad,size:13.5});
+    }
+  } else {
+    const cols=21, rows=5, gap=26, x0=210, y0=120;
+    const shown=Math.round(101*positives);
+    pkDots(ctx,x0,y0,cols,rows,gap,9,(i)=> i>=shown ? null : (i===0 ? PK.bad : PK.b));
+    _t(ctx,x0,y0-24,"each dot = 100 people",{col:PK.dim,size:12});
+    _t(ctx,210,290,"● 100 genuinely ill",{col:PK.bad,size:14,bold:true});
+    _t(ctx,210,314,"● 10,000 healthy, told they are ill",{col:PK.b,size:14,bold:true});
+    if(positives>=1) pkPanel(ctx,560,278,300,48,"a positive still means ~1 in 100",PK.good);
+  }
 }
-ANIMS.pref_bayesian_inference_static=(cv,ctx)=>pref_bayesScene(ctx,cv,{sick:1,fp:1,zoom:1});
+ANIMS.pref_bayesian_inference_static=(cv,ctx)=>pref_bayesScene(ctx,cv,{pop:1,positives:1});
 ANIMS.pref_bayesian_inference=async(cv,ctx)=>{
   pref_bayesScene(ctx,cv,{});
   await narrate("Suppose one person in ten thousand has some illness, and the test for it is right ninety nine times out of a hundred. Test a million people.");
-  await tween(1200,k=>pref_bayesScene(ctx,cv,{sick:k}));
-  await narrate("About a hundred of them genuinely have it, and the test catches nearly all of those.");
-  await tween(1600,k=>pref_bayesScene(ctx,cv,{sick:1,fp:k}));
-  await narrate("But of the nine hundred and ninety nine thousand nine hundred healthy people, one in a hundred still gets a wrong positive. That is about ten thousand people, told they are ill when they are fine.");
-  await tween(800,k=>pref_bayesScene(ctx,cv,{sick:1,fp:1,zoom:k}));
-  await narrate("So among everyone who got a positive result, roughly a hundred are ill and ten thousand are not. The test was not bad. Something rare simply stays rare, even after decent evidence.");
-  pref_bayesScene(ctx,cv,{sick:1,fp:1,zoom:1});
+  await tween(1200,k=>pref_bayesScene(ctx,cv,{pop:k}));
+  await narrate("About a hundred of them genuinely have it. Out of a million, that is far too few to even see on this picture — which is what rare means.");
+  await tween(1800,k=>pref_bayesScene(ctx,cv,{pop:1,positives:Math.max(0.02,k)}));
+  await narrate("Now keep only the people who tested positive. Every dot here is a hundred people. One dot is the genuinely ill. The other hundred dots are healthy people who got a wrong result — because one percent of nine hundred and ninety nine thousand is an awful lot of people. So a positive result still leaves you about one in a hundred. The test was not bad. Something rare simply stays rare, even after decent evidence.");
+  pref_bayesScene(ctx,cv,{pop:1,positives:1});
 };
 
 /* ── FOURIER: three tones stack into one squiggle ─────────────────────────────────────────── */
@@ -4506,31 +4536,36 @@ ANIMS.pref_quant_finance=async(cv,ctx)=>{
 /* ── ETFs: one company, or a sliver of five hundred ───────────────────────────────────────── */
 function pref_etfScene(ctx,cv,st){
   const {spread=0, fee=0}=st;
-  // The fee view is ADDED BELOW the spread view rather than replacing it: the closing frame
-  // should hold both halves of the argument at once, which is also what the preface argues.
+  // LAYOUT FIXED 2026-08-13 after rendering: the labels were drawn INSIDE the dot grid and the
+  // first bar collided with its bottom edge. The geometry tests could not see either — every
+  // coordinate was finite and the frame was full. Bands are now explicit and do not overlap:
+  // picture 76-206, labels 224-246, bars 268-330.
   pkFrame(ctx,cv,"One company, or a sliver of five hundred",
     fee>0 ? "And the fee compounds too — against you, about a third over forty years."
           : "If one burns down, it was a fraction of a percent of what you hold.");
-  ctx.fillStyle=PK.bad; ctx.fillRect(190,96,74,74);
-  _t(ctx,227,190,"one company",{align:"center",col:PK.dim,size:13});
+  ctx.fillStyle = spread>0.7 ? "rgba(212,106,98,0.38)" : PK.bad;   // dim it once it has failed
+  ctx.fillRect(196,96,72,72);
+  ctx.strokeStyle=PK.bad; ctx.lineWidth=1.5; ctx.strokeRect(196,96,72,72);
+  _t(ctx,232,224,"one company",{align:"center",col:PK.dim,size:13});
   if(spread>0.7){
-    ctx.strokeStyle=PK.bad; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(190,96); ctx.lineTo(264,170); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(264,96); ctx.lineTo(190,170); ctx.stroke();
+    // the cross must not be red on red — it was invisible until this was rendered
+    ctx.strokeStyle=PK.ink; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(196,96); ctx.lineTo(268,168); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(268,96); ctx.lineTo(196,168); ctx.stroke();
+    _t(ctx,232,246,"if it fails, that is everything",{align:"center",col:PK.bad,size:12.5});
   }
   const n=Math.round(pkLerp(1,400,spread));
-  pkDots(ctx,520,92,20,20,8.6,3,(i)=> i<n ? PK.a : null);
-  _t(ctx,606,190,"five hundred companies",{align:"center",col:PK.dim,size:13});
+  pkDots(ctx,540,80,20,20,6.6,2.6,(i)=> i<n ? PK.a : null);
+  _t(ctx,603,224,"five hundred companies",{align:"center",col:PK.dim,size:13});
   if(spread>=1){
     ctx.strokeStyle=PK.bad; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.arc(520,92,5.5,0,Math.PI*2); ctx.stroke();
-    _t(ctx,606,212,"one failing barely shows",{align:"center",col:PK.good,size:13,bold:true});
+    ctx.beginPath(); ctx.arc(540,80,5,0,Math.PI*2); ctx.stroke();
+    _t(ctx,603,246,"one failing barely shows",{align:"center",col:PK.good,size:12.5,bold:true});
   }
   if(fee>0){
-    pkBar(ctx,300,246,380,1,PK.good,"no fee","100%");
-    pkBar(ctx,300,290,380,pkLerp(1,0.69,fee),PK.bad,"1% a year",
+    pkBar(ctx,300,268,380,1,PK.good,"no fee","100%");
+    pkBar(ctx,300,304,380,pkLerp(1,0.69,fee),PK.bad,"1% a year",
           Math.round(pkLerp(100,69,fee))+"%");
-    _t(ctx,490,334,"forty years later",{align:"center",col:PK.dim,size:12.5});
   }
 }
 ANIMS.pref_investing_with_etfs_static=(cv,ctx)=>pref_etfScene(ctx,cv,{spread:1,fee:1});
