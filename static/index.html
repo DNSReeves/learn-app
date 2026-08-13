@@ -4091,44 +4091,56 @@ ANIMS.pref_fourier_series=async(cv,ctx)=>{
 /* preface animations — batch 2: odes, pdes, roman, physiology, diabetes, glp1 */
 (function(){
 
-/* ── ODEs: the fuller the bath, the faster it drains ──────────────────────────────────────── */
+/* ── ODEs: three levels, three flow rates, then the curve that follows ────────────────────
+   Rebuilt 2026-08-13. The first version drew ONE bath draining, which meant the final frame was a
+   large empty box with a sliver in it and the RULE — rate depends on level — was never visible in
+   a single frame. Three baths at three levels, with drain arrows proportional to each, states the
+   rule as a picture. */
 function pref_odeScene(ctx,cv,st){
-  const {t=0, curve=0}=st;
+  const {rule=0, curve=0}=st;
   pkFrame(ctx,cv,"The fuller it is, the faster it drains",
-    "You are not told the level. You are told the RULE for how it changes.");
-  const lvl=Math.exp(-2.1*t);
-  const bx=150, by=110, bw=190, bh=180;
-  ctx.strokeStyle=PK.line; ctx.lineWidth=2; ctx.strokeRect(bx,by,bw,bh);
-  ctx.fillStyle="rgba(111,168,220,0.45)";
-  ctx.fillRect(bx+2,by+bh-bh*lvl+2,bw-4,bh*lvl-4);
-  _t(ctx,bx+bw/2,by-14,"water level",{align:"center",col:PK.dim,size:13});
-  // the drain arrow: length tracks the level
-  pkArrow(ctx,bx+bw/2,by+bh+8,bx+bw/2,by+bh+8+pkLerp(12,58,lvl),PK.b,3);
-  _t(ctx,bx+bw+16,by+bh+34,lvl>0.6?"draining fast":(lvl>0.25?"slower":"barely a trickle"),
-     {col:PK.b,size:13.5});
+    curve>0 ? "Step that rule forward and the whole curve appears."
+            : "You are not told the level over time. You are told the RULE.");
+  const levels=[["full",0.92],["half",0.5],["low",0.16]];
+  levels.forEach(([lab,f],i)=>{
+    const bx=110+i*140, by=92, bw=104, bh=118;
+    ctx.strokeStyle=PK.line; ctx.lineWidth=1.8; ctx.strokeRect(bx,by,bw,bh);
+    const fill=bh*f*Math.min(1,rule*1.4);
+    ctx.fillStyle="rgba(111,168,220,0.5)";
+    ctx.fillRect(bx+2,by+bh-fill,bw-4,fill);
+    _t(ctx,bx+bw/2,by-10,lab,{align:"center",col:PK.dim,size:12.5});
+    if(rule>0.35){
+      const L=pkLerp(8,52,f)*Math.min(1,(rule-0.35)/0.65);
+      pkArrow(ctx,bx+bw/2,by+bh+6,bx+bw/2,by+bh+6+L,PK.b,3);
+      if(rule>=1) _t(ctx,bx+bw/2,by+bh+L+24,
+        f>0.7?"fast":(f>0.35?"slower":"a trickle"),{align:"center",col:PK.b,size:12.5});
+    }
+  });
+  if(rule>=1) _t(ctx,250,318,"more water above → more push at the plughole",
+                 {align:"center",col:PK.dim,size:13});
   if(curve>0){
-    const x0=430, x1=830, y0=120, y1=290, pts=[];
+    const x0=560, x1=850, y0=104, y1=286, pts=[];
     ctx.strokeStyle=PK.line; ctx.lineWidth=1;
     ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x1,y1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x0,y1); ctx.stroke();
-    for(let i=0;i<=80;i++){ const u=i/80; pts.push([x0+(x1-x0)*u, y1-(y1-y0)*Math.exp(-2.1*u)]); }
+    for(let i=0;i<=80;i++){ const u=i/80; pts.push([x0+(x1-x0)*u, y1-(y1-y0)*Math.exp(-2.4*u)]); }
     pkPath(ctx,pts,PK.good,3,curve);
     _t(ctx,x0-8,y0+6,"full",{align:"right",col:PK.dim,size:12});
     _t(ctx,x0-8,y1,"empty",{align:"right",col:PK.dim,size:12});
     _t(ctx,(x0+x1)/2,y1+22,"time",{align:"center",col:PK.dim,size:12});
-    if(curve>=1) _t(ctx,(x0+x1)/2,y0-10,"the answer, worked out from the rule",
-                    {align:"center",col:PK.good,size:13.5,bold:true});
+    if(curve>=1) _t(ctx,(x0+x1)/2,336,"the answer, worked out from the rule",
+                    {align:"center",col:PK.good,size:13,bold:true});
   }
 }
-ANIMS.pref_odes_static=(cv,ctx)=>pref_odeScene(ctx,cv,{t:0.45,curve:1});
+ANIMS.pref_odes_static=(cv,ctx)=>pref_odeScene(ctx,cv,{rule:1,curve:1});
 ANIMS.pref_odes=async(cv,ctx)=>{
-  pref_odeScene(ctx,cv,{t:0});
-  await narrate("Fill a bath and pull the plug. The fuller it is, the faster it drains — more water above means more push at the plughole.");
-  await tween(2600,k=>pref_odeScene(ctx,cv,{t:k}));
-  await narrate("So the rate of change depends on how much is there right now. Nobody handed you the water level over time. You were handed a rule connecting the level to how fast it is falling.");
-  await tween(1600,k=>pref_odeScene(ctx,cv,{t:1,curve:k}));
-  await narrate("Work that rule forward in tiny steps and the whole curve appears. A population, a cooling cup, a stretched spring, a spreading disease — all the same shape of problem. Tell me how it is changing, and I will tell you where it goes.");
-  pref_odeScene(ctx,cv,{t:1,curve:1});
+  pref_odeScene(ctx,cv,{});
+  await narrate("Fill a bath and pull the plug. Here are three baths at three different levels.");
+  await tween(2400,k=>pref_odeScene(ctx,cv,{rule:k}));
+  await narrate("The fuller one drains fastest — more water above means more push at the plughole. The low one is barely a trickle. That is the rule: how fast it changes depends on how much is there right now. Nobody handed you the water level over time.");
+  await tween(1800,k=>pref_odeScene(ctx,cv,{rule:1,curve:k}));
+  await narrate("Step that rule forward in tiny increments and the whole curve appears — steep at first, flattening as it empties. A population, a cooling cup, a stretched spring, a spreading disease: all the same shape of problem. Tell me how it is changing, and I will tell you where it goes.");
+  pref_odeScene(ctx,cv,{rule:1,curve:1});
 };
 
 /* ── PDEs: heat creeping along a spoon ────────────────────────────────────────────────────── */
@@ -4254,46 +4266,67 @@ ANIMS.pref_physiology_biophysics=async(cv,ctx)=>{
   pref_physScene(ctx,cv,{fill:1,beat:1});
 };
 
-/* ── DIABETES: the key that opens the cell ────────────────────────────────────────────────── */
+/* ── DIABETES: a door, a key, and the sugar that piles up outside ────────────────────────
+   Rebuilt 2026-08-13. The first version drew two empty ovals whose "door" was a hairline and whose
+   sugar floated diagonally in space; the two failure modes were indistinguishable apart from one
+   blue dot. Now the door is a real object that opens or does not, the sugar queues at it, and a
+   blood-sugar bar shows the consequence — which is the thing that actually does the damage. */
+function pref_diabCell(ctx,cx,label,mode,t){
+  // mode: "works" | "type1" | "type2"
+  const open = mode==="works" ? t : 0;
+  const bx=cx-58, by=92, bw=150, bh=104;
+  ctx.strokeStyle=PK.line; ctx.lineWidth=2; ctx.strokeRect(bx,by,bw,bh);
+  _t(ctx,bx+bw/2,by+bh/2+5,"cell",{align:"center",col:PK.dim,size:13});
+  // the door in the left wall
+  ctx.strokeStyle= open>0.5 ? PK.good : PK.line; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(bx,by+34); ctx.lineTo(bx-pkLerp(0,26,open), by+34-pkLerp(0,20,open));
+  ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx,by+34); ctx.lineTo(bx,by+82); ctx.stroke();
+  // sugar queued outside, or inside once the door opens
+  for(let i=0;i<6;i++){
+    const inside = open>0.55 && i<Math.round(open*4);
+    const x = inside ? bx+34+ (i%4)*26 : bx-64-(i%3)*24;
+    const y = inside ? by+40+Math.floor(i/4)*30 : by+22+Math.floor(i/3)*30;
+    ctx.fillStyle=PK.b; ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2); ctx.fill();
+  }
+  // the key
+  if(mode!=="type1"){
+    const kx = mode==="works" ? bx-16 : bx-40;
+    ctx.fillStyle=PK.a; ctx.beginPath(); ctx.arc(kx,by+34,9,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=PK.a; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(kx+8,by+34); ctx.lineTo(kx+22,by+34); ctx.stroke();
+    if(mode==="type2"){
+      ctx.strokeStyle=PK.bad; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(kx-11,by+23); ctx.lineTo(kx+11,by+45); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(kx+11,by+23); ctx.lineTo(kx-11,by+45); ctx.stroke();
+    }
+  } else {
+    _t(ctx,bx-22,by+96,"no key",{align:"center",col:PK.bad,size:12.5,bold:true});
+  }
+  // blood sugar piling up outside
+  const high = mode==="works" ? 1-0.72*open : 1;
+  pkBar(ctx,cx-58,by+bh+22,150,high,high>0.6?PK.bad:PK.good,"","");
+  _t(ctx,cx+16,by+bh+66, high>0.6?"blood sugar HIGH":"blood sugar normal",
+     {align:"center",col:high>0.6?PK.bad:PK.good,size:12.5,bold:true});
+  _t(ctx,cx+16,by+bh+90,label,{align:"center",col:PK.dim,size:13});
+}
 function pref_diabScene(ctx,cv,st){
   const {key=0, blocked=0}=st;
   pkFrame(ctx,cv, blocked>0 ? "Two ways the key can fail" : "Sugar cannot get in on its own",
-    blocked>0 ? "No key made at all, or doors that stopped answering."
+    blocked>0 ? "Either way, the sugar stays in the blood — and that is what does the damage."
               : "Insulin unlocks the door. Then the sugar moves in.");
-  const draw=(cx,label,hasKey,opens)=>{
-    ctx.strokeStyle=PK.line; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.ellipse(cx,196,96,72,0,0,Math.PI*2); ctx.stroke();
-    _t(ctx,cx,290,label,{align:"center",col:PK.dim,size:13});
-    // the door
-    ctx.strokeStyle=opens>0?PK.good:PK.line; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(cx-96,196); ctx.lineTo(cx-96+pkLerp(0,22,opens),176); ctx.stroke();
-    // sugar dots outside; some inside once open
-    for(let i=0;i<7;i++){
-      const inside = opens>0.6 && i<Math.round(opens*5);
-      const x = inside ? cx-40+i*20 : cx-150-((i%4)*20);
-      const y = inside ? 196+((i%2)*22-11) : 160+((i%4)*24);
-      ctx.fillStyle=PK.b; ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
-    }
-    if(hasKey>0){
-      ctx.fillStyle=PK.a;
-      ctx.beginPath(); ctx.arc(cx-118,196,8,0,Math.PI*2); ctx.fill();
-      _t(ctx,cx-118,222,"insulin",{align:"center",col:PK.a,size:11.5});
-    }
-  };
-  if(blocked<=0){ draw(450,"a working cell",key,key); }
-  else {
-    draw(250,"type 1 — no key is made",0,0);
-    draw(680,"type 2 — the door stopped answering",1,0);
-  }
+  if(blocked<=0) pref_diabCell(ctx,450,"a working cell","works",key);
+  else { pref_diabCell(ctx,236,"type 1 — no key is made","type1",1);
+         pref_diabCell(ctx,676,"type 2 — the door stops answering","type2",1); }
 }
 ANIMS.pref_diabetes_static=(cv,ctx)=>pref_diabScene(ctx,cv,{key:1,blocked:1});
 ANIMS.pref_diabetes=async(cv,ctx)=>{
-  pref_diabScene(ctx,cv,{});
-  await narrate("Eat a slice of bread and it becomes sugar in your blood within minutes. Your cells want that sugar — it is their fuel. But they cannot simply absorb it. The door has to be unlocked from outside.");
-  await tween(1600,k=>pref_diabScene(ctx,cv,{key:k}));
-  await narrate("The key is insulin, made by your pancreas. Blood sugar rises, insulin is released, doors open, and the sugar moves out of the blood and into the cells. That loop runs quietly every time you eat.");
+  pref_diabScene(ctx,cv,{key:0});
+  await narrate("Eat a slice of bread and it becomes sugar in your blood within minutes. Your cells want it — it is their fuel. But they cannot simply absorb it. The door has to be unlocked from outside, and the sugar queues up until it is.");
+  await tween(1800,k=>pref_diabScene(ctx,cv,{key:k}));
+  await narrate("The key is insulin, made by your pancreas. Blood sugar rises, insulin is released, the door opens, and the sugar moves out of the blood and into the cell. Blood sugar comes back down. That loop runs quietly every time you eat.");
   await tween(1200,k=>pref_diabScene(ctx,cv,{key:1,blocked:k}));
-  await narrate("There are two ways it breaks. In type one, the body destroys the cells that make insulin, so no key gets made at all. In type two, insulin is still made but the doors have stopped responding to it. Either way sugar piles up in the blood, where it does not belong — and it does its damage quietly, over years, without hurting at all.");
+  await narrate("There are two ways it breaks. In type one, the body destroys the cells that make insulin, so no key gets made at all. In type two, the key is still there but the door has stopped responding to it. Either way the door stays shut and the sugar stays in the blood — and it does its damage quietly, over years, without hurting at all.");
   pref_diabScene(ctx,cv,{key:1,blocked:1});
 };
 
