@@ -820,5 +820,30 @@
       ],
       "anim": "ode_eulerdrift"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "If you know exactly how fast something is changing right now, you can work out where it ends up.",
+    "body": [
+      "Fill a bath and pull the plug. The fuller it is, the faster it drains — more water above means more push at the plughole. So the rate of change depends on how much is there right now.",
+      "That sentence is an equation of this kind. You are not told the water level over time. You are told a RULE connecting the level to how fast it is changing, and asked to work out the rest.",
+      "Enormous amounts of the world are described this way. A population grows faster when there are more of it. A hot cup cools faster when it is further above room temperature. A spring pulls harder the further you stretch it. In each case you know the rule for change, not the answer.",
+      "Sometimes you can solve it exactly and get a clean formula. Usually you cannot, and then you step forward in tiny increments — where is it now, how fast is it changing, so where is it a moment later — and let a computer take millions of tiny steps.",
+      "Every weather forecast, every spacecraft trajectory, every model of a spreading disease is that same stepping forward. The rule for change is the thing we can actually observe; the future is what we work out from it."
+    ],
+    "aha": [
+      {
+        "title": "The rule is easier to find than the answer",
+        "text": "Nobody could look at a cooling cup and guess the formula for its temperature. But anyone can spot that it cools faster when it is hotter than the room. Physics is often easier to state as a rule about change than as an answer."
+      },
+      {
+        "title": "Tiny steps drift",
+        "text": "Stepping forward in small increments always accumulates a little error, and over enough steps that error can grow into nonsense. Knowing how much to trust a long simulation is a real skill, and it is why forecasts get vaguer further out."
+      },
+      {
+        "title": "Same equation, different worlds",
+        "text": "The equation for a cooling cup, a draining bath and a decaying radioactive lump is the same equation. Learn it once and you have learned all three. That repetition across unrelated subjects is what makes the maths worth the effort."
+      }
+    ],
+    "closer": "Tell me how it is changing, and I will tell you where it goes."
+  }
 }

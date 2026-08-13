@@ -886,5 +886,30 @@
       "anim": "nn_training"
     }
   ],
-  "order": 1
+  "order": 1,
+  "preface": {
+    "hook": "Nobody told it what a cat looks like. It guessed, was wrong, and nudged itself — a few million times.",
+    "body": [
+      "Imagine a machine with a hundred thousand little dials on it. Pictures go in one end, and out the other end comes a guess: cat, or not a cat. At the start every dial is set randomly, so the guesses are pure nonsense.",
+      "Now show it a picture of a cat. It guesses 'not a cat'. Wrong. Here is the clever part: the machine can work out, for every single dial, which way to turn it a tiny bit so the answer would have been slightly less wrong. So it turns all of them, a tiny bit.",
+      "One picture barely changes anything. But do it with a million pictures, over and over, and the dials drift into a setting that gets it right. Nobody chose those settings. Nobody could — there are far too many, and no person could explain what most of them do.",
+      "That is a neural network. It is not a brain, and it does not think. It is an enormous pile of dials, tuned by being wrong over and over until it stops being wrong so often.",
+      "This matters because it flips how software gets made. Normally a person writes the rules. Here, nobody writes the rules — you supply examples and a way to measure wrongness, and the rules build themselves. It also explains the strange failures: a system that learned only from examples has no idea what to do with something unlike anything it ever saw."
+    ],
+    "aha": [
+      {
+        "title": "Being wrong is the fuel",
+        "text": "The whole thing runs on error. If the machine were right the first time there would be nothing to learn from. This is why these systems need mountains of examples — each mistake is one small nudge, and it takes an enormous number of nudges."
+      },
+      {
+        "title": "Nobody can read the answer out",
+        "text": "You can look at every dial and still not be able to say why it decided 'cat'. The knowledge is spread across all of them, not stored anywhere you can point to. That is genuinely awkward when the decision matters — like a loan, or a diagnosis."
+      },
+      {
+        "title": "It only knows what it was shown",
+        "text": "A network trained only on daytime photos can be hopeless at night. It never learned what a cat IS — it learned what the pictures it saw had in common. Those are not the same thing, and the gap is where most real failures live."
+      }
+    ],
+    "closer": "No rules were written. The examples wrote them."
+  }
 }

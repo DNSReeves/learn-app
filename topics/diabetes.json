@@ -705,5 +705,30 @@
       "resources": [],
       "anim": "dia_receptors"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Sugar in your blood cannot get into your cells on its own. It needs a key — and diabetes is a problem with the key.",
+    "body": [
+      "Eat a slice of bread and it becomes sugar in your blood within minutes. Your cells want that sugar; it is their fuel. But they cannot simply absorb it. The door has to be unlocked from outside.",
+      "The key is insulin, made by your pancreas. Blood sugar rises, insulin is released, doors open, sugar moves out of the blood and into cells where it is used or stored. Sugar level falls back. That loop runs quietly every time you eat.",
+      "There are two main ways it breaks. In type 1, the body's own defences destroy the cells that make insulin — no key gets made at all. This usually starts young, is not caused by anything the person did, and needs insulin from outside for life.",
+      "In type 2, insulin is still being made, but the doors have stopped responding to it. The pancreas compensates by making more and more, sometimes for years, until it cannot keep up. This is the common kind and it builds slowly and silently.",
+      "Either way sugar piles up in the blood, where it does not belong. That is the damage: over years, high blood sugar quietly harms the smallest vessels — in eyes, kidneys, nerves and feet. Almost everything in diabetes care is about keeping that level in a safe band."
+    ],
+    "aha": [
+      {
+        "title": "Two different diseases, one name",
+        "text": "Type 1 and type 2 share a symptom and almost nothing else — different causes, different ages, different treatments. Sharing a name has caused a great deal of unfair blame aimed at people with type 1."
+      },
+      {
+        "title": "The damage is silent for years",
+        "text": "High blood sugar does not hurt. Someone can feel completely well while damage accumulates in the background, which is exactly why it is screened for rather than waited for."
+      },
+      {
+        "title": "Muscles have a second door",
+        "text": "Working muscle can pull sugar out of the blood without insulin at all. That is why a walk after a meal lowers blood sugar, and why exercise is genuinely treatment here rather than general good advice."
+      }
+    ],
+    "closer": "The sugar is not the problem. Being locked out of the cells is."
+  }
 }

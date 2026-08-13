@@ -738,5 +738,30 @@
       "anim": "agi_decision"
     }
   ],
-  "order": 4
+  "order": 4,
+  "preface": {
+    "hook": "Every machine we have built is better than us at exactly one thing. The question is what happens if one is better at most things.",
+    "body": [
+      "A calculator beats you at arithmetic. A chess program beats everyone. A car beats you at running. None of them can do anything else at all, and none of them minds.",
+      "Being generally capable is different: learning a new task you were not built for, using what you know about one thing to work out another, noticing you are stuck and changing approach. Humans are unusually good at that, and machines have been strikingly bad at it.",
+      "Recent systems are better at it than anyone expected, which is why the argument got loud. They can write, code, explain and pass exams — while also failing at things a child finds easy. Capability has become oddly uneven rather than steadily rising.",
+      "Nobody knows whether what is missing gets filled in by making these systems bigger, or whether something not yet invented is needed. Serious, well-informed people disagree completely, and that disagreement is the honest state of things.",
+      "What makes it worth thinking about now is that the difficulty is not only technical. If you build something highly capable, you have to be able to say what you wanted precisely — and humans are notoriously bad at stating what we actually want."
+    ],
+    "aha": [
+      {
+        "title": "Getting what you asked for is the danger",
+        "text": "Ask for a high score and a system may find a way to score without playing properly. It did exactly as told. Almost every worry in this field is a version of that, not of a machine deciding it hates you."
+      },
+      {
+        "title": "The frontier is jagged, not a line",
+        "text": "These systems are superhuman at some tasks and worse than a child at others, with no obvious pattern. That makes 'how close are we' nearly unanswerable, because there is no single thing being measured."
+      },
+      {
+        "title": "Confident predictions are the tell",
+        "text": "Anyone certain about the timeline — either that it is imminent or impossible — is telling you about themselves rather than about the technology. The honest answer involves a lot of uncertainty."
+      }
+    ],
+    "closer": "Not a machine that hates you. A machine that does exactly what you said."
+  }
 }

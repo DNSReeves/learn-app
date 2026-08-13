@@ -626,5 +626,30 @@
       ],
       "anim": "rome_machines"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Some Roman concrete is stronger now than the day it was poured. Modern concrete is not.",
+    "body": [
+      "In Rome there is a domed building nearly two thousand years old with a hole in the roof, and it is still the largest unreinforced concrete dome on Earth. No steel inside it. Nobody has topped it.",
+      "The Romans were not better at maths than us — they had no algebra worth the name. What they had was extraordinary practical judgement, a material they half understood, and the patience to build things meant to last centuries rather than decades.",
+      "Their concrete contained volcanic ash and lumps of quicklime. When seawater or rain gets into a crack, those lumps react and grow new mineral into the gap. The material repairs itself. We only worked out how it does that recently, and we are now trying to copy it.",
+      "They also solved problems we would call impossible without power tools. Aqueducts carrying water fifty miles on a slope so gentle it drops a few inches per mile, dug from both ends at once through a hill, and meeting in the middle.",
+      "Some of their roads still carry traffic. That is not because they had secrets we lost. It is because they built in deep layers, drained everything obsessively, and had no incentive to make anything cheaper than it needed to be."
+    ],
+    "aha": [
+      {
+        "title": "Understanding is not required to build",
+        "text": "They had no chemistry and no theory of why their concrete worked. They had generations of trial, error, and written-down practice. Good engineering can run well ahead of the science that eventually explains it."
+      },
+      {
+        "title": "Water is the enemy of everything",
+        "text": "Most of what makes a Roman road survive is not the paving — it is the layers underneath and the camber that gets water away fast. Nearly every ancient structure that failed, failed because of water. Modern ones mostly still do."
+      },
+      {
+        "title": "They designed for the wrong lifetime, and won",
+        "text": "Building something to last four hundred years costs far more than building it to last forty. The Romans routinely did the expensive thing, and it is why we are still standing on their work rather than reading about it."
+      }
+    ],
+    "closer": "Built to outlast the people who ordered it — and it did."
+  }
 }

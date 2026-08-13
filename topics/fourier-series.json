@@ -682,5 +682,30 @@
       ],
       "anim": "fs_transform"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Play three piano keys at once and the air carries one wobbly wave. Your ear pulls the three notes back out of it.",
+    "body": [
+      "Sound reaches you as a single squiggle — air pressure going up and down. When a whole orchestra plays, that is still just one squiggle arriving at your eardrum. Somehow you hear a violin and a drum separately, out of one wiggling line.",
+      "That is possible because a complicated wave can always be built by stacking simple ones. Pure tones, each a smooth repeating wave, added together. Get the right ingredients at the right loudnesses and you can rebuild any repeating shape at all.",
+      "It works in reverse too, and that is the useful direction. Hand over a messy wave and there is a procedure that tells you exactly which pure tones went into it, and how much of each. You can take the recipe back out of the cake.",
+      "This turns out to be one of the most useful ideas anyone has ever had. Your phone compresses music by finding tones your ear will not miss and throwing them away. Noise-cancelling headphones find the rumble and play its exact opposite. Doctors read heart traces this way.",
+      "Even a square-cornered wave — up, flat, straight down — can be built from smooth round tones, if you are willing to stack up enough of them. That one seems impossible until you watch it happen."
+    ],
+    "aha": [
+      {
+        "title": "Your ear does this in real time",
+        "text": "Inside your ear is a coiled tube, and different spots along it respond to different pitches. It physically splits the incoming squiggle into ingredient tones before your brain gets involved. The mathematics was worked out long after the ear was doing it."
+      },
+      {
+        "title": "Sharp corners cost a lot",
+        "text": "Smooth waves are cheap to build from a few tones. Sharp edges need very many, and no matter how many you add, a small overshoot stays at the corner. That stubborn little wobble has a name and it shows up in real recordings."
+      },
+      {
+        "title": "It is why files can shrink",
+        "text": "Music and photos compress because most of the ingredients contribute almost nothing that a person would notice. Find those, drop them, keep the rest. That is roughly what MP3 and JPEG are doing."
+      }
+    ],
+    "closer": "Any repeating shape is a stack of simple waves, waiting to be listed."
+  }
 }

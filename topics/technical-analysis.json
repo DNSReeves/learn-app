@@ -875,5 +875,30 @@
       ],
       "anim": "ta_playbook"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "A price chart is a record of what millions of people did with their money. Some patterns are footprints. Some are clouds that look like faces.",
+    "body": [
+      "Every price on a chart is the point where a buyer and a seller agreed. Draw them over months and you get a picture of a long argument between crowds of people about what something is worth.",
+      "People notice shapes in that picture and give them names. Some of it is real: prices genuinely do stall near levels where lots of people previously bought, because those people remember and act again. Crowds have memory, and memory leaves marks.",
+      "But humans see patterns in everything, including noise. Show someone a chart of pure coin flips and they will find trends, reversals and support levels, and be quite certain. That is the trap sitting at the centre of the subject.",
+      "So the only honest way to use it is to test. Take a rule, apply it mechanically across decades of history, and count. Most things that look compelling on a chart evaporate the moment you check them properly.",
+      "A few survive. Trends that have persisted often continue a while longer, more than chance would explain. That is a small, real, well-documented edge — and it is a long way from the confident lines people draw on screens."
+    ],
+    "aha": [
+      {
+        "title": "You will find patterns in randomness",
+        "text": "Generate a fake chart from coin flips and it will contain textbook shapes. Your eyes cannot tell the difference. This is why 'it looks obvious on the chart' is not evidence of anything."
+      },
+      {
+        "title": "Some of it is self-fulfilling — for a while",
+        "text": "If enough people believe a level matters and act on it, it does matter, briefly. That makes such effects real but fragile: they can vanish the moment the crowd's attention moves elsewhere."
+      },
+      {
+        "title": "Testing is the whole discipline",
+        "text": "The difference between someone doing this seriously and someone drawing lines is that the serious one counted. Rules get checked against history, including the periods where they failed badly."
+      }
+    ],
+    "closer": "Crowds leave real footprints. They also leave shapes that mean nothing."
+  }
 }

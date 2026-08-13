@@ -831,5 +831,30 @@
       "anim": "llm_goodhart"
     }
   ],
-  "order": 2
+  "order": 2,
+  "preface": {
+    "hook": "It has read nearly everything ever written, and all it does is guess the next word. That should not work as well as it does.",
+    "body": [
+      "The machine behind a chatbot has one job: given some text, guess what comes next. That is it. Feed it 'the capital of France is' and it produces 'Paris', because in everything it read, that is what followed.",
+      "It learned by being shown staggering amounts of text with the next word hidden, guessing, and being corrected — billions of times. Nobody taught it grammar or facts. Both fell out of getting very good at guessing.",
+      "Here is the surprising part. To guess the next word really well, across everything people write, you end up having to represent quite a lot: that Paris is in France, that a sad story continues sadly, how an argument is structured. Prediction turns out to require understanding-shaped machinery.",
+      "But it is still prediction. It has no way to check anything against the world. When it does not know, it does not go quiet — it produces the most plausible-sounding continuation, which is why it can be confidently, fluently wrong.",
+      "Holding both halves at once is the skill. It is genuinely useful and it is genuinely not a knower of facts. Treat it as an extremely well-read colleague who never says 'I am not sure' and you will use it about right."
+    ],
+    "aha": [
+      {
+        "title": "Confidence carries no information",
+        "text": "It sounds exactly as certain when inventing a citation as when quoting a real one, because both are just plausible continuations. There is no internal signal of doubt to leak into the wording."
+      },
+      {
+        "title": "Nobody wrote the rules",
+        "text": "No one programmed in grammar or facts. They emerged from prediction practice, which is why nobody can point inside and show you where 'Paris is in France' is stored."
+      },
+      {
+        "title": "It is frozen at a moment",
+        "text": "Everything it learned came from text gathered up to a certain date. Ask about last week and it either has a separate lookup bolted on, or it will cheerfully make something up."
+      }
+    ],
+    "closer": "Guess the next word, a trillion times, and something strange starts happening."
+  }
 }

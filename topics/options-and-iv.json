@@ -965,5 +965,30 @@
       ],
       "anim": "opt_failure"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Pay a small amount now for the right to decide later. That is an option, and almost everything else is working out the fair price of that right.",
+    "body": [
+      "Imagine paying a shop five pounds to hold a bike at today's price for a month. If the price rises, you buy at the old price and you are ahead. If it falls, you walk away and lose your five pounds. You bought the right to choose, not the bike.",
+      "That is an option. The most you can lose is what you paid. The upside can be much larger. That lopsidedness is why they are useful — and why they can be dangerous when people buy them for the wrong reason.",
+      "So what should the right to decide cost? Mostly it depends on how much the price is likely to move. If the bike price never budges, the option is nearly worthless. If it swings wildly, the chance of a big win is larger and the right costs more.",
+      "So the price of an option is really a statement about expected movement. Turn that around — look at what people are paying and work backwards — and you learn what the crowd expects. That number has a name, and it is watched closely.",
+      "The catch is that you also pay for time. Every day that passes, an unused option is worth slightly less, because there is less remaining chance for things to move. Being right eventually is not enough; you have to be right before it expires."
+    ],
+    "aha": [
+      {
+        "title": "You can be right and still lose",
+        "text": "If the move you predicted happens a month after your option expires, you get nothing. Options require being right about direction AND timing, which is much harder than direction alone."
+      },
+      {
+        "title": "The price tells you what people expect",
+        "text": "Expensive options mean the crowd is braced for large movement. That number spikes before big announcements and during panics — it is a fear gauge readable straight off the market."
+      },
+      {
+        "title": "Selling them inverts the risk",
+        "text": "Buy an option and you risk a small amount for a large possible gain. Sell one and you collect a small amount while taking on a large possible loss. Both are legitimate; confusing which side you are on has ruined people."
+      }
+    ],
+    "closer": "You are not buying the thing. You are buying the right to change your mind."
+  }
 }

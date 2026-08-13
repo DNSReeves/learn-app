@@ -621,5 +621,30 @@
       "anim": "bio_scaling"
     }
   ],
-  "order": 1
+  "order": 1,
+  "preface": {
+    "hook": "Your heart is a pump, your bones are levers, your lungs are bellows. The body does not get to break physics.",
+    "body": [
+      "It is tempting to treat living things as a separate kind of thing, running on some special spark. They are not. Blood obeys the same rules as water in a pipe. A bone under load bends like any beam.",
+      "That is good news, because it means you can predict a body. Narrow a blood vessel and pressure has to rise, for exactly the reason a thumb over a hose speeds up the water. Not roughly like it — the same equation.",
+      "Take the heart. A hollow muscle squeezes, valves stop the blood going backwards, and it pushes roughly five litres a minute for eighty years without a service. Stretch its walls a bit more before a beat and it squeezes harder — the heart matches whatever comes back to it, automatically, with nothing telling it to.",
+      "Most of the body works like that: not a boss issuing orders, but parts arranged so the right thing happens on its own. Get too hot and you sweat before you have decided anything. Stand up and your vessels tighten before your brain notices.",
+      "Learn the physics and a great deal of medicine stops being a list to memorise. Why does that drug lower blood pressure? Because of where it acts in a system of pipes and pumps you can now reason about."
+    ],
+    "aha": [
+      {
+        "title": "The heart tunes itself",
+        "text": "Fill it more and the next beat is stronger — a property of the muscle itself, no nerves involved. It is why a transplanted heart, cut off from its nerves, still keeps up when you climb stairs."
+      },
+      {
+        "title": "Most control needs no controller",
+        "text": "There is no committee deciding your temperature. There are parts wired so that too hot triggers cooling, which stops when it is cool enough. Thermostats work the same way, and so does almost everything keeping you alive."
+      },
+      {
+        "title": "Small changes in a tube are enormous",
+        "text": "Halve a vessel's width and flow through it drops about sixteen-fold, not two-fold. That fourth-power sensitivity is why tiny amounts of narrowing matter so much, and why the body controls vessel width so obsessively."
+      }
+    ],
+    "closer": "Not a special kind of matter. A very well-arranged one."
+  }
 }

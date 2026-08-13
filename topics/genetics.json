@@ -1749,5 +1749,30 @@
       ]
     }
   ],
-  "order": 1
+  "order": 1,
+  "preface": {
+    "hook": "Every cell in you carries the same instruction book. What makes them different is which pages they read.",
+    "body": [
+      "Inside almost every cell of your body sits the same set of instructions, written in an alphabet of just four letters, about three billion letters long. Your eye cells have it. Your skin cells have it. They all have the identical book.",
+      "So why is an eye not a toenail? Because cells read different pages. An eye cell keeps most of the book firmly shut and works from the eye chapter. The instructions for building a toenail are sitting right there in that eye cell, unread, the entire time.",
+      "The book gets copied every time a cell divides, which is constantly. Copying three billion letters by hand would produce typos, and copying by machinery does too — just very rarely. Most typos land on a page nobody was reading and nothing happens. Occasionally one lands somewhere that matters.",
+      "You got your book from your parents: roughly half from each, shuffled. That is why you resemble them without being either of them, and why a brother or sister got a different shuffle of the same two books.",
+      "Almost nothing about you traces back to one line of the book. Height, say, is nudged by hundreds of spots, each worth a fraction of an inch, plus how well you ate growing up. When someone says a gene 'for' something, be suspicious — that phrasing is nearly always doing too much work."
+    ],
+    "aha": [
+      {
+        "title": "The book is not a blueprint",
+        "text": "A blueprint shows the finished building. This is more like a recipe — instructions carried out in order, where timing and conditions change the result. Two cakes from one recipe can come out differently, and cells work the same way."
+      },
+      {
+        "title": "Most of it is not genes at all",
+        "text": "Only a small slice of the three billion letters spells out instructions for building things. Much of the rest decides WHEN pages get read, which turns out to be just as important. It was written off as junk for decades, and that was wrong."
+      },
+      {
+        "title": "Inherited is not the same as unchangeable",
+        "text": "You cannot swap the book you were given. But which pages get read responds to food, sleep, exercise and medicine. 'It runs in my family' describes where you started, not where you have to finish."
+      }
+    ],
+    "closer": "One book, read differently in every room of the house."
+  }
 }

@@ -925,5 +925,30 @@
   "order": 3,
   "prereqs": [
     "llms"
-  ]
+  ],
+  "preface": {
+    "hook": "A calculator waits for you. An agent goes off and does things — which is a much bigger difference than it sounds.",
+    "body": [
+      "A normal program does exactly what it was told, once, and stops. You ask a calculator for eight times seven and it answers. It has no plan and nothing to decide.",
+      "An agent is given a goal instead of an instruction. Book me a table somewhere nice on Friday. Now it has to work out steps, look things up, notice when something failed, and try again differently.",
+      "That is built by looping. It thinks about what to do, takes one action, looks at what happened, and repeats. The looping is the entire trick — a single answer becomes a sequence of moves that respond to what it finds.",
+      "Which introduces a problem that did not exist before: it can be wrong in the middle and carry on confidently. A calculator giving one wrong answer is one wrong answer. An agent misreading step two can spend twenty more steps building on the mistake.",
+      "So most of the real work is not making them capable. It is making them checkable — proving what they actually did, limiting what they are allowed to touch, and having them stop and ask rather than guess when the goal is unclear."
+    ],
+    "aha": [
+      {
+        "title": "The loop is the whole idea",
+        "text": "Take away 'look at the result and decide the next move' and you have an ordinary program again. Everything impressive and everything alarming about agents comes from that one addition."
+      },
+      {
+        "title": "Errors compound",
+        "text": "A small misunderstanding early gets built upon, so by step fifteen the work can be confidently and completely wrong. This is why good agent design checks progress rather than only checking the final answer."
+      },
+      {
+        "title": "Permissions matter more than cleverness",
+        "text": "The interesting question is rarely 'can it do this'. It is 'what can it reach, and what happens if it is wrong'. An agent that can only read is a very different proposition from one that can send and delete."
+      }
+    ],
+    "closer": "Give it a goal instead of an instruction, and everything changes."
+  }
 }

@@ -1322,5 +1322,30 @@
       ],
       "anim": "etf_bestdays"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "You can own a tiny slice of five hundred companies at once, for the price of one share, and pay almost nothing for it.",
+    "body": [
+      "Buying shares in one company means your money rides on that company. If it does well you do well. If it burns down, so does your money. Picking the right one is hard — professionals who do it full time mostly do not beat simply owning everything.",
+      "So instead, imagine a big shared pot. Thousands of people put money in, and the pot buys a small piece of every large company in the country. You buy a share of the pot. Now you own a sliver of all of them.",
+      "That is an ETF. One company going bust barely dents it, because it was only ever a fraction of a percent of what you hold. You have swapped the chance of a spectacular win for a far smaller chance of a disaster.",
+      "The other half of the story is cost. Someone picking shares for you charges real money every year — often one or two percent. A pot that simply holds everything needs almost no decisions, so it can charge a tiny fraction of that.",
+      "That difference sounds trivial and is not. Over decades, fees compound exactly like returns do, just against you. The unglamorous move — own everything, pay almost nothing, wait a long time — beats most clever ones."
+    ],
+    "aha": [
+      {
+        "title": "Doing nothing is a strategy, and a good one",
+        "text": "It feels like you ought to be picking, timing, reacting. The evidence is unkind to that instinct. Most of the gain goes to people who bought sensible things and then left them alone for a very long time."
+      },
+      {
+        "title": "Small fees are not small",
+        "text": "One percent a year sounds like a rounding error. Over forty years it can quietly consume a quarter of what you would have had. It is charged whether the year was good or bad."
+      },
+      {
+        "title": "Spreading out is not free of risk",
+        "text": "Owning everything protects you from any single company failing. It does not protect you when the whole market falls at once, which it does, sometimes badly. Diversification handles one kind of danger and not the other."
+      }
+    ],
+    "closer": "Own a little of everything, pay almost nothing, and be patient."
+  }
 }

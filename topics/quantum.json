@@ -1,0 +1,810 @@
+{
+  "id": "quantum",
+  "title": "Quantum Physics & Quantum Computing",
+  "tagline": "Not spooky, not parallel universes. Amplitudes that cancel — and a machine built to exploit it.",
+  "category": "Physics & Engineering",
+  "description": "The physics first, then the machine: why a quantum state is a vector of amplitudes rather than a list of probabilities, what measurement actually does, and why a quantum computer's advantage comes from interference rather than from trying every answer at once. Written for someone comfortable with calculus and linear algebra who wants the honest version, including where the speedups do not apply.",
+  "prereqs": [
+    "calculus"
+  ],
+  "intro": {
+    "hook": "The single most repeated sentence about quantum computers — that they try every answer at once — is wrong, and believing it makes the whole subject impossible to understand.",
+    "body": [
+      "A quantum state is not a probability distribution. It is a vector of complex amplitudes, and amplitudes can be negative — or complex — so they can cancel. Everything strange about quantum mechanics, and everything useful about quantum computing, follows from that one difference.",
+      "This course builds the physics before the machine, because the machine is unintelligible without it. Superposition, interference, measurement, and entanglement come first; qubits, gates, and algorithms follow as engineering consequences.",
+      "The tone is deliberate: no wave-particle mysticism, no consciousness, no many-worlds advocacy. Where physicists genuinely disagree — chiefly about what measurement *is* — the course says so and marks the boundary between the mathematics everyone agrees on and the interpretation nobody has settled.",
+      "You will also learn where quantum computers are *not* faster, which is most places. The honest speedup list is short, and knowing its shape is more useful than any amount of enthusiasm."
+    ],
+    "why": [
+      {
+        "title": "It is the deepest working theory we have",
+        "text": "Quantum mechanics underwrites chemistry, semiconductors, lasers, MRI and the stability of matter itself. No prediction of it has ever failed a test — to twelve significant figures in the best cases."
+      },
+      {
+        "title": "The computing story is now an engineering story",
+        "text": "The question stopped being 'is this possible' and became 'what does error correction cost'. That is a question with numbers in it, and the numbers are the interesting part."
+      },
+      {
+        "title": "It sharpens how you read a claim",
+        "text": "Few fields are surrounded by more confident nonsense. Learning where the mathematics stops and the interpretation begins is transferable well beyond physics."
+      }
+    ],
+    "closer": "Start with amplitudes. Everything else is a consequence."
+  },
+  "concepts": [
+    {
+      "id": "c01-amplitudes",
+      "title": "States Are Amplitudes, Not Probabilities",
+      "summary": "A quantum state is a complex vector; probabilities are what you get by squaring it, and that squaring is where the strangeness enters.",
+      "cards": [
+        {
+          "h": "The one structural difference",
+          "md": "Classical uncertainty is a **probability distribution**: a coin is heads with probability 0.5 and tails with 0.5, the numbers are non-negative, and they add to 1.\n\nA quantum state instead assigns a **complex amplitude** to each outcome, and it is the *squared magnitude* of the amplitude that gives the probability.\n\n## |ψ⟩ = α|0⟩ + β|1⟩,  with |α|² + |β|² = 1\n\nThe amplitudes α and β are complex numbers. The probabilities |α|² and |β|² behave normally. But the amplitudes underneath do not: they can be **negative**, or complex, and that means two contributions to the same outcome can *cancel*.\n\nNothing in classical probability can cancel. Two routes to an outcome always make it more likely, never less. That single asymmetry is the source of every quantum effect in this course."
+        },
+        {
+          "h": "Superposition is not 'both at once'",
+          "md": "The popular gloss — the particle is in both states simultaneously — is misleading because it suggests a *fact of the matter* that we merely fail to observe.\n\nA cleaner reading: |ψ⟩ = α|0⟩ + β|1⟩ is a **vector in a two-dimensional complex space**, and |0⟩ and |1⟩ are two chosen basis directions. The state is no more 'both' than a vector pointing northeast is 'both north and east'. It is one state, expressed in a basis that happens not to align with it.\n\nThis matters practically: superposition is **basis-dependent**. A state that is a superposition in one measurement basis is a definite outcome in another. If someone says a system 'is in superposition' without naming the basis, the statement is incomplete."
+        },
+        {
+          "h": "Why complex numbers, and not just signs",
+          "md": "Real amplitudes with signs would already give you cancellation. Complex ones give you something more: a **relative phase** that varies continuously.\n\nTwo states differing only by an overall factor e^{iθ} are physically identical — a **global phase is unobservable**. But a *relative* phase between components,\n\n## |0⟩ + e^{iφ}|1⟩\n\nis absolutely observable, because it controls how the components interfere when you rotate the basis before measuring.\n\nThat distinction — global phase meaningless, relative phase physical — is one of the most common places to go wrong, and it returns in every later concept."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A state has amplitudes α = 0.6 and β = −0.8. What is the probability of measuring outcome 1?",
+          "options": [
+            "−0.8",
+            "0.64",
+            "0.8",
+            "The negative sign makes the state invalid"
+          ],
+          "answer": 1,
+          "feedback": [
+            "This treats the amplitude as if it were the probability. Amplitudes can be negative; probabilities cannot. The probability is the squared magnitude.",
+            "Correct: |β|² = (−0.8)² = 0.64. Note that the sign vanishes in the probability — which is precisely why the sign can only ever reveal itself through interference with another path.",
+            "This is the magnitude |β|, not its square. Magnitudes are amplitudes stripped of phase; probabilities require squaring.",
+            "Negative amplitudes are entirely legitimate and are the whole point. The only requirement is that the squared magnitudes sum to 1, and 0.36 + 0.64 = 1 here."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Two experimenters prepare the same physical state. One writes it as |0⟩ + |1⟩ (normalised); the other writes it as e^{iπ/4}(|0⟩ + |1⟩). What differs physically?",
+          "options": [
+            "Nothing — they describe the same physical state",
+            "The second has different measurement probabilities",
+            "The second is a superposition and the first is not",
+            "They differ only if measured in the |0⟩/|1⟩ basis"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct: the factor is a global phase, common to every component, so it cancels in every predicted probability. Only relative phases between components are observable.",
+            "A global phase multiplies both components equally, so every squared magnitude is unchanged — in any basis.",
+            "Both are the same superposition; multiplying a vector by a unit complex number does not change what it is a superposition of.",
+            "A global phase is unobservable in every basis, not just this one. That is what makes it global."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A colleague says an electron 'is in superposition'. What is the most important thing missing from that claim?",
+          "options": [
+            "Which basis the superposition is with respect to",
+            "Whether the electron has been observed yet",
+            "The electron's position",
+            "Whether the amplitudes are real or complex"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct: superposition is basis-relative. The state |0⟩+|1⟩ is a superposition in the computational basis but is a definite outcome in the basis containing it. Without naming a basis the claim has no content.",
+            "Observation matters for what happens next, but it does not repair the claim: even an unobserved state is only 'in superposition' relative to some chosen basis.",
+            "Position is one possible observable, but the omission is general — any observable defines its own basis, and the claim is incomplete for all of them.",
+            "Whether the amplitudes are real or complex affects the relative phase, but a real-amplitude superposition is still a superposition. The basis is the missing piece."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Feynman Lectures on Physics, Volume III — Chapter 1",
+          "url": "https://www.feynmanlectures.caltech.edu/III_01.html",
+          "type": "reading",
+          "note": "Feynman opens the whole subject with the two-slit experiment and the amplitude rule, in plain language and without apology. Still the best first chapter written on this."
+        }
+      ]
+    },
+    {
+      "id": "c02-interference",
+      "title": "Interference: Where the Minus Sign Earns Its Keep",
+      "summary": "Add amplitudes before squaring, and paths to the same outcome can cancel — the effect no classical probability model can imitate.",
+      "cards": [
+        {
+          "h": "The rule that produces everything",
+          "md": "When a system can reach the same final outcome by several **indistinguishable** routes, you add the *amplitudes* and square the total:\n\n## P = |A₁ + A₂|²   — not   |A₁|² + |A₂|²\n\nExpanding gives |A₁|² + |A₂|² + 2·Re(A₁*A₂). That last term is the **interference term**. It can be positive, zero, or negative.\n\nIf A₂ = −A₁, the total is zero: two ways of arriving, and the outcome never happens. Classically that is impossible — adding a second route to an outcome cannot reduce its frequency.\n\nEvery quantum algorithm in this course is an exercise in arranging for the wrong answers to have amplitudes that cancel."
+        },
+        {
+          "h": "Indistinguishable is the load-bearing word",
+          "md": "Interference requires that the routes be **fundamentally indistinguishable** — not merely that you did not look.\n\nIf anything anywhere in the universe records which path was taken, the routes become distinguishable and the interference term vanishes. The probabilities then add classically. This is **decoherence**, and it is not a matter of a conscious observer noticing: a stray air molecule scattering off the system is a perfectly good record.\n\nThe practical consequence dominates the entire engineering effort of quantum computing. Keeping paths indistinguishable means keeping the machine isolated from everything, while still controlling it precisely — two requirements in direct tension."
+        },
+        {
+          "h": "A worked cancellation",
+          "md": "Take a state (|0⟩ + |1⟩)/√2 and apply an operation that maps |0⟩ → (|0⟩+|1⟩)/√2 and |1⟩ → (|0⟩−|1⟩)/√2. This is the **Hadamard**, and it is its own inverse.\n\nTrack the amplitude of |1⟩ in the result:\n\n- from the |0⟩ component: +1/2\n- from the |1⟩ component: −1/2\n\nThey sum to **zero**. The outcome 1 has become impossible, from a state where it had probability one-half.\n\nNothing was measured, nothing was discarded. The amplitude was simply routed into the other outcome. That is the entire trick, and the rest of quantum computing is doing it with more qubits."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Two paths lead to the same outcome with amplitudes +0.5 and −0.5. What is the probability of that outcome?",
+          "options": [
+            "0.5",
+            "0.25",
+            "0",
+            "0.125"
+          ],
+          "answer": 2,
+          "feedback": [
+            "This adds the magnitudes as if they were probabilities. Amplitudes must be added first, with their signs.",
+            "This squares each amplitude and adds the results — the classical rule. It is exactly the rule quantum mechanics violates when paths are indistinguishable.",
+            "Correct: (+0.5) + (−0.5) = 0, and |0|² = 0. Two ways of getting there, and it never happens. This is destructive interference, and no classical probability model can reproduce it.",
+            "This looks like an average of the squared amplitudes. The rule is: sum the amplitudes, then square the sum."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "In a two-slit experiment, a detector is installed that records which slit each particle passed through — but the record is never read by anyone. What happens to the interference pattern?",
+          "options": [
+            "It disappears, because the paths are now distinguishable in principle",
+            "It remains, because no conscious observer read the record",
+            "It remains at half strength",
+            "It inverts — maxima become minima"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct: what destroys interference is the *existence* of which-path information anywhere, not anyone's knowledge of it. Consciousness plays no role in the mathematics.",
+            "This is the most persistent misconception in the subject. The record entangles the particle with the detector, and that alone makes the paths distinguishable. Reading it changes nothing.",
+            "Partial which-path information does give partial visibility, but a detector that fully records the path removes the interference entirely.",
+            "Inversion would require a phase shift, not path information. Which-path information removes the interference term rather than flipping its sign."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A designer wants an algorithm where the correct answer is much more likely than the wrong ones. In amplitude terms, what must the circuit arrange?",
+          "options": [
+            "Wrong answers receive amplitudes that cancel; the correct answer's amplitudes add in phase",
+            "The correct answer is measured more often by repeating the circuit",
+            "The correct answer is given a larger probability directly",
+            "The wrong answers are assigned negative probabilities"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct: this is the design problem of every quantum algorithm. You cannot write probabilities directly — you steer amplitudes so that unwanted outcomes destructively interfere.",
+            "Repetition helps average out noise, but it cannot create an advantage that the amplitudes do not already encode. A circuit with a flat amplitude distribution stays flat however often you run it.",
+            "There is no operation that sets a probability. Quantum evolution is unitary and acts on amplitudes; probabilities are a derived quantity.",
+            "Probabilities are always non-negative. It is the *amplitudes* that can be negative, and that is precisely the resource being exploited."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "MIT OpenCourseWare 8.04 — Quantum Physics I",
+          "url": "https://ocw.mit.edu/courses/8-04-quantum-physics-i-spring-2013/",
+          "type": "reading",
+          "note": "Full lecture notes and problem sets from a real first course. Worth it if you want the mathematics done properly rather than described."
+        }
+      ],
+      "anim": "qm_interference"
+    },
+    {
+      "id": "c03-measurement",
+      "title": "Measurement: The Born Rule and the Honest Gap",
+      "summary": "Measurement yields one outcome with probability equal to the squared amplitude — and why that happens is the one place the theory is genuinely unfinished.",
+      "cards": [
+        {
+          "h": "What everyone agrees on",
+          "md": "Measure |ψ⟩ = α|0⟩ + β|1⟩ in the computational basis and you get:\n\n- outcome 0 with probability |α|², after which the state is |0⟩\n- outcome 1 with probability |β|², after which the state is |1⟩\n\nThis is the **Born rule**, and it is not in dispute. It has been tested to extraordinary precision and no experiment has ever contradicted it.\n\nTwo consequences do the real work. First, measurement is **irreversible** — the discarded component is gone, unlike the unitary evolution everywhere else in the theory. Second, a single measurement tells you almost nothing: one sample from a distribution. Learning α and β requires many identically prepared copies."
+        },
+        {
+          "h": "What is genuinely unsettled",
+          "md": "*Why* one outcome occurs, rather than the superposition simply continuing, is not settled. The candidate answers — Copenhagen, many-worlds, pilot-wave, objective collapse — make **identical experimental predictions** in every test performed so far.\n\nThis is a real gap, and it is worth being precise about its size. It does not affect any calculation in this course. It is not evidence that quantum mechanics is shaky. And it is not resolved by any of the confident popular accounts.\n\nThe intellectually honest position: use the Born rule, which works perfectly, and treat the interpretation as an open question in the philosophy of physics rather than a settled fact you happen not to have been told."
+        },
+        {
+          "h": "The no-cloning consequence",
+          "md": "Because you cannot learn a state from one copy, an obvious workaround suggests itself: copy the state many times, then measure each copy.\n\nYou cannot. The **no-cloning theorem** proves no unitary operation can map |ψ⟩|0⟩ → |ψ⟩|ψ⟩ for arbitrary unknown |ψ⟩. The proof is three lines and follows from linearity alone.\n\nThis single fact shapes the field. It is why quantum error correction cannot work by making backup copies — and why quantum key distribution is secure, since an eavesdropper cannot copy the transmission without disturbing it."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "You are handed one qubit in an unknown state and measure it, getting 0. What have you learned about the original state?",
+          "options": [
+            "It was |0⟩",
+            "Only that its amplitude on |0⟩ was non-zero",
+            "That |α|² > 0.5",
+            "Nothing at all"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The state after measurement is |0⟩, but the state before it need not have been. Any state with a non-zero |0⟩ component could produce this result.",
+            "Correct: a single sample rules out only α = 0. It cannot distinguish α = 0.99 from α = 0.1 — that requires many identically prepared copies.",
+            "A more likely outcome is not a certain one. Getting 0 once is entirely consistent with |α|² = 0.01; it was simply the less likely branch.",
+            "You did learn something: α ≠ 0. It is a weak conclusion, but not an empty one."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Which statement about the measurement problem is accurate?",
+          "options": [
+            "The competing interpretations make different predictions, and experiments are narrowing them down",
+            "The Born rule's predictions are undisputed; why a single outcome occurs is unresolved",
+            "Many-worlds has been experimentally confirmed",
+            "The problem was solved by decoherence theory"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The main interpretations are constructed to be empirically equivalent. Some objective-collapse models do predict deviations and are being tested, but the headline interpretations are not separated by experiment.",
+            "Correct: this is the precise boundary. The predictive machinery is secure and universally used; the question of what selects one outcome is open, and honest treatments say so.",
+            "No interpretation has been experimentally confirmed over the others, because they agree on the observable predictions.",
+            "Decoherence explains beautifully why interference becomes unobservable and why the classical basis is picked out — but it does not by itself explain why one outcome is realised. It reframes the problem rather than closing it."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why can't quantum error correction simply keep spare copies of each qubit, the way classical systems keep backups?",
+          "options": [
+            "Copies would decohere at the same rate",
+            "The no-cloning theorem forbids copying an unknown state",
+            "There is not enough physical space for the copies",
+            "Copies would be entangled and therefore useless"
+          ],
+          "answer": 1,
+          "feedback": [
+            "They would decohere, but that is not the obstacle in principle. The obstacle is that the copies cannot be made at all.",
+            "Correct: no unitary can duplicate an arbitrary unknown state, which follows from linearity alone. Quantum error correction instead spreads one logical qubit across many physical ones and measures *only* the error, never the data.",
+            "Space is an engineering constraint, not a fundamental one — and error correction does in fact use very many physical qubits.",
+            "Entanglement is a resource error correction actively exploits, not a reason copying fails. Copying fails because it is mathematically impossible."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Stanford Encyclopedia of Philosophy — Bell's Theorem",
+          "url": "https://plato.stanford.edu/entries/bell-theorem/",
+          "type": "reading",
+          "note": "Careful, technically literate, and scrupulous about separating what is proven from what is interpreted. The antidote to popular writing on this subject."
+        }
+      ]
+    },
+    {
+      "id": "c04-qubit",
+      "title": "The Qubit and the Bloch Sphere",
+      "summary": "One qubit is two real parameters on a sphere — a picture that makes gates obvious and that stops working the moment you have two qubits.",
+      "cards": [
+        {
+          "h": "Two complex numbers, two real freedoms",
+          "md": "A qubit state α|0⟩ + β|1⟩ has two complex numbers — four real parameters. Normalisation removes one, and the unobservable global phase removes another, leaving **two**:\n\n## |ψ⟩ = cos(θ/2)|0⟩ + e^{iφ} sin(θ/2)|1⟩\n\nThose two angles are latitude and longitude on a sphere. **North pole is |0⟩, south pole is |1⟩**, and everything else is a superposition.\n\nThe equator is where the two outcomes are equally likely, and longitude φ there is the relative phase. Two states can have identical measurement statistics in the computational basis and still be different states — different points on the same latitude."
+        },
+        {
+          "h": "Gates are rotations",
+          "md": "Every single-qubit operation is a **rotation of this sphere**. That is not an analogy; the correspondence is exact.\n\n- **X** — 180° about the x-axis: the quantum NOT, swapping poles\n- **Z** — 180° about the z-axis: leaves probabilities alone, flips the relative phase\n- **H** (Hadamard) — 180° about the diagonal axis: maps a pole to the equator, turning a definite value into an equal superposition and back\n\nBecause rotations are invertible, **every quantum gate is reversible**. This is a genuine departure from classical logic, where AND discards information and cannot be undone. Reversibility is forced: unitary evolution has no way to erase."
+        },
+        {
+          "h": "Where the picture fails",
+          "md": "The Bloch sphere is so useful that it is worth stating its limit plainly: **it works only for a single qubit**.\n\nTwo qubits have a 4-dimensional complex state space — six real parameters after normalisation and global phase — and no three-dimensional picture captures it. There is no 'two Bloch spheres' representation of an entangled pair, because the whole content of entanglement is precisely what cannot be assigned to the parts separately.\n\nIf you find yourself reasoning about entanglement by imagining two arrows, you have left the mathematics behind. The next concept is about exactly that failure."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why does a single qubit need only two real parameters when two complex amplitudes contain four?",
+          "options": [
+            "Amplitudes are always real in practice",
+            "Normalisation removes one and the unobservable global phase removes another",
+            "The imaginary parts are negligible",
+            "Measurement destroys two of them"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Amplitudes are genuinely complex, and the relative phase between them is physically observable — it is longitude on the sphere.",
+            "Correct: |α|²+|β|² = 1 is one constraint, and multiplying the whole state by e^{iθ} changes nothing observable, removing another. Four minus two leaves the sphere's two angles.",
+            "The imaginary part carries the relative phase, which controls interference. Discarding it would discard the effect the entire subject rests on.",
+            "Measurement is not involved in counting the parameters of the state before it."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "The Z gate is applied to a qubit on the equator of the Bloch sphere. What changes?",
+          "options": [
+            "The measurement probabilities in the computational basis",
+            "Nothing observable",
+            "The relative phase, which is observable after a basis change",
+            "The state becomes |1⟩"
+          ],
+          "answer": 2,
+          "feedback": [
+            "Z rotates about the z-axis, so latitude — and therefore the computational-basis probabilities — is untouched.",
+            "This confuses relative phase with global phase. A relative phase shift is a genuine change of state: apply a Hadamard afterwards and it converts into a probability difference you can measure.",
+            "Correct: Z moves the state around the equator, changing longitude. Invisible to an immediate computational-basis measurement, decisive once you interfere the components.",
+            "Z leaves the poles fixed and never moves an equatorial state to a pole. It is X that swaps the poles."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A colleague draws two Bloch spheres to explain an entangled pair. What is wrong?",
+          "options": [
+            "Nothing — one sphere per qubit is the standard picture",
+            "The spheres should be drawn touching",
+            "An entangled pair has no valid description as two separate qubit states",
+            "Bloch spheres only apply to photons"
+          ],
+          "answer": 2,
+          "feedback": [
+            "It is standard for *unentangled* pairs, where each qubit does have its own state. Entanglement is exactly the case where it fails.",
+            "Geometry of the drawing is not the issue; the issue is that the individual states being drawn do not exist.",
+            "Correct: for an entangled state the parts have no individual pure states. All the information is in the correlations, which live in the joint 4-dimensional space and cannot be distributed onto two spheres.",
+            "The Bloch sphere applies to any two-level quantum system, whatever the physical implementation."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Quantum Computing for the Very Curious — Michael Nielsen",
+          "url": "https://quantum.country/qcvc",
+          "type": "interactive",
+          "note": "By the co-author of the standard graduate text, built around spaced repetition. The clearest treatment of qubits and gates written for people who want to actually retain it."
+        }
+      ]
+    },
+    {
+      "id": "c05-entanglement",
+      "title": "Entanglement and What Bell Actually Proved",
+      "summary": "Correlations stronger than any pre-agreed classical strategy can produce — and, importantly, no way to send a signal with them.",
+      "cards": [
+        {
+          "h": "A state that does not factor",
+          "md": "Consider two qubits in\n\n## (|00⟩ + |11⟩)/√2\n\nMeasure the first: outcome 0 or 1, each with probability one-half. Measure the second: the *same* answer, always, however far apart they are.\n\nWhat makes this more than ordinary correlation is that the state **cannot be written as a product** of two individual states. There is no |ψ₁⟩⊗|ψ₂⟩ equal to it — and this is a theorem, not a limit of ingenuity.\n\nThe consequence: each qubit alone has no definite state. The information is entirely in the relationship. Classically, correlated coins still each have their own value; here there is nothing to have a value."
+        },
+        {
+          "h": "Why 'they agreed in advance' fails",
+          "md": "The natural objection is that the pair simply carried matching instructions from the start — the socks-in-drawer explanation.\n\nBell's theorem rules this out. Any theory in which each particle carries pre-existing values for all measurements, and neither is influenced by the other's *setting*, obeys an inequality bounding the correlations across different measurement-angle combinations.\n\nQuantum mechanics predicts a violation of that bound. **Experiments violate it**, decisively, and the loopholes were closed by 2015. This is settled physics, and the 2022 Nobel Prize recognised it.\n\nSo the correlations are not explained by shared prior instructions. Something in that picture must go — most commonly, the assumption that unmeasured quantities have definite values."
+        },
+        {
+          "h": "No signalling, and why that matters",
+          "md": "It is tempting to conclude that measuring here changes something there, and that this could carry a message. It cannot.\n\nThe local outcome is random — 50/50 — no matter what the distant party does. Only when the two results are **brought together and compared** does the correlation appear, and that comparison requires an ordinary classical channel limited by the speed of light.\n\nThis is the **no-signalling theorem**, and it is not a lucky accident: it is provable from the structure of the theory.\n\nThe practical version: entanglement is a *correlation* resource, not a communication channel. Quantum teleportation, despite its name, moves a state only with two classical bits sent alongside."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Alice and Bob share the state (|00⟩+|11⟩)/√2 and are light-years apart. Alice measures and gets 0. What can Bob detect from his side alone?",
+          "options": [
+            "That Alice measured, from a change in his statistics",
+            "Nothing — his outcomes remain 50/50 regardless",
+            "His qubit is now definitely 0, which he can verify",
+            "A faint correlation appearing in real time"
+          ],
+          "answer": 1,
+          "feedback": [
+            "This would permit faster-than-light signalling. Bob's local statistics are provably unchanged by anything Alice does, including whether she measures at all.",
+            "Correct: Bob sees a fair coin either way. The correlation is only visible once the two records are compared over a classical channel — which is why entanglement cannot carry a message.",
+            "His outcome will indeed match Alice's, but he cannot know that without her result. Measuring, he sees 0 or 1 with equal probability, exactly as before.",
+            "There is nothing observable locally to appear or change. The correlation exists in the joint statistics, not in either side's marginal distribution."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "What does the experimental violation of Bell's inequality establish?",
+          "options": [
+            "Information travels faster than light",
+            "No theory with pre-existing local values reproduces the observed correlations",
+            "Quantum mechanics is incomplete",
+            "Measurement outcomes are determined by the observer's expectations"
+          ],
+          "answer": 1,
+          "feedback": [
+            "No signal is transmitted — the no-signalling theorem forbids it. Bell rules out a class of *explanations*, not the speed limit.",
+            "Correct: that is precisely the class of theories excluded. It was Einstein, Podolsky and Rosen's preferred completion of quantum mechanics, and it is the one experiment has ruled out.",
+            "The EPR argument suggested incompleteness; Bell's theorem plus the experiments cut the other way, against the local hidden-variable completion.",
+            "Nothing in the result involves observers' minds. The violation is a statistical fact about correlations between detector settings and outcomes."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why is the Bloch-sphere picture unavailable for each half of an entangled pair?",
+          "options": [
+            "The sphere would need to be four-dimensional",
+            "Neither qubit has an individual pure state; the information is in the correlation",
+            "Entangled qubits rotate too quickly to plot",
+            "It works, but only after measurement"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The joint space is larger, but the deeper point is that there is no individual state to plot at all — not that the plot needs more dimensions.",
+            "Correct: an entangled state does not factor, so the parts have no pure states of their own. Each qubit alone is a maximally mixed state — the centre of the sphere, carrying no information.",
+            "Nothing is rotating too fast; the obstacle is structural, not practical.",
+            "After measurement the entanglement is destroyed and each qubit does have a definite state — but then it is no longer the entangled situation being described."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Stanford Encyclopedia of Philosophy — Quantum Entanglement and Information",
+          "url": "https://plato.stanford.edu/entries/qt-entangle/",
+          "type": "reading",
+          "note": "Sets out exactly what entanglement is and is not, including a careful treatment of why no-signalling holds. Rigorous without requiring the full formalism."
+        }
+      ]
+    },
+    {
+      "id": "c06-gates",
+      "title": "Gates, Circuits and Reversibility",
+      "summary": "Quantum computation is a unitary matrix applied to a state vector — reversible by construction, with entanglement created by two-qubit gates.",
+      "cards": [
+        {
+          "h": "Unitary, and what that buys",
+          "md": "Between preparation and measurement, a quantum computer does exactly one kind of thing: apply **unitary** transformations, matrices U with U†U = I.\n\nUnitarity has two immediate consequences. It **preserves total probability** — the squared magnitudes still sum to 1. And it is **invertible**, so every computation can be run backwards.\n\nThat second point is a real break with classical logic. A classical AND gate takes two bits to one and destroys information; you cannot reconstruct the inputs. No quantum gate can do that, because U⁻¹ = U† always exists.\n\nClassical circuits can be made reversible — at the cost of carrying extra bits along — which is how classical functions are embedded into quantum circuits."
+        },
+        {
+          "h": "Entanglement needs two-qubit gates",
+          "md": "Single-qubit gates rotate individual spheres and can never create entanglement: applied to a product state they yield another product state.\n\nEntanglement requires a **two-qubit gate**, canonically the **CNOT**: flip the second qubit if and only if the first is |1⟩.\n\nStart with (|0⟩+|1⟩)/√2 on the control and |0⟩ on the target. CNOT maps it to\n\n## (|00⟩ + |11⟩)/√2\n\nwhich is the Bell state from the previous concept. Two gates — a Hadamard and a CNOT — produce the canonical entangled pair.\n\n**Universality**: arbitrary single-qubit rotations plus CNOT can approximate any unitary to any accuracy. The gate set is small, as in classical logic."
+        },
+        {
+          "h": "Reading a circuit honestly",
+          "md": "A circuit diagram is a matrix product read left to right, with wires as qubits and boxes as gates. Measurement is drawn at the end because it is where reversibility stops.\n\nThe honest way to read the state vector: **n qubits carry 2ⁿ amplitudes**. Thirty qubits is over a billion complex numbers, which is why simulating quantum systems classically is expensive — and it was Feynman's original argument for building quantum computers in the first place.\n\nBut resist the next step. Holding 2ⁿ amplitudes is not the same as having 2ⁿ answers available. Measurement returns **one** n-bit string. What those amplitudes are good for is the subject of the next concept."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why can no quantum gate implement a classical AND directly on two qubits?",
+          "options": [
+            "AND is too slow",
+            "AND is irreversible, and unitary evolution must be invertible",
+            "AND needs three qubits",
+            "AND cannot be written as a matrix"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Speed is not the issue; the obstruction is structural.",
+            "Correct: AND maps four input combinations onto two outputs, destroying information. Unitary matrices are invertible, so this map cannot be unitary. The standard fix is the Toffoli gate, which keeps the inputs and writes the AND into a third qubit.",
+            "This is close to the practical remedy — Toffoli uses three qubits — but the *reason* the extra qubit is needed is irreversibility.",
+            "AND has a perfectly good matrix representation; that matrix is simply not unitary."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A circuit applies only single-qubit gates to a product state of five qubits. Can the result be entangled?",
+          "options": [
+            "Yes, if the rotations are large enough",
+            "No — single-qubit gates map product states to product states",
+            "Yes, if the gates are applied simultaneously",
+            "Only if the qubits started in superposition"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The size of a rotation is irrelevant. Each qubit's state is transformed independently, so the joint state remains a product.",
+            "Correct: entanglement requires an interaction between qubits — a two-qubit gate such as CNOT. This is why hardware effort concentrates on high-fidelity two-qubit gates; they are the scarce, error-prone resource.",
+            "Simultaneity changes nothing. The combined operation is still a tensor product of single-qubit unitaries.",
+            "Superposition on individual qubits is still a product state. Superposition and entanglement are different properties."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "A 40-qubit register holds about a trillion amplitudes. How much information can one measurement extract?",
+          "options": [
+            "All trillion amplitudes",
+            "One 40-bit string",
+            "Roughly half the amplitudes",
+            "As many bits as there are qubits, squared"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The amplitudes are not readable. They govern the outcome distribution but are never output.",
+            "Correct: one measurement gives one 40-bit answer, sampled from the distribution the amplitudes define. The exponential state space is not an exponential output channel — the single most important thing to understand about the field.",
+            "There is no partial read-out of amplitudes. Measurement in the computational basis returns one basis string.",
+            "Measurement yields exactly n bits from n qubits, not n² — and even those are a single sample."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Scott Aaronson — Introduction to Quantum Information Science lecture notes",
+          "url": "https://www.scottaaronson.com/qclec.pdf",
+          "type": "reading",
+          "note": "A complete course from a leading complexity theorist, unusually direct about what is and is not known. The chapters on gates and universality are the reference for this concept."
+        }
+      ]
+    },
+    {
+      "id": "c07-why-fast",
+      "title": "Why Quantum Computers Are Fast — and Mostly Aren't",
+      "summary": "The advantage comes from interference, not parallelism, which is exactly why it applies to so few problems.",
+      "cards": [
+        {
+          "h": "Killing the parallel-universe story",
+          "md": "The standard claim is that a quantum computer evaluates a function on all 2ⁿ inputs at once and thereby searches exponentially faster. The first half is nearly true and the second half does not follow.\n\nYou can indeed prepare a superposition over all inputs and apply a circuit computing f, ending with amplitudes spread over all (x, f(x)) pairs.\n\nBut measurement returns **one** pair, at random. That is no better than evaluating f on one random input — which a classical computer does instantly, for free.\n\nThe superposition is not the resource. What matters is what you do **before** measuring."
+        },
+        {
+          "h": "The actual mechanism",
+          "md": "A useful quantum algorithm has three stages:\n\n- **spread** amplitude across many computational paths\n- **arrange interference** so paths leading to wrong answers cancel and paths leading to the right one reinforce\n- **measure**, now that the amplitude is concentrated where you want it\n\nThe middle stage is the whole art, and it is severely constrained. You must find structure in the problem — periodicity, an algebraic relation — that a unitary can exploit to make wrong answers cancel *in bulk*, without knowing which they are.\n\nMost problems have no such structure. That is why the speedup list is short, and why 'quantum computers will solve X' claims deserve the question: **what is interfering with what?**"
+        },
+        {
+          "h": "The honest speedup table",
+          "md": "- **Factoring / discrete log** (Shor): exponential. Real, and the reason post-quantum cryptography is being deployed now.\n- **Unstructured search** (Grover): quadratic only — √N instead of N. A 2⁵⁶ key becomes 2¹²⁸ work, which is not a break.\n- **Simulating quantum systems**: exponential, and arguably the most valuable — chemistry, materials, superconductivity. Feynman's original motivation.\n- **Linear algebra, optimisation, machine learning**: claims here are heavily caveated. Several proposed speedups were later *dequantised* — matched by new classical algorithms.\n- **NP-complete problems in general**: no known exponential speedup, and strong reasons to doubt one exists.\n\nQuantum computers are not faster computers. They are differently-shaped ones, and the shape fits few problems.\n\nThis connects directly to the **neural networks** and **AI agents** topics: 'quantum machine learning' is where dequantisation has bitten hardest, and claims there should be read with the interference question in hand."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "A vendor claims their quantum computer will evaluate all 2⁵⁰ routes of a delivery problem simultaneously and return the best. What is the flaw?",
+          "options": [
+            "2⁵⁰ is too many even for a quantum computer",
+            "Evaluating in superposition is possible, but measurement returns one random route unless interference concentrates amplitude on the best",
+            "Delivery routing is not a computational problem",
+            "Quantum computers cannot store route data"
+          ],
+          "answer": 1,
+          "feedback": [
+            "The superposition is the easy part; 2⁵⁰ amplitudes over 50 qubits is unremarkable. The difficulty is extraction.",
+            "Correct, and it is the central point of the whole subject. Without a structure that lets wrong routes cancel, you have an expensive random sampler. Routing has no known such structure — Grover gives at best a quadratic gain.",
+            "It is a computational problem; the claim fails on how quantum speedups work, not on the problem's nature.",
+            "Storage is not the obstacle. Getting an answer out is."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Grover's algorithm searches an unstructured space of N items in about √N steps. What does that mean for a 128-bit symmetric key?",
+          "options": [
+            "It is broken — the search becomes feasible",
+            "The effective security drops to about 64 bits, which is a real reduction but not a break in practice",
+            "No effect, since Grover does not apply to keys",
+            "Security is unchanged because √N is still exponential"
+          ],
+          "answer": 1,
+          "feedback": [
+            "A quadratic speedup does not break a well-sized symmetric key. 2⁶⁴ quantum operations on error-corrected hardware is far beyond anything projected.",
+            "Correct: Grover halves the exponent. The standard response is to double symmetric key lengths — cheap. The genuine cryptographic threat is Shor against public-key systems, which is exponential, not this.",
+            "Grover does apply to key search; it is simply much weaker than commonly assumed.",
+            "√(2¹²⁸) = 2⁶⁴ is a genuine reduction and the reasoning matters — but the conclusion that nothing changed is wrong, which is why key sizes are being doubled."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Which application has the strongest case for exponential quantum advantage?",
+          "options": [
+            "Training large neural networks",
+            "Simulating quantum systems such as molecules and materials",
+            "Sorting large datasets",
+            "General combinatorial optimisation"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Quantum machine learning is where dequantisation results have hit hardest — several claimed speedups were matched classically once the assumptions were examined.",
+            "Correct: simulating quantum systems is the natural fit, since the hardware shares the structure of the problem. It was Feynman's original argument and remains the least contested application.",
+            "Sorting is bounded by comparisons and information flow; there is no exponential quantum speedup, and only limited gains at all.",
+            "General optimisation has no known exponential speedup. Grover-style quadratic gains are the realistic ceiling, and complexity theory gives strong reasons to expect no more."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "NIST — Post-Quantum Cryptography project",
+          "url": "https://csrc.nist.gov/projects/post-quantum-cryptography",
+          "type": "reading",
+          "note": "The concrete consequence of Shor's algorithm: the standards (FIPS 203/204/205, published 2024) that replace the public-key cryptography a quantum computer would break, and the migration timeline. Note what is NOT on the list — symmetric ciphers, because Grover's quadratic speedup does not warrant replacing them."
+        }
+      ]
+    },
+    {
+      "id": "c08-algorithms",
+      "title": "Three Algorithms, and What Each Exploits",
+      "summary": "Deutsch–Jozsa, Grover and Shor — each a different way of making wrong answers cancel.",
+      "cards": [
+        {
+          "h": "Deutsch–Jozsa: the proof of concept",
+          "md": "The problem is artificial but the lesson is exact. You are given a black-box function on n bits, promised to be either **constant** or **balanced** (0 on exactly half the inputs). Which is it?\n\nClassically, in the worst case you need 2ⁿ⁻¹ + 1 queries. Quantum mechanically: **one**.\n\nThe circuit puts the input register in an equal superposition, queries f once so the answer is written into phases, then applies Hadamards. If f is constant, the phases align and all amplitude returns to |00…0⟩. If f is balanced, that outcome's amplitude **cancels exactly** and you measure something else.\n\nNo input was searched. A global property of f was made to interfere with itself."
+        },
+        {
+          "h": "Grover: amplitude amplification",
+          "md": "Search N unsorted items for the one satisfying a condition. Classically N/2 queries on average.\n\nGrover repeats two steps: mark the target by flipping its amplitude's sign, then reflect all amplitudes about their mean. Each round tips a little more amplitude onto the target. After about **√N** rounds it dominates, and you measure it.\n\nThe geometry is worth holding: the state rotates through a fixed small angle each round, toward the target. This also means you can **overshoot** — continuing past the optimum rotates back *away*, and the success probability falls. A rare case where running an algorithm longer makes it worse.\n\nGrover is provably optimal for unstructured search, so the quadratic ceiling is a theorem, not a temporary limitation."
+        },
+        {
+          "h": "Shor: periodicity is the structure",
+          "md": "Factoring an integer N reduces, by a classical argument, to finding the **period** of the function f(x) = aˣ mod N. Period-finding is where the quantum part lives.\n\nA superposition over x is evaluated, then a **quantum Fourier transform** is applied. The QFT makes amplitudes at frequencies matching the period reinforce and everything else cancel. Measuring yields the period with high probability; classical post-processing finishes the factoring.\n\nThe critical observation: Shor works because factoring has **hidden periodic structure** the QFT can lock onto. Take the periodicity away and the method has nothing to grip. That is the answer to why Shor's success has not generalised across the hard problems.\n\nThis is the same Fourier machinery as in the **Fourier series** topic — the transform that concentrates energy at a frequency here concentrates *amplitude* at a period."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "In Deutsch–Jozsa, what happens to the amplitude of the all-zeros outcome when f is balanced?",
+          "options": [
+            "It is exactly cancelled by destructive interference",
+            "It is reduced by half",
+            "It is unchanged but the other outcomes grow",
+            "It becomes negative"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct: half the phases are + and half are −, and they sum to exactly zero. Measuring anything other than all-zeros therefore proves the function is balanced, from a single query.",
+            "A partial reduction would leave the answer probabilistic. The cancellation is exact, which is what makes one query sufficient with certainty.",
+            "The all-zeros amplitude does change — it vanishes. That is the signal being read.",
+            "Amplitudes can be negative in general, but here the two halves cancel to zero rather than leaving a negative residue."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "You run Grover for four times the optimal number of iterations. What happens?",
+          "options": [
+            "The target becomes even more likely",
+            "The success probability falls, because the state rotates past the target",
+            "The algorithm halts automatically at the optimum",
+            "The state decoheres"
+          ],
+          "answer": 1,
+          "feedback": [
+            "More iterations do not mean more concentration. Each iteration is a fixed rotation, and past the optimum it rotates away.",
+            "Correct: the evolution is a rotation in a two-dimensional plane, and it continues past the target. Knowing when to stop is part of the algorithm — which requires knowing roughly how many solutions there are.",
+            "Nothing halts on its own. Unitary evolution has no notion of having arrived.",
+            "Decoherence is a hardware effect. Even on perfect hardware, over-rotation reduces the success probability."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "Why has Shor's approach not produced exponential speedups for other hard problems?",
+          "options": [
+            "Other problems are larger",
+            "It depends on hidden periodic structure that most hard problems lack",
+            "The quantum Fourier transform is too slow",
+            "Other problems are not in NP"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Size is not the issue — Shor scales well precisely because of the structure it exploits.",
+            "Correct: the quantum Fourier transform locks onto periodicity. Where a problem hides no period — or no similar algebraic structure — there is nothing for it to find. This is the general shape of the field's limits.",
+            "The QFT is efficient, requiring only O(n²) gates. Speed is not the obstacle.",
+            "Many hard problems are firmly in NP, including factoring itself. Membership in NP is not what determines quantum advantage."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "John Preskill — Physics 219, Quantum Computation lecture notes (Caltech)",
+          "url": "https://www.preskill.caltech.edu/ph219/",
+          "type": "reading",
+          "note": "The graduate reference, freely available and still updated. Go here for the full derivations if you want to see the cancellations in these algorithms written out explicitly."
+        }
+      ]
+    },
+    {
+      "id": "c09-decoherence",
+      "title": "Decoherence, Error Correction and the Real Timeline",
+      "summary": "Why building one is hard, what a logical qubit costs, and how to read the announcements.",
+      "cards": [
+        {
+          "h": "The engineering problem in one sentence",
+          "md": "A quantum computer must be **perfectly isolated** from its environment so paths stay indistinguishable, and **precisely controlled** from outside so gates can be applied. Those requirements are in direct opposition.\n\nEvery stray interaction — a photon, a vibration, a fluctuating field — leaks which-path information into the environment and destroys interference. This is **decoherence**, and it is not noise added to a signal. It is the computation's central resource draining away.\n\nCoherence times are now milliseconds to seconds depending on the platform, and gates take nanoseconds to microseconds. That ratio sets how deep a circuit can be before the result is indistinguishable from noise."
+        },
+        {
+          "h": "Error correction without copying",
+          "md": "No-cloning forbids backups, so quantum error correction takes a different route: encode **one logical qubit across many physical ones**, then measure operators that reveal *whether an error occurred* without revealing the data.\n\nThose **syndrome measurements** are the clever part. They collapse the error into a definite one — bit flip, phase flip, or both — while leaving the encoded state untouched, so it can be corrected without ever being read.\n\nThe **threshold theorem** is the reason the field exists: if the physical error rate is below a threshold — around 1% for the surface code — arbitrarily long computations become possible by adding more physical qubits. Above threshold, adding qubits makes things worse. Hardware has recently crossed below it, which is what makes current progress meaningful."
+        },
+        {
+          "h": "Reading the announcements",
+          "md": "The overhead is the number that matters. Estimates for a fault-tolerant logical qubit run to **roughly a thousand physical qubits**, sometimes more. Breaking RSA-2048 needs a few thousand logical qubits — so millions of physical ones. Today's best machines have hundreds to low thousands of physical qubits, mostly without full error correction.\n\nThree questions to ask of any announcement:\n\n- **Physical or logical qubits?** The difference is roughly three orders of magnitude.\n- **What error rate, and is it below threshold?** Qubit count without fidelity is meaningless.\n- **Is the demonstrated task useful, or chosen to be hard classically?** Quantum-advantage demonstrations are often deliberately useless tasks — legitimate as physics, not as applications.\n\nWhere this goes next: the **AI agents** and **AGI** topics take up the same discipline of separating a demonstrated capability from an extrapolated one."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Why is decoherence better described as information leaking out than as noise coming in?",
+          "options": [
+            "It isn't — the two are equivalent",
+            "The environment records which-path information, which alone destroys interference",
+            "Because it only happens at low temperatures",
+            "Because noise can be filtered and decoherence cannot"
+          ],
+          "answer": 1,
+          "feedback": [
+            "They are genuinely different. Classical noise perturbs a signal you can still average; decoherence removes the interference the computation depends on.",
+            "Correct: once the environment holds a record distinguishing the paths, the interference term vanishes — even if the system's energy is untouched. This is the same principle as the which-path detector in the two-slit experiment.",
+            "Decoherence occurs at all temperatures; cooling slows some mechanisms but does not change the nature of the process.",
+            "Filterability is a practical difference, but it does not explain the mechanism. The mechanism is the creation of which-path information."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "What does the threshold theorem establish?",
+          "options": [
+            "Quantum computers will eventually outperform classical ones at everything",
+            "Below a physical error rate threshold, arbitrarily long computations are possible by adding more physical qubits",
+            "Errors can be eliminated entirely with enough cooling",
+            "Any quantum computation can be simulated classically below threshold"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It says nothing about which problems benefit — that is set by algorithms, and the speedup list is short.",
+            "Correct, and note the direction of the condition: below threshold, more qubits help; above it, more qubits hurt, because each added component brings more errors than the code can fix. Crossing that line is what recent hardware results are about.",
+            "Errors are never eliminated. Error correction detects and fixes them faster than they accumulate.",
+            "This inverts the meaning. The threshold is what makes reliable quantum computation possible, not what makes it classically simulable."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "An announcement claims 1,000 qubits and a solved problem no classical computer can handle. What should you check first?",
+          "options": [
+            "Whether they are physical or logical qubits, and the gate error rate",
+            "Whether the machine is superconducting or trapped-ion",
+            "The total cost of the machine",
+            "Whether the results were peer reviewed"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct: 1,000 physical qubits at a poor error rate and 1,000 logical qubits are separated by three orders of magnitude of engineering. And a 'problem no classical computer can handle' is usually a sampling task chosen for that property, not an application.",
+            "The platform affects coherence times and gate speeds, but it does not tell you whether the result is meaningful.",
+            "Cost says nothing about capability.",
+            "Peer review is worth having, but published results are routinely misreported in exactly this way — the qubit-type question is what resolves it."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "Daniel Gottesman — An Introduction to Quantum Error Correction and Fault-Tolerant Quantum Computation",
+          "url": "https://arxiv.org/abs/0904.2557",
+          "type": "reading",
+          "note": "The standard pedagogical introduction to how syndrome measurement and the threshold theorem work, by one of the people who built the theory."
+        }
+      ]
+    }
+  ],
+  "preface": {
+    "hook": "Two ways of getting somewhere can add up to no way at all.",
+    "anim": "qm_preface",
+    "body": [
+      "Throw a ball at a wall with two open doorways. It goes through one or the other, and if you open a second doorway, the ball has more ways to get through, never fewer. That is how everything you have ever handled behaves.",
+      "Now think about a pond. Drop a stone and ripples spread out. Drop a second stone nearby and where two humps meet, the water rises higher — but where a hump meets a dip, they flatten each other out completely. Two waves arrive and the water goes perfectly still. Waves can undo each other in a way balls cannot.",
+      "The discovery that started quantum physics is that the tiniest things — single particles of light, single electrons — do the pond thing rather than the ball thing. Send them one at a time toward a wall with two slits, and there are places on the far side where a particle lands if only one slit is open, but never lands when both are. Opening a second route made it stop arriving.",
+      "Nobody talked anybody into this. It was measured, over and over, for a century, and it is why your phone, every computer chip, and MRI scanners work at all. It is also not a trick of being too small to see properly: the particle really does have two routes, and the routes really do cancel.",
+      "A quantum computer is a machine built to arrange those cancellations on purpose. You set it up so that all the wrong answers cancel each other out, and only the right answer is left standing when you look. That is the whole idea. Everything after this is learning how to aim it."
+    ],
+    "aha": [
+      {
+        "title": "It is not about being unsure",
+        "text": "When you flip a coin under your hand, it already IS heads or tails and you just do not know yet. This is not that. Before you look, the particle genuinely has both routes — and that is exactly why they can cancel. If it had secretly picked one, there would be nothing to cancel with."
+      },
+      {
+        "title": "Looking really does change it",
+        "text": "If you put a detector at the slits to catch which one the particle used, the cancelling stops immediately and it goes back to behaving like a ball. Not because you frightened it — because once the answer exists anywhere in the world, there is only one route left, and one route cannot cancel."
+      },
+      {
+        "title": "Not a faster computer — a differently shaped one",
+        "text": "A quantum computer will not make videos load faster or run games better. It is astonishingly good at a short list of jobs where cancellation can be arranged, like predicting how molecules behave, and no better than your laptop at almost everything else."
+      }
+    ],
+    "closer": "Everything strange in this subject comes from one thing: routes that can cancel."
+  }
+}

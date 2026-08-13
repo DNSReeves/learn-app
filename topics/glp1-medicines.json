@@ -752,5 +752,30 @@
       ],
       "anim": "glp_sideeffects"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Your gut already makes something that tells your brain you have had enough. These drugs make it last hours instead of minutes.",
+    "body": [
+      "When food arrives in your intestine, it releases a hormone that does several things at once: tells the pancreas to release insulin, slows the stomach emptying, and signals the brain that you are full.",
+      "It is beautifully effective and it is gone within minutes — the body breaks it down almost immediately. That is fine for a normal meal, but it means the signal cannot be stretched out.",
+      "These medicines are copies of that hormone, redesigned so the body cannot break them down quickly. The same message, arriving continuously for a week instead of a few minutes after eating.",
+      "The result is that people feel full sooner, stay full longer, and think about food much less. That last part surprises people most — many describe the constant background chatter about food simply going quiet.",
+      "They started as diabetes drugs, because of the insulin effect, and the weight loss was noticed afterward. They are not appetite suppressants in the old stimulant sense, and they are not a shortcut around eating well — they change how strongly the signal to eat arrives."
+    ],
+    "aha": [
+      {
+        "title": "The drug is a copy, not an invention",
+        "text": "It is a modified version of something everyone already makes. That is why it slots into an existing system rather than overriding one — and part of why the side effects are mostly digestive."
+      },
+      {
+        "title": "Food noise is a real thing",
+        "text": "Before these drugs, the constant mental pull toward food was largely treated as weak willpower. People on them report it fading, which is strong evidence it was a biological signal all along rather than a character flaw."
+      },
+      {
+        "title": "Some of what is lost is muscle",
+        "text": "Rapid weight loss of any kind takes muscle along with fat. That is why protein and resistance exercise are not optional extras alongside these drugs — muscle is hard to get back, especially later in life."
+      }
+    ],
+    "closer": "Not a new signal. An old one, held open."
+  }
 }

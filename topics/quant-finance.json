@@ -956,5 +956,30 @@
       ],
       "anim": "qf_research"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Someone beat the market five years running. Work out whether that is skill before you hand them your money.",
+    "body": [
+      "Put ten thousand people in a room and have everyone flip a coin five times. Around three hundred will get five heads. They did nothing clever. With enough people, someone always has a remarkable streak.",
+      "Markets are that room. Thousands of funds, decades of results — so impressive records exist whether or not anyone has genuine skill. The hard question is telling the coin-flippers from the real thing.",
+      "That is what this subject is for. It is not mainly about predicting prices; it is about measuring, honestly, whether an apparent edge is real. How much of this was luck? How much risk was taken to get it? Would it have survived a different decade?",
+      "The tools are mostly ways of being suspicious of yourself. Test on data you did not use to build the idea. Count how many things you tried before this one worked. Check whether the good years came from the strategy or from one lucky holding.",
+      "It is a strange field in that its best output is often 'no'. Most promising ideas do not survive proper testing, and the discipline is in accepting that rather than adjusting the test until the answer improves."
+    ],
+    "aha": [
+      {
+        "title": "Try enough things and something will look brilliant",
+        "text": "Test a thousand random rules against history and a few will look wonderful by chance alone. Unless you count how many you tried, you cannot tell those apart from a real discovery."
+      },
+      {
+        "title": "Returns mean nothing without the risk taken",
+        "text": "Doubling your money by risking ruin is not the same achievement as doubling it steadily. Any honest comparison has to account for how much danger was accepted along the way."
+      },
+      {
+        "title": "The data you kept back is the only real test",
+        "text": "An idea checked against the same history that inspired it proves nothing. Holding some data aside, untouched, and testing once at the end is the difference between research and self-flattery."
+      }
+    ],
+    "closer": "The interesting question is never 'did it work'. It is 'would it have, by luck alone'."
+  }
 }

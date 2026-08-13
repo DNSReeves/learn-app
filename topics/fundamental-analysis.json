@@ -1172,5 +1172,30 @@
       ],
       "anim": "fa_etf_lens"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "A share is a small piece of a real business. The question is never 'will it go up' — it is 'what is this business worth'.",
+    "body": [
+      "Imagine buying the lemonade stand on your street. You would ask how much it makes in a summer, whether anyone could set up next door, and what the equipment is worth. Then you would decide what to pay.",
+      "Buying a share is exactly that, in miniature. You are buying a claim on a real business's future earnings. The price on the screen is what other people are asking today, and it need not match what the business is worth.",
+      "So the work is to estimate the worth independently, from what the business actually does: what comes in, what goes out, what it owns, what it owes, and whether its advantage will survive competitors trying to take it.",
+      "That estimate is always rough. Which is why the discipline is to buy only when the price is well below your estimate — the gap is your room to be somewhat wrong and still be fine.",
+      "It is a slow, unexciting way to look at markets, and it will not tell you what happens next week. It tells you whether you are buying something worth owning, which over long stretches turns out to matter far more."
+    ],
+    "aha": [
+      {
+        "title": "Price and value are different things",
+        "text": "The price is a fact you can look up. The value is an estimate you have to make. Confusing the two — assuming the price must be right because it is a number — is the single most expensive habit in investing."
+      },
+      {
+        "title": "Profit is an opinion, cash is a fact",
+        "text": "Reported profit involves judgement calls about timing and estimates. Cash actually arriving is much harder to dress up. When the two diverge for long, the cash is usually telling the truth."
+      },
+      {
+        "title": "A great company can be a bad investment",
+        "text": "Everyone knowing a business is excellent tends to be already reflected in a high price. You can be completely right about the company and still make no money, because you paid for perfection."
+      }
+    ],
+    "closer": "Work out what it is worth. Then look at the price. Never the other way round."
+  }
 }

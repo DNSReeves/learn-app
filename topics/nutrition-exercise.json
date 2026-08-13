@@ -777,5 +777,30 @@
       ],
       "anim": "nut_myths"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Food is fuel and building material at the same time. Most confusing diet advice comes from mixing the two up.",
+    "body": [
+      "Your body needs energy to run — to keep you warm, to move, to think. It also needs raw material to build and repair things: muscle, bone, skin, the enzymes doing the work. Food is doing both jobs at once.",
+      "Fat and carbohydrate are mostly fuel. Protein can be burnt as fuel but is the main building material, and unlike fat, your body has no real store of it. That single asymmetry explains a large amount of otherwise baffling advice.",
+      "For weight, the energy side dominates: take in less than you spend and you lose. But WHAT you eat while doing that decides whether the loss comes mostly from fat or takes a large share of muscle with it.",
+      "Which is where exercise comes in, and not mainly for the calories it burns — the numbers there are smaller than people expect. Its real job is to signal that muscle is being used and should be kept. Diet decides how much you lose; training decides what kind of tissue it is.",
+      "Almost every diet argument you have heard is a fight about the fuel side while ignoring the building side. Both matter, and they are not in competition."
+    ],
+    "aha": [
+      {
+        "title": "Exercise burns less than you think",
+        "text": "A hard hour might cost what is in a large muffin. As a way to create a shortfall it is inefficient. As a way to keep muscle while the shortfall comes from food, it is close to irreplaceable."
+      },
+      {
+        "title": "There is no protein store",
+        "text": "Spare fat gets stored for later. Spare protein does not — so it is needed regularly, not occasionally. This is why protein spread across the day beats one large hit, especially as people get older."
+      },
+      {
+        "title": "Losing weight and losing fat are different goals",
+        "text": "The scales cannot tell the difference between fat, muscle and water. Someone can be delighted with the number while quietly losing the tissue that keeps them strong and independent later."
+      }
+    ],
+    "closer": "Fuel and building material. Do not sacrifice one chasing the other."
+  }
 }

@@ -821,5 +821,30 @@
       ],
       "anim": "pde_modern"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Heat one end of a metal bar and the warmth creeps along it. To describe that, time is not enough — you need place as well.",
+    "body": [
+      "Hold a metal spoon in hot soup and the handle warms up slowly. The heat does not jump to the end. It spreads, and at any moment different parts of the spoon are at different temperatures.",
+      "So a single number will not describe it. You need a temperature for every point along the spoon, and all of those change as time passes. The thing you are solving for is a whole landscape that shifts.",
+      "The rule behind it is beautifully simple: heat flows from hotter to colder, faster where the difference is sharper. A sharp jump between hot and cold smooths out quickly. A gentle slope barely moves.",
+      "Change the rule slightly and you get completely different behaviour. One rule spreads and smooths, like heat. Another sends shapes travelling without smoothing, like a wave on a rope or a sound crossing a room. A third describes something settled and no longer changing, like a drum skin pulled taut.",
+      "These are the equations behind weather, aircraft wings, MRI scans, the sound in a concert hall and the price of an option. Almost nothing can be solved with a clean formula, so they are solved by chopping space into a grid and stepping forward — which is what a supercomputer spends most of its life doing."
+    ],
+    "aha": [
+      {
+        "title": "Smoothing forgets the past",
+        "text": "Heat spreading destroys information. Watch a bar that is now evenly warm and you cannot tell where it was heated. Run the equation backwards and it blows up into nonsense. Some processes genuinely only run one way."
+      },
+      {
+        "title": "Waves remember, heat does not",
+        "text": "Two equations that look almost identical behave completely differently. One smooths everything out; the other carries a shape across the room intact, which is why you can understand speech from across a hall. A small change in the maths, an enormous change in the world."
+      },
+      {
+        "title": "The edges matter as much as the rule",
+        "text": "The same equation with different conditions at the boundary gives entirely different answers — a bar with one end in ice behaves nothing like one wrapped in a blanket. Getting the edges wrong ruins the solution, however good the equation."
+      }
+    ],
+    "closer": "Change spread over space as well as time — which is most of the world."
+  }
 }

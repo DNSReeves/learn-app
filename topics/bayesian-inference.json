@@ -900,5 +900,30 @@
       "anim": "bayes_decision"
     }
   ],
-  "order": 1
+  "order": 1,
+  "preface": {
+    "hook": "A test that is right 99% of the time just said you have a rare disease. The chance you actually have it can still be small.",
+    "body": [
+      "That sounds like a trick, and it is not. Suppose one person in ten thousand has some illness, and the test is right 99 times out of 100.",
+      "Test a million people. About a hundred of them genuinely have it, and the test catches almost all of those. But of the 999,900 healthy people, one in a hundred still gets a wrong positive — that is about ten thousand people, all told they are ill when they are not.",
+      "So among everyone who got a positive result, roughly a hundred are ill and ten thousand are fine. Getting a positive moved you from very unlikely to still-quite-unlikely. The test was not bad. Something rare simply stays rare, even after decent evidence.",
+      "The general lesson is that a piece of evidence never tells you the answer on its own. It updates whatever you believed beforehand. Start from 'almost nobody has this' and one test will not carry you all the way.",
+      "That is the whole of Bayesian thinking: hold a belief, meet evidence, move — by an amount that depends on how strong the evidence is AND how likely the thing was to begin with. Doctors, spam filters, and search-and-rescue teams all run on this, and so does anyone who changes their mind well."
+    ],
+    "aha": [
+      {
+        "title": "Rare things need stronger evidence",
+        "text": "The rarer something is, the more convincing a result has to be before you should believe it. This is why one surprising study rarely settles anything, and why the reply 'that would be extraordinary, so I want better proof' is good reasoning rather than stubbornness."
+      },
+      {
+        "title": "It tells you how much to move, not what to think",
+        "text": "Two sensible people can see the same evidence and end up in different places, because they started in different places. The rule does not fix your starting belief. It fixes how far the evidence should shift it."
+      },
+      {
+        "title": "You already do this",
+        "text": "A friend says they saw a fox in the garden and you believe them instantly. They say they saw a tiger and you ask questions. Same friend, same reliability — different starting odds. That reflex, written down carefully, is the entire subject."
+      }
+    ],
+    "closer": "Evidence does not replace what you believed. It moves it."
+  }
 }

@@ -694,5 +694,30 @@
       ],
       "anim": "calc_applied"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Zoom in far enough on any curve and it stops looking curved. Almost everything else follows from that.",
+    "body": [
+      "Take a circle and zoom in on one tiny piece of its edge. Zoom in more. Keep going. The bend gets gentler and gentler until, on your screen, it is just a straight line. It was never actually straight — but the closer you look, the less that matters.",
+      "That is the first half of calculus. Anything that curves, bends, or changes can be handled by chopping it into pieces so small that each one is boringly straight. Straight lines are easy. We have known how to handle straight lines since school.",
+      "The second half is the same trick backwards. Suppose you want the area of a shape with a wobbly edge, and you only know how to find the area of rectangles. So you fill the shape with rectangles. Thin ones fit better than fat ones. Make them thinner and thinner, add them all up, and you close in on the true answer.",
+      "Chop it up small enough that the hard thing becomes easy, then add all the easy pieces back together. That is the whole idea. Everything else is bookkeeping — clever bookkeeping, but bookkeeping.",
+      "It was invented because people wanted to know where a cannonball would land and how the planets move, and it turned out to answer a much larger question: given how fast something is changing right now, what happens next? That question is everywhere, which is why calculus ended up everywhere too."
+    ],
+    "aha": [
+      {
+        "title": "'Infinitely small' is not a cheat",
+        "text": "It sounds like hand-waving to talk about slices with almost no width. It took mathematicians about 200 years to make it properly rigorous, and they did. The idea came first and the careful version came later — which is how a lot of mathematics actually happens."
+      },
+      {
+        "title": "Speed is the everyday version",
+        "text": "A speedometer reads 30 mph. But speed is distance over time, and at this instant no time has passed and no distance was covered. What the needle shows is exactly what calculus was built to define — and you have been reading one since you were small."
+      },
+      {
+        "title": "The two halves undo each other",
+        "text": "Chopping into slices and adding slices back up turn out to be opposites, like multiplying and dividing. That is not obvious at all, and when someone finally proved it, it became the most useful result in the subject."
+      }
+    ],
+    "closer": "Make the hard thing small enough and it becomes an easy thing."
+  }
 }

@@ -916,5 +916,30 @@
       ]
     }
   ],
-  "order": 2
+  "order": 2,
+  "preface": {
+    "hook": "Exercise does not make you stronger. It damages you — and the repair overshoots.",
+    "body": [
+      "Lift something heavy and you cause small amounts of damage: micro-tears in muscle, stress in bone, a system pushed past what it was comfortable with. That is the point, not a side effect.",
+      "Afterwards the body repairs it. Crucially, it does not rebuild to exactly what was there before. It rebuilds slightly stronger, on the reasonable assumption that whatever happened once might happen again.",
+      "So the gain happens while you rest, not while you train. Train again before the repair finishes and you dig the hole deeper. Wait too long and the improvement fades. Almost every argument about training schedules is an argument about that timing.",
+      "It also explains why progress stalls. The body only overshoots if the demand was genuinely more than it was used to. Do the same thing every week and there is nothing to overshoot for — which is why a programme that once worked stops working.",
+      "The same principle covers bone, heart, lungs and even tendons, on wildly different timescales. Muscle responds in weeks. Tendons take months. Bone takes longer still — which is why people who add training too quickly tend to break the slow-adapting parts."
+    ],
+    "aha": [
+      {
+        "title": "Rest is part of the training",
+        "text": "Skipping recovery does not make you keener, it makes you weaker — you are interrupting the process that produces the improvement. Elite athletes guard their rest as carefully as their sessions."
+      },
+      {
+        "title": "Different tissues adapt at different speeds",
+        "text": "Your muscles get stronger faster than your tendons do. That mismatch is behind a huge share of injuries in people who felt fine and ramped up quickly — the engine outgrew the mounting."
+      },
+      {
+        "title": "Soreness is not the scoreboard",
+        "text": "Aching badly two days later mostly means you did something unfamiliar, not something effective. Plenty of highly productive training leaves you barely sore at all."
+      }
+    ],
+    "closer": "Break it slightly. Let it rebuild bigger. Repeat."
+  }
 }

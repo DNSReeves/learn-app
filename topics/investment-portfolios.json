@@ -925,5 +925,30 @@
       ],
       "anim": "port_playbook"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Do not put all your eggs in one basket — but the useful part is knowing which baskets drop at different times.",
+    "body": [
+      "Everyone knows to spread money around. The advice is nearly useless as usually given, because spreading across ten things that all fall together is barely different from holding one thing.",
+      "What actually helps is owning things that do badly at different moments. When shares in companies fall hard, government bonds have often risen, because frightened people want somewhere safe. One zigs while the other zags.",
+      "Combine them and the ride gets smoother — not because you gave up much return, but because the bad patches partly cancel out. That is close to the only thing in investing that is genuinely free, and it is why the idea won a Nobel Prize.",
+      "Smoothness matters more than it sounds. A big fall does lasting damage: recovering from losing half your money takes doubling it, not gaining back fifty percent. Avoiding the worst holes is worth more than catching the best runs.",
+      "So a portfolio is not a list of good investments. It is a team, chosen so their weaknesses do not all show up on the same day. A brilliant player who collapses exactly when everyone else does adds far less than they appear to."
+    ],
+    "aha": [
+      {
+        "title": "Losses hurt more than gains help",
+        "text": "Lose 50% and you need +100% just to get back to level. This asymmetry is why avoiding disasters beats chasing winners, and why a smoother path can end up ahead of a more exciting one."
+      },
+      {
+        "title": "Things that never moved together sometimes start",
+        "text": "In a really bad crisis, investments that had been unrelated for decades can fall in unison as everyone sells everything at once. Diversification is most likely to disappoint precisely when it is most needed."
+      },
+      {
+        "title": "The mix matters more than the picks",
+        "text": "How much you hold in shares versus safer things explains most of what happens to a portfolio. Which particular shares matters far less than almost everyone assumes."
+      }
+    ],
+    "closer": "Not a list of good things. A team that fails at different times."
+  }
 }

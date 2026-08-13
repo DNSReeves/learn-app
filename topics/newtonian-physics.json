@@ -920,5 +920,30 @@
       ],
       "anim": "newton_limits"
     }
-  ]
+  ],
+  "preface": {
+    "hook": "Things keep doing what they are already doing. Everything else is working out what changed their mind.",
+    "body": [
+      "Roll a ball across a wooden floor and it slows down and stops. So it feels obvious that moving things naturally run out of go, and that you must keep pushing to keep something moving.",
+      "That is wrong, and spotting why took humanity about two thousand years. The ball stops because the floor rubs against it. Take the rubbing away — a puck on ice, a spacecraft in empty space — and it just keeps going, forever, with nothing pushing it at all.",
+      "So the question is never 'what keeps this moving'. It is 'what changed its motion'. A push or a pull — a force — does not keep things going. It speeds them up, slows them down, or bends their path.",
+      "The famous part is that the same rules cover the Moon. The Moon is falling toward Earth constantly, exactly like a dropped apple. It also moves sideways fast enough that it keeps missing. That is what an orbit is: falling and missing, over and over.",
+      "One set of rules for the apple and the Moon, written down in the 1680s, and we still use them to land spacecraft. They are not the last word — very fast and very small things need different rules — but for everything you will ever throw, drive, or build, they are exactly right."
+    ],
+    "aha": [
+      {
+        "title": "Weightless does not mean gravity-free",
+        "text": "Astronauts float on the space station, but gravity up there is nearly as strong as on the ground. They float because they are falling — the whole station is falling around Earth, and so are they. Falling together feels like no weight at all."
+      },
+      {
+        "title": "Heavy things do not fall faster",
+        "text": "Drop a hammer and a feather where there is no air and they land together. Everyone finds this hard to believe, which is why an astronaut did it on the Moon with a real hammer and a real feather. Air resistance was the whole difference."
+      },
+      {
+        "title": "Going round a corner is acceleration",
+        "text": "You feel thrown outward on a roundabout, so it seems like a force pushes you out. Nothing does. The car is being pulled inward, and you are simply carrying on straight while it turns under you."
+      }
+    ],
+    "closer": "Nothing needs a reason to keep going. Only to change."
+  }
 }
