@@ -1773,6 +1773,7 @@
         "text": "You cannot swap the book you were given. But which pages get read responds to food, sleep, exercise and medicine. 'It runs in my family' describes where you started, not where you have to finish."
       }
     ],
-    "closer": "One book, read differently in every room of the house."
+    "closer": "One book, read differently in every room of the house.",
+    "anim": "pref_genetics"
   }
 }

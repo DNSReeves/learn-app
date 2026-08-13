@@ -989,6 +989,7 @@
         "text": "Buy an option and you risk a small amount for a large possible gain. Sell one and you collect a small amount while taking on a large possible loss. Both are legitimate; confusing which side you are on has ruined people."
       }
     ],
-    "closer": "You are not buying the thing. You are buying the right to change your mind."
+    "closer": "You are not buying the thing. You are buying the right to change your mind.",
+    "anim": "pref_options_and_iv"
   }
 }

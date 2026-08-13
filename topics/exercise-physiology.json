@@ -940,6 +940,7 @@
         "text": "Aching badly two days later mostly means you did something unfamiliar, not something effective. Plenty of highly productive training leaves you barely sore at all."
       }
     ],
-    "closer": "Break it slightly. Let it rebuild bigger. Repeat."
+    "closer": "Break it slightly. Let it rebuild bigger. Repeat.",
+    "anim": "pref_exercise_physiology"
   }
 }

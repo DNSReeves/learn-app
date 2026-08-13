@@ -718,6 +718,7 @@
         "text": "Chopping into slices and adding slices back up turn out to be opposites, like multiplying and dividing. That is not obvious at all, and when someone finally proved it, it became the most useful result in the subject."
       }
     ],
-    "closer": "Make the hard thing small enough and it becomes an easy thing."
+    "closer": "Make the hard thing small enough and it becomes an easy thing.",
+    "anim": "pref_calculus"
   }
 }

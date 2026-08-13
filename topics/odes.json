@@ -844,6 +844,7 @@
         "text": "The equation for a cooling cup, a draining bath and a decaying radioactive lump is the same equation. Learn it once and you have learned all three. That repetition across unrelated subjects is what makes the math worth the effort."
       }
     ],
-    "closer": "Tell me how it is changing, and I will tell you where it goes."
+    "closer": "Tell me how it is changing, and I will tell you where it goes.",
+    "anim": "pref_odes"
   }
 }

@@ -1,5 +1,23 @@
 # Animation backlog — P1.3 coverage pass (2026-07-25, iss_eb4f851e)
 
+> ## ▶ PREFACE COVERAGE COMPLETE (2026-08-13) — 24 of 24
+> Every preface now carries an animation. 23 are driven by a shared **preface animation kit**
+> (labelled bars, paths, dot grids, arrows, panels, a common title/caption frame) rather than
+> being bespoke scenes; `qm_preface` predates the kit and stays as it is.
+>
+> The trade was deliberate: fewer novel drawing paths means fewer ways to be silently wrong, one
+> harness can check them all identically, and a preface visual should be simple by design — one
+> idea, large, no chart furniture. The cost is that they look consistent rather than characterful.
+>
+> `tests/preface_anims.test.js` asserts every animation and its static frame exist, every
+> coordinate reaching the canvas is FINITE, none ends on a near-empty frame, none puts jargon on
+> screen, and the pack wiring and page registration agree in both directions. Verified by
+> mutation. **It still cannot tell whether any of them LOOKS right** — that needs a browser and a
+> person, and it is the outstanding item.
+>
+> CONCEPT coverage is unchanged at 203 of 216: `quantum` c04/c05/c08 and five in
+> `exercise-physiology` remain without one.
+
 > ## ▶ REOPENED (2026-08-12) — coverage is no longer 100%, and the block below is now historical
 > Two additions since that block was written, and the honest numbers have moved:
 >

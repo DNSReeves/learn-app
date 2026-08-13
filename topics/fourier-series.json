@@ -706,6 +706,7 @@
         "text": "Music and photos compress because most of the ingredients contribute almost nothing that a person would notice. Find those, drop them, keep the rest. That is roughly what MP3 and JPEG are doing."
       }
     ],
-    "closer": "Any repeating shape is a stack of simple waves, waiting to be listed."
+    "closer": "Any repeating shape is a stack of simple waves, waiting to be listed.",
+    "anim": "pref_fourier_series"
   }
 }

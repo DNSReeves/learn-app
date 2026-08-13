@@ -1,7 +1,7 @@
 # Learn
 
 Mastery-based learning dashboard. Multi-user, extensible to any topic, all data local.
-A growing library: **24 topics across 8 categories** (Investing & Finance · AI & Machine Learning · Health & Medicine · Mathematics · Physics & Engineering · Physiology · Molecular Biology · Statistics) — **216 gated concepts and 730 checkpoint questions**, with **203 of 216 concepts carrying an animated, voice-narrated canvas** (196 distinct animations in use, 393 registered; Kokoro TTS). Every topic opens with a **preface** written for a curious twelve-year-old, then an intro for the adult reader. Started as a single Bayesian-Inference topic and generalized to any subject — drop a JSON pack in `topics/` and it appears on the dashboard. (The managed service runs on `:8801`; the `--port 8090` below is the manual-run example.)
+A growing library: **24 topics across 8 categories** (Investing & Finance · AI & Machine Learning · Health & Medicine · Mathematics · Physics & Engineering · Physiology · Molecular Biology · Statistics) — **216 gated concepts and 730 checkpoint questions**, with **203 of 216 concepts carrying an animated, voice-narrated canvas** (196 distinct animations in use, 393 registered; Kokoro TTS). Every topic opens with a **preface** written for a curious twelve-year-old — all 24 with their own animation — then an intro for the adult reader. Started as a single Bayesian-Inference topic and generalized to any subject — drop a JSON pack in `topics/` and it appears on the dashboard. (The managed service runs on `:8801`; the `--port 8090` below is the manual-run example.)
 
 ## Run
 

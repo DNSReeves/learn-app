@@ -845,6 +845,7 @@
         "text": "The same equation with different conditions at the boundary gives entirely different answers — a bar with one end in ice behaves nothing like one wrapped in a blanket. Getting the edges wrong ruins the solution, however good the equation."
       }
     ],
-    "closer": "Change spread over space as well as time — which is most of the world."
+    "closer": "Change spread over space as well as time — which is most of the world.",
+    "anim": "pref_pdes"
   }
 }

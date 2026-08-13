@@ -855,6 +855,7 @@
         "text": "Everything it learned came from text gathered up to a certain date. Ask about last week and it either has a separate lookup bolted on, or it will cheerfully make something up."
       }
     ],
-    "closer": "Guess the next word, a trillion times, and something strange starts happening."
+    "closer": "Guess the next word, a trillion times, and something strange starts happening.",
+    "anim": "pref_llms"
   }
 }

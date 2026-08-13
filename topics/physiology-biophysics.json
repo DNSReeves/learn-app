@@ -645,6 +645,7 @@
         "text": "Halve a vessel's width and flow through it drops about sixteen-fold, not two-fold. That fourth-power sensitivity is why tiny amounts of narrowing matter so much, and why the body controls vessel width so obsessively."
       }
     ],
-    "closer": "Not a special kind of matter. A very well-arranged one."
+    "closer": "Not a special kind of matter. A very well-arranged one.",
+    "anim": "pref_physiology_biophysics"
   }
 }

@@ -910,6 +910,7 @@
         "text": "A network trained only on daytime photos can be hopeless at night. It never learned what a cat IS — it learned what the pictures it saw had in common. Those are not the same thing, and the gap is where most real failures live."
       }
     ],
-    "closer": "No rules were written. The examples wrote them."
+    "closer": "No rules were written. The examples wrote them.",
+    "anim": "pref_neural_networks"
   }
 }

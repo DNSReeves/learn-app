@@ -949,6 +949,7 @@
         "text": "The interesting question is rarely 'can it do this'. It is 'what can it reach, and what happens if it is wrong'. An agent that can only read is a very different proposition from one that can send and delete."
       }
     ],
-    "closer": "Give it a goal instead of an instruction, and everything changes."
+    "closer": "Give it a goal instead of an instruction, and everything changes.",
+    "anim": "pref_ai_agents"
   }
 }

@@ -924,6 +924,7 @@
         "text": "A friend says they saw a fox in the garden and you believe them instantly. They say they saw a tiger and you ask questions. Same friend, same reliability — different starting odds. That reflex, written down carefully, is the entire subject."
       }
     ],
-    "closer": "Evidence does not replace what you believed. It moves it."
+    "closer": "Evidence does not replace what you believed. It moves it.",
+    "anim": "pref_bayesian_inference"
   }
 }

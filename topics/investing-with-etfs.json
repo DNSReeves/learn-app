@@ -1346,6 +1346,7 @@
         "text": "Owning everything protects you from any single company failing. It does not protect you when the whole market falls at once, which it does, sometimes badly. Diversification handles one kind of danger and not the other."
       }
     ],
-    "closer": "Own a little of everything, pay almost nothing, and be patient."
+    "closer": "Own a little of everything, pay almost nothing, and be patient.",
+    "anim": "pref_investing_with_etfs"
   }
 }

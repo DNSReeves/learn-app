@@ -3758,6 +3758,946 @@ ANIMS.phys_impulse=async(cv,ctx)=>{
   phys_impScene(ctx,cv,{nRev:1,wRev:1,peakN:true,peakW:true,eq:true});
 };
 })();
+/* ── PREFACE ANIMATION KIT (2026-08-13) ───────────────────────────────────────────────────────
+   Shared primitives for the twelve-year-old prefaces. Each preface animation is a short script
+   over these rather than a bespoke canvas scene, for three reasons: fewer novel drawing paths
+   means fewer ways to be silently wrong, the verification harness can check all of them the same
+   way, and a preface visual should be simple by design — one idea, large, no chart furniture.
+
+   Canvas is 900x380. Everything here is a pure function of its arguments, so any frame can be
+   reproduced from its parameters alone. */
+(function(){
+const PK = {
+  bg:"#0F1720", ink:"#D7DFEA", dim:"#8496AB", line:"#5A6B7C",
+  a:"#6FA8DC", b:"#E8A13C", good:"#5FBF95", bad:"#D46A62", warm:"#C88CC0",
+};
+window.PK = PK;
+
+/** Title + optional caption, the frame every preface scene shares. */
+function pkFrame(ctx,cv,title,caption){
+  clear(ctx,cv);
+  _t(ctx,cv.width/2,32,title,{size:18,bold:true,align:"center"});
+  if(caption) _t(ctx,cv.width/2,356,caption,{align:"center",col:PK.dim,size:13.5});
+}
+/** A labelled horizontal bar. w is 0..1 of the track. */
+function pkBar(ctx,x,y,track,w,col,label,value){
+  ctx.strokeStyle=PK.line; ctx.lineWidth=1; ctx.strokeRect(x,y,track,26);
+  const fill=Math.max(0,Math.min(1,w))*track;
+  if(fill>0.5){ ctx.fillStyle=col; ctx.fillRect(x,y,fill,26); }
+  if(label) _t(ctx,x-12,y+18,label,{align:"right",col:PK.dim,size:13});
+  if(value) _t(ctx,x+track+12,y+18,value,{col:col,size:14,bold:true});
+}
+/** A line from a list of [x,y] points, drawn to fraction k of its length. */
+function pkPath(ctx,pts,col,lw,k){
+  if(pts.length<2) return;
+  const n=Math.max(2,Math.round(pts.length*Math.max(0,Math.min(1,k===undefined?1:k))));
+  ctx.strokeStyle=col; ctx.lineWidth=lw||2.5; ctx.beginPath();
+  for(let i=0;i<n;i++){ i?ctx.lineTo(pts[i][0],pts[i][1]):ctx.moveTo(pts[i][0],pts[i][1]); }
+  ctx.stroke();
+}
+/** A grid of dots — for counting arguments (people, companies, trials). */
+function pkDots(ctx,x,y,cols,rows,gap,r,colOf){
+  for(let j=0;j<rows;j++) for(let i=0;i<cols;i++){
+    const c=colOf?colOf(j*cols+i):PK.dim;
+    if(!c) continue;
+    ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x+i*gap,y+j*gap,r,0,Math.PI*2); ctx.fill();
+  }
+}
+/** An arrow, for flow and force. */
+function pkArrow(ctx,x0,y0,x1,y1,col,lw){
+  const dx=x1-x0, dy=y1-y0, L=Math.hypot(dx,dy);
+  if(L<1) return;
+  const ux=dx/L, uy=dy/L;
+  ctx.strokeStyle=col; ctx.lineWidth=lw||3; ctx.beginPath();
+  ctx.moveTo(x0,y0); ctx.lineTo(x1-ux*9,y1-uy*9); ctx.stroke();
+  ctx.fillStyle=col; ctx.beginPath();
+  ctx.moveTo(x1,y1); ctx.lineTo(x1-ux*11-uy*5,y1-uy*11+ux*5);
+  ctx.lineTo(x1-ux*11+uy*5,y1-uy*11-ux*5); ctx.closePath(); ctx.fill();
+}
+/** A rounded panel to set one statement apart. */
+function pkPanel(ctx,x,y,w,h,text,col){
+  ctx.fillStyle="rgba(20,26,34,0.88)"; ctx.fillRect(x,y,w,h);
+  ctx.strokeStyle=col||PK.line; ctx.lineWidth=1.5; ctx.strokeRect(x,y,w,h);
+  _t(ctx,x+w/2,y+h/2+5,text,{align:"center",col:col||PK.ink,size:15,bold:true});
+}
+/** Two side-by-side captions, for a contrast scene. */
+function pkPair(ctx,cv,left,right,yy){
+  _t(ctx,cv.width*0.27,yy,left,{align:"center",col:PK.dim,size:13.5});
+  _t(ctx,cv.width*0.73,yy,right,{align:"center",col:PK.dim,size:13.5});
+}
+const pkLerp=(a,b,k)=>a+(b-a)*k;
+Object.assign(window,{pkFrame,pkBar,pkPath,pkDots,pkArrow,pkPanel,pkPair,pkLerp});
+})();
+
+/* preface animations — batch 1: calculus, neural-networks, genetics, newtonian, bayes, fourier */
+(function(){
+
+/* ── CALCULUS: zoom in until the curve is straight ────────────────────────────────────────── */
+function pref_calcScene(ctx,cv,st){
+  const {zoom=0, slices=0}=st;
+  pkFrame(ctx,cv,"Zoom in far enough and the curve goes straight",
+    slices>0 ? "Fill it with rectangles. Thinner ones fit better."
+             : "The bend never disappears. It just stops mattering.");
+  const cx=300, cy=210, R=140;
+  const span=pkLerp(Math.PI*0.9, 0.09, zoom);        // arc shown, shrinking as we zoom
+  const scale=pkLerp(1, 12, zoom);
+  const pts=[];
+  for(let i=0;i<=60;i++){
+    const a=-Math.PI/2 - span/2 + span*(i/60);
+    pts.push([cx + R*scale*Math.cos(a), cy + R*scale*Math.sin(a) + R*(scale-1)]);
+  }
+  pkPath(ctx,pts,PK.a,3);
+  if(zoom>0.75){
+    pkPath(ctx,[[pts[0][0],pts[0][1]],[pts[60][0],pts[60][1]]],PK.good,2);
+    _t(ctx,cx,300,"a straight line, near enough",{align:"center",col:PK.good,size:14,bold:true});
+  }
+  if(slices>0){
+    const n=Math.round(pkLerp(4,26,slices)), x0=560, x1=830, base=300;
+    for(let i=0;i<n;i++){
+      const w=(x1-x0)/n, x=x0+i*w;
+      const h=90*Math.sin(Math.PI*(i+0.5)/n)+40;
+      ctx.fillStyle="rgba(232,161,60,0.35)"; ctx.fillRect(x,base-h,w-1,h);
+      ctx.strokeStyle=PK.b; ctx.lineWidth=1; ctx.strokeRect(x,base-h,w-1,h);
+    }
+    _t(ctx,695,325,n+" rectangles",{align:"center",col:PK.b,size:14,bold:true});
+  }
+}
+ANIMS.pref_calculus_static=(cv,ctx)=>pref_calcScene(ctx,cv,{zoom:1,slices:1});
+ANIMS.pref_calculus=async(cv,ctx)=>{
+  pref_calcScene(ctx,cv,{});
+  await narrate("Here is a curve. Nothing about it is straight.");
+  await tween(1600,k=>pref_calcScene(ctx,cv,{zoom:k}));
+  await narrate("Now zoom in on one tiny piece of it. And again. The bend gets gentler and gentler until, on your screen, it is simply a straight line. It was never actually straight — but the closer you look, the less that matters, and straight lines are easy.");
+  await tween(1400,k=>pref_calcScene(ctx,cv,{zoom:1,slices:k}));
+  await narrate("The same trick backwards. To find the area under a wobbly shape, fill it with rectangles, which you already know how to measure. Thin ones fit better than fat ones. Make them thinner and thinner and add them all up, and you close in on the true answer. Chop the hard thing small enough that it becomes an easy thing.");
+  pref_calcScene(ctx,cv,{zoom:1,slices:1});
+};
+
+/* ── NEURAL NETWORKS: dials tuned by being wrong ──────────────────────────────────────────── */
+function pref_nnScene(ctx,cv,st){
+  const {round=0, err=1}=st;
+  pkFrame(ctx,cv,"A pile of dials, tuned by being wrong",
+    round>0 ? "Nobody chose the settings. The mistakes did." : "Every dial starts at random.");
+  // the dials
+  const cols=10, rows=3, x0=120, y0=90, gap=52;
+  for(let j=0;j<rows;j++) for(let i=0;i<cols;i++){
+    const seed=(i*7+j*13)%17;
+    const a=pkLerp(seed/17*Math.PI*2, (Math.sin(i+j)*0.6+1.4), round);
+    const cx=x0+i*gap, cy=y0+j*gap;
+    ctx.strokeStyle=PK.line; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(cx,cy,15,0,Math.PI*2); ctx.stroke();
+    ctx.strokeStyle=round>0.9?PK.good:PK.a; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+13*Math.cos(a),cy+13*Math.sin(a)); ctx.stroke();
+  }
+  // the error bar
+  pkBar(ctx,240,278,420,err,err>0.35?PK.bad:PK.good,"how wrong",
+        err>0.5?"very":(err>0.2?"less":"barely"));
+  if(round>0) _t(ctx,450,320,"round "+Math.round(pkLerp(1,1000000,round)).toLocaleString("en-US"),
+                 {align:"center",col:PK.dim,size:13});
+}
+ANIMS.pref_neural_networks_static=(cv,ctx)=>pref_nnScene(ctx,cv,{round:1,err:0.08});
+ANIMS.pref_neural_networks=async(cv,ctx)=>{
+  pref_nnScene(ctx,cv,{round:0,err:1});
+  await narrate("Imagine a machine with a hundred thousand little dials. Pictures go in one end; out the other comes a guess. At the start every dial is random, so the guesses are nonsense, and the machine is very wrong.");
+  await tween(2400,k=>pref_nnScene(ctx,cv,{round:k,err:pkLerp(1,0.08,k)}));
+  await narrate("Show it a cat. It guesses wrong. Here is the clever part: it can work out, for every single dial, which way to nudge it so the answer would have been slightly less wrong. So it nudges all of them, a tiny bit. One picture barely changes anything. A million pictures, over and over, and the dials drift into a setting that gets it right. Nobody chose those settings. Nobody could.");
+  pref_nnScene(ctx,cv,{round:1,err:0.08});
+};
+
+/* ── GENETICS: one book, different pages open ─────────────────────────────────────────────── */
+function pref_genScene(ctx,cv,st){
+  const {open=0, typo=0}=st;
+  pkFrame(ctx,cv,"Same book in every cell — different pages open",
+    typo>0 ? "Copy three billion letters and typos happen. Most land on a shut page."
+           : "An eye cell holds the toenail instructions too. It just never reads them.");
+  const cells=[["eye cell",180,PK.a],["skin cell",450,PK.b],["muscle cell",720,PK.warm]];
+  cells.forEach(([label,cx,col],idx)=>{
+    ctx.strokeStyle=PK.line; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.ellipse(cx,180,105,78,0,0,Math.PI*2); ctx.stroke();
+    // the book: 6 pages, one open per cell
+    for(let i=0;i<6;i++){
+      const px=cx-72+i*24, lit = open>0 && i===idx*2;
+      ctx.fillStyle = lit ? col : "rgba(132,150,171,0.28)";
+      ctx.fillRect(px,152,18,56);
+      if(lit && open>=1) _t(ctx,px+9,232,"read",{align:"center",col:col,size:11});
+    }
+    _t(ctx,cx,268,label,{align:"center",col:PK.dim,size:13});
+    if(typo>0 && idx===1){
+      ctx.fillStyle=PK.bad;
+      ctx.beginPath(); ctx.arc(cx-72+4*24+9,168,4.5,0,Math.PI*2); ctx.fill();
+      _t(ctx,cx,300,"a typo, on a page nobody reads",{align:"center",col:PK.bad,size:12.5});
+    }
+  });
+}
+ANIMS.pref_genetics_static=(cv,ctx)=>pref_genScene(ctx,cv,{open:1,typo:1});
+ANIMS.pref_genetics=async(cv,ctx)=>{
+  pref_genScene(ctx,cv,{});
+  await narrate("Inside almost every cell of your body sits the same instruction book, written in a four-letter alphabet, three billion letters long. Your eye cells have it. Your skin cells have it. The identical book.");
+  await tween(1300,k=>pref_genScene(ctx,cv,{open:k}));
+  await narrate("So why is an eye not a toenail? Because cells read different pages. An eye cell keeps most of the book firmly shut and works from the eye chapter. The toenail instructions are sitting right there, unread, the whole time.");
+  await tween(900,k=>pref_genScene(ctx,cv,{open:1,typo:k}));
+  await narrate("The book gets copied every time a cell divides. Copying three billion letters produces the occasional typo. Most land on a page nobody was reading, and nothing happens. Occasionally one lands somewhere that matters.");
+  pref_genScene(ctx,cv,{open:1,typo:1});
+};
+
+/* ── NEWTON: nothing stops it, and the Moon keeps missing ─────────────────────────────────── */
+function pref_newtonScene(ctx,cv,st){
+  const {roll=0, orbit=0}=st;
+  pkFrame(ctx,cv, orbit>0 ? "The Moon is falling. It keeps missing."
+                          : "Take the rubbing away and it never stops",
+    orbit>0 ? "Sideways fast enough, and 'falling' becomes 'going round'."
+            : "A ball stops because of the floor — not because moving runs out.");
+  if(orbit<=0){
+    const y1=150, y2=250;
+    ctx.strokeStyle=PK.line; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(120,y1+22); ctx.lineTo(820,y1+22); ctx.stroke();
+    _t(ctx,90,y1+5,"floor",{align:"right",col:PK.dim,size:12.5});
+    ctx.fillStyle=PK.b;
+    const x1=pkLerp(140,pkLerp(140,520,1),roll);
+    ctx.beginPath(); ctx.arc(x1,y1,14,0,Math.PI*2); ctx.fill();
+    if(roll>=1) _t(ctx,540,y1+5,"stops — the floor rubbed it away",{col:PK.dim,size:13});
+    ctx.beginPath(); ctx.moveTo(120,y2+22); ctx.lineTo(820,y2+22); ctx.stroke();
+    _t(ctx,90,y2+5,"ice",{align:"right",col:PK.dim,size:12.5});
+    ctx.fillStyle=PK.good;
+    ctx.beginPath(); ctx.arc(pkLerp(140,800,roll),y2,14,0,Math.PI*2); ctx.fill();
+    if(roll>=1) _t(ctx,450,y2+52,"still going",{align:"center",col:PK.good,size:14,bold:true});
+  } else {
+    const cx=450, cy=200;
+    ctx.fillStyle=PK.a; ctx.beginPath(); ctx.arc(cx,cy,34,0,Math.PI*2); ctx.fill();
+    _t(ctx,cx,cy+56,"Earth",{align:"center",col:PK.dim,size:12.5});
+    ctx.strokeStyle="rgba(132,150,171,0.45)"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(cx,cy,130,0,Math.PI*2); ctx.stroke();
+    const a=-Math.PI/2 + orbit*Math.PI*1.6;
+    const mx=cx+130*Math.cos(a), my=cy+130*Math.sin(a);
+    ctx.fillStyle=PK.ink; ctx.beginPath(); ctx.arc(mx,my,11,0,Math.PI*2); ctx.fill();
+    pkArrow(ctx,mx,my,cx+ (mx-cx)*0.45, cy+(my-cy)*0.45, PK.bad, 2.5);
+    _t(ctx,mx+18,my-14,"falling",{col:PK.bad,size:12.5});
+    pkArrow(ctx,mx,my,mx-Math.sin(a)*54,my+Math.cos(a)*54,PK.good,2.5);
+  }
+}
+ANIMS.pref_newtonian_physics_static=(cv,ctx)=>pref_newtonScene(ctx,cv,{roll:1,orbit:0.55});
+ANIMS.pref_newtonian_physics=async(cv,ctx)=>{
+  pref_newtonScene(ctx,cv,{});
+  await narrate("Roll a ball across a wooden floor and it slows down and stops. So it feels obvious that moving things run out of go.");
+  await tween(1800,k=>pref_newtonScene(ctx,cv,{roll:k}));
+  await narrate("That is wrong, and spotting why took about two thousand years. The ball stops because the floor rubs against it. Take the rubbing away — a puck on ice, a spacecraft in empty space — and it just keeps going, with nothing pushing it at all.");
+  await tween(2200,k=>pref_newtonScene(ctx,cv,{roll:1,orbit:Math.max(0.02,k)}));
+  await narrate("Which explains the Moon. It is falling toward Earth constantly, exactly like a dropped apple. It also moves sideways fast enough that it keeps missing. That is all an orbit is: falling, and missing, over and over.");
+  pref_newtonScene(ctx,cv,{roll:1,orbit:0.75});
+};
+
+/* ── BAYES: 100 ill, 10,000 false alarms ──────────────────────────────────────────────────── */
+function pref_bayesScene(ctx,cv,st){
+  const {sick=0, fp=0, zoom=0}=st;
+  pkFrame(ctx,cv,"A million people, and a very good test",
+    zoom>0 ? "Among the positives: about 100 ill, about 10,000 not."
+           : "One in ten thousand is ill. The test is right 99 times in 100.");
+  const cols=40, rows=10, gap=17, x0=140, y0=80;
+  pkDots(ctx,x0,y0,cols,rows,gap,5,(i)=>{
+    const total=cols*rows;
+    const nSick=Math.round(total*0.0025*sick);          // scaled for visibility
+    const nFp=Math.round(total*0.25*fp);
+    if(i<nSick) return PK.bad;
+    if(i>=total-nFp) return PK.b;
+    return "rgba(132,150,171,0.3)";
+  });
+  _t(ctx,x0,y0-18,"each dot = 2,500 people",{col:PK.dim,size:12});
+  if(sick>0) _t(ctx,x0,300,"● about 100 genuinely ill",{col:PK.bad,size:13.5});
+  if(fp>0)   _t(ctx,x0,322,"● about 10,000 healthy, told they are ill",{col:PK.b,size:13.5});
+  if(zoom>0) pkPanel(ctx,560,286,300,50,"positive → still ~1 in 100 ill",PK.good);
+}
+ANIMS.pref_bayesian_inference_static=(cv,ctx)=>pref_bayesScene(ctx,cv,{sick:1,fp:1,zoom:1});
+ANIMS.pref_bayesian_inference=async(cv,ctx)=>{
+  pref_bayesScene(ctx,cv,{});
+  await narrate("Suppose one person in ten thousand has some illness, and the test for it is right ninety nine times out of a hundred. Test a million people.");
+  await tween(1200,k=>pref_bayesScene(ctx,cv,{sick:k}));
+  await narrate("About a hundred of them genuinely have it, and the test catches nearly all of those.");
+  await tween(1600,k=>pref_bayesScene(ctx,cv,{sick:1,fp:k}));
+  await narrate("But of the nine hundred and ninety nine thousand nine hundred healthy people, one in a hundred still gets a wrong positive. That is about ten thousand people, told they are ill when they are fine.");
+  await tween(800,k=>pref_bayesScene(ctx,cv,{sick:1,fp:1,zoom:k}));
+  await narrate("So among everyone who got a positive result, roughly a hundred are ill and ten thousand are not. The test was not bad. Something rare simply stays rare, even after decent evidence.");
+  pref_bayesScene(ctx,cv,{sick:1,fp:1,zoom:1});
+};
+
+/* ── FOURIER: three tones stack into one squiggle ─────────────────────────────────────────── */
+function pref_fourierScene(ctx,cv,st){
+  const {n=1, sum=0}=st;
+  pkFrame(ctx,cv,"Three pure tones, one wobbly wave",
+    sum>0 ? "Your ear takes the sum apart again, in real time."
+          : "Each one is a smooth, simple, repeating wave.");
+  const specs=[[1,26,PK.a],[2,16,PK.b],[3,11,PK.warm]];
+  const x0=140, x1=780;
+  specs.forEach(([f,amp,col],i)=>{
+    if(i+1>n) return;
+    const y=110+i*56, pts=[];
+    for(let x=x0;x<=x1;x+=3) pts.push([x, y+amp*Math.sin((x-x0)/44*f)]);
+    pkPath(ctx,pts,col,2.2);
+    _t(ctx,100,y+5,"tone "+(i+1),{align:"right",col:PK.dim,size:12.5});
+  });
+  if(sum>0){
+    const y=300, pts=[];
+    for(let x=x0;x<=x1;x+=3){
+      let v=0;
+      specs.forEach(([f,amp],i)=>{ if(i+1<=n) v+=amp*Math.sin((x-x0)/44*f); });
+      pts.push([x, y+v*0.72]);
+    }
+    pkPath(ctx,pts,PK.good,3,sum);
+    _t(ctx,100,y+5,"together",{align:"right",col:PK.good,size:13,bold:true});
+  }
+}
+ANIMS.pref_fourier_series_static=(cv,ctx)=>pref_fourierScene(ctx,cv,{n:3,sum:1});
+ANIMS.pref_fourier_series=async(cv,ctx)=>{
+  pref_fourierScene(ctx,cv,{n:1});
+  await narrate("A pure tone is a smooth repeating wave. Nothing complicated about it.");
+  await tween(1000,k=>pref_fourierScene(ctx,cv,{n:k>0.5?2:1}));
+  await tween(1000,k=>pref_fourierScene(ctx,cv,{n:k>0.5?3:2}));
+  await narrate("Play three at once — three piano keys — and the air cannot carry three separate things. It carries one wave, the sum of them.");
+  await tween(1500,k=>pref_fourierScene(ctx,cv,{n:3,sum:k}));
+  await narrate("That is what arrives at your eardrum: one wobbly line. And yet you hear three notes. Your ear pulls the ingredients back out of the sum. Any repeating shape at all can be built this way, and taken apart again — which is why your phone can shrink a song and headphones can cancel a rumble.");
+  pref_fourierScene(ctx,cv,{n:3,sum:1});
+};
+})();
+
+/* preface animations — batch 2: odes, pdes, roman, physiology, diabetes, glp1 */
+(function(){
+
+/* ── ODEs: the fuller the bath, the faster it drains ──────────────────────────────────────── */
+function pref_odeScene(ctx,cv,st){
+  const {t=0, curve=0}=st;
+  pkFrame(ctx,cv,"The fuller it is, the faster it drains",
+    "You are not told the level. You are told the RULE for how it changes.");
+  const lvl=Math.exp(-2.1*t);
+  const bx=150, by=110, bw=190, bh=180;
+  ctx.strokeStyle=PK.line; ctx.lineWidth=2; ctx.strokeRect(bx,by,bw,bh);
+  ctx.fillStyle="rgba(111,168,220,0.45)";
+  ctx.fillRect(bx+2,by+bh-bh*lvl+2,bw-4,bh*lvl-4);
+  _t(ctx,bx+bw/2,by-14,"water level",{align:"center",col:PK.dim,size:13});
+  // the drain arrow: length tracks the level
+  pkArrow(ctx,bx+bw/2,by+bh+8,bx+bw/2,by+bh+8+pkLerp(12,58,lvl),PK.b,3);
+  _t(ctx,bx+bw+16,by+bh+34,lvl>0.6?"draining fast":(lvl>0.25?"slower":"barely a trickle"),
+     {col:PK.b,size:13.5});
+  if(curve>0){
+    const x0=430, x1=830, y0=120, y1=290, pts=[];
+    ctx.strokeStyle=PK.line; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x1,y1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x0,y1); ctx.stroke();
+    for(let i=0;i<=80;i++){ const u=i/80; pts.push([x0+(x1-x0)*u, y1-(y1-y0)*Math.exp(-2.1*u)]); }
+    pkPath(ctx,pts,PK.good,3,curve);
+    _t(ctx,x0-8,y0+6,"full",{align:"right",col:PK.dim,size:12});
+    _t(ctx,x0-8,y1,"empty",{align:"right",col:PK.dim,size:12});
+    _t(ctx,(x0+x1)/2,y1+22,"time",{align:"center",col:PK.dim,size:12});
+    if(curve>=1) _t(ctx,(x0+x1)/2,y0-10,"the answer, worked out from the rule",
+                    {align:"center",col:PK.good,size:13.5,bold:true});
+  }
+}
+ANIMS.pref_odes_static=(cv,ctx)=>pref_odeScene(ctx,cv,{t:0.45,curve:1});
+ANIMS.pref_odes=async(cv,ctx)=>{
+  pref_odeScene(ctx,cv,{t:0});
+  await narrate("Fill a bath and pull the plug. The fuller it is, the faster it drains — more water above means more push at the plughole.");
+  await tween(2600,k=>pref_odeScene(ctx,cv,{t:k}));
+  await narrate("So the rate of change depends on how much is there right now. Nobody handed you the water level over time. You were handed a rule connecting the level to how fast it is falling.");
+  await tween(1600,k=>pref_odeScene(ctx,cv,{t:1,curve:k}));
+  await narrate("Work that rule forward in tiny steps and the whole curve appears. A population, a cooling cup, a stretched spring, a spreading disease — all the same shape of problem. Tell me how it is changing, and I will tell you where it goes.");
+  pref_odeScene(ctx,cv,{t:1,curve:1});
+};
+
+/* ── PDEs: heat creeping along a spoon ────────────────────────────────────────────────────── */
+function pref_pdeScene(ctx,cv,st){
+  const {t=0, wave=0}=st;
+  pkFrame(ctx,cv, wave>0 ? "Change the rule and it travels instead" : "Heat does not jump. It spreads.",
+    wave>0 ? "One rule smooths everything out. Another carries a shape across the room."
+           : "Every point has its own temperature, and all of them change.");
+  const x0=140, x1=800, y=wave>0?150:200, n=66;
+  for(let i=0;i<n;i++){
+    const u=i/(n-1), x=x0+(x1-x0)*u, w=(x1-x0)/n;
+    const T = t<=0 ? (u<0.06?1:0) : Math.exp(-Math.pow(u,2)/(0.09*t+0.004));
+    const r=Math.round(pkLerp(60,232,T)), g=Math.round(pkLerp(90,120,T)), b=Math.round(pkLerp(130,60,T));
+    ctx.fillStyle=`rgb(${r},${g},${b})`; ctx.fillRect(x,y-22,w+1,44);
+  }
+  ctx.strokeStyle=PK.line; ctx.lineWidth=1.5; ctx.strokeRect(x0,y-22,x1-x0,44);
+  _t(ctx,x0-10,y+5,"hot",{align:"right",col:PK.bad,size:13});
+  _t(ctx,x1+10,y+5,"cold",{col:PK.a,size:13});
+  if(wave>0){
+    const yw=278, pts=[];
+    for(let x=x0;x<=x1;x+=3){
+      const c=x0+(x1-x0)*wave*0.85, d=(x-c)/48;
+      pts.push([x, yw-34*Math.exp(-d*d)]);
+    }
+    pkPath(ctx,pts,PK.good,3);
+    _t(ctx,x0-10,yw+5,"a wave",{align:"right",col:PK.good,size:13});
+    _t(ctx,(x0+x1)/2,yw+42,"same shape, moved — nothing smoothed away",
+       {align:"center",col:PK.good,size:13.5,bold:true});
+  }
+}
+ANIMS.pref_pdes_static=(cv,ctx)=>pref_pdeScene(ctx,cv,{t:0.55,wave:0.6});
+ANIMS.pref_pdes=async(cv,ctx)=>{
+  pref_pdeScene(ctx,cv,{t:0});
+  await narrate("Hold a metal spoon in hot soup. One end is hot, the rest is not — yet.");
+  await tween(2600,k=>pref_pdeScene(ctx,cv,{t:k}));
+  await narrate("The heat does not jump to the handle. It spreads, and at any moment different parts of the spoon are at different temperatures. So one number will not describe this. You need a temperature for every point, and all of them are changing at once. Sharp differences smooth out fastest.");
+  await tween(2000,k=>pref_pdeScene(ctx,cv,{t:1,wave:Math.max(0.05,k)}));
+  await narrate("Now change the rule slightly and you get something completely different: a shape that travels without smoothing, like a sound crossing a room. That is why you can understand speech from the far side of a hall — the wave rule remembers, and the heat rule forgets.");
+  pref_pdeScene(ctx,cv,{t:1,wave:0.85});
+};
+
+/* ── ROMAN: a crack that fills itself in ──────────────────────────────────────────────────── */
+function pref_romanScene(ctx,cv,st){
+  const {crack=0, heal=0}=st;
+  pkFrame(ctx,cv,"A crack that fills itself in",
+    heal>=1 ? "Stronger at the crack than the concrete around it."
+            : "Water gets in. In Roman concrete, that is when the repair starts.");
+  const x=170, y=120, w=560, h=150;
+  ctx.fillStyle="rgba(132,150,171,0.22)"; ctx.fillRect(x,y,w,h);
+  ctx.strokeStyle=PK.line; ctx.lineWidth=2; ctx.strokeRect(x,y,w,h);
+  // lumps of lime scattered through the block
+  for(let i=0;i<26;i++){
+    const lx=x+30+((i*97)%(w-60)), ly=y+18+((i*53)%(h-36));
+    ctx.fillStyle= heal>0 ? PK.good : "rgba(215,223,234,0.55)";
+    ctx.beginPath(); ctx.arc(lx,ly,4,0,Math.PI*2); ctx.fill();
+  }
+  if(crack>0){
+    ctx.strokeStyle=PK.bad; ctx.lineWidth=pkLerp(1,4,crack);
+    ctx.beginPath();
+    ctx.moveTo(x+w*0.42,y);
+    ctx.lineTo(x+w*0.47,y+h*0.4);
+    ctx.lineTo(x+w*0.40,y+h*0.72);
+    ctx.lineTo(x+w*0.46,y+h);
+    ctx.stroke();
+    _t(ctx,x+w*0.52,y-10,"crack",{col:PK.bad,size:13});
+  }
+  if(heal>0){
+    ctx.strokeStyle=PK.good; ctx.lineWidth=pkLerp(1,5,heal);
+    ctx.beginPath();
+    ctx.moveTo(x+w*0.42,y);
+    ctx.lineTo(x+w*0.47,y+h*0.4*heal);
+    ctx.stroke();
+    pkPanel(ctx,x+w+20,y+40,150,70, heal>=1?"sealed":"sealing…", PK.good);
+  }
+}
+ANIMS.pref_roman_engineering_static=(cv,ctx)=>pref_romanScene(ctx,cv,{crack:1,heal:1});
+ANIMS.pref_roman_engineering=async(cv,ctx)=>{
+  pref_romanScene(ctx,cv,{});
+  await narrate("Roman concrete has lumps of quicklime scattered through it. For a long time that was assumed to be sloppy mixing.");
+  await tween(1200,k=>pref_romanScene(ctx,cv,{crack:k}));
+  await narrate("Now crack it, which everything eventually does, and let rain or seawater in. In ordinary concrete that is the beginning of the end.");
+  await tween(1800,k=>pref_romanScene(ctx,cv,{crack:1,heal:k}));
+  await narrate("Here the water reaches those lumps, they react, and new mineral grows into the gap. The material repairs itself. We only worked out how recently, and we are now trying to copy it — which is a strange position to be in, two thousand years later.");
+  pref_romanScene(ctx,cv,{crack:1,heal:1});
+};
+
+/* ── PHYSIOLOGY: fill it more, it squeezes harder ─────────────────────────────────────────── */
+function pref_physScene(ctx,cv,st){
+  const {fill=0, beat=0}=st;
+  pkFrame(ctx,cv,"Fill it more and it squeezes harder — all by itself",
+    "No nerve tells it to. The muscle simply does this when stretched.");
+  const hearts=[[280,"a little blood back",0.45],[640,"a lot of blood back",1.0]];
+  hearts.forEach(([cx,label,amt])=>{
+    const f=amt*fill;
+    const R=pkLerp(46,46+34*f,1);
+    const squeeze=pkLerp(1,1-0.30*f,beat);
+    ctx.strokeStyle=PK.line; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.ellipse(cx,180,R*squeeze,R*1.12*squeeze,0,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle="rgba(212,106,98,0.35)";
+    ctx.beginPath(); ctx.ellipse(cx,180,(R-7)*squeeze,(R-7)*1.12*squeeze,0,0,Math.PI*2); ctx.fill();
+    _t(ctx,cx,268,label,{align:"center",col:PK.dim,size:13});
+    if(beat>0){
+      const out=pkLerp(0,amt,beat);
+      pkArrow(ctx,cx,110,cx,110-pkLerp(6,66,out),PK.bad,3.5);
+      _t(ctx,cx,88-pkLerp(6,66,out),amt>0.7?"strong beat":"gentle beat",
+         {align:"center",col:PK.bad,size:13,bold:true});
+    }
+  });
+}
+ANIMS.pref_physiology_biophysics_static=(cv,ctx)=>pref_physScene(ctx,cv,{fill:1,beat:1});
+ANIMS.pref_physiology_biophysics=async(cv,ctx)=>{
+  pref_physScene(ctx,cv,{});
+  await narrate("Your heart is a hollow muscle with valves, pushing about five litres a minute for eighty years without a service.");
+  await tween(1500,k=>pref_physScene(ctx,cv,{fill:k}));
+  await narrate("Here are two hearts. One has had a little blood come back to it, the other a lot — so its walls are stretched further before the beat.");
+  await tween(1200,k=>pref_physScene(ctx,cv,{fill:1,beat:k}));
+  await narrate("Now they beat. The stretched one squeezes harder, and pushes more out. Nothing told it to. That is a property of the muscle itself, which is why a transplanted heart, cut off from its nerves, still keeps up when you climb the stairs. Most of the body works like this: not a boss issuing orders, but parts arranged so the right thing happens on its own.");
+  pref_physScene(ctx,cv,{fill:1,beat:1});
+};
+
+/* ── DIABETES: the key that opens the cell ────────────────────────────────────────────────── */
+function pref_diabScene(ctx,cv,st){
+  const {key=0, blocked=0}=st;
+  pkFrame(ctx,cv, blocked>0 ? "Two ways the key can fail" : "Sugar cannot get in on its own",
+    blocked>0 ? "No key made at all, or doors that stopped answering."
+              : "Insulin unlocks the door. Then the sugar moves in.");
+  const draw=(cx,label,hasKey,opens)=>{
+    ctx.strokeStyle=PK.line; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.ellipse(cx,196,96,72,0,0,Math.PI*2); ctx.stroke();
+    _t(ctx,cx,290,label,{align:"center",col:PK.dim,size:13});
+    // the door
+    ctx.strokeStyle=opens>0?PK.good:PK.line; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(cx-96,196); ctx.lineTo(cx-96+pkLerp(0,22,opens),176); ctx.stroke();
+    // sugar dots outside; some inside once open
+    for(let i=0;i<7;i++){
+      const inside = opens>0.6 && i<Math.round(opens*5);
+      const x = inside ? cx-40+i*20 : cx-150-((i%4)*20);
+      const y = inside ? 196+((i%2)*22-11) : 160+((i%4)*24);
+      ctx.fillStyle=PK.b; ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
+    }
+    if(hasKey>0){
+      ctx.fillStyle=PK.a;
+      ctx.beginPath(); ctx.arc(cx-118,196,8,0,Math.PI*2); ctx.fill();
+      _t(ctx,cx-118,222,"insulin",{align:"center",col:PK.a,size:11.5});
+    }
+  };
+  if(blocked<=0){ draw(450,"a working cell",key,key); }
+  else {
+    draw(250,"type 1 — no key is made",0,0);
+    draw(680,"type 2 — the door stopped answering",1,0);
+  }
+}
+ANIMS.pref_diabetes_static=(cv,ctx)=>pref_diabScene(ctx,cv,{key:1,blocked:1});
+ANIMS.pref_diabetes=async(cv,ctx)=>{
+  pref_diabScene(ctx,cv,{});
+  await narrate("Eat a slice of bread and it becomes sugar in your blood within minutes. Your cells want that sugar — it is their fuel. But they cannot simply absorb it. The door has to be unlocked from outside.");
+  await tween(1600,k=>pref_diabScene(ctx,cv,{key:k}));
+  await narrate("The key is insulin, made by your pancreas. Blood sugar rises, insulin is released, doors open, and the sugar moves out of the blood and into the cells. That loop runs quietly every time you eat.");
+  await tween(1200,k=>pref_diabScene(ctx,cv,{key:1,blocked:k}));
+  await narrate("There are two ways it breaks. In type one, the body destroys the cells that make insulin, so no key gets made at all. In type two, insulin is still made but the doors have stopped responding to it. Either way sugar piles up in the blood, where it does not belong — and it does its damage quietly, over years, without hurting at all.");
+  pref_diabScene(ctx,cv,{key:1,blocked:1});
+};
+
+/* ── GLP-1: a signal that normally vanishes, held open ────────────────────────────────────── */
+function pref_glpScene(ctx,cv,st){
+  const {natural=0, drug=0}=st;
+  pkFrame(ctx,cv,"The same signal, held open",
+    "Your gut already makes this. The body just breaks it down in minutes.");
+  const x0=150, x1=820, ytop=120, ybot=270;
+  ctx.strokeStyle=PK.line; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x0,ybot); ctx.lineTo(x1,ybot); ctx.stroke();
+  _t(ctx,(x0+x1)/2,ybot+26,"time after eating  →",{align:"center",col:PK.dim,size:12.5});
+  _t(ctx,x0-10,ytop+6,"signal",{align:"right",col:PK.dim,size:12.5});
+  if(natural>0){
+    const pts=[];
+    for(let i=0;i<=80;i++){ const u=i/80; pts.push([x0+(x1-x0)*u, ybot-(ybot-ytop)*Math.exp(-u*13)]); }
+    pkPath(ctx,pts,PK.a,2.6,natural);
+    _t(ctx,x0+60,ytop-8,"what your gut makes — gone in minutes",{col:PK.a,size:13});
+  }
+  if(drug>0){
+    const pts=[];
+    for(let i=0;i<=80;i++){ const u=i/80; pts.push([x0+(x1-x0)*u, ybot-(ybot-ytop)*0.82*Math.exp(-u*0.30)]); }
+    pkPath(ctx,pts,PK.good,3.2,drug);
+    _t(ctx,x0+300,ytop+34,"the medicine — the same message, for a week",{col:PK.good,size:13.5,bold:true});
+  }
+}
+ANIMS.pref_glp1_medicines_static=(cv,ctx)=>pref_glpScene(ctx,cv,{natural:1,drug:1});
+ANIMS.pref_glp1_medicines=async(cv,ctx)=>{
+  pref_glpScene(ctx,cv,{});
+  await narrate("When food reaches your intestine it releases a hormone that does several things at once: it tells the pancreas to release insulin, slows the stomach emptying, and signals the brain that you have had enough.");
+  await tween(1400,k=>pref_glpScene(ctx,cv,{natural:k}));
+  await narrate("It is beautifully effective, and it is gone within minutes. The body breaks it down almost immediately. Fine for one meal, but the signal cannot be stretched out.");
+  await tween(1800,k=>pref_glpScene(ctx,cv,{natural:1,drug:k}));
+  await narrate("These medicines are copies of that same hormone, redesigned so the body cannot break them down quickly. The identical message, arriving continuously for a week instead of a few minutes. People feel full sooner and stay full longer — and many describe the constant background chatter about food simply going quiet.");
+  pref_glpScene(ctx,cv,{natural:1,drug:1});
+};
+})();
+
+/* preface animations — batch 3: exercise, nutrition, llms, agents, agi, quant-finance */
+(function(){
+
+/* ── EXERCISE: damage, then the repair overshoots ─────────────────────────────────────────── */
+function pref_exScene(ctx,cv,st){
+  const {t=0}=st;
+  pkFrame(ctx,cv,"Break it slightly. The repair overshoots.",
+    "The gain happens while you rest — not while you train.");
+  const x0=140, x1=830, base=280, top=110;
+  ctx.strokeStyle=PK.line; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x0,base); ctx.lineTo(x1,base); ctx.stroke();
+  // the starting level, as a reference line
+  const y0=base-70;
+  ctx.strokeStyle="rgba(132,150,171,0.6)"; ctx.setLineWidth&&0;
+  ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
+  _t(ctx,x0-10,y0+5,"before",{align:"right",col:PK.dim,size:12.5});
+  // strength: dips on the session, recovers past the line
+  const pts=[];
+  for(let i=0;i<=100;i++){
+    const u=i/100;
+    let v;
+    if(u<0.12) v=0;
+    else if(u<0.30) v=-38*((u-0.12)/0.18);
+    else v=-38*Math.exp(-(u-0.30)*7) + 34*(1-Math.exp(-(u-0.30)*4.2));
+    pts.push([x0+(x1-x0)*u, y0-v]);
+  }
+  pkPath(ctx,pts,PK.a,3,t);
+  if(t>0.16) _t(ctx,x0+(x1-x0)*0.16,base+24,"session",{align:"center",col:PK.bad,size:12.5});
+  if(t>0.35) _t(ctx,x0+(x1-x0)*0.33,y0+52,"weaker for a while",{align:"center",col:PK.bad,size:13});
+  if(t>=1){
+    _t(ctx,x1-10,y0-40,"stronger than before",{align:"right",col:PK.good,size:14,bold:true});
+    pkArrow(ctx,x1-24,y0,x1-24,y0-32,PK.good,2.5);
+  }
+}
+ANIMS.pref_exercise_physiology_static=(cv,ctx)=>pref_exScene(ctx,cv,{t:1});
+ANIMS.pref_exercise_physiology=async(cv,ctx)=>{
+  pref_exScene(ctx,cv,{t:0.05});
+  await narrate("Lift something heavy and you cause small amounts of damage — micro tears in muscle, a system pushed past what it was comfortable with. That is the point, not a side effect.");
+  await tween(2800,k=>pref_exScene(ctx,cv,{t:k}));
+  await narrate("Straight afterwards you are weaker, not stronger. Then the body repairs it — and it does not rebuild to what was there before. It rebuilds slightly stronger, on the reasonable assumption that whatever happened once might happen again. So the gain happens while you rest. Train again before the repair finishes and you dig the hole deeper. Wait too long and it fades.");
+  pref_exScene(ctx,cv,{t:1});
+};
+
+/* ── NUTRITION: fuel and building material ───────────────────────────────────────────────── */
+function pref_nutScene(ctx,cv,st){
+  const {split=0, train=0}=st;
+  pkFrame(ctx,cv,"Food does two jobs at once",
+    train>0 ? "Diet decides how much you lose. Training decides what KIND."
+            : "Fuel to run on, and material to rebuild with.");
+  pkBar(ctx,300,120,380,split,PK.b,"fuel","carbs & fat");
+  pkBar(ctx,300,176,380,split*0.55,PK.good,"building","protein");
+  if(split>0.6) _t(ctx,300,224,"there is no store of building material — it is needed daily",
+                   {col:PK.dim,size:12.5});
+  if(train>0){
+    const lose=1-0.45*train;
+    pkBar(ctx,300,266,380,lose,PK.a,"weight lost","");
+    ctx.fillStyle=PK.bad;
+    ctx.fillRect(300+380*lose*(1-train*0.75),266,380*lose*train*0.75,26);
+    _t(ctx,300,314,train>0.6 ? "with training, most of the loss is fat, not muscle"
+                             : "without it, a large share is muscle",
+       {col:train>0.6?PK.good:PK.bad,size:13.5,bold:true});
+  }
+}
+ANIMS.pref_nutrition_exercise_static=(cv,ctx)=>pref_nutScene(ctx,cv,{split:1,train:1});
+ANIMS.pref_nutrition_exercise=async(cv,ctx)=>{
+  pref_nutScene(ctx,cv,{});
+  await narrate("Your body needs energy to run — to keep you warm, to move, to think. It also needs raw material to build and repair: muscle, bone, skin.");
+  await tween(1600,k=>pref_nutScene(ctx,cv,{split:k}));
+  await narrate("Food is doing both jobs at once. Fat and carbohydrate are mostly fuel. Protein can be burnt as fuel but is the main building material — and unlike fat, your body keeps no store of it, so it is needed regularly rather than occasionally.");
+  await tween(1800,k=>pref_nutScene(ctx,cv,{split:1,train:k}));
+  await narrate("For weight, the energy side dominates: take in less than you spend and you lose. But what you eat, and whether you train, decides whether that loss is mostly fat or takes a large share of muscle with it. The scales cannot tell the difference. Almost every diet argument is a fight about fuel while ignoring the building.");
+  pref_nutScene(ctx,cv,{split:1,train:1});
+};
+
+/* ── LLMs: guess the next word ────────────────────────────────────────────────────────────── */
+function pref_llmScene(ctx,cv,st){
+  const {guess=0, wrong=0}=st;
+  pkFrame(ctx,cv,"All it does is guess the next word",
+    wrong>0 ? "It sounds equally certain when it is inventing."
+            : "Do that a trillion times and something strange starts happening.");
+  _t(ctx,150,140,"The capital of France is",{size:22,col:PK.ink});
+  const opts=[["Paris",0.91,PK.good],["Lyon",0.04,PK.dim],["Berlin",0.03,PK.dim],["cheese",0.02,PK.dim]];
+  opts.forEach(([w,p,col],i)=>{
+    if(guess<=0) return;
+    const y=182+i*34;
+    pkBar(ctx,470,y-18,300,p*guess,col,w,(p*100).toFixed(0)+"%");
+  });
+  if(wrong>0){
+    pkPanel(ctx,150,272,660,58,
+      "Ask it something it never read, and it still answers — just as confidently.",PK.bad);
+  }
+}
+ANIMS.pref_llms_static=(cv,ctx)=>pref_llmScene(ctx,cv,{guess:1,wrong:1});
+ANIMS.pref_llms=async(cv,ctx)=>{
+  pref_llmScene(ctx,cv,{});
+  await narrate("The machine behind a chatbot has one job. Given some text, guess what comes next.");
+  await tween(1500,k=>pref_llmScene(ctx,cv,{guess:k}));
+  await narrate("Feed it 'the capital of France is' and it produces Paris, because in everything it read, that is what followed. Nobody taught it grammar or facts. Both fell out of getting very good at guessing. And to guess really well, across everything people write, you end up having to represent quite a lot.");
+  await tween(1000,k=>pref_llmScene(ctx,cv,{guess:1,wrong:k}));
+  await narrate("But it is still guessing. It has no way to check anything against the world, so when it does not know, it does not go quiet — it produces the most plausible-sounding continuation. That is why it can be fluently, confidently wrong, and why its confidence tells you nothing at all.");
+  pref_llmScene(ctx,cv,{guess:1,wrong:1});
+};
+
+/* ── AGENTS: one shot vs a loop ───────────────────────────────────────────────────────────── */
+function pref_agentScene(ctx,cv,st){
+  const {loop=0, drift=0}=st;
+  pkFrame(ctx,cv,"A calculator waits. An agent goes.",
+    drift>0 ? "A wrong step early gets built on for twenty more."
+            : "Give it a goal instead of an instruction, and it has to decide.");
+  // left: one shot
+  _t(ctx,230,110,"ordinary program",{align:"center",col:PK.dim,size:13.5});
+  pkArrow(ctx,140,160,330,160,PK.a,3);
+  _t(ctx,235,148,"ask → answer",{align:"center",col:PK.a,size:13});
+  _t(ctx,235,192,"then it stops",{align:"center",col:PK.dim,size:12.5});
+  // right: the loop
+  _t(ctx,650,110,"agent",{align:"center",col:PK.dim,size:13.5});
+  const steps=["think","act","look","again"];
+  steps.forEach((s,i)=>{
+    const a=-Math.PI/2 + i*Math.PI/2;
+    const cx=650+82*Math.cos(a), cy=190+62*Math.sin(a);
+    const on = loop*4 > i;
+    ctx.fillStyle= on ? (drift>0 && i>=2 ? PK.bad : PK.good) : "rgba(132,150,171,0.3)";
+    ctx.beginPath(); ctx.arc(cx,cy,26,0,Math.PI*2); ctx.fill();
+    _t(ctx,cx,cy+5,s,{align:"center",col:PK.bg,size:12.5,bold:true});
+  });
+  if(loop>=1){
+    ctx.strokeStyle=drift>0?PK.bad:PK.good; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(650,190,82,0,Math.PI*2); ctx.stroke();
+  }
+  if(drift>0) pkPanel(ctx,190,286,520,50,"step 2 was wrong — steps 3 to 20 build on it",PK.bad);
+}
+ANIMS.pref_ai_agents_static=(cv,ctx)=>pref_agentScene(ctx,cv,{loop:1,drift:1});
+ANIMS.pref_ai_agents=async(cv,ctx)=>{
+  pref_agentScene(ctx,cv,{});
+  await narrate("A normal program does exactly what it was told, once, and stops. You ask a calculator for eight times seven and it answers. It has no plan and nothing to decide.");
+  await tween(2000,k=>pref_agentScene(ctx,cv,{loop:k}));
+  await narrate("An agent is given a goal instead. Book me a table somewhere nice on Friday. Now it has to work out steps, look things up, notice when something failed, and try again differently. It thinks, acts, looks at what happened, and repeats. That looping is the entire trick.");
+  await tween(1000,k=>pref_agentScene(ctx,cv,{loop:1,drift:k}));
+  await narrate("Which introduces a problem that did not exist before. It can be wrong in the middle and carry on confidently. A calculator giving one wrong answer gives one wrong answer. An agent misreading step two can spend twenty more steps building on that mistake.");
+  pref_agentScene(ctx,cv,{loop:1,drift:1});
+};
+
+/* ── AGI: the jagged frontier ─────────────────────────────────────────────────────────────── */
+function pref_agiScene(ctx,cv,st){
+  const {bars=0, line=0}=st;
+  pkFrame(ctx,cv,"Better than us at some things. Worse than a child at others.",
+    line>0 ? "There is no single number being measured."
+           : "Capability is not one line going up.");
+  const tasks=[["write",0.92],["code",0.86],["exams",0.95],["arithmetic",0.55],
+               ["count objects",0.30],["tie a shoe",0.06],["remember you",0.22],["plan a week",0.41]];
+  const x0=170, w=560, y0=100;
+  tasks.forEach(([t,v],i)=>{
+    const y=y0+i*26;
+    pkBar(ctx,x0,y,w,v*bars,v>0.7?PK.good:(v>0.35?PK.b:PK.bad),t,"");
+  });
+  if(line>0){
+    ctx.strokeStyle=PK.dim; ctx.lineWidth=2;
+    const yh=y0+13;
+    ctx.beginPath(); ctx.moveTo(x0+w*0.55,y0-8); ctx.lineTo(x0+w*0.55,y0+tasks.length*26-6); ctx.stroke();
+    _t(ctx,x0+w*0.55+10,y0-14,"a human, roughly",{col:PK.dim,size:12.5});
+  }
+}
+ANIMS.pref_agi_and_beyond_static=(cv,ctx)=>pref_agiScene(ctx,cv,{bars:1,line:1});
+ANIMS.pref_agi_and_beyond=async(cv,ctx)=>{
+  pref_agiScene(ctx,cv,{});
+  await narrate("Every machine we have built is better than us at exactly one thing. A calculator at arithmetic, a chess program at chess. None of them can do anything else at all.");
+  await tween(2000,k=>pref_agiScene(ctx,cv,{bars:k}));
+  await narrate("Recent systems are different, and stranger. They write, code and pass exams at a level that surprised nearly everyone — while failing at things a small child finds easy.");
+  await tween(900,k=>pref_agiScene(ctx,cv,{bars:1,line:k}));
+  await narrate("So capability is not one line rising steadily. It is jagged, with no obvious pattern, which makes how close are we nearly unanswerable — there is no single thing being measured. Anyone certain about the timeline, in either direction, is telling you about themselves rather than about the technology.");
+  pref_agiScene(ctx,cv,{bars:1,line:1});
+};
+
+/* ── QUANT FINANCE: 10,000 flippers, ~312 with five heads ─────────────────────────────────── */
+function pref_qfScene(ctx,cv,st){
+  const {flip=0, zoom=0}=st;
+  pkFrame(ctx,cv,"Ten thousand people. Five coin flips each.",
+    zoom>0 ? "About 312 of them get five heads. None of them is skilled."
+           : "Each dot is one person.");
+  const cols=50, rows=20, gap=13, x0=140, y0=78;
+  const lucky=Math.round(cols*rows*0.03125);
+  pkDots(ctx,x0,y0,cols,rows,gap,4,(i)=>{
+    if(flip<=0) return "rgba(132,150,171,0.35)";
+    const isLucky = (i*37)%1000 < 31.25;                 // deterministic ~1/32 scatter
+    if(isLucky) return flip>0.5 ? PK.b : "rgba(132,150,171,0.35)";
+    return "rgba(132,150,171,0.28)";
+  });
+  if(zoom>0){
+    pkPanel(ctx,300,318,420,46,"~312 with a perfect streak, by luck alone",PK.b);
+  }
+}
+ANIMS.pref_quant_finance_static=(cv,ctx)=>pref_qfScene(ctx,cv,{flip:1,zoom:1});
+ANIMS.pref_quant_finance=async(cv,ctx)=>{
+  pref_qfScene(ctx,cv,{});
+  await narrate("Put ten thousand people in a room and have everyone flip a coin five times.");
+  await tween(1800,k=>pref_qfScene(ctx,cv,{flip:k}));
+  await narrate("Around three hundred will get five heads in a row. They did nothing clever. With enough people, someone always has a remarkable streak.");
+  await tween(900,k=>pref_qfScene(ctx,cv,{flip:1,zoom:k}));
+  await narrate("Markets are that room. Thousands of funds, decades of results — so impressive records exist whether or not anyone has genuine skill. The hard question is telling the coin flippers from the real thing, and that is what this subject is for. Its best output is often the word no.");
+  pref_qfScene(ctx,cv,{flip:1,zoom:1});
+};
+})();
+
+/* preface animations — batch 4: etfs, portfolios, fundamental, technical, options */
+(function(){
+
+/* ── ETFs: one company, or a sliver of five hundred ───────────────────────────────────────── */
+function pref_etfScene(ctx,cv,st){
+  const {spread=0, fee=0}=st;
+  // The fee view is ADDED BELOW the spread view rather than replacing it: the closing frame
+  // should hold both halves of the argument at once, which is also what the preface argues.
+  pkFrame(ctx,cv,"One company, or a sliver of five hundred",
+    fee>0 ? "And the fee compounds too — against you, about a third over forty years."
+          : "If one burns down, it was a fraction of a percent of what you hold.");
+  ctx.fillStyle=PK.bad; ctx.fillRect(190,96,74,74);
+  _t(ctx,227,190,"one company",{align:"center",col:PK.dim,size:13});
+  if(spread>0.7){
+    ctx.strokeStyle=PK.bad; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(190,96); ctx.lineTo(264,170); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(264,96); ctx.lineTo(190,170); ctx.stroke();
+  }
+  const n=Math.round(pkLerp(1,400,spread));
+  pkDots(ctx,520,92,20,20,8.6,3,(i)=> i<n ? PK.a : null);
+  _t(ctx,606,190,"five hundred companies",{align:"center",col:PK.dim,size:13});
+  if(spread>=1){
+    ctx.strokeStyle=PK.bad; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(520,92,5.5,0,Math.PI*2); ctx.stroke();
+    _t(ctx,606,212,"one failing barely shows",{align:"center",col:PK.good,size:13,bold:true});
+  }
+  if(fee>0){
+    pkBar(ctx,300,246,380,1,PK.good,"no fee","100%");
+    pkBar(ctx,300,290,380,pkLerp(1,0.69,fee),PK.bad,"1% a year",
+          Math.round(pkLerp(100,69,fee))+"%");
+    _t(ctx,490,334,"forty years later",{align:"center",col:PK.dim,size:12.5});
+  }
+}
+ANIMS.pref_investing_with_etfs_static=(cv,ctx)=>pref_etfScene(ctx,cv,{spread:1,fee:1});
+ANIMS.pref_investing_with_etfs=async(cv,ctx)=>{
+  pref_etfScene(ctx,cv,{});
+  await narrate("Buying shares in one company means your money rides on that company. If it does well you do well. If it burns down, so does your money.");
+  await tween(2000,k=>pref_etfScene(ctx,cv,{spread:k}));
+  await narrate("So instead, imagine a big shared pot that buys a small piece of every large company there is. You buy a share of the pot. Now one company going bust barely dents you, because it was only ever a fraction of a percent of what you hold. You swapped the chance of a spectacular win for a much smaller chance of disaster.");
+  await tween(1600,k=>pref_etfScene(ctx,cv,{spread:1,fee:Math.max(0.02,k)}));
+  await narrate("The other half is cost. Someone picking shares for you charges perhaps one percent a year. That sounds like a rounding error. Over forty years it quietly takes about a third of what you would otherwise have had — and it is charged whether the year was good or bad.");
+  pref_etfScene(ctx,cv,{spread:1,fee:1});
+};
+
+/* ── PORTFOLIOS: two zigzags, and a calmer sum ────────────────────────────────────────────── */
+function pref_portScene(ctx,cv,st){
+  const {both=0, sum=0}=st;
+  pkFrame(ctx,cv,"Two things that fall at different times",
+    sum>0 ? "The bad patches partly cancel. That is the whole idea."
+          : "One zigs while the other zags.");
+  const x0=150, x1=830, mid=190, A=[], B=[], S=[];
+  for(let i=0;i<=120;i++){
+    const u=i/120, x=x0+(x1-x0)*u;
+    const a=Math.sin(u*11)*34 + Math.sin(u*3.1)*22;
+    const b=-a*0.78 + Math.sin(u*5.7)*9;
+    A.push([x,mid-a]); B.push([x,mid-b]); S.push([x,mid-(a+b)/2]);
+  }
+  pkPath(ctx,A,PK.a,2.4);
+  if(both>0) pkPath(ctx,B,PK.b,2.4,both);
+  _t(ctx,x1+8,A[120][1]+4,"shares",{col:PK.a,size:12.5});
+  if(both>0.9) _t(ctx,x1+8,B[120][1]+4,"bonds",{col:PK.b,size:12.5});
+  if(sum>0){
+    const S2=S.map(([x,y])=>[x,y+120]);
+    pkPath(ctx,S2,PK.good,3.2,sum);
+    _t(ctx,x0-10,mid+124,"together",{align:"right",col:PK.good,size:13,bold:true});
+    if(sum>=1) _t(ctx,(x0+x1)/2,340,"a much smoother ride, for about the same return",
+                  {align:"center",col:PK.good,size:14,bold:true});
+  }
+}
+ANIMS.pref_investment_portfolios_static=(cv,ctx)=>pref_portScene(ctx,cv,{both:1,sum:1});
+ANIMS.pref_investment_portfolios=async(cv,ctx)=>{
+  pref_portScene(ctx,cv,{});
+  await narrate("Everyone knows to spread money around. As usually given the advice is nearly useless, because spreading across ten things that all fall together is barely different from holding one thing.");
+  await tween(1700,k=>pref_portScene(ctx,cv,{both:k}));
+  await narrate("What actually helps is owning things that do badly at different moments. When shares fall hard, government bonds have often risen, because frightened people want somewhere safe.");
+  await tween(1700,k=>pref_portScene(ctx,cv,{both:1,sum:k}));
+  await narrate("Combine them and the ride gets smoother — not because you gave up much return, but because the bad patches partly cancel out. That matters more than it sounds. Losing half your money takes a doubling to undo, so avoiding the worst holes is worth more than catching the best runs.");
+  pref_portScene(ctx,cv,{both:1,sum:1});
+};
+
+/* ── FUNDAMENTAL: price wanders, worth is a band ──────────────────────────────────────────── */
+function pref_fundScene(ctx,cv,st){
+  const {value=0, price=0, buy=0}=st;
+  pkFrame(ctx,cv,"What is it worth? Then look at the price.",
+    buy>0 ? "Buy only when the price is well below the estimate."
+          : "The price is a fact. The value is an estimate you make.");
+  const x0=150, x1=830, mid=195;
+  if(value>0){
+    const h=46*value;
+    ctx.fillStyle="rgba(95,191,149,0.18)"; ctx.fillRect(x0,mid-h,x1-x0,h*2);
+    ctx.strokeStyle=PK.good; ctx.lineWidth=1.5;
+    ctx.strokeRect(x0,mid-h,x1-x0,h*2);
+    _t(ctx,x1+8,mid+5,"worth",{col:PK.good,size:13,bold:true});
+  }
+  if(price>0){
+    const pts=[];
+    for(let i=0;i<=120;i++){
+      const u=i/120;
+      pts.push([x0+(x1-x0)*u, mid - (Math.sin(u*7.3)*74 + Math.sin(u*2.1)*46)]);
+    }
+    pkPath(ctx,pts,PK.b,2.6,price);
+    _t(ctx,x0+16,88,"price, as other people feel about it",{col:PK.b,size:13});
+    if(buy>0){
+      // mark the cheap stretches
+      for(let i=0;i<=120;i+=2){
+        const u=i/120, y=mid-(Math.sin(u*7.3)*74+Math.sin(u*2.1)*46);
+        if(y>mid+50){ ctx.fillStyle=PK.good;
+          ctx.beginPath(); ctx.arc(x0+(x1-x0)*u,y,3.6,0,Math.PI*2); ctx.fill(); }
+      }
+      _t(ctx,(x0+x1)/2,332,"these stretches — cheap enough to be wrong and still fine",
+         {align:"center",col:PK.good,size:13.5,bold:true});
+    }
+  }
+}
+ANIMS.pref_fundamental_analysis_static=(cv,ctx)=>pref_fundScene(ctx,cv,{value:1,price:1,buy:1});
+ANIMS.pref_fundamental_analysis=async(cv,ctx)=>{
+  pref_fundScene(ctx,cv,{});
+  await narrate("Imagine buying the lemonade stand on your street. You would ask how much it makes in a summer, whether anyone could set up next door, and what the equipment is worth. Then you would decide what to pay.");
+  await tween(1300,k=>pref_fundScene(ctx,cv,{value:k}));
+  await narrate("Buying a share is that, in miniature. So the work is to estimate what the business is worth, from what it actually does. That estimate is always rough — a band, not a number.");
+  await tween(1800,k=>pref_fundScene(ctx,cv,{value:1,price:k}));
+  await narrate("Meanwhile the price wanders about, because it is only what other people are asking today. It need not match the worth at all.");
+  await tween(900,k=>pref_fundScene(ctx,cv,{value:1,price:1,buy:k}));
+  await narrate("Which is why the discipline is to buy only when the price is well below your estimate. The gap is your room to be somewhat wrong and still be fine. Work out what it is worth, then look at the price — never the other way round.");
+  pref_fundScene(ctx,cv,{value:1,price:1,buy:1});
+};
+
+/* ── TECHNICAL: which chart is real? ──────────────────────────────────────────────────────── */
+function pref_taScene(ctx,cv,st){
+  const {draw=0, reveal=0}=st;
+  pkFrame(ctx,cv,"One of these is a real market. One is coin flips.",
+    reveal>0 ? "Your eyes cannot tell. That is the trap at the centre of the subject."
+             : "Both have trends, reversals and levels that look obvious.");
+  const mk=(seed)=>{ let v=0, out=[]; for(let i=0;i<=110;i++){
+      v += Math.sin(i*seed)*3.1 + Math.cos(i*seed*0.37)*2.4; out.push(v); } return out; };
+  [[220,mk(1.13),PK.a],[660,mk(2.71),PK.b]].forEach(([cx,ser,col])=>{
+    const x0=cx-180, w=360, base=210, sc=1.5;
+    const pts=ser.map((v,i)=>[x0+w*(i/110), base - v*sc]);
+    pkPath(ctx,pts,col,2.2,draw);
+    ctx.strokeStyle=PK.line; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x0,base+62); ctx.lineTo(x0+w,base+62); ctx.stroke();
+  });
+  pkPair(ctx,cv,"chart A","chart B",300);
+  if(reveal>0) pkPanel(ctx,250,318,400,46,"both were made the same way",PK.bad);
+}
+ANIMS.pref_technical_analysis_static=(cv,ctx)=>pref_taScene(ctx,cv,{draw:1,reveal:1});
+ANIMS.pref_technical_analysis=async(cv,ctx)=>{
+  pref_taScene(ctx,cv,{});
+  await narrate("Every price on a chart is the point where a buyer and a seller agreed. Draw them over months and you get a picture of a long argument about what something is worth.");
+  await tween(2000,k=>pref_taScene(ctx,cv,{draw:k}));
+  await narrate("Here are two charts. Both have trends, both have reversals, both have levels the price seems to respect. Have a look and decide which one came from a real market.");
+  await tween(900,k=>pref_taScene(ctx,cv,{draw:1,reveal:k}));
+  await narrate("Neither. Both were made the same way, from a simple wiggle with no market in it at all. Humans see patterns in everything, including noise — which is why it looks obvious on the chart is not evidence of anything. The only honest way to use this is to take a rule, test it mechanically across decades, and count. Most of what looks compelling evaporates. A few things survive.");
+  pref_taScene(ctx,cv,{draw:1,reveal:1});
+};
+
+/* ── OPTIONS: the right to decide later ───────────────────────────────────────────────────── */
+function pref_optScene(ctx,cv,st){
+  const {payoff=0, decay=0}=st;
+  pkFrame(ctx,cv,"Pay a little now for the right to decide later",
+    decay>0 ? "And every day that passes, the unused right is worth less."
+            : "The most you can lose is what you paid. The upside is open.");
+  const x0=170, x1=780, base=270, strike=x0+(x1-x0)*0.45;
+  ctx.strokeStyle=PK.line; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x0,base); ctx.lineTo(x1,base); ctx.stroke();
+  _t(ctx,(x0+x1)/2,base+50,"price of the bike  →",{align:"center",col:PK.dim,size:12.5});
+  ctx.strokeStyle="rgba(132,150,171,0.5)";
+  ctx.beginPath(); ctx.moveTo(strike,110); ctx.lineTo(strike,base+8); ctx.stroke();
+  _t(ctx,strike,100,"the price you locked in",{align:"center",col:PK.dim,size:12});
+  const cost=26;
+  const pts=[];
+  for(let i=0;i<=100;i++){
+    const x=x0+(x1-x0)*(i/100);
+    const y = x<strike ? base+cost : base+cost-(x-strike)*0.62;
+    pts.push([x,y]);
+  }
+  pkPath(ctx,pts,PK.good,3.2,payoff);
+  if(payoff>0.4) _t(ctx,x0+20,base+cost+22,"you walk away — you lose the five dollars",
+                    {col:PK.bad,size:12.5});
+  if(payoff>=1) _t(ctx,x1-10,150,"upside, open-ended",{align:"right",col:PK.good,size:13.5,bold:true});
+  if(decay>0){
+    const shrunk=pts.map(([x,y])=>[x, y===base+cost ? y : base+cost-(base+cost-y)*(1-0.6*decay)]);
+    pkPath(ctx,shrunk,PK.bad,2,1);
+    _t(ctx,x1-10,base-30,"…and shrinking as time runs out",{align:"right",col:PK.bad,size:13});
+  }
+}
+ANIMS.pref_options_and_iv_static=(cv,ctx)=>pref_optScene(ctx,cv,{payoff:1,decay:1});
+ANIMS.pref_options_and_iv=async(cv,ctx)=>{
+  pref_optScene(ctx,cv,{});
+  await narrate("Imagine paying a bike shop five dollars to hold a bike at today's price for a month.");
+  await tween(1800,k=>pref_optScene(ctx,cv,{payoff:k}));
+  await narrate("If the price rises, you buy at the old price and you are ahead — and the further it rises, the further ahead. If it falls, you simply walk away and lose your five dollars. You bought the right to choose, not the bike. That lopsidedness is why options are useful.");
+  await tween(1400,k=>pref_optScene(ctx,cv,{payoff:1,decay:k}));
+  await narrate("The catch is that you are also paying for time. Every day that passes, an unused right is worth slightly less, because there is less remaining chance for things to move. Being right eventually is not enough. You have to be right before it expires.");
+  pref_optScene(ctx,cv,{payoff:1,decay:1});
+};
+})();
+
 /* quantum / qm_preface — water waves cancelling, then the same picture for a quantum outcome */
 (function(){
 const QP={water:"#6FA8DC", crest:"#8FC4E8", trough:"#3E6A8E", flat:"#5FBF95",

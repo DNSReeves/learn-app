@@ -801,6 +801,7 @@
         "text": "The scales cannot tell the difference between fat, muscle and water. Someone can be delighted with the number while quietly losing the tissue that keeps them strong and independent later."
       }
     ],
-    "closer": "Fuel and building material. Do not sacrifice one chasing the other."
+    "closer": "Fuel and building material. Do not sacrifice one chasing the other.",
+    "anim": "pref_nutrition_exercise"
   }
 }

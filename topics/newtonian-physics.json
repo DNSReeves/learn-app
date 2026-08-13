@@ -944,6 +944,7 @@
         "text": "You feel thrown outward on a roundabout, so it seems like a force pushes you out. Nothing does. The car is being pulled inward, and you are simply carrying on straight while it turns under you."
       }
     ],
-    "closer": "Nothing needs a reason to keep going. Only to change."
+    "closer": "Nothing needs a reason to keep going. Only to change.",
+    "anim": "pref_newtonian_physics"
   }
 }
