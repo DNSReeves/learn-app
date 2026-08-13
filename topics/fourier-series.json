@@ -681,6 +681,111 @@
         }
       ],
       "anim": "fs_transform"
+    },
+    {
+      "id": "c08-orthogonal-not-independent",
+      "title": "Orthogonal Is Not Independent",
+      "summary": "Orthogonality is a property of the basis; independence is a property of the coefficients. The gap between them is where frequency-domain evidence goes wrong.",
+      "cards": [
+        {
+          "h": "The theorem that IS true",
+          "md": "There is a real result behind the intuition, and it is worth stating precisely before taking it apart.\n\nFor a **stationary Gaussian** process, the DFT coefficients are *asymptotically independent* complex Gaussians, with variance given by the power spectral density at that frequency. This is the **Whittle likelihood**, and it is exactly what licenses writing a log-likelihood as a sum over frequency bins:\n\n## log L ≈ −Σ_f [ log S(f) + I(f)/S(f) ]\n\nEach bin contributes its own additive term. In Bayesian language, each frequency is a separate piece of evidence and the likelihood ratios multiply — the condition that **Bayesian Inference** calls conditional independence.\n\nSo the instinct is sound. The trouble is what it rests on."
+        },
+        {
+          "h": "Three things must hold, and the basis supplies only one",
+          "md": "Orthogonality of sines and cosines is a **geometric** fact about the basis. It says nothing on its own about *your* coefficients. Three separate conditions are doing the work:\n\n- **The Fourier basis must diagonalise the covariance.** True for stationary (circulant) processes. Under non-stationarity it simply is not, and bins are coupled no matter how orthogonal the basis is.\n- **Uncorrelated must imply independent** — which needs Gaussianity. Returns are not Gaussian; volatility clustering creates dependence *between* bands whose coefficients are linearly uncorrelated.\n- **It is asymptotic.** At finite N, spectral leakage convolves the true spectrum with the window kernel, correlating adjacent bins. Tapering reduces leakage and also reduces the number of effectively independent bins.\n\nOrthogonal gives you *uncorrelated*, and only under the first condition. Independent needs all three."
+        },
+        {
+          "h": "Multiplying across bins is unforgiving",
+          "md": "Suppose you accept independence and multiply likelihood ratios across bins. Then a **small systematic error per bin compounds**, and the arithmetic is brutal:\n\n## 200 bins, each biased by a factor of 1.05 → 17,000× on the odds\n\nNothing was mis-measured badly. Each bin was off by five percent in the same direction — a slightly wrong window, a slightly mis-specified noise model — and the posterior is certain of something it has no right to be.\n\nThis is the mirror of the double-counting error. Correlated evidence makes you overconfident by repeating itself; independent-but-biased evidence makes you overconfident by accumulating. **Both produce a confident number and neither announces itself.** The defence is the same: count how many genuinely independent pieces of evidence you have, and it is nearly always fewer than the nominal count."
+        },
+        {
+          "h": "And the power spectrum cannot answer 'are these the same'",
+          "md": "A separate trap, and a sharper one. Two series can have **identical power spectra and be entirely unrelated** — that is precisely what a phase-randomised surrogate is. All the sameness lives in the *relative phase*, which |X(f)| discards.\n\nThe right statistic is **magnitude-squared coherence**, built from the cross-spectrum, which keeps the phase relationship. It has a famous trap of its own: estimated from a single periodogram it is **identically 1 at every frequency** — degenerate, carrying no information at all. You must average over segments or tapers, and the number of independent segments, not the number of bins, is your real evidence count.\n\n**How to settle it empirically.** Build phase-randomised surrogates of both series — identical power spectra, destroyed phase relationship — and run your procedure on many surrogate pairs. If it reports 0.999 on real data and trips above 0.99 on a third of surrogates, the independence assumption is generating the number, not the data. That is the same calibration discipline as a held-out test in **Quantitative Finance**."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Two series are compared bin by bin in the frequency domain, and the likelihood ratios are multiplied because 'the Fourier basis is orthogonal'. What does orthogonality actually guarantee here?",
+          "options": [
+            "Nothing by itself — it gives uncorrelated coefficients only if the basis diagonalises the covariance, and uncorrelated is not independent without Gaussianity",
+            "That the coefficients are statistically independent",
+            "That the coefficients are independent provided N is large",
+            "That the coefficients are independent for any stationary process"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct. Orthogonality is a property of the basis functions; independence is a property of the coefficients of your data. Three conditions are needed — a covariance the basis diagonalises, Gaussianity, and large N — and the basis supplies only the first, and only under stationarity.",
+            "Orthogonality is geometric. It concerns the inner product of the basis functions, and holds identically whatever data you feed in — which is exactly why it cannot certify anything about your coefficients.",
+            "Large N is necessary and not sufficient. Non-stationarity breaks the diagonalisation at any N, and non-Gaussianity keeps uncorrelated from meaning independent however much data you collect.",
+            "Stationarity gets you uncorrelated asymptotically. Independence additionally needs Gaussianity — and for financial returns that is precisely the assumption that fails."
+          ]
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "A frequency-domain comparison multiplies likelihood ratios over 200 bins. Each bin's likelihood is mis-specified by only 5% in the same direction. What happens?",
+          "options": [
+            "A negligible error — 5% is well within any sensible tolerance",
+            "The bias compounds to roughly 17,000× on the odds",
+            "The errors cancel, since they are random",
+            "The posterior is unaffected because likelihood ratios are scale-free"
+          ],
+          "answer": 1,
+          "feedback": [
+            "Per bin it is negligible. Multiplied 200 times it is not: 1.05^200 is about 17,000, which converts near-ignorance into apparent certainty.",
+            "Correct. This is why a frequency-domain likelihood is unforgiving — the number of bins that makes the method powerful is the same number that amplifies a systematic error.",
+            "They cancel only if the errors are independent and mean-zero. A systematic bias — a wrong window, a mis-specified noise floor — points the same way in every bin, which is the case that compounds.",
+            "Scale-freeness is why they multiply rather than add. It is exactly what makes the compounding happen."
+          ]
+        },
+        {
+          "id": "q3",
+          "type": "mcq",
+          "prompt": "You compare the amplitude spectra of two series, find them nearly identical, and conclude the signals are the same. What is the flaw?",
+          "options": [
+            "Amplitude spectra should be compared on a log scale",
+            "Identical power spectra are compatible with completely unrelated signals — the relationship lives in the phase",
+            "You need more frequency bins",
+            "Spectra can only be compared for stationary signals"
+          ],
+          "answer": 1,
+          "feedback": [
+            "A log scale changes what is visible, not what is knowable. The information you need was discarded before the plotting.",
+            "Correct. A phase-randomised surrogate has, by construction, exactly the same power spectrum and no relationship at all. Taking |X(f)| throws away the phase, which is where sameness is encoded — so use the cross-spectrum and coherence.",
+            "More bins gives finer resolution of a quantity that cannot answer the question. It sharpens the wrong instrument.",
+            "Stationarity matters for interpreting a spectrum, but even for two perfectly stationary signals, matching power spectra do not imply any relationship."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "Coherence is estimated between two series from a single periodogram, with no segment averaging. The result is 1.0 at every frequency. What does that mean?",
+          "options": [
+            "The two series are perfectly related at all frequencies",
+            "Nothing — single-periodogram coherence is identically 1 by construction",
+            "The series are identical",
+            "The sampling rate is too low"
+          ],
+          "answer": 1,
+          "feedback": [
+            "It would be an extraordinary result if it meant anything. It does not — the estimator is degenerate in this case and returns 1 for any two series whatsoever.",
+            "Correct, and it is a classic trap. With one periodogram the normalisation forces the ratio to unity regardless of the data. Averaging over segments or tapers is what makes coherence informative — and the number of independent segments, not bins, is the real evidence count.",
+            "The estimator returns 1 for two completely unrelated series as readily as for identical ones, which is what makes the output uninformative rather than impressive.",
+            "Sampling rate affects the frequency range, not this degeneracy. Averaging is the fix."
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "label": "scipy.signal.coherence — magnitude-squared coherence via Welch's method",
+          "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.coherence.html",
+          "type": "reading",
+          "note": "The practical tool, and the documentation makes the key point structural: nperseg and noverlap exist because coherence must be estimated from AVERAGED segments. The parameters are the theory."
+        }
+      ]
     }
   ],
   "preface": {
