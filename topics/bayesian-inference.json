@@ -484,6 +484,10 @@
         {
           "h": "Double-counting",
           "md": "The loop has one failure mode worth tattooing somewhere: **evidence may be counted once.**\n\nIf two news stories both trace back to the same source, they are one piece of evidence wearing two hats. Updating on both is like flipping a coin once and recording it twice. Correlated signals — analysts quoting each other, indicators derived from the same price series — must be discounted or your posterior becomes confident far beyond what the world actually told you."
+        },
+        {
+          "h": "A lab panel is not three pieces of evidence",
+          "md": "The condition has a name worth knowing: evidence must be **conditionally independent** — independent *given the hypothesis*. Not merely \"different measurements\", and not \"uncorrelated in the population\".\n\nA standard lipid panel is the trap. Total cholesterol, LDL and non-HDL are largely **re-expressions of overlapping measurements** — non-HDL is total minus HDL by definition. Suppose each carries a likelihood ratio of 3 for elevated cardiac risk, against a 10% pre-test probability:\n\n## naive: 1:9 × 3 × 3 × 3 = 3:1 → **75%**\n\nTreat them honestly as close to one measurement and it is 1:9 × 3 = 1:3, or **25%**. Same patient, same numbers, same afternoon — and a difference that changes what you do.\n\nThe tell is mechanical, not statistical: ask what each marker is *made of*. Two quantities computed from the same blood draw, one partly by subtraction from the other, cannot be three independent votes."
         }
       ],
       "questions": [
@@ -539,6 +543,24 @@
             "Right. One underlying source ≈ one piece of evidence; the echoes add almost nothing.",
             "The underlying report is real evidence — once.",
             "Bayes says discount the echo, not invert it; contrarianism needs its own evidence."
+          ]
+        },
+        {
+          "id": "q4",
+          "type": "mcq",
+          "prompt": "A cardiology risk tool multiplies likelihood ratios from total cholesterol, LDL and non-HDL cholesterol, treating each as separate evidence. What is the most likely consequence?",
+          "options": [
+            "The posterior risk is overstated, because the three markers are largely the same measurement",
+            "The posterior risk is understated, because correlated evidence cancels",
+            "No effect — likelihood ratios always multiply",
+            "The result is fine as long as each likelihood ratio was measured accurately"
+          ],
+          "answer": 0,
+          "feedback": [
+            "Correct. Non-HDL is total minus HDL by definition, so this is close to counting one measurement three times. On a 10% pre-test probability with LR 3 each, the naive answer is 75% against roughly 25% — the newsletter error in a white coat.",
+            "Correlated evidence does not cancel; it over-accumulates. Each repetition pushes the odds the same way, so the error is confident overshoot rather than dilution.",
+            "They multiply only when the pieces are conditionally independent — independent given the hypothesis. That is a real assumption about the world, not a property of the arithmetic.",
+            "Accuracy per marker is not the issue. Each LR can be perfectly measured in isolation and the combination still be wrong, because the error is in treating them as separate votes."
           ]
         }
       ],
