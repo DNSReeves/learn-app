@@ -4223,17 +4223,22 @@ function pref_physScene(ctx,cv,st){
   const hearts=[[280,"a little blood back",0.45],[640,"a lot of blood back",1.0]];
   hearts.forEach(([cx,label,amt])=>{
     const f=amt*fill;
-    const R=pkLerp(46,46+34*f,1);
+    const R=46+34*f;                       // resting size — how full it is before the beat
     const squeeze=pkLerp(1,1-0.30*f,beat);
-    ctx.strokeStyle=PK.line; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.ellipse(cx,180,R*squeeze,R*1.12*squeeze,0,0,Math.PI*2); ctx.stroke();
-    ctx.fillStyle="rgba(212,106,98,0.35)";
-    ctx.beginPath(); ctx.ellipse(cx,180,(R-7)*squeeze,(R-7)*1.12*squeeze,0,0,Math.PI*2); ctx.fill();
-    _t(ctx,cx,268,label,{align:"center",col:PK.dim,size:13});
+    // The RESTING outline stays put while the body squeezes inside it. Without this the squeeze
+    // cancelled the fill difference and both hearts ended the same size — which is the one thing
+    // this picture exists to show. Only visible once rendered.
+    ctx.strokeStyle=PK.line; ctx.lineWidth=2; ctx.setLineDash&&ctx.setLineDash([]);
+    ctx.beginPath(); ctx.ellipse(cx,206,R,R*1.12,0,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle="rgba(212,106,98,0.42)";
+    ctx.beginPath(); ctx.ellipse(cx,206,(R-6)*squeeze,(R-6)*1.12*squeeze,0,0,Math.PI*2); ctx.fill();
+    _t(ctx,cx,306,label,{align:"center",col:PK.dim,size:13});
     if(beat>0){
       const out=pkLerp(0,amt,beat);
-      pkArrow(ctx,cx,110,cx,110-pkLerp(6,66,out),PK.bad,3.5);
-      _t(ctx,cx,88-pkLerp(6,66,out),amt>0.7?"strong beat":"gentle beat",
+      // arrows sit BELOW the title band: tail at 128, tip no higher than 72
+      const tip=128-pkLerp(6,56,out);
+      pkArrow(ctx,cx,128,cx,tip,PK.bad,3.5);
+      _t(ctx,cx,tip-10,amt>0.7?"strong beat":"gentle beat",
          {align:"center",col:PK.bad,size:13,bold:true});
     }
   });
@@ -4506,7 +4511,7 @@ function pref_qfScene(ctx,cv,st){
   pkFrame(ctx,cv,"Ten thousand people. Five coin flips each.",
     zoom>0 ? "About 312 of them get five heads. None of them is skilled."
            : "Each dot is one person.");
-  const cols=50, rows=20, gap=13, x0=140, y0=78;
+  const cols=50, rows=15, gap=13, x0=140, y0=84;   // 15 rows so the grid ends clear of the panel
   const lucky=Math.round(cols*rows*0.03125);
   pkDots(ctx,x0,y0,cols,rows,gap,4,(i)=>{
     if(flip<=0) return "rgba(132,150,171,0.35)";
@@ -4515,7 +4520,7 @@ function pref_qfScene(ctx,cv,st){
     return "rgba(132,150,171,0.28)";
   });
   if(zoom>0){
-    pkPanel(ctx,300,318,420,46,"~312 with a perfect streak, by luck alone",PK.b);
+    pkPanel(ctx,300,294,420,42,"~312 with a perfect streak, by luck alone",PK.b);
   }
 }
 ANIMS.pref_quant_finance_static=(cv,ctx)=>pref_qfScene(ctx,cv,{flip:1,zoom:1});
@@ -4677,8 +4682,8 @@ function pref_taScene(ctx,cv,st){
     ctx.strokeStyle=PK.line; ctx.lineWidth=1;
     ctx.beginPath(); ctx.moveTo(x0,base+62); ctx.lineTo(x0+w,base+62); ctx.stroke();
   });
-  pkPair(ctx,cv,"chart A","chart B",300);
-  if(reveal>0) pkPanel(ctx,250,318,400,46,"both were made the same way",PK.bad);
+  pkPair(ctx,cv,"chart A","chart B",288);
+  if(reveal>0) pkPanel(ctx,250,302,400,40,"both were made the same way",PK.bad);
 }
 ANIMS.pref_technical_analysis_static=(cv,ctx)=>pref_taScene(ctx,cv,{draw:1,reveal:1});
 ANIMS.pref_technical_analysis=async(cv,ctx)=>{
