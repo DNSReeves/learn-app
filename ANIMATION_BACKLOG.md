@@ -66,6 +66,54 @@
 > which is still the standing guidance for how new animations get built.
 
 
+> ## ▶ AUTHORING AN ANIMATION — the required steps (2026-08-13)
+>
+> **An animation is not done until someone has rendered it and looked at it.** This is not advice.
+> It is the step that found 17 defects in 25 animations — and every one of them passed the
+> automated checks while doing so.
+>
+> ```
+> 1  author            write the scene as a pure function of its parameters
+> 2  register          ANIMS.<name> and ANIMS.<name>_static in static/index.html
+> 3  wire              set "anim" on the concept or preface; validate_pack.py gates the name
+> 4  check geometry    node tests/preface_anims.test.js        (finite coords, non-blank, no jargon)
+> 5  RENDER AND LOOK   python3 tools/render_anim.py <name> /tmp/shots     ← not optional
+> 6  review in context python3 tools/contact_sheet.py /tmp/shots /tmp/sheet.png
+> ```
+>
+> **Step 4 is not step 5.** The geometry checks answer "is this drawing well-formed" — coordinates
+> finite, frame not blank, nothing jargon-y on screen. They cannot answer "is this drawing TRUE".
+> The 2026-08-01 programme browser-verified every animation ("static frames paint + runners play,
+> 0 page errors") and that is the same class of check: it proves nothing crashed. Both are worth
+> having. Neither is looking.
+>
+> **What only looking finds.** Every defect in the 2026-08-13 sweep fell into three kinds, and the
+> list is worth reading before authoring rather than after:
+>
+> | kind | example found |
+> |---|---|
+> | **caption contradicts picture** | "your eyes cannot tell" over two charts drawn from *different* frequencies, plainly distinguishable |
+> | | "sealed" beside a crack sealed 40% of its length |
+> | | "these stretches — cheap enough" over a price curve that never entered them (measured: range −29..103 against a ±46 band) |
+> | **wrong proportion** | 400 dots at 2,500 people each, one labelled "about 100 ill" — off by 25× — and the picture showing 1% as 62% |
+> | | a resting-size difference cancelled by the squeeze, so two hearts ended identical when the whole point was that one is bigger |
+> | | near-perfect anti-correlation rendering "partly cancel" as a flat line |
+> | **collision / omission** | labels drawn inside a dot grid, a panel over its own fourth bar, a label drawn *inside* the bar it describes, an arrow with no label to say what it means |
+>
+> **Two habits that follow.**
+>
+> - **Design the data, do not discover it.** If a caption names a region — a dip, a crossing, a
+>   stretch below a band — compute the curve's range first and confirm the region exists. Three of
+>   the defects above were captions describing something that was never drawn.
+> - **A parameter used twice must change twice.** The fundamental-analysis price appears in the
+>   drawn curve AND in the test deciding where to shade. Editing one leaves the picture confidently
+>   highlighting the wrong part of itself. Assert the occurrence count before replacing.
+>
+> **The static frame is the poster.** `<name>_static` is what a reader sees before pressing play,
+> and it must stand alone. Two ETF defects were exactly this: a branch that replaced the scene
+> rather than adding to it, so both the opening still and the closing frame drew two bars and
+> dropped everything else.
+
 > **P3.10 DECISION (2026-07-25, iss_ef1e0e3c — one built each way, as specced):**
 > **Declarative wins**, as the operator expected — now with evidence. Arm (a):
 > `phase_portrait` is a ~20-line spec (matrices, starts, narration prose) over a 5-op
