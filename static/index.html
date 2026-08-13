@@ -958,6 +958,7 @@ let T=null; // current topic payload
    course's intro does not suppress another's. Not persisted: the intro is cheap to re-show
    and a student returning days later has usually forgotten why they started. */
 const INTRO_SEEN = new Set();
+const PREFACE_SEEN = new Set();   // same per-session policy as INTRO_SEEN
 const SESH={moves:{},mastered:[]};   // P4.14: this visit's posterior moves
 async function viewTopic(tid, focus){
   T = await api("/topic/"+tid);
@@ -992,6 +993,9 @@ async function viewTopic(tid, focus){
      for a screen whose job is to make the subject compelling. Now it opens once per session
      per topic for everyone; the button reads "Back to the course" for anyone with progress,
      so it costs a returning student one click and nothing else. */
+  if (T.preface && !focus && !PREFACE_SEEN.has(tid)){
+    renderLadder("__preface__"); viewPreface(tid); return;
+  }
   if (T.intro && !focus && !INTRO_SEEN.has(tid)){
     renderLadder("__intro__"); viewIntro(tid); return;
   }
@@ -1004,6 +1008,41 @@ async function viewTopic(tid, focus){
 /* The doorway into a subject: why it is worth knowing, before any test of what you know.
    Content is pack-authored (`intro` in the topic JSON) and validated by validate_pack.py;
    the visual reuses the existing animation registry, so an intro adds no new asset path. */
+/* THE PREFACE (2026-08-12, operator: "start with a preface, that teaches each subject to an
+   audience of curious and inquisitive 12 year olds"). It sits BEFORE the intro, and it is not a
+   simplified intro — it is a different job. The intro argues why a subject deserves an adult's
+   time; the preface makes the idea land at all, built only from things a twelve-year-old already
+   has. No jargon, no formula, one concrete picture.
+
+   Same rendering shape as viewIntro on purpose: same animation registry, same Listen path, same
+   markup. A preface adds content, not a new asset path. */
+function viewPreface(tid){
+  const P = T.preface; if(!P){ return viewIntro(tid); }
+  renderLadder("__preface__");
+  $("#stage").innerHTML = `
+  <section class="stage intro preface">
+    <div class="introhead">
+      <div class="introkicker">${esc(T.title||"")} &middot; start here</div>
+      <h1 class="introhook">${esc(P.hook)}</h1>
+      <button class="btn ghost" id="prefplay" title="Listen to this preface">🔊 Listen</button>
+    </div>
+    ${P.anim ? `<div class="introanim">${animHTML()}</div>` : ""}
+    <div class="introbody">${P.body.map(x=>`<p>${esc(x)}</p>`).join("")}</div>
+    ${P.aha ? `<div class="whygrid">${P.aha.map(a=>`<div class="whycard"><h3>${esc(a.title)}</h3><p>${esc(a.text)}</p></div>`).join("")}</div>` : ""}
+    ${P.closer?`<p class="introcloser">${esc(P.closer)}</p>`:""}
+    <div class="certactions">
+      <button class="btn ghost" id="pref-topics">All topics</button>
+      <button class="btn warm" id="pref-go">${T.intro?"Now the grown-up version →":"Begin the course →"}</button>
+    </div>
+  </section>`;
+  if (P.anim) mountAnim(P.anim, {zoom:true});
+  $("#pref-topics").onclick = ()=>{ location.hash = "#/topics"; };
+  $("#pref-go").onclick = ()=>{ _introStop&&_introStop(); stopCardAudio(); cancelVoice();
+                                PREFACE_SEEN.add(tid); openTopic(tid); };
+  const pb = $("#prefplay");
+  if (pb) pb.onclick = ()=> speakIntro(P, pb);
+}
+
 function viewIntro(tid){
   const I = T.intro; if(!I){ return viewTopic(tid); }
   renderLadder("__intro__");
@@ -1078,6 +1117,11 @@ function renderLadder(curId){
     /* Intro rung (2026-08-08): the opening is shown automatically on a first visit, but a
        student who wants to re-read why the subject matters should not have to reset progress
        to get it back. Same reasoning as the certificate rung. */
+    (T.preface
+      ? `<button class="rung ${curId==="__preface__"?"active":""}" id="pref-rung"><span class="dot">◔</span>
+           <span><span class="rt">Start here</span><br>
+           <span class="rp">the idea, in plain words</span></span></button>`
+      : "") +
     (T.intro
       ? `<button class="rung ${curId==="__intro__"?"active":""}" id="intro-rung"><span class="dot">✦</span>
            <span><span class="rt">Why this matters</span><br>
@@ -1111,6 +1155,7 @@ function renderLadder(curId){
       : "");
   const rr2=$("#review-rung"); if(rr2) rr2.onclick=()=>{stopCardAudio(); viewReview(T.id);};
   const cr=$("#cert-rung"); if(cr) cr.onclick=()=>{stopCardAudio(); viewCertificate(T.id);};
+  const pr=$("#pref-rung"); if(pr) pr.onclick=()=>{stopCardAudio(); viewPreface(T.id);};
   const ir=$("#intro-rung"); if(ir) ir.onclick=()=>{stopCardAudio(); viewIntro(T.id);};
   $("#back").onclick=()=>{stopCardAudio(); viewDash();};
   $("#ladder").querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
@@ -3711,6 +3756,194 @@ ANIMS.phys_impulse=async(cv,ctx)=>{
   await tween(1700,k=>phys_impScene(ctx,cv,{nRev:1,peakN:true,wRev:k}));
   await narrate("Same Δp, roughly one-fifth the peak force. Crumple zones, helmets, bending your knees on landing — all the very same theorem.");
   phys_impScene(ctx,cv,{nRev:1,wRev:1,peakN:true,peakW:true,eq:true});
+};
+})();
+/* quantum / qm_preface — water waves cancelling, then the same picture for a quantum outcome */
+(function(){
+const QP={water:"#6FA8DC", crest:"#8FC4E8", trough:"#3E6A8E", flat:"#5FBF95",
+          txt:"#D7DFEA", dim:"#8496AB", rock:"#C08A5A", warn:"#D46A62"};
+
+function qpWave(ctx,x0,x1,yMid,amp,phase,col,lw){
+  ctx.strokeStyle=col; ctx.lineWidth=lw||2; ctx.beginPath();
+  for(let x=x0;x<=x1;x+=3){
+    const y=yMid+amp*Math.sin((x-x0)/26+phase);
+    x===x0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+function qpDrop(ctx,x,y,r,col){
+  ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+}
+
+/* st: {drop2, cancel, quantum} — 0..1 knobs, every frame a pure function of them */
+function qpScene(ctx,cv,st){
+  clear(ctx,cv);
+  const {drop2=0, cancel=0, quantum=0}=st;
+  const yA=110, yB=178, yC=262, x0=150, x1=760;
+
+  _t(ctx,cv.width/2,30, quantum ? "Now the same trick, with a particle"
+                                : "Two waves meeting in a pond",
+     {size:17,bold:true,align:"center"});
+
+  /* wave one — always there */
+  qpDrop(ctx,110,yA,7,QP.rock);
+  _t(ctx,64,yA+5,"drop 1",{col:QP.dim,size:12});
+  qpWave(ctx,x0,x1,yA,20,0,QP.crest,2.4);
+
+  /* wave two — arrives, and can be upside down */
+  if(drop2>0){
+    qpDrop(ctx,110,yB,7,QP.rock);
+    _t(ctx,64,yB+5,"drop 2",{col:QP.dim,size:12});
+    const flip = cancel>0 ? Math.PI : 0;
+    qpWave(ctx,x0,x0+(x1-x0)*drop2,yB,20,flip,cancel>0?QP.trough:QP.crest,2.4);
+    if(cancel>0) _t(ctx,x1+8,yB+5,"upside down",{col:QP.trough,size:12});
+  }
+
+  /* the sum */
+  if(drop2>=1){
+    _t(ctx,64,yC+5,"together",{col:QP.dim,size:12});
+    if(cancel>0){
+      const amp=20*(1-cancel);
+      qpWave(ctx,x0,x1,yC,amp,0,cancel>=1?QP.flat:QP.crest,cancel>=1?3:2.4);
+      if(cancel>=1){
+        _t(ctx,cv.width/2,yC-26,"flat — the water is still",
+           {align:"center",col:QP.flat,size:15,bold:true});
+      }
+    } else {
+      qpWave(ctx,x0,x1,yC,40,0,QP.crest,3);
+      _t(ctx,cv.width/2,yC-46,"twice as big",{align:"center",col:QP.crest,size:15,bold:true});
+    }
+  }
+
+  /* the punchline, once the pond has made the point */
+  if(quantum>0){
+    ctx.fillStyle="rgba(20,26,34,0.86)"; ctx.fillRect(0,300,cv.width,80);
+    _t(ctx,cv.width/2,326,
+       "A particle can arrive by two routes — and the routes can cancel, exactly like this.",
+       {align:"center",col:QP.txt,size:15,bold:true});
+    _t(ctx,cv.width/2,350,
+       "Two ways of getting somewhere, and it never gets there. Nothing you can throw or roll does that.",
+       {align:"center",col:QP.dim,size:13});
+  } else {
+    _t(ctx,cv.width/2,352,
+       "Waves can add up — or wipe each other out completely.",
+       {align:"center",col:QP.dim,size:13});
+  }
+}
+
+ANIMS.qm_preface_static=(cv,ctx)=>qpScene(ctx,cv,{drop2:1,cancel:1,quantum:1});
+ANIMS.qm_preface=async(cv,ctx)=>{
+  qpScene(ctx,cv,{});
+  await narrate("Drop a stone in a pond and ripples spread out. Now drop a second stone nearby, and the two sets of ripples meet.");
+  await tween(1400,k=>qpScene(ctx,cv,{drop2:k}));
+  await narrate("Where two crests meet, the wave gets taller — twice as big. That part feels obvious.");
+  await tween(1200,k=>qpScene(ctx,cv,{drop2:1,cancel:k}));
+  await narrate("But if one wave arrives upside down — a dip exactly where the other has a bump — they cancel. Two waves arrive, and the water goes perfectly flat. Not smaller. Flat.");
+  await tween(900,k=>qpScene(ctx,cv,{drop2:1,cancel:1,quantum:k}));
+  await narrate("Here is the strange part. A single particle, one at a time, can do this too. It can have two possible routes to the same place, and those routes can cancel — so it never arrives there at all. Two ways of getting somewhere, and it gets there never. A thrown ball cannot do that, and no ordinary object can. That is where quantum physics starts, and a quantum computer is a machine built to arrange those cancellations on purpose.");
+  qpScene(ctx,cv,{drop2:1,cancel:1,quantum:1});
+};
+})();
+/* quantum / qm_interference — c02: two amplitudes cancelling, against the classical rule */
+(function(){
+const QI={axis:"#8496AB", pos:"#6FA8DC", neg:"#D46A62", ok:"#5FBF95", dim:"#8496AB",
+          txt:"#D7DFEA", bar:"#E8A13C"};
+const QI_UNIT=150;                       // px per unit of amplitude
+const QI_CX=300, QI_AX=250;              // left panel centre, right panel axis x
+
+function qiArrow(ctx,x0,y,dx,col,lw){
+  if(Math.abs(dx)<0.6) return;
+  const x1=x0+dx, s=Math.sign(dx);
+  ctx.strokeStyle=col; ctx.lineWidth=lw||3; ctx.beginPath();
+  ctx.moveTo(x0,y); ctx.lineTo(x1-s*7,y); ctx.stroke();
+  ctx.fillStyle=col; ctx.beginPath();
+  ctx.moveTo(x1,y); ctx.lineTo(x1-s*9,y-5); ctx.lineTo(x1-s*9,y+5); ctx.closePath(); ctx.fill();
+}
+function qiAxis(ctx,x,y,half){
+  ctx.strokeStyle=QI.axis; ctx.lineWidth=1; ctx.beginPath();
+  ctx.moveTo(x-half,y); ctx.lineTo(x+half,y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,y-6); ctx.lineTo(x,y+6); ctx.stroke();
+  _t(ctx,x,y+20,"0",{align:"center",col:QI.dim,size:12});
+}
+
+/* st: {join, sq, classical, same}  — every stage is a pure function of these 0..1 knobs */
+function qiScene(ctx,cv,st){
+  clear(ctx,cv);
+  const {join=0, sq=0, classical=0, same=0}=st;
+  _t(ctx,cv.width/2,30,"Two paths to the same outcome",{size:17,bold:true,align:"center"});
+
+  const a1=0.5, a2=same?0.5:-0.5;                 // amplitudes; `same` flips path 2 to +½
+  const y1=96, y2=150, yR=232;
+
+  /* ── the two contributing amplitudes, drawn from a common origin ── */
+  qiAxis(ctx,QI_AX,y1,200); qiAxis(ctx,QI_AX,y2,200);
+  qiArrow(ctx,QI_AX,y1,a1*QI_UNIT,QI.pos);
+  qiArrow(ctx,QI_AX,y2,a2*QI_UNIT,a2<0?QI.neg:QI.pos);
+  _t(ctx,60,y1+5,"path 1",{col:QI.dim,size:13});
+  _t(ctx,60,y2+5,"path 2",{col:QI.dim,size:13});
+  _t(ctx,QI_AX+a1*QI_UNIT+14,y1+5,"+½",{col:QI.pos,size:14,bold:true});
+  _t(ctx,QI_AX+a2*QI_UNIT+(a2<0?-30:14),y2+5,same?"+½":"−½",{col:a2<0?QI.neg:QI.pos,size:14,bold:true});
+
+  /* ── head-to-tail sum: path 2 slides onto the tip of path 1 ── */
+  const sum=a1+a2;
+  qiAxis(ctx,QI_AX,yR,200);
+  _t(ctx,60,yR+5,"sum",{col:QI.dim,size:13});
+  if(join>0){
+    qiArrow(ctx,QI_AX,yR,a1*QI_UNIT,QI.pos,3);
+    const tail=QI_AX+a1*QI_UNIT;
+    qiArrow(ctx,tail,yR,a2*QI_UNIT*join,a2<0?QI.neg:QI.pos,3);
+  }
+  if(join>=1){
+    const end=QI_AX+sum*QI_UNIT;
+    if(Math.abs(sum)<1e-9){
+      ctx.strokeStyle=QI.ok; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.arc(QI_AX,yR,9,0,Math.PI*2); ctx.stroke();
+      _t(ctx,QI_AX,yR-20,"0",{align:"center",col:QI.ok,size:15,bold:true});
+    } else {
+      qiArrow(ctx,QI_AX,yR+26,sum*QI_UNIT,QI.ok,4);
+      _t(ctx,end+14,yR+31,"+1",{col:QI.ok,size:14,bold:true});
+    }
+  }
+
+  /* ── the probability read-out ── */
+  if(sq>0){
+    const p=sum*sum, w=p*QI_UNIT*1.4;
+    _t(ctx,620,96,"probability = |sum|²",{size:14,bold:true,col:QI.txt});
+    ctx.strokeStyle=QI.axis; ctx.lineWidth=1; ctx.strokeRect(620,112,QI_UNIT*1.4,26);
+    if(w>0.5){ ctx.fillStyle=QI.bar; ctx.fillRect(620,112,w*sq,26); }
+    _t(ctx,620,160,`|${sum===0?"0":"1"}|² = ${p.toFixed(0)}`,
+       {size:15,bold:true,col:sum===0?QI.ok:QI.bar});
+    if(sum===0) _t(ctx,620,182,"the outcome never happens",{size:13,col:QI.ok});
+  }
+
+  /* ── the classical comparison, for contrast ── */
+  if(classical>0){
+    _t(ctx,620,232,"classically:",{size:13,col:QI.dim});
+    _t(ctx,620,254,"|+½|² + |−½|² = ½",{size:15,bold:true,col:QI.dim});
+    ctx.strokeStyle=QI.neg; ctx.lineWidth=2; ctx.beginPath();
+    ctx.moveTo(616,248); ctx.lineTo(616+150*classical,248); ctx.stroke();
+    _t(ctx,620,276,"two routes can only ADD",{size:12,col:QI.dim});
+  }
+  _t(ctx,cv.width/2,352,
+     same?"Same sign: the amplitudes reinforce — probability 1."
+         :"Opposite signs: the amplitudes cancel — probability 0.",
+     {align:"center",col:QI.dim,size:13});
+}
+
+ANIMS.qm_interference_static=(cv,ctx)=>qiScene(ctx,cv,{join:1,sq:1,classical:1});
+ANIMS.qm_interference=async(cv,ctx)=>{
+  qiScene(ctx,cv,{});
+  await narrate("Two paths lead to the same outcome. The first carries amplitude plus one half. The second carries minus one half — same size, opposite sign.");
+  await tween(1200,k=>qiScene(ctx,cv,{join:k}));
+  await narrate("To get the probability you add the amplitudes first, head to tail. Plus one half and minus one half bring you exactly back to zero.");
+  await tween(700,k=>qiScene(ctx,cv,{join:1,sq:k}));
+  await narrate("Square that sum and the probability is zero. Two ways of arriving, and the outcome never happens at all.");
+  await tween(900,k=>qiScene(ctx,cv,{join:1,sq:1,classical:k}));
+  await narrate("Classically this is impossible. Squaring each path separately gives one half — adding a second route can only make an outcome more likely, never less. That gap is the whole resource a quantum computer spends.");
+  await tween(900,k=>qiScene(ctx,cv,{join:k,sq:0,same:1}));
+  await tween(600,k=>qiScene(ctx,cv,{join:1,sq:k,same:1}));
+  await narrate("Flip the sign of the second path and the same two amplitudes now reinforce, giving probability one. Every quantum algorithm is this choice, made deliberately: cancel the wrong answers, reinforce the right one.");
+  qiScene(ctx,cv,{join:1,sq:1,same:1});
 };
 })();
 /* newtonian-physics / phys_slides */

@@ -1,7 +1,7 @@
 # Learn
 
 Mastery-based learning dashboard. Multi-user, extensible to any topic, all data local.
-A growing library: **22 topics across 5 categories** (Investing & Finance · AI & Machine Learning · Health & Medicine · Mathematics · Physics & Engineering) — **195 gated concepts, 664 checkpoint questions, and every concept carrying an animated, voice-narrated canvas** (192 distinct animations; Kokoro TTS). Started as a single Bayesian-Inference topic and generalized to any subject — drop a JSON pack in `topics/` and it appears on the dashboard. (The managed service runs on `:8801`; the `--port 8090` below is the manual-run example.)
+A growing library: **24 topics across 8 categories** (Investing & Finance · AI & Machine Learning · Health & Medicine · Mathematics · Physics & Engineering · Physiology · Molecular Biology · Statistics) — **216 gated concepts and 730 checkpoint questions**, with **203 of 216 concepts carrying an animated, voice-narrated canvas** (196 distinct animations in use, 393 registered; Kokoro TTS). Every topic opens with a **preface** written for a curious twelve-year-old, then an intro for the adult reader. Started as a single Bayesian-Inference topic and generalized to any subject — drop a JSON pack in `topics/` and it appears on the dashboard. (The managed service runs on `:8801`; the `--port 8090` below is the manual-run example.)
 
 ## Run
 
@@ -54,6 +54,30 @@ server-side too — the API refuses to serve a locked concept.
   topic, the interface demonstrates the subject on the learner themselves.
 
 ## Adding topic #2 … #100
+
+### The preface (2026-08-12)
+
+Every pack opens with a `preface` before the `intro`. They are different jobs and should not be
+merged: the **intro** argues why a subject deserves an adult's time; the **preface** makes the
+central idea land at all, for a curious and inquisitive twelve-year-old, using only what that
+reader already has. One concrete image, no jargon, no formula.
+
+```json
+"preface": {
+  "hook":   "one line that has to earn the next thirty seconds (< 200 chars)",
+  "anim":   "optional; must already be registered in static/index.html",
+  "body":   ["up to 6 short paragraphs"],
+  "aha":    [{"title": "...", "text": "..."}],   // 1-3 takeaway cards
+  "closer": "one line"
+}
+```
+
+`validate_pack.py` gates it the same way it gates the intro, plus two checks specific to this
+audience: the average sentence must stay at or under **26 words** and no single sentence may
+exceed **48**, because sentence length is where an explanation stops reading as plain speech.
+Jargon cannot be checked automatically — that part is on the author.
+
+Measured across the 24 shipped prefaces: average sentence **14.2 words**, longest **39**.
 
 Copy `topics/bayesian-inference.json` as a template. Schema per concept:
 

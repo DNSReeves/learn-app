@@ -1,5 +1,27 @@
 # Animation backlog — P1.3 coverage pass (2026-07-25, iss_eb4f851e)
 
+> ## ▶ REOPENED (2026-08-12) — coverage is no longer 100%, and the block below is now historical
+> Two additions since that block was written, and the honest numbers have moved:
+>
+> - **Concepts: 203 of 216 animated (94%).** The library grew from 195 to 216 concepts. The new
+>   `quantum` topic ships 1 of 9 animated (`qm_interference` — two amplitudes cancelling); the
+>   other 8 have none. `exercise-physiology` still carries 5 without, unchanged from before.
+> - **Prefaces: 1 of 24 animated.** Every topic now opens with a preface for a twelve-year-old
+>   reader. Only `quantum` has a bespoke visual (`qm_preface` — two pond ripples cancelling to
+>   flat). The other 23 are text-only.
+>
+> **Do not reuse an existing concept animation for a preface.** They are narrated for an adult
+> reader and break the register in the first sentence. A preface visual needs its own scene and
+> its own script.
+>
+> **Verification note.** `tests/verify_anim.js` drives the quantum animations against a recording
+> 2-D context and asserts geometry, stage sequence, finite coordinates and — for the preface —
+> that no jargon reaches the screen. It cannot check that anything *looks* right; that still needs
+> a human with a browser. Any new animation should get the same treatment plus an actual look.
+>
+> Remaining, in the order worth doing: `quantum` c04 (Bloch sphere), c05 (entanglement
+> correlations), c08 (Grover rotation); then preface visuals for the highest-traffic topics.
+
 > ## ▶▶ COMPLETE (2026-08-01) — 100% VISUAL COVERAGE
 > The batch-2 visual-aids programme closed this backlog out. **Every one of the 195 concepts now carries a bespoke animated, voice-narrated canvas (192 distinct animations) — coverage 100%.** The final push added **73 animations** across Mathematics, AI/ML, Investing & Finance, Health & Medicine, Physics, and Genetics, built by parallel authoring agents (fragment-author → merge-verify) and browser-verified (static frames paint + runners play, 0 page errors) before each commit. The declarative-vs-imperative decision record below stays the standing build guidance. The status block that follows is the earlier (64%) snapshot, kept for history.
 

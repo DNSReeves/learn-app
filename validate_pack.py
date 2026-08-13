@@ -72,6 +72,66 @@ def _regex_issue(pat) -> str | None:
     return None
 
 
+def _check_preface(pack):
+    """The optional `preface` — the subject explained to a curious twelve-year-old, shown BEFORE
+    the intro (operator, 2026-08-12).
+
+    It is not a shorter intro. The intro argues why a subject deserves an adult's attention; the
+    preface makes the central idea land at all, using only what a twelve-year-old already has.
+    That difference is what these checks defend:
+
+      · no jargon gate can be automated, but LENGTH can — long sentences are where explanations
+        stop being readable at that age, so the average is capped;
+      · `aha` cards are the memorable takeaways and are capped at 3, because four is a lecture;
+      · `anim`, as with the intro, must already be registered in index.html.
+
+    Optional, strict once present — same rule as the intro. A half-built preface is the first
+    thing a student ever sees.
+    """
+    pref = pack.get("preface")
+    if pref is None:
+        return
+    if not isinstance(pref, dict):
+        err("preface must be an object")
+        return
+    hook = pref.get("hook")
+    if not isinstance(hook, str) or not hook.strip():
+        err("preface: missing 'hook' — the one line that has to make a twelve-year-old curious")
+    elif len(hook) > 200:
+        err(f"preface: hook is {len(hook)} chars — keep it under 200; it is a hook, not a summary")
+    body = pref.get("body")
+    if not isinstance(body, list) or not body or not all(isinstance(x, str) and x.strip() for x in body):
+        err("preface: 'body' must be a non-empty list of non-empty paragraphs")
+    elif len(body) > 6:
+        err(f"preface: {len(body)} body paragraphs — 6 is the ceiling for this audience")
+    else:
+        import re as _re
+        sents = [t for para in body for t in _re.split(r"(?<=[.!?])\s+", para) if t.strip()]
+        if sents:
+            avg = sum(len(t.split()) for t in sents) / len(sents)
+            if avg > 26:
+                err(f"preface: average sentence is {avg:.0f} words — over 26 stops reading as "
+                    f"plain speech. Split the long ones.")
+            longest = max(sents, key=lambda t: len(t.split()))
+            if len(longest.split()) > 48:
+                err(f"preface: a {len(longest.split())}-word sentence — no twelve-year-old parses "
+                    f"that: {longest[:70]}…")
+    aha = pref.get("aha")
+    if aha is not None:
+        if not isinstance(aha, list) or not 1 <= len(aha) <= 3:
+            err("preface: 'aha' must be a list of 1-3 {title, text} cards — four is a lecture")
+        else:
+            for i, a in enumerate(aha):
+                if not isinstance(a, dict) or not a.get("title") or not a.get("text"):
+                    err(f"preface: aha[{i}] needs a non-empty 'title' and 'text'")
+    anim = pref.get("anim")
+    if anim is not None and anim not in _ANIMS:
+        err(f"preface: anim '{anim}' is not registered in static/index.html "
+            f"(known: {', '.join(sorted(_ANIMS))})")
+    if pref.get("closer") is not None and not str(pref.get("closer")).strip():
+        err("preface: 'closer' must be a non-empty string when present")
+
+
 def _check_intro(pack):
     """The optional `intro` block — a motivating opening shown before concept 1.
 
@@ -129,6 +189,7 @@ def check(pack):
             err(f"pack missing '{k}'")
     if not re.fullmatch(r"[a-z0-9-]+", pack.get("id", "")):
         err("pack id must be a lowercase slug")
+    _check_preface(pack)
     _check_intro(pack)
     ids = set()
     for i, c in enumerate(pack.get("concepts", [])):
