@@ -3993,6 +3993,9 @@ function pref_newtonScene(ctx,cv,st){
     pkArrow(ctx,mx,my,cx+ (mx-cx)*0.45, cy+(my-cy)*0.45, PK.bad, 2.5);
     _t(ctx,mx+18,my-14,"falling",{col:PK.bad,size:12.5});
     pkArrow(ctx,mx,my,mx-Math.sin(a)*54,my+Math.cos(a)*54,PK.good,2.5);
+    _t(ctx,mx-Math.sin(a)*70,my+Math.cos(a)*70+4,"moving sideways",
+       {align:"center",col:PK.good,size:12.5,bold:true});
+    _t(ctx,mx-14,my+22,"Moon",{align:"center",col:PK.dim,size:12});
   }
 }
 ANIMS.pref_newtonian_physics_static=(cv,ctx)=>pref_newtonScene(ctx,cv,{roll:1,orbit:0.55});
@@ -4208,10 +4211,20 @@ function pref_romanScene(ctx,cv,st){
     _t(ctx,x+w*0.52,y-10,"crack",{col:PK.bad,size:13});
   }
   if(heal>0){
+    // The seal must travel the WHOLE crack by heal=1 — it previously stopped 40% down while a
+    // panel beside it announced "sealed".
     ctx.strokeStyle=PK.good; ctx.lineWidth=pkLerp(1,5,heal);
-    ctx.beginPath();
-    ctx.moveTo(x+w*0.42,y);
-    ctx.lineTo(x+w*0.47,y+h*0.4*heal);
+    const seg=[[0.42,0],[0.47,0.40],[0.40,0.72],[0.46,1.0]];
+    ctx.beginPath(); ctx.moveTo(x+w*seg[0][0],y);
+    for(let i=1;i<seg.length;i++){
+      const from=seg[i-1], to=seg[i];
+      if(heal>=to[1]){ ctx.lineTo(x+w*to[0], y+h*to[1]); }
+      else if(heal>from[1]){
+        const t=(heal-from[1])/(to[1]-from[1]);
+        ctx.lineTo(x+w*pkLerp(from[0],to[0],t), y+h*pkLerp(from[1],to[1],t));
+        break;
+      } else break;
+    }
     ctx.stroke();
     pkPanel(ctx,x+w+20,y+40,150,70, heal>=1?"sealed":"sealing…", PK.good);
   }
@@ -4373,11 +4386,11 @@ function pref_exScene(ctx,cv,st){
   const {t=0}=st;
   pkFrame(ctx,cv,"Break it slightly. The repair overshoots.",
     "The gain happens while you rest — not while you train.");
-  const x0=140, x1=830, base=280, top=110;
+  const x0=140, x1=830, base=306, top=96;
   ctx.strokeStyle=PK.line; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(x0,base); ctx.lineTo(x1,base); ctx.stroke();
   // the starting level, as a reference line
-  const y0=base-70;
+  const y0=base-96;
   ctx.strokeStyle="rgba(132,150,171,0.6)"; ctx.setLineWidth&&0;
   ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
   _t(ctx,x0-10,y0+5,"before",{align:"right",col:PK.dim,size:12.5});
@@ -4387,8 +4400,8 @@ function pref_exScene(ctx,cv,st){
     const u=i/100;
     let v;
     if(u<0.12) v=0;
-    else if(u<0.30) v=-38*((u-0.12)/0.18);
-    else v=-38*Math.exp(-(u-0.30)*7) + 34*(1-Math.exp(-(u-0.30)*4.2));
+    else if(u<0.30) v=-62*((u-0.12)/0.18);          // a deeper dip, so the cost is visible
+    else v=-62*Math.exp(-(u-0.30)*7) + 56*(1-Math.exp(-(u-0.30)*4.2));
     pts.push([x0+(x1-x0)*u, y0-v]);
   }
   pkPath(ctx,pts,PK.a,3,t);
@@ -4423,9 +4436,11 @@ function pref_nutScene(ctx,cv,st){
     pkBar(ctx,300,266,380,lose,PK.a,"weight lost","");
     ctx.fillStyle=PK.bad;
     ctx.fillRect(300+380*lose*(1-train*0.75),266,380*lose*train*0.75,26);
-    _t(ctx,300,314,train>0.6 ? "with training, most of the loss is fat, not muscle"
-                             : "without it, a large share is muscle",
-       {col:train>0.6?PK.good:PK.bad,size:13.5,bold:true});
+    _t(ctx,300,314,"■ fat",{col:PK.bad,size:13,bold:true});
+    _t(ctx,360,314,"■ muscle",{col:PK.a,size:13,bold:true});
+    _t(ctx,450,314,train>0.6 ? "— with training, most of the loss is fat"
+                             : "— without it, a large share is muscle",
+       {col:train>0.6?PK.good:PK.bad,size:13,bold:true});
   }
 }
 ANIMS.pref_nutrition_exercise_static=(cv,ctx)=>pref_nutScene(ctx,cv,{split:1,train:1});
@@ -4447,13 +4462,14 @@ function pref_llmScene(ctx,cv,st){
             : "Do that a trillion times and something strange starts happening.");
   _t(ctx,150,140,"The capital of France is",{size:22,col:PK.ink});
   const opts=[["Paris",0.91,PK.good],["Lyon",0.04,PK.dim],["Berlin",0.03,PK.dim],["cheese",0.02,PK.dim]];
+  // bars start higher so the panel below cannot reach them
   opts.forEach(([w,p,col],i)=>{
     if(guess<=0) return;
-    const y=182+i*34;
+    const y=172+i*30;
     pkBar(ctx,470,y-18,300,p*guess,col,w,(p*100).toFixed(0)+"%");
   });
   if(wrong>0){
-    pkPanel(ctx,150,272,660,58,
+    pkPanel(ctx,150,300,660,46,
       "Ask it something it never read, and it still answers — just as confidently.",PK.bad);
   }
 }
@@ -4480,7 +4496,7 @@ function pref_agentScene(ctx,cv,st){
   _t(ctx,235,148,"ask → answer",{align:"center",col:PK.a,size:13});
   _t(ctx,235,192,"then it stops",{align:"center",col:PK.dim,size:12.5});
   // right: the loop
-  _t(ctx,650,110,"agent",{align:"center",col:PK.dim,size:13.5});
+  _t(ctx,650,88,"agent",{align:"center",col:PK.dim,size:13.5});
   const steps=["think","act","look","again"];
   steps.forEach((s,i)=>{
     const a=-Math.PI/2 + i*Math.PI/2;
@@ -4627,7 +4643,7 @@ function pref_portScene(ctx,cv,st){
   for(let i=0;i<=120;i++){
     const u=i/120, x=x0+(x1-x0)*u;
     const a=Math.sin(u*11)*34 + Math.sin(u*3.1)*22;
-    const b=-a*0.78 + Math.sin(u*5.7)*9;
+    const b=-a*0.44 + Math.sin(u*6.3)*24 + Math.sin(u*2.4)*13;   // partial, not perfect
     A.push([x,mid-a]); B.push([x,mid-b]); S.push([x,mid-(a+b)/2]);
   }
   pkPath(ctx,A,PK.a,2.4);
@@ -4671,16 +4687,20 @@ function pref_fundScene(ctx,cv,st){
     const pts=[];
     for(let i=0;i<=120;i++){
       const u=i/120;
-      pts.push([x0+(x1-x0)*u, mid - (Math.sin(u*7.3)*74 + Math.sin(u*2.1)*46)]);
+      pts.push([x0+(x1-x0)*u, mid - (84*Math.sin(u*5.6+0.35) - 14)]);
     }
     pkPath(ctx,pts,PK.b,2.6,price);
     _t(ctx,x0+16,88,"price, as other people feel about it",{col:PK.b,size:13});
     if(buy>0){
-      // mark the cheap stretches
-      for(let i=0;i<=120;i+=2){
-        const u=i/120, y=mid-(Math.sin(u*7.3)*74+Math.sin(u*2.1)*46);
-        if(y>mid+50){ ctx.fillStyle=PK.good;
-          ctx.beginPath(); ctx.arc(x0+(x1-x0)*u,y,3.6,0,Math.PI*2); ctx.fill(); }
+      // Shade the stretches where price sits BELOW the value band. Dots on the line were hidden
+      // beneath the line itself — the callout named something invisible.
+      for(let i=0;i<120;i++){
+        const u=i/120, u2=(i+1)/120;
+        const y=mid-(84*Math.sin(u*5.6+0.35) - 14);
+        if(y>mid+46){
+          ctx.fillStyle="rgba(95,191,149,0.30)";
+          ctx.fillRect(x0+(x1-x0)*u, mid+46, (x1-x0)/120+1, y-(mid+46));
+        }
       }
       _t(ctx,(x0+x1)/2,332,"these stretches — cheap enough to be wrong and still fine",
          {align:"center",col:PK.good,size:13.5,bold:true});
@@ -4706,9 +4726,12 @@ function pref_taScene(ctx,cv,st){
   pkFrame(ctx,cv,"One of these is a real market. One is coin flips.",
     reveal>0 ? "Your eyes cannot tell. That is the trap at the centre of the subject."
              : "Both have trends, reversals and levels that look obvious.");
-  const mk=(seed)=>{ let v=0, out=[]; for(let i=0;i<=110;i++){
-      v += Math.sin(i*seed)*3.1 + Math.cos(i*seed*0.37)*2.4; out.push(v); } return out; };
-  [[220,mk(1.13),PK.a],[660,mk(2.71),PK.b]].forEach(([cx,ser,col])=>{
+  // Identical frequency content, different phase — so the two really are indistinguishable,
+  // which is what the caption claims. Different frequencies made them obviously different.
+  const mk=(ph)=>{ let v=0, out=[]; for(let i=0;i<=110;i++){
+      v += Math.sin(i*0.93+ph)*3.0 + Math.cos(i*0.41+ph*1.6)*2.3 + Math.sin(i*1.9+ph*0.7)*1.5;
+      out.push(v); } return out; };
+  [[220,mk(0.0),PK.a],[660,mk(2.2),PK.b]].forEach(([cx,ser,col])=>{
     const x0=cx-180, w=360, base=210, sc=1.5;
     const pts=ser.map((v,i)=>[x0+w*(i/110), base - v*sc]);
     pkPath(ctx,pts,col,2.2,draw);
@@ -4750,7 +4773,7 @@ function pref_optScene(ctx,cv,st){
     pts.push([x,y]);
   }
   pkPath(ctx,pts,PK.good,3.2,payoff);
-  if(payoff>0.4) _t(ctx,x0+20,base+cost+22,"you walk away — you lose the five dollars",
+  if(payoff>0.4) _t(ctx,x0+20,base-16,"you walk away — you lose the five dollars",
                     {col:PK.bad,size:12.5});
   if(payoff>=1) _t(ctx,x1-10,150,"upside, open-ended",{align:"right",col:PK.good,size:13.5,bold:true});
   if(decay>0){
