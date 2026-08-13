@@ -125,6 +125,22 @@ Animations live in `static/index.html` under `ANIMS` (canvas draw + narration sc
 via the Web Speech API — audio works offline, mute toggle included, respects
 `prefers-reduced-motion`). Add a new `ANIMS.yourkey` and reference it from a pack.
 
+### Animations: render before you call it done
+
+Full authoring steps and the defect taxonomy are in `ANIMATION_BACKLOG.md`. The short version:
+
+```bash
+node tests/preface_anims.test.js                      # geometry: finite coords, non-blank, no jargon
+python3 tools/render_anim.py <anim_name> /tmp/shots   # render in real Chromium — then LOOK at it
+python3 tools/contact_sheet.py /tmp/shots /tmp/sheet.png   # all of them on one page
+```
+
+The geometry checks establish that a drawing is **well-formed**. They cannot establish that it is
+**true** — whether two elements overlap, whether a picture of a ratio shows the right ratio, or
+whether a caption describes something the picture actually contains. Measured 2026-08-13: **17
+defects across 25 animations**, every one invisible to the automated checks, which passed
+throughout. Three of them were captions naming a region that was never drawn.
+
 ## Data & privacy
 
 Everything lives in one SQLite file you control. Passwords are PBKDF2-SHA256
